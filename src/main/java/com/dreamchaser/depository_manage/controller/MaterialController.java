@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.Map;
 
 /**
- * @author Dreamchaser
  */
 @RestController
 public class MaterialController {

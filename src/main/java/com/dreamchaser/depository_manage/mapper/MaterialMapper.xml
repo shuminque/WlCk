@@ -12,11 +12,13 @@
         <result column="quantity" property="quantity" jdbcType="VARCHAR" />
         <result column="price" property="price" jdbcType="VARCHAR" />
         <result column="type_id" property="typeId" jdbcType="INTEGER" />
+        <result column="state_id" property="stateId" jdbcType="INTEGER" />
+        <result column="engin_id" property="enginId" jdbcType="INTEGER" />
     </resultMap>
 
     <!-- 表查询字段 -->
     <sql id="allColumns">
-        m.id, m.depository_id, m.mname, m.quantity, m.price, m.type_id
+        m.id, m.depository_id, m.mname, m.quantity, m.price, m.type_id, m.state_id, m.engin_id
     </sql>
 
     <!-- 查询所有数据的条数 -->
@@ -45,6 +47,12 @@
         </if>
         <if test="typeId != null">
             AND m.type_id = #{typeId}
+        </if>
+        <if test="stateId != null">
+            AND m.state_id = #{stateId}
+        </if>
+        <if test="enginId != null">
+            AND m.engin_id = #{enginId}
         </if>
     </select>
 
@@ -75,6 +83,12 @@
         <if test="typeId != null">
             AND m.type_id = #{typeId}
         </if>
+        <if test="stateId != null">
+            AND m.state_id = #{stateId}
+        </if>
+        <if test="enginId != null">
+            AND m.engin_id = #{enginId}
+        </if>
         <if test="begin != null and size != null">
             LIMIT #{begin},#{size}
         </if>
@@ -100,21 +114,23 @@
     <!-- 插入数据 -->
     <insert id="insertMaterial" parameterType="map">
         INSERT INTO material (
-            id, depository_id, mname, quantity, price, type_id
+            id, depository_id, mname, quantity, price, type_id, state_id, enign_id
         ) VALUES (
             #{id},
             #{depositoryId},
             #{mname},
             #{quantity},
             #{price},
-            #{typeId}
+            #{typeId},
+            #{stateId},
+            #{enignId}
         )
     </insert>
 
     <!-- 批量插入数据 -->
     <insert id="insertMaterials" parameterType="list">
         INSERT INTO material (
-            id, depository_id, mname, quantity, price, type_id
+            id, depository_id, mname, quantity, price, type_id, state_id, enign_id
         ) VALUES
         <foreach collection="list" index="index" item="item" separator=",">
             (
@@ -123,7 +139,9 @@
                 #{item.mname},
                 #{item.quantity},
                 #{item.price},
-                #{item.typeId}
+                #{item.typeId},
+                #{stateId},
+                #{enignId}
             )
         </foreach>
     </insert>
@@ -146,6 +164,12 @@
             </if>
             <if test="typeId != null">
                 type_id = #{typeId}
+            </if>
+            <if test="stateId != null">
+                state_id = #{stateId}
+            </if>
+            <if test="enginId != null">
+                engin_id = #{enginId}
             </if>
         </set>
         WHERE id = #{id}
@@ -197,6 +221,12 @@
                 </if>
                 <if test="item.typeId != null">
                     type_id = #{item.typeId}
+                </if>
+                <if test="item.stateId != null">
+                    state_id = #{item.stateId}
+                </if>
+                <if test="item.enginId != null">
+                    engin_id = #{item.enginId}
                 </if>
             </set>
             WHERE id = #{item.id}

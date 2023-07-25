@@ -4,8 +4,6 @@ import lombok.Data;
 
 /**
  * 产品信息记录（库存）(material)
- * @author Dreamchaser
- * @version 1.0.0 2021-05-20
  */
 @Data
 public class Material {
@@ -29,4 +27,10 @@ public class Material {
 
     /** 材料种类id */
     private Integer typeId;
+
+    /**材料状态id*/
+    private Integer stateId;
+
+    /**工程名称id*/
+    private Integer enginId;
 }

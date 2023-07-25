@@ -3,10 +3,7 @@ package com.dreamchaser.depository_manage.controller;
 import com.dreamchaser.depository_manage.exception.MyException;
 import com.dreamchaser.depository_manage.pojo.DepositoryRecordP;
 import com.dreamchaser.depository_manage.security.bean.UserToken;
-import com.dreamchaser.depository_manage.service.DepositoryRecordService;
-import com.dreamchaser.depository_manage.service.DepositoryService;
-import com.dreamchaser.depository_manage.service.NoticeService;
-import com.dreamchaser.depository_manage.service.UserService;
+import com.dreamchaser.depository_manage.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -129,6 +126,7 @@ public class PageController {
         ModelAndView mv = new ModelAndView();
         mv.setViewName("pages/depository/table-stock");
         mv.addObject("depositories", depositoryService.findDepositoryAll());
+
         return mv;
     }
 

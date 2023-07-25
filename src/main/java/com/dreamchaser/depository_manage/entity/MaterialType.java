@@ -1,5 +1,7 @@
 package com.dreamchaser.depository_manage.entity;
 
+import lombok.Data;
+
 /**
  * material_type
  * 

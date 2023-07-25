@@ -2,9 +2,7 @@ package com.dreamchaser.depository_manage.service.impl;
 
 import com.dreamchaser.depository_manage.entity.DepositoryRecord;
 import com.dreamchaser.depository_manage.entity.Material;
-import com.dreamchaser.depository_manage.mapper.DepositoryMapper;
-import com.dreamchaser.depository_manage.mapper.MaterialMapper;
-import com.dreamchaser.depository_manage.mapper.MaterialTypeMapper;
+import com.dreamchaser.depository_manage.mapper.*;
 import com.dreamchaser.depository_manage.pojo.DepositoryRecordP;
 import com.dreamchaser.depository_manage.pojo.MaterialP;
 import com.dreamchaser.depository_manage.service.MaterialService;
@@ -27,6 +25,11 @@ public class MaterialServiceImpl implements MaterialService {
     DepositoryMapper depositoryMapper;
     @Autowired
     MaterialTypeMapper materialTypeMapper;
+    @Autowired
+    MaterialStateMapper materialStateMapper;
+    @Autowired
+    MaterialEnginMapper materialEnginMapper;
+
     @Override
     public Integer insertMaterial(Map<String, Object> map) {
         return materialMapper.insertMaterial(map);
@@ -94,6 +97,8 @@ public class MaterialServiceImpl implements MaterialService {
             MaterialP m=new MaterialP(material);
             m.setDepositoryName(depositoryMapper.findDepositoryNameById(material.getDepositoryId()));
             m.setTypeName(materialTypeMapper.findMaterialTypeNameById(material.getTypeId()));
+            m.setStateName(materialStateMapper.findMaterialStateNameById(material.getStateId()));
+            m.setEnginName(materialEnginMapper.findMaterialEnginNameById(material.getEnginId()));
             result.add(m);
         }
         return result;

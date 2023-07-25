@@ -8,7 +8,6 @@ import org.springframework.stereotype.Service;
 import java.util.Map;
 
 /**
- * @author 金昊霖
  */
 @Service
 public class MaterialTypeServiceImpl implements MaterialTypeService {

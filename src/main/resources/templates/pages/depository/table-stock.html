@@ -33,6 +33,7 @@
                             </div>
                         </div>
 
+
                         <div class="layui-inline">
                             <button type="submit" class="layui-btn layui-btn-primary" lay-submit
                                     lay-filter="data-search-btn"><i class="layui-icon"></i> 搜 索
@@ -78,12 +79,14 @@
             },
             toolbar: ['filter', 'exports', 'print'],
             cols: [ [
-                {field: 'id', width: '16%', title: '材料编号'},
-                {field: 'mname', width: '16%', title: '材料名称'},
-                {field: 'typeName', width: '16%', title: '材料类型'},
-                {field: 'depositoryName', width: '16%', title: '仓库名称', sort: true},
-                {field: 'quantity', width: '16%', title: '数量', sort: true},
-                {field: 'price', title: '金额', width: '20%', sort: true},
+                {field: 'id', width: '8%', title: 'AT号'},
+                {field: 'depositoryName', width: '12%', title: '厂区', sort: true},
+                {field: 'mname', width: '14%', title: '品名'},
+                {field: 'typeName', width: '18%', title: '材料类型'},
+                {field: 'enginName',title: '工程', width:'12%', sort: true },
+                {field: 'stateName',title: '状态', width:'16%', sort: true },
+                {field: 'price', title: '金额', width: '12%', sort: true},
+                {field: 'quantity', width: '8%', title: '数量', sort: true},
             ]],
             limits: [10, 15, 20, 25, 50],
             limit: 10,

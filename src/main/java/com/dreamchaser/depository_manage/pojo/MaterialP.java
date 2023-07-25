@@ -27,12 +27,19 @@ public class MaterialP {
     /** 材料种类名称 */
     private String typeName;
 
-    public MaterialP(Integer id, Integer depositoryId, String mname, Double quantity, Double price, String typeName) {
+    private String stateName;
+
+    private String enginName;
+
+    public MaterialP(Integer id, Integer depositoryId, String mname, Double quantity, Double price, String typeName,
+                     String stateName, String enginName) {
         this.id = id;
         this.mname = mname;
         this.quantity = quantity;
         this.price = price;
         this.typeName = typeName;
+        this.stateName =stateName;
+        this.enginName =enginName;
     }
     public MaterialP(Material material) {
         this.id = material.getId();

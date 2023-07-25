@@ -47,7 +47,7 @@ public class DepositoryRecordController {
         map.put("applicantId",userToken.getUser().getId());
         return CrudUtil.postHandle(depositoryRecordService.apply(map),1);
     }
-    @DeleteMapping("/deposito   ryRecord")
+    @DeleteMapping("/depositoryRecord")
     public RestResponse deleteDepositoryRecord(@RequestBody Map<String,Object> map){
         if (map.containsKey("id")){
             Integer id=ObjectFormatUtil.toInteger(map.get("id"));
