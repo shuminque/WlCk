@@ -1,0 +1,163 @@
+2023-07-21 08:02:13.085  INFO 7752 --- [main] com.dreamchaser.depository_manage.DepositoryManageApplication : Starting DepositoryManageApplication on queshumin-pc with PID 7752 (C:\Users\queshumin\Desktop\depository_manage-master\target\classes started by queshumin in C:\Users\queshumin\Desktop\depository_manage-master)
+2023-07-21 08:02:13.085  INFO 7752 --- [main] com.dreamchaser.depository_manage.DepositoryManageApplication : The following profiles are active: test
+2023-07-21 08:02:15.265  INFO 7752 --- [main] org.springframework.boot.web.embedded.tomcat.TomcatWebServer : Tomcat initialized with port(s): 8080 (http)
+2023-07-21 08:02:15.281  INFO 7752 --- [main] org.apache.catalina.core.StandardService : Starting service [Tomcat]
+2023-07-21 08:02:15.281  INFO 7752 --- [main] org.apache.catalina.core.StandardEngine : Starting Servlet engine: [Apache Tomcat/9.0.41]
+2023-07-21 08:02:15.281  INFO 7752 --- [main] org.apache.catalina.core.AprLifecycleListener : Loaded Apache Tomcat Native library [2.0.4] using APR version [1.7.4].
+2023-07-21 08:02:15.281  INFO 7752 --- [main] org.apache.catalina.core.AprLifecycleListener : APR capabilities: IPv6 [true], sendfile [true], accept filters [false], random [true].
+2023-07-21 08:02:15.281  INFO 7752 --- [main] org.apache.catalina.core.AprLifecycleListener : APR/OpenSSL configuration: useAprConnector [false], useOpenSSL [true]
+2023-07-21 08:02:15.281  INFO 7752 --- [main] org.apache.catalina.core.AprLifecycleListener : OpenSSL successfully initialized [OpenSSL 3.0.9 30 May 2023]
+2023-07-21 08:02:15.359  INFO 7752 --- [main] org.apache.catalina.core.ContainerBase.[Tomcat].[localhost].[/] : Initializing Spring embedded WebApplicationContext
+2023-07-21 08:02:15.359  INFO 7752 --- [main] org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 2220 ms
+2023-07-21 08:02:16.019  INFO 7752 --- [main] org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor : Initializing ExecutorService 'applicationTaskExecutor'
+2023-07-21 08:02:16.071  INFO 7752 --- [main] org.springframework.boot.autoconfigure.web.servlet.WelcomePageHandlerMapping : Adding welcome page template: index
+2023-07-21 08:02:16.218  INFO 7752 --- [main] org.springframework.boot.web.embedded.tomcat.TomcatWebServer : Tomcat started on port(s): 8080 (http) with context path ''
+2023-07-21 08:02:16.235  INFO 7752 --- [main] com.dreamchaser.depository_manage.DepositoryManageApplication : Started DepositoryManageApplication in 3.983 seconds (JVM running for 4.783)
+2023-07-21 08:02:46.281  INFO 7752 --- [http-nio-8080-exec-1] org.apache.catalina.core.ContainerBase.[Tomcat].[localhost].[/] : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2023-07-21 08:02:46.281  INFO 7752 --- [http-nio-8080-exec-1] org.springframework.web.servlet.DispatcherServlet : Initializing Servlet 'dispatcherServlet'
+2023-07-21 08:02:46.285  INFO 7752 --- [http-nio-8080-exec-1] org.springframework.web.servlet.DispatcherServlet : Completed initialization in 4 ms
+2023-07-21 08:02:48.450  INFO 7752 --- [http-nio-8080-exec-5] com.alibaba.druid.pool.DruidDataSource : {dataSource-1} inited
+2023-07-21 08:11:41.309  INFO 7752 --- [SpringContextShutdownHook] org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor : Shutting down ExecutorService 'applicationTaskExecutor'
+2023-07-21 08:11:41.314  INFO 7752 --- [SpringContextShutdownHook] com.alibaba.druid.pool.DruidDataSource : {dataSource-1} closed
+2023-07-21 08:11:46.055  INFO 11652 --- [main] com.dreamchaser.depository_manage.DepositoryManageApplication : Starting DepositoryManageApplication on queshumin-pc with PID 11652 (C:\Users\queshumin\Desktop\depository_manage-master\target\classes started by queshumin in C:\Users\queshumin\Desktop\depository_manage-master)
+2023-07-21 08:11:46.057  INFO 11652 --- [main] com.dreamchaser.depository_manage.DepositoryManageApplication : The following profiles are active: test
+2023-07-21 08:11:46.720  INFO 11652 --- [main] org.springframework.boot.web.embedded.tomcat.TomcatWebServer : Tomcat initialized with port(s): 8080 (http)
+2023-07-21 08:11:46.726  INFO 11652 --- [main] org.apache.catalina.core.StandardService : Starting service [Tomcat]
+2023-07-21 08:11:46.727  INFO 11652 --- [main] org.apache.catalina.core.StandardEngine : Starting Servlet engine: [Apache Tomcat/9.0.41]
+2023-07-21 08:11:46.728  INFO 11652 --- [main] org.apache.catalina.core.AprLifecycleListener : Loaded Apache Tomcat Native library [2.0.4] using APR version [1.7.4].
+2023-07-21 08:11:46.728  INFO 11652 --- [main] org.apache.catalina.core.AprLifecycleListener : APR capabilities: IPv6 [true], sendfile [true], accept filters [false], random [true].
+2023-07-21 08:11:46.728  INFO 11652 --- [main] org.apache.catalina.core.AprLifecycleListener : APR/OpenSSL configuration: useAprConnector [false], useOpenSSL [true]
+2023-07-21 08:11:46.731  INFO 11652 --- [main] org.apache.catalina.core.AprLifecycleListener : OpenSSL successfully initialized [OpenSSL 3.0.9 30 May 2023]
+2023-07-21 08:11:46.780  INFO 11652 --- [main] org.apache.catalina.core.ContainerBase.[Tomcat].[localhost].[/] : Initializing Spring embedded WebApplicationContext
+2023-07-21 08:11:46.780  INFO 11652 --- [main] org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 696 ms
+2023-07-21 08:11:47.167  INFO 11652 --- [main] org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor : Initializing ExecutorService 'applicationTaskExecutor'
+2023-07-21 08:11:47.216  INFO 11652 --- [main] org.springframework.boot.autoconfigure.web.servlet.WelcomePageHandlerMapping : Adding welcome page template: index
+2023-07-21 08:11:47.333  INFO 11652 --- [main] org.springframework.boot.web.embedded.tomcat.TomcatWebServer : Tomcat started on port(s): 8080 (http) with context path ''
+2023-07-21 08:11:47.340  INFO 11652 --- [main] com.dreamchaser.depository_manage.DepositoryManageApplication : Started DepositoryManageApplication in 1.565 seconds (JVM running for 3.227)
+2023-07-21 08:11:54.656  INFO 11652 --- [http-nio-8080-exec-1] org.apache.catalina.core.ContainerBase.[Tomcat].[localhost].[/] : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2023-07-21 08:11:54.656  INFO 11652 --- [http-nio-8080-exec-1] org.springframework.web.servlet.DispatcherServlet : Initializing Servlet 'dispatcherServlet'
+2023-07-21 08:11:54.659  INFO 11652 --- [http-nio-8080-exec-1] org.springframework.web.servlet.DispatcherServlet : Completed initialization in 3 ms
+2023-07-21 08:11:55.803  INFO 11652 --- [http-nio-8080-exec-3] com.alibaba.druid.pool.DruidDataSource : {dataSource-1} inited
+2023-07-21 10:12:52.559  INFO 11652 --- [SpringContextShutdownHook] org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor : Shutting down ExecutorService 'applicationTaskExecutor'
+2023-07-21 10:12:52.561  INFO 11652 --- [SpringContextShutdownHook] com.alibaba.druid.pool.DruidDataSource : {dataSource-1} closed
+2023-07-21 10:40:18.878  INFO 7400 --- [main] com.dreamchaser.depository_manage.DepositoryManageApplication : Starting DepositoryManageApplication on queshumin-pc with PID 7400 (C:\Users\queshumin\Desktop\depository_manage-master\target\classes started by queshumin in C:\Users\queshumin\Desktop\depository_manage-master)
+2023-07-21 10:40:18.881  INFO 7400 --- [main] com.dreamchaser.depository_manage.DepositoryManageApplication : The following profiles are active: test
+2023-07-21 10:40:19.647  INFO 7400 --- [main] org.springframework.boot.web.embedded.tomcat.TomcatWebServer : Tomcat initialized with port(s): 8080 (http)
+2023-07-21 10:40:19.654  INFO 7400 --- [main] org.apache.catalina.core.StandardService : Starting service [Tomcat]
+2023-07-21 10:40:19.654  INFO 7400 --- [main] org.apache.catalina.core.StandardEngine : Starting Servlet engine: [Apache Tomcat/9.0.41]
+2023-07-21 10:40:19.655  INFO 7400 --- [main] org.apache.catalina.core.AprLifecycleListener : Loaded Apache Tomcat Native library [2.0.4] using APR version [1.7.4].
+2023-07-21 10:40:19.655  INFO 7400 --- [main] org.apache.catalina.core.AprLifecycleListener : APR capabilities: IPv6 [true], sendfile [true], accept filters [false], random [true].
+2023-07-21 10:40:19.655  INFO 7400 --- [main] org.apache.catalina.core.AprLifecycleListener : APR/OpenSSL configuration: useAprConnector [false], useOpenSSL [true]
+2023-07-21 10:40:19.659  INFO 7400 --- [main] org.apache.catalina.core.AprLifecycleListener : OpenSSL successfully initialized [OpenSSL 3.0.9 30 May 2023]
+2023-07-21 10:40:19.709  INFO 7400 --- [main] org.apache.catalina.core.ContainerBase.[Tomcat].[localhost].[/] : Initializing Spring embedded WebApplicationContext
+2023-07-21 10:40:19.709  INFO 7400 --- [main] org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 789 ms
+2023-07-21 10:40:20.129  INFO 7400 --- [main] org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor : Initializing ExecutorService 'applicationTaskExecutor'
+2023-07-21 10:40:20.179  INFO 7400 --- [main] org.springframework.boot.autoconfigure.web.servlet.WelcomePageHandlerMapping : Adding welcome page template: index
+2023-07-21 10:40:20.267  INFO 7400 --- [main] org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor : Shutting down ExecutorService 'applicationTaskExecutor'
+2023-07-21 10:40:20.269  INFO 7400 --- [main] org.apache.catalina.core.StandardService : Stopping service [Tomcat]
+2023-07-21 10:40:20.289  INFO 7400 --- [main] org.springframework.boot.autoconfigure.logging.ConditionEvaluationReportLoggingListener : 
+
+Error starting ApplicationContext. To display the conditions report re-run your application with 'debug' enabled.
+2023-07-21 11:43:03.181  INFO 9360 --- [main] com.dreamchaser.depository_manage.DepositoryManageApplication : Starting DepositoryManageApplication on queshumin-pc with PID 9360 (C:\Users\queshumin\Desktop\depository_manage-master\target\classes started by queshumin in C:\Users\queshumin\Desktop\depository_manage-master)
+2023-07-21 11:43:03.184  INFO 9360 --- [main] com.dreamchaser.depository_manage.DepositoryManageApplication : The following profiles are active: test
+2023-07-21 11:43:03.879  INFO 9360 --- [main] org.springframework.boot.web.embedded.tomcat.TomcatWebServer : Tomcat initialized with port(s): 8080 (http)
+2023-07-21 11:43:03.886  INFO 9360 --- [main] org.apache.catalina.core.StandardService : Starting service [Tomcat]
+2023-07-21 11:43:03.886  INFO 9360 --- [main] org.apache.catalina.core.StandardEngine : Starting Servlet engine: [Apache Tomcat/9.0.41]
+2023-07-21 11:43:03.887  INFO 9360 --- [main] org.apache.catalina.core.AprLifecycleListener : Loaded Apache Tomcat Native library [2.0.4] using APR version [1.7.4].
+2023-07-21 11:43:03.887  INFO 9360 --- [main] org.apache.catalina.core.AprLifecycleListener : APR capabilities: IPv6 [true], sendfile [true], accept filters [false], random [true].
+2023-07-21 11:43:03.887  INFO 9360 --- [main] org.apache.catalina.core.AprLifecycleListener : APR/OpenSSL configuration: useAprConnector [false], useOpenSSL [true]
+2023-07-21 11:43:03.890  INFO 9360 --- [main] org.apache.catalina.core.AprLifecycleListener : OpenSSL successfully initialized [OpenSSL 3.0.9 30 May 2023]
+2023-07-21 11:43:03.939  INFO 9360 --- [main] org.apache.catalina.core.ContainerBase.[Tomcat].[localhost].[/] : Initializing Spring embedded WebApplicationContext
+2023-07-21 11:43:03.940  INFO 9360 --- [main] org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 722 ms
+2023-07-21 11:43:04.328  INFO 9360 --- [main] org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor : Initializing ExecutorService 'applicationTaskExecutor'
+2023-07-21 11:43:04.377  INFO 9360 --- [main] org.springframework.boot.autoconfigure.web.servlet.WelcomePageHandlerMapping : Adding welcome page template: index
+2023-07-21 11:43:04.508  INFO 9360 --- [main] org.springframework.boot.web.embedded.tomcat.TomcatWebServer : Tomcat started on port(s): 8080 (http) with context path ''
+2023-07-21 11:43:04.515  INFO 9360 --- [main] com.dreamchaser.depository_manage.DepositoryManageApplication : Started DepositoryManageApplication in 1.669 seconds (JVM running for 2.073)
+2023-07-21 11:43:08.980  INFO 9360 --- [http-nio-8080-exec-1] org.apache.catalina.core.ContainerBase.[Tomcat].[localhost].[/] : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2023-07-21 11:43:08.981  INFO 9360 --- [http-nio-8080-exec-1] org.springframework.web.servlet.DispatcherServlet : Initializing Servlet 'dispatcherServlet'
+2023-07-21 11:43:08.985  INFO 9360 --- [http-nio-8080-exec-1] org.springframework.web.servlet.DispatcherServlet : Completed initialization in 4 ms
+2023-07-21 11:43:10.311  INFO 9360 --- [http-nio-8080-exec-3] com.alibaba.druid.pool.DruidDataSource : {dataSource-1} inited
+2023-07-21 14:49:01.626  INFO 9360 --- [SpringContextShutdownHook] org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor : Shutting down ExecutorService 'applicationTaskExecutor'
+2023-07-21 14:49:01.627  INFO 9360 --- [SpringContextShutdownHook] com.alibaba.druid.pool.DruidDataSource : {dataSource-1} closed
+2023-07-21 14:49:04.684  INFO 500 --- [main] com.dreamchaser.depository_manage.DepositoryManageApplication : Starting DepositoryManageApplication on queshumin-pc with PID 500 (C:\Users\queshumin\Desktop\depository_manage-master\target\classes started by queshumin in C:\Users\queshumin\Desktop\depository_manage-master)
+2023-07-21 14:49:04.686  INFO 500 --- [main] com.dreamchaser.depository_manage.DepositoryManageApplication : The following profiles are active: test
+2023-07-21 14:49:05.377  INFO 500 --- [main] org.springframework.boot.web.embedded.tomcat.TomcatWebServer : Tomcat initialized with port(s): 8080 (http)
+2023-07-21 14:49:05.383  INFO 500 --- [main] org.apache.catalina.core.StandardService : Starting service [Tomcat]
+2023-07-21 14:49:05.384  INFO 500 --- [main] org.apache.catalina.core.StandardEngine : Starting Servlet engine: [Apache Tomcat/9.0.41]
+2023-07-21 14:49:05.384  INFO 500 --- [main] org.apache.catalina.core.AprLifecycleListener : Loaded Apache Tomcat Native library [2.0.4] using APR version [1.7.4].
+2023-07-21 14:49:05.384  INFO 500 --- [main] org.apache.catalina.core.AprLifecycleListener : APR capabilities: IPv6 [true], sendfile [true], accept filters [false], random [true].
+2023-07-21 14:49:05.385  INFO 500 --- [main] org.apache.catalina.core.AprLifecycleListener : APR/OpenSSL configuration: useAprConnector [false], useOpenSSL [true]
+2023-07-21 14:49:05.388  INFO 500 --- [main] org.apache.catalina.core.AprLifecycleListener : OpenSSL successfully initialized [OpenSSL 3.0.9 30 May 2023]
+2023-07-21 14:49:05.437  INFO 500 --- [main] org.apache.catalina.core.ContainerBase.[Tomcat].[localhost].[/] : Initializing Spring embedded WebApplicationContext
+2023-07-21 14:49:05.437  INFO 500 --- [main] org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 720 ms
+2023-07-21 14:49:05.832  INFO 500 --- [main] org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor : Initializing ExecutorService 'applicationTaskExecutor'
+2023-07-21 14:49:05.881  INFO 500 --- [main] org.springframework.boot.autoconfigure.web.servlet.WelcomePageHandlerMapping : Adding welcome page template: index
+2023-07-21 14:49:06.003  INFO 500 --- [main] org.springframework.boot.web.embedded.tomcat.TomcatWebServer : Tomcat started on port(s): 8080 (http) with context path ''
+2023-07-21 14:49:06.015  INFO 500 --- [main] com.dreamchaser.depository_manage.DepositoryManageApplication : Started DepositoryManageApplication in 1.669 seconds (JVM running for 2.055)
+2023-07-21 14:49:19.345  INFO 500 --- [http-nio-8080-exec-1] org.apache.catalina.core.ContainerBase.[Tomcat].[localhost].[/] : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2023-07-21 14:49:19.345  INFO 500 --- [http-nio-8080-exec-1] org.springframework.web.servlet.DispatcherServlet : Initializing Servlet 'dispatcherServlet'
+2023-07-21 14:49:19.349  INFO 500 --- [http-nio-8080-exec-1] org.springframework.web.servlet.DispatcherServlet : Completed initialization in 3 ms
+2023-07-21 14:49:20.837  INFO 500 --- [http-nio-8080-exec-3] com.alibaba.druid.pool.DruidDataSource : {dataSource-1} inited
+2023-07-21 14:52:19.510  INFO 500 --- [SpringContextShutdownHook] org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor : Shutting down ExecutorService 'applicationTaskExecutor'
+2023-07-21 14:52:19.513  INFO 500 --- [SpringContextShutdownHook] com.alibaba.druid.pool.DruidDataSource : {dataSource-1} closed
+2023-07-21 14:52:21.504  INFO 13284 --- [main] com.dreamchaser.depository_manage.DepositoryManageApplication : Starting DepositoryManageApplication on queshumin-pc with PID 13284 (C:\Users\queshumin\Desktop\depository_manage-master\target\classes started by queshumin in C:\Users\queshumin\Desktop\depository_manage-master)
+2023-07-21 14:52:21.506  INFO 13284 --- [main] com.dreamchaser.depository_manage.DepositoryManageApplication : The following profiles are active: test
+2023-07-21 14:52:22.229  INFO 13284 --- [main] org.springframework.boot.web.embedded.tomcat.TomcatWebServer : Tomcat initialized with port(s): 8080 (http)
+2023-07-21 14:52:22.236  INFO 13284 --- [main] org.apache.catalina.core.StandardService : Starting service [Tomcat]
+2023-07-21 14:52:22.236  INFO 13284 --- [main] org.apache.catalina.core.StandardEngine : Starting Servlet engine: [Apache Tomcat/9.0.41]
+2023-07-21 14:52:22.237  INFO 13284 --- [main] org.apache.catalina.core.AprLifecycleListener : Loaded Apache Tomcat Native library [2.0.4] using APR version [1.7.4].
+2023-07-21 14:52:22.237  INFO 13284 --- [main] org.apache.catalina.core.AprLifecycleListener : APR capabilities: IPv6 [true], sendfile [true], accept filters [false], random [true].
+2023-07-21 14:52:22.238  INFO 13284 --- [main] org.apache.catalina.core.AprLifecycleListener : APR/OpenSSL configuration: useAprConnector [false], useOpenSSL [true]
+2023-07-21 14:52:22.241  INFO 13284 --- [main] org.apache.catalina.core.AprLifecycleListener : OpenSSL successfully initialized [OpenSSL 3.0.9 30 May 2023]
+2023-07-21 14:52:22.291  INFO 13284 --- [main] org.apache.catalina.core.ContainerBase.[Tomcat].[localhost].[/] : Initializing Spring embedded WebApplicationContext
+2023-07-21 14:52:22.291  INFO 13284 --- [main] org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 740 ms
+2023-07-21 14:52:22.677  INFO 13284 --- [main] org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor : Initializing ExecutorService 'applicationTaskExecutor'
+2023-07-21 14:52:22.724  INFO 13284 --- [main] org.springframework.boot.autoconfigure.web.servlet.WelcomePageHandlerMapping : Adding welcome page template: index
+2023-07-21 14:52:22.843  INFO 13284 --- [main] org.springframework.boot.web.embedded.tomcat.TomcatWebServer : Tomcat started on port(s): 8080 (http) with context path ''
+2023-07-21 14:52:22.850  INFO 13284 --- [main] com.dreamchaser.depository_manage.DepositoryManageApplication : Started DepositoryManageApplication in 1.784 seconds (JVM running for 2.397)
+2023-07-21 14:52:25.540  INFO 13284 --- [http-nio-8080-exec-1] org.apache.catalina.core.ContainerBase.[Tomcat].[localhost].[/] : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2023-07-21 14:52:25.541  INFO 13284 --- [http-nio-8080-exec-1] org.springframework.web.servlet.DispatcherServlet : Initializing Servlet 'dispatcherServlet'
+2023-07-21 14:52:25.544  INFO 13284 --- [http-nio-8080-exec-1] org.springframework.web.servlet.DispatcherServlet : Completed initialization in 3 ms
+2023-07-21 14:52:26.594  INFO 13284 --- [http-nio-8080-exec-3] com.alibaba.druid.pool.DruidDataSource : {dataSource-1} inited
+2023-07-21 15:41:08.415  INFO 13284 --- [SpringContextShutdownHook] org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor : Shutting down ExecutorService 'applicationTaskExecutor'
+2023-07-21 15:41:08.418  INFO 13284 --- [SpringContextShutdownHook] com.alibaba.druid.pool.DruidDataSource : {dataSource-1} closed
+2023-07-21 16:08:38.741  INFO 2728 --- [main] com.dreamchaser.depository_manage.DepositoryManageApplication : Starting DepositoryManageApplication on queshumin-pc with PID 2728 (C:\Users\queshumin\Desktop\depository_manage-master\target\classes started by queshumin in C:\Users\queshumin\Desktop\depository_manage-master)
+2023-07-21 16:08:38.743  INFO 2728 --- [main] com.dreamchaser.depository_manage.DepositoryManageApplication : The following profiles are active: test
+2023-07-21 16:08:39.454  INFO 2728 --- [main] org.springframework.boot.web.embedded.tomcat.TomcatWebServer : Tomcat initialized with port(s): 8080 (http)
+2023-07-21 16:08:39.460  INFO 2728 --- [main] org.apache.catalina.core.StandardService : Starting service [Tomcat]
+2023-07-21 16:08:39.461  INFO 2728 --- [main] org.apache.catalina.core.StandardEngine : Starting Servlet engine: [Apache Tomcat/9.0.41]
+2023-07-21 16:08:39.462  INFO 2728 --- [main] org.apache.catalina.core.AprLifecycleListener : Loaded Apache Tomcat Native library [2.0.4] using APR version [1.7.4].
+2023-07-21 16:08:39.462  INFO 2728 --- [main] org.apache.catalina.core.AprLifecycleListener : APR capabilities: IPv6 [true], sendfile [true], accept filters [false], random [true].
+2023-07-21 16:08:39.462  INFO 2728 --- [main] org.apache.catalina.core.AprLifecycleListener : APR/OpenSSL configuration: useAprConnector [false], useOpenSSL [true]
+2023-07-21 16:08:39.465  INFO 2728 --- [main] org.apache.catalina.core.AprLifecycleListener : OpenSSL successfully initialized [OpenSSL 3.0.9 30 May 2023]
+2023-07-21 16:08:39.517  INFO 2728 --- [main] org.apache.catalina.core.ContainerBase.[Tomcat].[localhost].[/] : Initializing Spring embedded WebApplicationContext
+2023-07-21 16:08:39.517  INFO 2728 --- [main] org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 740 ms
+2023-07-21 16:08:39.911  INFO 2728 --- [main] org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor : Initializing ExecutorService 'applicationTaskExecutor'
+2023-07-21 16:08:39.961  INFO 2728 --- [main] org.springframework.boot.autoconfigure.web.servlet.WelcomePageHandlerMapping : Adding welcome page template: index
+2023-07-21 16:08:40.085  INFO 2728 --- [main] org.springframework.boot.web.embedded.tomcat.TomcatWebServer : Tomcat started on port(s): 8080 (http) with context path ''
+2023-07-21 16:08:40.092  INFO 2728 --- [main] com.dreamchaser.depository_manage.DepositoryManageApplication : Started DepositoryManageApplication in 1.693 seconds (JVM running for 2.078)
+2023-07-21 16:08:49.106  INFO 2728 --- [http-nio-8080-exec-1] org.apache.catalina.core.ContainerBase.[Tomcat].[localhost].[/] : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2023-07-21 16:08:49.106  INFO 2728 --- [http-nio-8080-exec-1] org.springframework.web.servlet.DispatcherServlet : Initializing Servlet 'dispatcherServlet'
+2023-07-21 16:08:49.109  INFO 2728 --- [http-nio-8080-exec-1] org.springframework.web.servlet.DispatcherServlet : Completed initialization in 3 ms
+2023-07-21 16:08:50.205  INFO 2728 --- [http-nio-8080-exec-3] com.alibaba.druid.pool.DruidDataSource : {dataSource-1} inited
+2023-07-21 16:44:10.859  INFO 2728 --- [SpringContextShutdownHook] org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor : Shutting down ExecutorService 'applicationTaskExecutor'
+2023-07-21 16:44:10.862  INFO 2728 --- [SpringContextShutdownHook] com.alibaba.druid.pool.DruidDataSource : {dataSource-1} closed
+2023-07-21 16:44:14.781  INFO 6668 --- [main] com.dreamchaser.depository_manage.DepositoryManageApplication : Starting DepositoryManageApplication on queshumin-pc with PID 6668 (C:\Users\queshumin\Desktop\depository_manage-master\target\classes started by queshumin in C:\Users\queshumin\Desktop\depository_manage-master)
+2023-07-21 16:44:14.784  INFO 6668 --- [main] com.dreamchaser.depository_manage.DepositoryManageApplication : The following profiles are active: test
+2023-07-21 16:44:15.498  INFO 6668 --- [main] org.springframework.boot.web.embedded.tomcat.TomcatWebServer : Tomcat initialized with port(s): 8080 (http)
+2023-07-21 16:44:15.505  INFO 6668 --- [main] org.apache.catalina.core.StandardService : Starting service [Tomcat]
+2023-07-21 16:44:15.505  INFO 6668 --- [main] org.apache.catalina.core.StandardEngine : Starting Servlet engine: [Apache Tomcat/9.0.41]
+2023-07-21 16:44:15.506  INFO 6668 --- [main] org.apache.catalina.core.AprLifecycleListener : Loaded Apache Tomcat Native library [2.0.4] using APR version [1.7.4].
+2023-07-21 16:44:15.506  INFO 6668 --- [main] org.apache.catalina.core.AprLifecycleListener : APR capabilities: IPv6 [true], sendfile [true], accept filters [false], random [true].
+2023-07-21 16:44:15.507  INFO 6668 --- [main] org.apache.catalina.core.AprLifecycleListener : APR/OpenSSL configuration: useAprConnector [false], useOpenSSL [true]
+2023-07-21 16:44:15.510  INFO 6668 --- [main] org.apache.catalina.core.AprLifecycleListener : OpenSSL successfully initialized [OpenSSL 3.0.9 30 May 2023]
+2023-07-21 16:44:15.560  INFO 6668 --- [main] org.apache.catalina.core.ContainerBase.[Tomcat].[localhost].[/] : Initializing Spring embedded WebApplicationContext
+2023-07-21 16:44:15.560  INFO 6668 --- [main] org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 743 ms
+2023-07-21 16:44:15.960  INFO 6668 --- [main] org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor : Initializing ExecutorService 'applicationTaskExecutor'
+2023-07-21 16:44:16.010  INFO 6668 --- [main] org.springframework.boot.autoconfigure.web.servlet.WelcomePageHandlerMapping : Adding welcome page template: index
+2023-07-21 16:44:16.134  INFO 6668 --- [main] org.springframework.boot.web.embedded.tomcat.TomcatWebServer : Tomcat started on port(s): 8080 (http) with context path ''
+2023-07-21 16:44:16.140  INFO 6668 --- [main] com.dreamchaser.depository_manage.DepositoryManageApplication : Started DepositoryManageApplication in 1.69 seconds (JVM running for 2.102)
+2023-07-21 16:44:19.899  INFO 6668 --- [http-nio-8080-exec-1] org.apache.catalina.core.ContainerBase.[Tomcat].[localhost].[/] : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2023-07-21 16:44:19.900  INFO 6668 --- [http-nio-8080-exec-1] org.springframework.web.servlet.DispatcherServlet : Initializing Servlet 'dispatcherServlet'
+2023-07-21 16:44:19.904  INFO 6668 --- [http-nio-8080-exec-1] org.springframework.web.servlet.DispatcherServlet : Completed initialization in 4 ms
+2023-07-21 16:44:21.117  INFO 6668 --- [http-nio-8080-exec-5] com.alibaba.druid.pool.DruidDataSource : {dataSource-1} inited
