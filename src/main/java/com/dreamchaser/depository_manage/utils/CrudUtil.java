@@ -6,7 +6,6 @@ import com.dreamchaser.depository_manage.pojo.StatusInfo;
 
 /**
  * 因为在控制层有很多重复可抽象出来的操作，所以写一个工具类
- * @author 金昊霖
  */
 public class CrudUtil {
     public static final RestResponse RESPONSE200=new RestResponse();

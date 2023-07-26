@@ -119,4 +119,12 @@ public class UserServiceImpl implements UserService {
         }
         return userP;
     }
+    @Override
+    public List<User> findUserAll(){
+        return userMapper.findUserAll();
+    }
+    @Override
+    public String findUserNameById(int id){
+        return userMapper.findUserNameById(id);
+    }
 }

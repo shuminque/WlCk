@@ -1,5 +1,6 @@
 package com.dreamchaser.depository_manage.mapper;
 
+import com.dreamchaser.depository_manage.entity.Depository;
 import com.dreamchaser.depository_manage.entity.User;
 import com.dreamchaser.depository_manage.pojo.SimpleUser;
 import org.apache.ibatis.annotations.Mapper;
@@ -99,4 +100,5 @@ public interface UserMapper {
      */
     Integer deleteUserByIds(List<Integer> list);
 
+    List<User> findUserAll();
 }

@@ -6,7 +6,6 @@ import java.util.Date;
 
 /**
  * 用于处理时间类型的工具类
- * @author 金昊霖
  */
 public class DateUtil {
     private static final SimpleDateFormat TIME_FORMAT =new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");

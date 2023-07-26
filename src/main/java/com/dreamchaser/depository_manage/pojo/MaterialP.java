@@ -12,6 +12,9 @@ public class MaterialP {
     /** 存储id */
     private Integer id;
 
+    /**AT号*/
+    private Integer atId;
+
     /** 仓库名称 */
     private String depositoryName;
 
@@ -31,9 +34,10 @@ public class MaterialP {
 
     private String enginName;
 
-    public MaterialP(Integer id, Integer depositoryId, String mname, Double quantity, Double price, String typeName,
+    public MaterialP(Integer id, Integer atId, Integer depositoryId, String mname, Double quantity, Double price, String typeName,
                      String stateName, String enginName) {
         this.id = id;
+        this.atId=atId;
         this.mname = mname;
         this.quantity = quantity;
         this.price = price;
@@ -43,6 +47,7 @@ public class MaterialP {
     }
     public MaterialP(Material material) {
         this.id = material.getId();
+        this.atId=material.getAtId();
         this.mname = material.getMname();
         this.quantity = material.getQuantity();
         this.price = material.getPrice();

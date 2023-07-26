@@ -1,5 +1,6 @@
 package com.dreamchaser.depository_manage.controller;
 
+import com.dreamchaser.depository_manage.entity.User;
 import com.dreamchaser.depository_manage.exception.MyException;
 import com.dreamchaser.depository_manage.pojo.DepositoryRecordP;
 import com.dreamchaser.depository_manage.security.bean.UserToken;
@@ -36,8 +37,12 @@ public class PageController {
     }
 
     @GetMapping("/index")
-    public String index() {
-        return "index";
+    public ModelAndView index(HttpServletRequest request) {
+        ModelAndView mv = new ModelAndView();
+        UserToken userToken = (UserToken) request.getAttribute("userToken");
+        mv.addObject("uname", userToken.getUser().getUname());
+        mv.setViewName("index");
+        return mv;
     }
 
     @GetMapping("/register")

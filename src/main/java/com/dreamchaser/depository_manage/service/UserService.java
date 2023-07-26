@@ -1,5 +1,6 @@
 package com.dreamchaser.depository_manage.service;
 
+import com.dreamchaser.depository_manage.entity.Depository;
 import com.dreamchaser.depository_manage.entity.User;
 import com.dreamchaser.depository_manage.pojo.UserP;
 
@@ -104,4 +105,6 @@ public interface UserService {
      * @return UserP对象
      */
     UserP singlePack(User user);
+    List<User> findUserAll();
+    String findUserNameById(int id);
 }

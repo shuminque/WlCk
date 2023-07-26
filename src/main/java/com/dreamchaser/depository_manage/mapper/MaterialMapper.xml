@@ -7,6 +7,7 @@
     <!-- 字段映射 -->
     <resultMap id="materialMap" type="com.dreamchaser.depository_manage.entity.Material">
         <id column="id" property="id" jdbcType="INTEGER" />
+        <id column="at_id" property="atId" jdbcType="INTEGER" />
         <result column="depository_id" property="depositoryId" jdbcType="INTEGER" />
         <result column="mname" property="mname" jdbcType="VARCHAR" />
         <result column="quantity" property="quantity" jdbcType="VARCHAR" />
@@ -18,7 +19,7 @@
 
     <!-- 表查询字段 -->
     <sql id="allColumns">
-        m.id, m.depository_id, m.mname, m.quantity, m.price, m.type_id, m.state_id, m.engin_id
+        m.id, m.at_id, m.depository_id, m.mname, m.quantity, m.price, m.type_id, m.state_id, m.engin_id
     </sql>
 
     <!-- 查询所有数据的条数 -->
@@ -53,6 +54,9 @@
         </if>
         <if test="enginId != null">
             AND m.engin_id = #{enginId}
+        </if>
+        <if test="atId != null">
+            AND m.at_id = #{atId}
         </if>
     </select>
 
@@ -89,6 +93,9 @@
         <if test="enginId != null">
             AND m.engin_id = #{enginId}
         </if>
+        <if test="atId != null">
+            AND m.at_id = #{atId}
+        </if>
         <if test="begin != null and size != null">
             LIMIT #{begin},#{size}
         </if>
@@ -114,34 +121,36 @@
     <!-- 插入数据 -->
     <insert id="insertMaterial" parameterType="map">
         INSERT INTO material (
-            id, depository_id, mname, quantity, price, type_id, state_id, enign_id
+            id, at_id, depository_id, mname, quantity, price, type_id, state_id, enign_id
         ) VALUES (
             #{id},
+            #{atId},
             #{depositoryId},
             #{mname},
             #{quantity},
             #{price},
             #{typeId},
             #{stateId},
-            #{enignId}
+            #{enignId},
         )
     </insert>
 
     <!-- 批量插入数据 -->
     <insert id="insertMaterials" parameterType="list">
         INSERT INTO material (
-            id, depository_id, mname, quantity, price, type_id, state_id, enign_id
+            id, at_id, depository_id, mname, quantity, price, type_id, state_id, enign_id
         ) VALUES
         <foreach collection="list" index="index" item="item" separator=",">
             (
                 #{item.id},
+                #{item.atId},
                 #{item.depositoryId},
                 #{item.mname},
                 #{item.quantity},
                 #{item.price},
                 #{item.typeId},
-                #{stateId},
-                #{enignId}
+                #{item.stateId},
+                #{item.enignId},
             )
         </foreach>
     </insert>
@@ -150,6 +159,9 @@
     <update id="updateMaterial">
         UPDATE material
         <set>
+            <if test="atId != null">
+                at_id = #{atId},
+            </if>
             <if test="depositoryId != null">
                 depository_id = #{depositoryId},
             </if>
@@ -163,13 +175,13 @@
                 price = #{price},
             </if>
             <if test="typeId != null">
-                type_id = #{typeId}
+                type_id = #{typeId},
             </if>
             <if test="stateId != null">
-                state_id = #{stateId}
+                state_id = #{stateId},
             </if>
             <if test="enginId != null">
-                engin_id = #{enginId}
+                engin_id = #{enginId},
             </if>
         </set>
         WHERE id = #{id}
@@ -185,7 +197,7 @@
                     quantity = quantity+#{quantity},
                 </if>
                 <if test="price != null">
-                    price = price + #{price}
+                    price = price + #{price},
                 </if>
             </if>
             <if test='state == "已出库"'>
@@ -193,7 +205,7 @@
                     quantity = quantity - #{quantity},
                 </if>
                 <if test="price != null">
-                    price = price - #{price}
+                    price = price - #{price},
                 </if>
             </if>
 
@@ -207,6 +219,9 @@
         <foreach collection="list" index="index" item="item" separator=";">
             UPDATE material
             <set>
+                <if test="item.atId != null">
+                    at_id = #{item.atId},
+                </if>
                 <if test="item.depositoryId != null">
                     depository_id = #{item.depositoryId},
                 </if>
@@ -220,13 +235,13 @@
                     price = #{item.price},
                 </if>
                 <if test="item.typeId != null">
-                    type_id = #{item.typeId}
+                    type_id = #{item.typeId},
                 </if>
                 <if test="item.stateId != null">
-                    state_id = #{item.stateId}
+                    state_id = #{item.stateId},
                 </if>
                 <if test="item.enginId != null">
-                    engin_id = #{item.enginId}
+                    engin_id = #{item.enginId},
                 </if>
             </set>
             WHERE id = #{item.id}

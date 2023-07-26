@@ -65,6 +65,7 @@ public class DepositoryRecordServiceImpl implements DepositoryRecordService {
         return transferRecordMapper.addTransferRecord(map);
     }
 
+
     @Override
     @Transactional
     public Integer review(Map<String, Object> map,Integer userid) {
@@ -81,7 +82,8 @@ public class DepositoryRecordServiceImpl implements DepositoryRecordService {
                 if (1 == record.getType()){
                     map.put("state","已入库");
                     //这里貌似会引起并发问题
-                    material.setPrice(material.getPrice()+record.getPrice());
+//                    material.setPrice(material.getPrice()+record.getPrice()); //总数
+                    material.setPrice(material.getPrice()+(record.getQuantity()*record.getPrice())) ;  //平均
                     material.setQuantity(material.getQuantity()+record.getQuantity());
                     materialMapper.updateMaterial(material);
                 }else {
@@ -102,7 +104,6 @@ public class DepositoryRecordServiceImpl implements DepositoryRecordService {
         }
         return depositoryRecordMapper.updateDepositoryRecord(map);
     }
-
 
     @Override
     public Integer updateDepositoryRecord(Map<String, Object> map) {

@@ -13,6 +13,9 @@ public class Material {
     /** 存储id */
     private Integer id;
 
+    /**AT号*/
+    private Integer atId;
+
     /** 仓库名称 */
     private Integer depositoryId;
 

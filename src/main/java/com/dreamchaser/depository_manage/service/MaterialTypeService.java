@@ -4,7 +4,6 @@ import java.util.Map;
 
 /**
  * 材料的服务层接口
- * @author 金昊霖
  */
 public interface MaterialTypeService {
     /**

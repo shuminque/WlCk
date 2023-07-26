@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="utf-8">
     <title>仓库管理系统</title>
@@ -12,7 +12,7 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="format-detection" content="telephone=no">
-    <link rel="icon" href="/static/images/favicon.ico">
+    <link rel="icon" href="/static/images/xuri-logo.ico">
     <link rel="stylesheet" href="/static/lib/layui-v2.6.3/css/layui.css" media="all">
     <link rel="stylesheet" href="/static/css/layuimini.css?v=2.0.4.2" media="all">
     <link rel="stylesheet" href="/static/css/themes/default.css" media="all">
@@ -59,8 +59,8 @@
                 <li class="layui-nav-item mobile layui-hide-xs" lay-unselect>
                     <a href="javascript:;" data-check-screen="full"><i class="fa fa-arrows-alt"></i></a>
                 </li>
-                <li class="layui-nav-item layuimini-setting">
-                    <a href="javascript:;">admin</a>
+                <li class="layui-nav-   item layuimini-setting">
+                    <a href="javascript:;" th:text="${uname}">admin</a>
                     <dl class="layui-nav-child">
                         <dd>
                             <a href="javascript:;" layuimini-content-href="/account_look" data-title="基本资料" data-icon="fa fa-gears">基本资料<span class="layui-badge-dot"></span></a>
