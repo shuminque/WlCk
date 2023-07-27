@@ -1,6 +1,7 @@
 package com.dreamchaser.depository_manage.mapper;
 
 import com.dreamchaser.depository_manage.entity.Depository;
+import com.dreamchaser.depository_manage.entity.Material;
 import org.apache.ibatis.annotations.Mapper;
 import org.springframework.stereotype.Repository;
 
@@ -32,4 +33,6 @@ public interface DepositoryMapper {
      * @return 仓库名称
      */
     String findDepositoryNameById(int id);
+    Integer findCountByCondition(Map<String,Object> map);
+    List<Depository> findDepositoryByCondition(Map<String,Object>map);
 }

@@ -135,4 +135,20 @@
             #{id}
         </foreach>
     </delete>
+
+    <!-- 查询所有符合条件的数据条数 -->
+    <select id="findCountByCondition" parameterType="map" resultType="integer">
+        SELECT
+        count(*)
+        FROM depository d WHERE 1=1
+        <if test="dname != null and dname != ''">
+            AND d.dname LIKE CONCAT('%', #{dname}, '%')
+        </if>
+        <if test="address != null and address != ''">
+            AND d.address LIKE CONCAT('%', #{address}, '%')
+        </if>
+        <if test="introduce != null and introduce != ''">
+            AND d.introduce LIKE CONCAT('%', #{introduce}, '%')
+        </if>
+    </select>
 </mapper>

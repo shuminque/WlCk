@@ -1,6 +1,8 @@
 package com.dreamchaser.depository_manage.service;
 
 import com.dreamchaser.depository_manage.entity.Depository;
+import com.dreamchaser.depository_manage.pojo.DepositoryP;
+import com.dreamchaser.depository_manage.pojo.MaterialP;
 
 import java.util.List;
 import java.util.Map;
@@ -22,4 +24,7 @@ public interface DepositoryService {
      * @return 仓库集合
      */
     List<Depository> findDepositoryAll();
+    Integer findCountByCondition(Map<String,Object> map);
+    public List<DepositoryP> findDepositoryPByCondition(Map<String, Object> map);
+
 }

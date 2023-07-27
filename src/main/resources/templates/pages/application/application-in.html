@@ -21,7 +21,7 @@
                             <div>
                                 <form class="layui-form" style="margin: 0 auto;max-width: 460px;padding-top: 40px;">
                                     <div class="layui-form-item">
-                                        <label class="layui-form-label">厂区：</label>
+                                        <label class="layui-form-label">厂区:</label>
                                         <div class="layui-input-block">
                                             <select name="depositoryId" lay-verify="required">
                                                 <option th:each="depository,iterStar:${depositories}" th:value="${depository?.getId()}" th:text="${depository?.getDname()}" selected>外芯仓库</option>
@@ -29,15 +29,15 @@
                                         </div>
                                     </div>
                                     <div class="layui-form-item">
-                                        <label class="layui-form-label">材料名称:</label>
+                                        <label class="layui-form-label">品名:</label>
                                         <div class="layui-input-block">
-                                            <input name="mname" type="text" placeholder="请填写材料名称" class="layui-input" lay-verify="required"  />
+                                            <input name="mname" type="text" placeholder="请填写品名" class="layui-input" lay-verify="required"  />
                                         </div>
                                     </div>
                                     <div class="layui-form-item">
-                                        <label class="layui-form-label">材料数量:</label>
+                                        <label class="layui-form-label">数量:</label>
                                         <div class="layui-input-block">
-                                            <input name="quantity" type="number" placeholder="请填写入材料数量" value="" class="layui-input" lay-verify="number" required>
+                                            <input name="quantity" type="number" placeholder="请填写数量" value="" class="layui-input" lay-verify="number" required>
                                         </div>
                                     </div>
                                     <div class="layui-form-item">
@@ -57,18 +57,21 @@
                                         </div>
                                     </div>
                                     <div class="layui-form-item">
+                                        <label class="layui-form-label">入库类型:</label>
+                                        <div class="layui-input-block">
+                                            <select name="applyRemark" class="layui-select">
+                                                <option value="采购入库">采购入库</option>
+                                                <option value="领用退回">领用退回</option>
+                                            </select>
+                                            <textarea name="applyRemark" placeholder="请填写相关原因及申请原因" value="" class="layui-textarea"></textarea>
+                                        </div>
+                                    </div>
+                                    <div class="layui-form-item">
                                         <label class="layui-form-label">审核人:</label>
                                         <div class="layui-input-block">
                                             <select name="reviewerId" lay-verify="required">
                                                 <option th:each="reviewer,iterStat:${reviewers}" th:value="${reviewer?.getId()}" th:text="${reviewer?.getUname()}" selected>张三</option>
                                             </select>
-                                        </div>
-                                    </div>
-
-                                    <div class="layui-form-item">
-                                        <label class="layui-form-label">备注说明:</label>
-                                        <div class="layui-input-block">
-                                            <textarea name="applyRemark" placeholder="请填写相关原因及申请原因" value="" class="layui-textarea"></textarea>
                                         </div>
                                     </div>
                                     <div class="layui-form-item">

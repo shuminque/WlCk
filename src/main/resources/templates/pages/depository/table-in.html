@@ -114,9 +114,10 @@
                 {field: 'quantity', width: 80, title: '数量', sort: true},
                 {field: 'price', title: '金额', minWidth: 80, sort: true},
                 {
-                    field: 'type', title: '类型', minWidth: 80, sort: true, templet: function (d) {
-                        return d.type === 0 ? '出库' : '入库';
-                    }
+                    field: 'applyRemark', title: '类型', minWidth: 120, sort: true,
+                    // templet: function (d) {
+                    //     return d.type === 0 ? '出库' : '入库';
+                    // }
                 },
                 {field: 'state', width: 150, title: '流程状态', sort: true},
                 {field: 'applicantName', width: 150, title: '申请人', sort: true},
