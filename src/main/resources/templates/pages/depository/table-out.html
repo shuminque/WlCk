@@ -23,11 +23,12 @@
                                 <input type="text" name="applyTime" id="date"  placeholder="请选择开始日期"
                                        autocomplete="off" class="layui-input">
                             </div>
+
                         </div>
                         <div class="layui-inline">
                             <label class="layui-form-label">仓库</label>
                             <div class="layui-input-inline">
-                                <select name="depositoryId" >
+                                <select name="depositoryId">
                                     <option value="" selected>请选择仓库</option>
                                     <option th:each="depository,iterStar:${depositories}" th:value="${depository?.getId()}" th:text="${depository?.getDname()}" >外芯仓库</option>
                                 </select>
@@ -61,6 +62,7 @@
 
         <script type="text/html" id="currentTableBar">
             <a class="layui-btn layui-btn-normal layui-btn-xs data-count-edit" lay-event="detail">详情</a>
+            <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
             <a class="layui-btn layui-btn-xs layui-btn-danger data-count-delete" lay-event="delete">删除</a>
         </script>
 
@@ -78,6 +80,7 @@
         //日期
         laydate.render({
             elem: '#date'
+            ,range:true,
         });
         table.render({
             elem: "#currentTableId",
@@ -110,7 +113,7 @@
             cols: [ [
                 {type: "checkbox", width: 50},
                 {field: 'id', width: 100, title: '申请编号', sort: true},
-                {field: 'mname', width: 120, title: '材料名称'},
+                {field: 'mname', width: 100, title: '材料名称'},
                 {field: 'depositoryName', width: 120, title: '仓库名称', sort: true},
                 {field: 'quantity', width: 80, title: '数量', sort: true},
                 {field: 'price', title: '金额', minWidth: 80, sort: true},
@@ -122,14 +125,16 @@
                 },
                 {field: 'state', width: 150, title: '流程状态', sort: true},
                 {field: 'applicantName', width: 150, title: '申请人', sort: true},
-                {field: 'applyTime', width: 200, title: '申请时间', sort: true},
-                {title: '操作', minWidth: 150, toolbar: '#currentTableBar', align: "center"}
+                {field: 'applyTime', width: 170, title: '申请时间', sort: true},
+                {title: '操作', minWidth: 200, toolbar: '#currentTableBar', align: "center"}
             ]],
             limits: [10, 15, 20, 25, 50],
             limit: 10,
             page: true,
-            skin: 'line'
+            skin: 'line',
+            // id:'idTest',
         });
+        // table.resize('idTest');
 
         // 监听搜索操作
         form.on('submit(data-search-btn)', function (data) {
@@ -263,6 +268,20 @@
                         }
                     })
                 });
+            } else if (obj.event ==='edit'){
+                var index = layer.open({
+                    title: '出库信息修改',
+                    type: 2,
+                    shade: 0.2,
+                    maxmin: true,
+                    shadeClose: true,
+                    area: ['100%', '100%'],
+                    content: '/form_step_look?id='+data.id,
+                });
+                $(window).on("resize", function () {
+                    layer.full(index);
+                });
+                return false;
             }
         });
     });

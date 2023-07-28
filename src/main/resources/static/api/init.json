@@ -112,7 +112,7 @@
           ]
         },
         {
-          "title": "其他管理",
+          "title": "基础数据",
           "icon": "fa fa-wrench",
           "target": "_self",
           "child": [
