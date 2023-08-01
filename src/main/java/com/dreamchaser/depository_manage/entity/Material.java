@@ -22,6 +22,9 @@ public class Material {
     /** 材料名称 */
     private String mname;
 
+    /**型号/规格*/
+    private String model;
+
     /** 数量 */
     private Double quantity;
 

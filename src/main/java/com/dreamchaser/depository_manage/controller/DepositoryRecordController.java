@@ -24,6 +24,12 @@ public class DepositoryRecordController {
     private DepositoryRecordService depositoryRecordService;
     @GetMapping("/depositoryRecord")
     public RestResponse findDepositoryRecordByCondition(@RequestParam Map<String,Object> map){
+        String dateRange = (String) map.get("applyTime");
+        if (dateRange !=null && dateRange.contains(" - ")){
+            String[] dates = dateRange.split(" - ");
+            map.put("startDate",dates[0]);
+            map.put("endDate",dates[1]);
+        }
         List<DepositoryRecordP> list=depositoryRecordService.findDepositoryRecordPByCondition(map);
         return new RestResponse(list,depositoryRecordService.findCountByCondition(map),200);
     }//方法处理GET请求到/depositoryRecord的路径。这个方法接收一组查询参数，然后调用DepositoryRecordService.findDepositoryRecordPByCondition方法来查询满足条件的仓库记录。

@@ -20,10 +20,16 @@
                         <div carousel-item>
                             <div>
                                 <form class="layui-form" style="margin: 0 auto;max-width: 460px;padding-top: 40px;">
+<!--                                    <div class="layui-form-item">-->
+<!--                                        <label class="layui-form-label">材料名称:</label>-->
+<!--                                        <div class="layui-input-block">-->
+<!--                                            <input name="mname" type="text" placeholder="请填写材料名称" class="layui-input" lay-verify="required"  />-->
+<!--                                        </div>-->
+<!--                                    </div>-->
                                     <div class="layui-form-item">
-                                        <label class="layui-form-label">材料名称:</label>
+                                        <label class="layui-form-label">品名:</label>
                                         <div class="layui-input-block">
-                                            <input name="mname" type="text" placeholder="请填写材料名称" class="layui-input" lay-verify="required"  />
+                                            <input name="mname" type="text" id="materialSelect" placeholder="请填写品名" readonly class="layui-input" lay-verify="required"  />
                                         </div>
                                     </div>
                                     <div class="layui-form-item">
@@ -123,10 +129,11 @@
 <script src="/static/lib/layui-v2.6.3/layui.js" charset="utf-8"></script>
 <script src="/static/js/lay-config.js?v=1.0.4" charset="utf-8"></script>
 <script>
-    layui.use([ 'form', 'step'], function () {
+    layui.use([ 'form', 'step', 'tableSelect'], function () {
         var $ = layui.$,
             form = layui.form,
-            step = layui.step;
+            step = layui.step,
+            tableSelect = layui.tableSelect;
 
 
 
@@ -181,11 +188,56 @@
             return false;
         });
 
+        tableSelect.render({
+            elem: '#materialSelect', // 定义输入框input对象
+            checkedKey: 'id', // 表格的唯一建值
+            searchType: 'more',
+            searchList : [
+                {searchKey: 'atId', searchPlaceholder: "搜索物品AT号"},
+                {searchKey: 'mname', searchPlaceholder: "搜索物品名称"},
+            ],
+            searchPlaceholder: '关键词搜索', // 搜索输入框的提示文字
+            table: { // 定义表格参数
+                url: '/material', // 你的数据源URL
+                parseData: function (res) { //res 即为原始返回的数据
+                    return {
+                        "status": res.status, //解析接口状态
+                        "message": res.statusInfo.message, //解析提示文本
+                        "count": res.count, //解析数据长度
+                        "data": res.data //解析数据列表
+                    };
+                },
+                request: {
+                    pageName: 'page', //页码的参数名称，默认：page
+                    limitName: 'size' //每页数据量的参数名，默认：limit
+                },
+                response: {
+                    statusName: 'status' //规定数据状态的字段名称，默认：code
+                    ,statusCode: 200 //规定成功的状态码，默认：0
+                    ,msgName: 'message' //规定状态信息的字段名称，默认：msg
+                    ,countName: 'count' //规定数据总数的字段名称，默认：count
+                    ,dataName: 'data' //规定数据列表的字段名称，默认：data
+                },
+                cols: [ [
+                    {type: 'radio'},
+                    {field: 'depositoryName',  title: '厂区', sort: true},
+                    {field: 'atId', title: 'AT号'},
+                    {field: 'mname',  title: '品名'},
+                    {field: 'typeName',  title: '材料类型'},
+                    {field: 'enginName',title: '工程',  sort: true },
+                ]]
+            },
+            done: function (elem, data) {
+                // 选择完后的回调
+                var selectedData = data.data[0]; // 获取选中的数据
+                $('#materialSelect').val(selectedData.mname); // 将选中的品名设置为输入框的值
+            }
+        });
+
         form.on('submit(formStep2)', function (data) {
             step.next('#stepForm');
             return false;
         });
-
 
         $('.pre').click(function () {
             step.pre('#stepForm');

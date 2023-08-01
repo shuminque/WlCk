@@ -8,6 +8,7 @@ import lombok.Data;
  * @author bianj
  * @version 1.0.0 2021-05-20
  */
+@Data
 public class MaterialType {
     /** 版本号 */
     private static final long serialVersionUID = 5895240732960572981L;

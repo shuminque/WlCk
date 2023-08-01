@@ -23,7 +23,6 @@
                                 <input type="text" name="applyTime" id="date"  placeholder="请选择开始日期"
                                        autocomplete="off" class="layui-input">
                             </div>
-
                         </div>
                         <div class="layui-inline">
                             <label class="layui-form-label">仓库</label>
@@ -148,7 +147,9 @@
                 req.depositoryId=data.depositoryId;
             }
             if (data.applyTime!==''){
-                req.applyTime=data.applyTime;
+                var dates = data.applyTime.split(' - ');
+                req.startDate = dates[0];
+                req.endDate = dates[1];
             }
             //执行搜索重载
             table.reload('currentTableId', {

@@ -10,6 +10,7 @@
         <id column="at_id" property="atId" jdbcType="INTEGER" />
         <result column="depository_id" property="depositoryId" jdbcType="INTEGER" />
         <result column="mname" property="mname" jdbcType="VARCHAR" />
+        <result column="model" property="model" jdbcType="VARCHAR" />
         <result column="quantity" property="quantity" jdbcType="VARCHAR" />
         <result column="price" property="price" jdbcType="VARCHAR" />
         <result column="type_id" property="typeId" jdbcType="INTEGER" />
@@ -19,7 +20,7 @@
 
     <!-- 表查询字段 -->
     <sql id="allColumns">
-        m.id, m.at_id, m.depository_id, m.mname, m.quantity, m.price, m.type_id, m.state_id, m.engin_id
+        m.id, m.at_id, m.depository_id, m.mname, m.model, m.quantity, m.price, m.type_id, m.state_id, m.engin_id
     </sql>
 
     <!-- 查询所有数据的条数 -->
@@ -39,6 +40,9 @@
         </if>
         <if test="mname != null and mname != ''">
             AND m.mname LIKE CONCAT('%', #{mname}, '%')
+        </if>
+        <if test="model != null and model != ''">
+            AND m.model LIKE CONCAT('%', #{model}, '%')
         </if>
         <if test="quantity != null">
             AND m.quantity = #{quantity}
@@ -77,6 +81,9 @@
         </if>
         <if test="mname != null and mname != ''">
             AND m.mname LIKE CONCAT('%', #{mname}, '%')
+        </if>
+        <if test="model != null and model != ''">
+            AND m.model LIKE CONCAT('%', #{model}, '%')
         </if>
         <if test="quantity != null">
             AND m.quantity = #{quantity}
@@ -121,12 +128,13 @@
     <!-- 插入数据 -->
     <insert id="insertMaterial" parameterType="map">
         INSERT INTO material (
-            id, at_id, depository_id, mname, quantity, price, type_id, state_id, enign_id
+            id, at_id, depository_id, mname, model,  quantity, price, type_id, state_id, enign_id
         ) VALUES (
             #{id},
             #{atId},
             #{depositoryId},
             #{mname},
+            #{model},
             #{quantity},
             #{price},
             #{typeId},
@@ -138,7 +146,7 @@
     <!-- 批量插入数据 -->
     <insert id="insertMaterials" parameterType="list">
         INSERT INTO material (
-            id, at_id, depository_id, mname, quantity, price, type_id, state_id, enign_id
+            id, at_id, depository_id, mname, model, quantity, price, type_id, state_id, enign_id
         ) VALUES
         <foreach collection="list" index="index" item="item" separator=",">
             (
@@ -146,6 +154,7 @@
                 #{item.atId},
                 #{item.depositoryId},
                 #{item.mname},
+                #{item.model},
                 #{item.quantity},
                 #{item.price},
                 #{item.typeId},
@@ -167,6 +176,9 @@
             </if>
             <if test="mname != null">
                 mname = #{mname},
+            </if>
+            <if test="model != null">
+                model = #{model},
             </if>
             <if test="quantity != null">
                 quantity = #{quantity},
@@ -227,6 +239,9 @@
                 </if>
                 <if test="item.mname != null">
                     mname = #{item.mname},
+                </if>
+                <if test="item.model != null">
+                    model = #{item.model},
                 </if>
                 <if test="item.quantity != null">
                     quantity = #{item.quantity},

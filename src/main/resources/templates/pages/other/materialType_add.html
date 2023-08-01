@@ -12,22 +12,25 @@
 <body>
 <div class="layuimini-container">
     <div class="layuimini-main">
+        <table class="layui-hide" id="currentTableId" lay-filter="currentTableFilter">
+            <legend>类型信息</legend>
+        </table>
         <fieldset class="table-search-fieldset">
-            <legend>材料种类增加</legend>
+            <legend>材料类型增加</legend>
             <div class="layui-fluid">
                 <div class="layui-card">
                     <div class="layui-card-body" style="padding-top: 40px;">
                         <div>
                             <form class="layui-form" lay-filter="form1" style="margin: 0 auto;max-width: 460px;padding-top: 100px; padding-bottom: 200px">
                                 <div class="layui-form-item">
-                                    <label class="layui-form-label">种类名称:</label>
+                                    <label class="layui-form-label">类型名称:</label>
                                     <div class="layui-input-block">
-                                        <input type="text" placeholder="请填写材料种类名称" class="layui-input" name="tname"
+                                        <input type="text" placeholder="请填写材料类型名称" class="layui-input" name="tname"
                                                lay-verify="required"/>
                                     </div>
                                 </div>
                                 <div class="layui-form-item">
-                                    <label class="layui-form-label">种类介绍:</label>
+                                    <label class="layui-form-label">类型介绍:</label>
                                     <div class="layui-input-block">
                                         <input type="text" placeholder="请填写入材料种类介绍" name="introduce" class="layui-input"
                                                lay-verify="required" required>
@@ -37,7 +40,7 @@
                                 <div class="layui-form-item">
                                     <div class="layui-input-block">
                                         <button class="layui-btn" lay-submit lay-filter="formStep">
-                                            &emsp;增加种类&emsp;
+                                            &emsp;增加类型&emsp;
                                         </button>
                                     </div>
                                 </div>
@@ -54,10 +57,45 @@
     <script src="/static/lib/layui-v2.6.3/layui.js" charset="utf-8"></script>
     <script>
         var data;
-        layui.use(['form', 'layer'], function () {
+        layui.use(['form', 'table','layer'], function () {
             var $ = layui.jquery,
                 form = layui.form,
+                table = layui.table,
                 layer = layui.layer;
+
+            table.render({
+                elem: "#currentTableId",
+                url: '/materialType',
+                parseData: function (res) { //res 即为原始返回的数据
+                    return {
+                        "status": res.status, //解析接口状态
+                        "message": res.statusInfo.message, //解析提示文本
+                        "count": res.count, //解析数据长度
+                        "data": res.data //解析数据列表
+                    };
+                },
+                request: {
+                    pageName: 'page', //页码的参数名称，默认：page
+                    limitName: 'size' //每页数据量的参数名，默认：limit
+                },
+                response: {
+                    statusName: 'status' //规定数据状态的字段名称，默认：code
+                    ,statusCode: 200 //规定成功的状态码，默认：0
+                    ,msgName: 'message' //规定状态信息的字段名称，默认：msg
+                    ,countName: 'count' //规定数据总数的字段名称，默认：count
+                    ,dataName: 'data' //规定数据列表的字段名称，默认：data
+                },
+                toolbar: ['filter', 'exports', 'print'],
+                cols: [ [
+                    {field: 'id', width: '25%', title: '编号'},
+                    {field: 'tname', width: '25%', title: '类型名称', sort: true},
+                    {field: 'introduce', width: '25%', title: '类型介绍'},
+                ]],
+                limits: [10, 15, 20, 25, 50],
+                limit: 10,
+                page: true,
+                skin: 'line'
+            });
 
             form.on('submit(formStep)', function (data) {
                 $.ajax({

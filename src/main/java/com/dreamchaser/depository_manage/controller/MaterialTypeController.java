@@ -4,9 +4,7 @@ import com.dreamchaser.depository_manage.pojo.RestResponse;
 import com.dreamchaser.depository_manage.service.MaterialTypeService;
 import com.dreamchaser.depository_manage.utils.CrudUtil;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 
@@ -17,6 +15,10 @@ public class MaterialTypeController {
     @PostMapping("/materialType")
     public RestResponse insertMaterialType(@RequestBody Map<String,Object> map){
         return CrudUtil.postHandle(materialTypeService.insertMaterialType(map),1);
+    }
+    @GetMapping("/materialType")
+    public RestResponse findMaterialType(@RequestParam Map<String,Object> map){
+        return new RestResponse(materialTypeService.findMaterialTypeAll(),materialTypeService.findCountByCondition(map),200);
     }
 
 }

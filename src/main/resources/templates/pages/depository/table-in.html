@@ -76,7 +76,8 @@
 
         //日期
         laydate.render({
-            elem: '#date'
+            elem: '#date',
+            range: true
         });
         table.render({
             elem: "#currentTableId",
@@ -142,7 +143,9 @@
                 req.depositoryId=data.depositoryId;
             }
             if (data.applyTime!==''){
-                req.applyTime=data.applyTime;
+                var dates = data.applyTime.split(' - ');
+                req.startDate = dates[0];
+                req.endDate = dates[1];
             }
             //执行搜索重载
             table.reload('currentTableId', {

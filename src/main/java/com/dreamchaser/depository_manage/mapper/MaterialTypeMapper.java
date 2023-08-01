@@ -1,5 +1,6 @@
 package com.dreamchaser.depository_manage.mapper;
 
+import com.dreamchaser.depository_manage.entity.Depository;
 import com.dreamchaser.depository_manage.entity.MaterialType;
 import org.apache.ibatis.annotations.Mapper;
 import org.springframework.stereotype.Repository;
@@ -54,4 +55,9 @@ public interface MaterialTypeMapper {
      * @return 符合条件结果
      */
     List<MaterialType> findMaterialTypeByCondition(Map<String,Object> map);
+
+    List<MaterialType> findMaterialTypeAll();
+
+    Integer findCountByCondition(Map<String,Object> map);
+
 }
