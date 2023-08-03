@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 /**
  * 全局异常捕捉处理
- * @author 金昊霖
  */
 @ControllerAdvice
 @Slf4j

@@ -29,6 +29,7 @@ public class MaterialP {
 
     /** 总金额 */
     private Double price;
+    private Double unitPrice;
 
     /** 材料种类名称 */
     private String typeName;
@@ -37,7 +38,7 @@ public class MaterialP {
 
     private String enginName;
 
-    public MaterialP(Integer id, Integer atId, Integer depositoryId, String mname, String model, Double quantity, Double price, String typeName,
+    public MaterialP(Integer id, Integer atId, Integer depositoryId, String mname, String model, Double quantity, Double price, Double unitPrice, String typeName,
                      String stateName, String enginName) {
         this.id = id;
         this.atId=atId;
@@ -45,6 +46,7 @@ public class MaterialP {
         this.model =model;
         this.quantity = quantity;
         this.price = price;
+        this.unitPrice=unitPrice;
         this.typeName = typeName;
         this.stateName =stateName;
         this.enginName =enginName;
@@ -56,5 +58,6 @@ public class MaterialP {
         this.model = material.getModel();
         this.quantity = material.getQuantity();
         this.price = material.getPrice();
+        this.unitPrice=material.getUnitPrice();
     }
 }

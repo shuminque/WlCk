@@ -27,7 +27,6 @@ import static com.dreamchaser.depository_manage.utils.CrudUtil.deleteHandle;
 
 /**
  * 用户的相关接口
- * @author 金昊霖
  */
 @RestController
 public class UserController {

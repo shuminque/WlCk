@@ -22,6 +22,10 @@ import java.util.Map;
 public class DepositoryRecordController {
     @Autowired
     private DepositoryRecordService depositoryRecordService;
+    @GetMapping("/get_record")
+    public DepositoryRecordP getDepositoryRecordById(@RequestParam Integer id) {
+        return depositoryRecordService.findDepositoryRecordById(id);
+    }
     @GetMapping("/depositoryRecord")
     public RestResponse findDepositoryRecordByCondition(@RequestParam Map<String,Object> map){
         String dateRange = (String) map.get("applyTime");

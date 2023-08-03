@@ -32,7 +32,12 @@
                                 <input type="text" name="mname" autocomplete="off" class="layui-input">
                             </div>
                         </div>
-
+<!--                        <div class="layui-inline">-->
+<!--                            <label class="layui-form-label">AT号</label>-->
+<!--                            <div class="layui-input-inline">-->
+<!--                                <input type="text" name="atId" autocomplete="off" class="layui-input">-->
+<!--                            </div>-->
+<!--                        </div>-->
 
                         <div class="layui-inline">
                             <button type="submit" class="layui-btn layui-btn-primary" lay-submit
@@ -79,15 +84,16 @@
             },
             toolbar: ['filter', 'exports', 'print'],
             cols: [ [
-                {field: 'id', width: '8%', title: '编号'},
+                {field: 'id', width: '4%', title: '编号'},
                 {field: 'depositoryName', width: '6%', title: '厂区', sort: true},
                 {field: 'atId', width: '6%', title: 'AT号'},
-                {field: 'mname', width: '14%', title: '品名'},
-                {field: 'model', width: '14%', title: '型号'},
+                {field: 'mname', width: '10%', title: '品名'},
+                {field: 'model', width: '7%', title: '型号'},
                 {field: 'typeName', width: '18%', title: '材料类型'},
                 {field: 'enginName',title: '工程', width:'12%', sort: true },
                 {field: 'stateName',title: '状态', width:'16%', sort: true },
-                {field: 'price', title: '金额', width: '12%', sort: true},
+                {field: 'price', title: '金额', width: '8%', sort: true},
+                {field: 'unitPrice', title: '均价', width: '8%', sort: true},
                 {field: 'quantity', width: '8%', title: '数量', sort: true},
             ]],
             limits: [10, 15, 20, 25, 50],
@@ -103,6 +109,9 @@
             if (data.mname!==''){
                 req.mname=data.mname;
             }
+            // if (data.atId!==''){
+            //     req.atId = data.atId;
+            // }
             if (data.depositoryId!==''){
                 req.depositoryId=data.depositoryId;
             }

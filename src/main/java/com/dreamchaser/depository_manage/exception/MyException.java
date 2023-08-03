@@ -3,7 +3,6 @@ package com.dreamchaser.depository_manage.exception;
 
 /**
  * 自定义异常类
- * @author 金昊霖
  */
 public class MyException extends RuntimeException {
     /**

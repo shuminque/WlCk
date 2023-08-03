@@ -13,7 +13,6 @@ import java.io.IOException;
 
 /**
  * 认证拦截器，如果请求头中有相应凭证则放行，否则拦截返回认证失效错误
- * @author 金昊霖
  */
 @Slf4j
 @Component

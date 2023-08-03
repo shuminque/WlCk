@@ -31,6 +31,8 @@ public class Material {
     /** 总金额 */
     private Double price;
 
+    private Double unitPrice;
+
     /** 材料种类id */
     private Integer typeId;
 

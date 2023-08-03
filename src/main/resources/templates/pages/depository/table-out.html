@@ -52,7 +52,7 @@
 
         <script type="text/html" id="toolbarDemo">
             <div class="layui-btn-container">
-                <button class="layui-btn layui-btn-normal layui-btn-sm data-add-btn" lay-event="add"> 添加</button>
+<!--                <button class="layui-btn layui-btn-normal layui-btn-sm data-add-btn" lay-event="add"> 添加</button>-->
                 <button class="layui-btn layui-btn-sm layui-btn-danger data-delete-btn" lay-event="delete"> 删除</button>
             </div>
         </script>
@@ -244,7 +244,7 @@
             } else if (obj.event === 'delete') {
                 var req={};
                 req.id=data.id;
-                layer.confirm('真的删除么', {icon: 2, title: '提示'}, function (index) {
+                layer.confirm('确认删除', {icon: 2, title: '提示'}, function (index) {
                     $.ajax({
                         url: '/depositoryRecord',
                         type: 'delete',
@@ -269,19 +269,26 @@
                         }
                     })
                 });
-            } else if (obj.event ==='edit'){
-                var index = layer.open({
-                    title: '出库信息修改',
-                    type: 2,
-                    shade: 0.2,
-                    maxmin: true,
-                    shadeClose: true,
-                    area: ['100%', '100%'],
-                    content: '/form_step_look?id='+data.id,
-                });
-                $(window).on("resize", function () {
-                    layer.full(index);
-                });
+            } else if (obj.event === 'edit') {
+                // 检查流程状态是否为待审核
+                if (data.state === '待审核') {
+                    var index = layer.open({
+                        title: '出库信息编辑',
+                        type: 2,
+                        shade: 0.2,
+                        maxmin: true,
+                        shadeClose: true,
+                        area: ['100%', '100%'],
+                        content: '/application_out?id=' + data.id,
+                    });
+                    $(window).on("resize", function () {
+                        layer.full(index);
+                    });
+                    // 重定向到提交申请页面，并通过查询参数传递记录的ID
+                    // window.location.href = '/application_in?id=' + data.id;
+                } else {
+                    layer.alert('只有待审核的记录才能编辑', {icon: 5});
+                }
                 return false;
             }
         });
