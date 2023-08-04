@@ -85,83 +85,104 @@
             elem: '#date',
             range: true
         });
-        table.render({
-            elem: "#currentTableId",
-            url: '/depositoryRecord',
-            parseData: function (res) { //res 即为原始返回的数据
-                return {
-                    "status": res.status, //解析接口状态
-                    "message": res.statusInfo.message, //解析提示文本
-                    "count": res.count, //解析数据长度
-                    "data": res.data //解析数据列表
-                };
+        //用户区分
+        $.ajax({
+            url: '/get_user_depository',
+            type: 'GET',
+            dataType: 'json',
+            success: function(data) {
+                let pp;
+                var userDepositoryId = data.depositoryId;
+                // 如果depositoryId为0，则允许访问两个厂区
+                if (userDepositoryId === 0) {
+                    pp = '/depositoryRecord';
+                } else {
+                    pp = '/depositoryRecord?depositoryId=' + userDepositoryId;
+                }
+                table.render({
+                    elem: "#currentTableId",
+                    url: pp,
+                    parseData: function (res) { //res 即为原始返回的数据
+                        return {
+                            "status": res.status, //解析接口状态
+                            "message": res.statusInfo.message, //解析提示文本
+                            "count": res.count, //解析数据长度
+                            "data": res.data //解析数据列表
+                        };
+                    },
+                    request: {
+                        pageName: 'page', //页码的参数名称，默认：page
+                        limitName: 'size' //每页数据量的参数名，默认：limit
+                    },
+                    where: {
+                        type:"1"
+                    },
+                    response: {
+                        statusName: 'status' //规定数据状态的字段名称，默认：code
+                        ,statusCode: 200 //规定成功的状态码，默认：0
+                        ,msgName: 'message' //规定状态信息的字段名称，默认：msg
+                        ,countName: 'count' //规定数据总数的字段名称，默认：count
+                        ,dataName: 'data' //规定数据列表的字段名称，默认：data
+                    },
+                    toolbar: '#toolbarDemo',
+                    defaultToolbar: ['filter', 'exports', 'print'],
+                    //这里layui和thymeleaf冲突了，要加个空格
+                    cols: [ [
+                        {type: "checkbox", width: 50},
+                        {field: 'id', width: 100, title: '申请编号', sort: true},
+                        {field: 'atId', width: 100, title: 'AT号', sort: true},
+                        {field: 'mname', width: 120, title: '材料名称'},
+                        {field: 'depositoryName', width: 120, title: '仓库名称', sort: true},
+                        {field: 'quantity', width: 80, title: '数量', sort: true},
+                        {field: 'price', title: '金额', minWidth: 80, sort: true},
+                        {field: 'applyRemark', title: '类型', minWidth: 120, sort: true},
+                        {field: 'state', width: 150, title: '流程状态', sort: true},
+                        {field: 'applicantName', width: 150, title: '申请人', sort: true},
+                        {field: 'applyTime', width: 170, title: '申请时间', sort: true},
+                        {title: '操作', minWidth: 200, toolbar: '#currentTableBar', align: "center"}
+                    ]],
+                    limits: [10, 15, 20, 25, 50],
+                    limit: 10,
+                    page: true,
+                    skin: 'line'
+                });
+
+                // 监听搜索操作
+                form.on('submit(data-search-btn)', function (data) {
+                    var req={};
+                    data=data.field;
+                    req.type=1;
+                    if (data.atId!==''){
+                        req.atId=data.atId;
+                    }
+                    if (data.mname!==''){
+                        req.mname=data.mname;
+                    }
+                    if (data.depositoryId!==''){
+                        req.depositoryId=data.depositoryId;
+                    }
+                    if (data.applyTime!==''){
+                        var dates = data.applyTime.split(' - ');
+                        req.startDate = dates[0];
+                        req.endDate = dates[1];
+                    }
+                    //执行搜索重载
+                    table.reload('currentTableId', {
+                        url: pp,
+                        page: {
+                            curr: 1
+                        },
+                        where: req
+                    }, 'data');
+                    return false;
+                });
             },
-            request: {
-                pageName: 'page', //页码的参数名称，默认：page
-                limitName: 'size' //每页数据量的参数名，默认：limit
-            },
-            where: {
-                type:"1"
-            },
-            response: {
-                statusName: 'status' //规定数据状态的字段名称，默认：code
-                ,statusCode: 200 //规定成功的状态码，默认：0
-                ,msgName: 'message' //规定状态信息的字段名称，默认：msg
-                ,countName: 'count' //规定数据总数的字段名称，默认：count
-                ,dataName: 'data' //规定数据列表的字段名称，默认：data
-            },
-            toolbar: '#toolbarDemo',
-            defaultToolbar: ['filter', 'exports', 'print'],
-            //这里layui和thymeleaf冲突了，要加个空格
-            cols: [ [
-                {type: "checkbox", width: 50},
-                {field: 'id', width: 100, title: '申请编号', sort: true},
-                {field: 'atId', width: 100, title: 'AT号', sort: true},
-                {field: 'mname', width: 120, title: '材料名称'},
-                {field: 'depositoryName', width: 120, title: '仓库名称', sort: true},
-                {field: 'quantity', width: 80, title: '数量', sort: true},
-                {field: 'price', title: '金额', minWidth: 80, sort: true},
-                {field: 'applyRemark', title: '类型', minWidth: 120, sort: true},
-                {field: 'state', width: 150, title: '流程状态', sort: true},
-                {field: 'applicantName', width: 150, title: '申请人', sort: true},
-                {field: 'applyTime', width: 170, title: '申请时间', sort: true},
-                {title: '操作', minWidth: 200, toolbar: '#currentTableBar', align: "center"}
-            ]],
-            limits: [10, 15, 20, 25, 50],
-            limit: 10,
-            page: true,
-            skin: 'line'
+            error: function() {
+                // 处理错误，例如显示一个消息
+                layer.msg('无法获取用户的厂区信息');
+            }
         });
 
-        // 监听搜索操作
-        form.on('submit(data-search-btn)', function (data) {
-            var req={};
-            data=data.field;
-            req.type=1;
-            if (data.atId!==''){
-                req.atId=data.atId;
-            }
-            if (data.mname!==''){
-                req.mname=data.mname;
-            }
-            if (data.depositoryId!==''){
-                req.depositoryId=data.depositoryId;
-            }
-            if (data.applyTime!==''){
-                var dates = data.applyTime.split(' - ');
-                req.startDate = dates[0];
-                req.endDate = dates[1];
-            }
-            //执行搜索重载
-            table.reload('currentTableId', {
-                url: '/depositoryRecord',
-                page: {
-                    curr: 1
-                },
-                where: req
-            }, 'data');
-            return false;
-        });
 
         /**
          * toolbar监听事件

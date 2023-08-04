@@ -21,21 +21,25 @@
                         <div carousel-item>
                             <div>
                                 <form class="layui-form" style="margin: 0 auto;max-width: 460px;padding-top: 40px;">
-                                    <div class="layui-form-item">
-                                        <label class="layui-form-label">厂区:</label>
-                                        <div class="layui-input-block">
-                                            <select name="depositoryId" lay-verify="required" id="depositorySelect">
-                                                <option th:each="depository,iterStar:${depositories}" th:value="${depository?.getId()}" th:text="${depository?.getDname()}" ></option>
-                                            </select>
-                                        </div>
-                                    </div>
+<!--                                    <div class="layui-form-item" >-->
+<!--                                        <label class="layui-form-label">厂区:</label>-->
+<!--                                        <div class="layui-input-block">-->
+<!--                                            <select name="depositoryId" lay-verify="required" id="depositorySelect">-->
+<!--                                                <option th:each="depository,iterStar:${depositories}" th:value="${depository?.getId()}" th:text="${depository?.getDname()}" ></option>-->
+<!--                                            </select>-->
+<!--                                        </div>-->
+<!--                                    </div>-->
                                     <div class="layui-form-item">
                                         <label class="layui-form-label">品名:</label>
                                         <div class="layui-input-block">
-                                            <input name="mname" type="text" id="materialSelect" placeholder="请填写品名" readonly class="layui-input" lay-verify="required"  />
-                                            <input name="atId"  type="text" id='atIdSelect' placeholder="AT号" readonly class="layui-input" />
+                                            <input name="mname" type="text" id="materialSelect" placeholder="请填写品名" readonly class="layui-input" lay-verify="required" />
+                                            <!-- 隐藏的输入字段用于传递AT号和厂区ID -->
+                                            <input name="atId" type="hidden" id="atIdSelect" />
+                                            <input name="depositoryId" type="hidden" id="depositorySelect" />
+
                                         </div>
                                     </div>
+
                                     <div class="layui-form-item">
                                         <label class="layui-form-label">数量:</label>
                                         <div class="layui-input-block">
@@ -114,6 +118,10 @@
 <script type="text/javascript" src="/static/js/lay-config.js?v=1.0.4" charset="utf-8"></script>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script>
+    var depositoryMapping = {
+        'SAB': 1, // 你的实际映射
+        'ZAB': 2,
+    };
     layui.use([ 'form', 'step', 'tableSelect'], function () {
         var $ = layui.$,
             form = layui.form,
@@ -167,74 +175,93 @@
             })
             return false;
         });
+        var userDepositoryId;
+        $.ajax({
+            url: '/get_user_depository',
+            type: 'GET',
+            dataType: 'json',
+            success: function(data) {
+                let pp;
+                var userDepositoryId = data.depositoryId;
+                // 如果depositoryId为0，则允许访问两个厂区
+                if (userDepositoryId === 0) {
+                    pp = '/material';
+                } else {
+                     pp = '/material?depositoryId=' + userDepositoryId;
+                }
+                tableSelect.render({
+                    elem: '#materialSelect', // 定义输入框input对象
+                    checkedKey: 'id', // 表格的唯一建值
+                    searchType: 'more',
+                    searchList : [
+                        {searchKey: 'atId', searchPlaceholder: "搜索物品AT号"},
+                    ],
 
-        tableSelect.render({
-            elem: '#materialSelect', // 定义输入框input对象
-            checkedKey: 'id', // 表格的唯一建值
-            searchType: 'more',
-            searchList : [
-                {searchKey: 'atId', searchPlaceholder: "搜索物品AT号"},
-            ],
-            table: { // 定义表格参数
-                url: '/material', // 你的数据源URL
-                parseData: function (res) { //res 即为原始返回的数据
-                    return {
-                        "status": res.status, //解析接口状态
-                        "message": res.statusInfo.message, //解析提示文本
-                        "count": res.count, //解析数据长度
-                        "data": res.data //解析数据列表
-                    };
-                },
-                request: {
-                    pageName: 'page', //页码的参数名称，默认：page
-                    limitName: 'size' //每页数据量的参数名，默认：limit
-                },
-                response: {
-                    statusName: 'status' //规定数据状态的字段名称，默认：code
-                    ,statusCode: 200 //规定成功的状态码，默认：0
-                    ,msgName: 'message' //规定状态信息的字段名称，默认：msg
-                    ,countName: 'count' //规定数据总数的字段名称，默认：count
-                    ,dataName: 'data' //规定数据列表的字段名称，默认：data
-                },
-                cols: [ [
-                    {type: 'radio'},
-                    {field: 'depositoryName',  title: '厂区', sort: true},
-                    {field: 'atId', title: 'AT号'},
-                    {field: 'mname',  title: '品名'},
-                    {field: 'typeName',  title: '材料类型'},
-                    {field: 'enginName',title: '工程',  sort: true },
-                ]],
-                limits: [10, 15, 20, 25, 50],
-                limit: 10,
-                page: true,
-                skin: 'line'
+                    table: { // 定义表格参数
+                        url: pp,
+                        parseData: function (res) { //res 即为原始返回的数据
+                            return {
+                                "status": res.status, //解析接口状态
+                                "message": res.statusInfo.message, //解析提示文本
+                                "count": res.count, //解析数据长度
+                                "data": res.data //解析数据列表
+                            };
+                        },
+                        request: {
+                            pageName: 'page', //页码的参数名称，默认：page
+                            limitName: 'size' //每页数据量的参数名，默认：limit
+                        },
+                        response: {
+                            statusName: 'status' //规定数据状态的字段名称，默认：code
+                            ,statusCode: 200 //规定成功的状态码，默认：0
+                            ,msgName: 'message' //规定状态信息的字段名称，默认：msg
+                            ,countName: 'count' //规定数据总数的字段名称，默认：count
+                            ,dataName: 'data' //规定数据列表的字段名称，默认：data
+                        },
+                        cols: [ [
+                            {type: 'radio'},
+                            {field: 'depositoryName',  title: '厂区', sort: true},
+                            {field: 'atId', title: 'AT号'},
+                            {field: 'mname',  title: '品名'},
+                            {field: 'model', title: '型号'},
+                            {field: 'typeName',  title: '材料类型'},
+                            {field: 'enginName',title: '工程',  sort: true },
+                        ]],
+                        limits: [10, 15, 20, 25, 50],
+                        limit: 10,
+                        page: true,
+                        skin: 'line'
+                    },
+                    done: function (elem, data) {
+
+                        // 获取选中的数据
+                        var selectedData = data.data[0];// 设置品名输入框的值
+                        $('#materialSelect').val(selectedData.mname);
+                        $('#atIdSelect').val(selectedData.atId); // 请确保这是正确的属性名
+                        var depositoryId = depositoryMapping[selectedData.depositoryName];
+                        $('#depositorySelect').val(depositoryId);
+
+                        // // 获取物品的厂区名称
+                        // var depositoryName = selectedData.depositoryName; // 请确保这是正确的属性名
+                        //
+                        // // 使用厂区名称来设置选择框的值
+                        // $("#depositorySelect option").each(function() {
+                        //     if ($(this).text() === depositoryName) {
+                        //         $(this).prop("selected", true);
+                        //     }
+                        // });
+
+                        // 重新渲染表单
+                        layui.form.render('select');
+                    }
+                });
             },
-            done: function (elem, data) {
-                // 获取选中的数据
-                var selectedData = data.data[0];
-                // 设置品名输入框的值
-                $('#materialSelect').val(selectedData.mname);
-
-                // 获取物品的厂区名称
-                var depositoryName = selectedData.depositoryName; // 请确保这是正确的属性名
-                var atId = selectedData.atId; // 请确保这是正确的属性名
-
-                // 使用厂区名称来设置选择框的值
-                $("#depositorySelect option").each(function() {
-                    if ($(this).text() === depositoryName) {
-                        $(this).prop("selected", true);
-                    }
-                });
-                $("#atIdSelect input").each(function() {
-                    if ($(this).text() === atId) {
-                        $(this).prop("selected", true);
-                    }
-                });
-                // 重新渲染表单
-                layui.form.render('select');
-                layui.form.render('input');
+            error: function() {
+                // 处理错误，例如显示一个消息
+                layer.msg('无法获取用户的厂区信息');
             }
         });
+
 
         form.on('submit(formStep2)', function (data) {
             step.next('#stepForm');
@@ -261,6 +288,7 @@
             $.get('/get_record?id=' + id, function(data) {
                 // 填充表单
                 $('select[name="depositoryId"]').val(data.depositoryId);
+                $('select[name="atId"]').val(data.atId);
                 $('input[name="mname"]').val(data.mname);
                 $('input[name="quantity"]').val(data.quantity);
                 $('select[name="currency"]').val(data.currency);

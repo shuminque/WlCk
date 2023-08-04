@@ -1,5 +1,6 @@
 package com.dreamchaser.depository_manage.controller;
 
+import com.dreamchaser.depository_manage.entity.User;
 import com.dreamchaser.depository_manage.exception.MyException;
 import com.dreamchaser.depository_manage.pojo.RestResponse;
 import com.dreamchaser.depository_manage.pojo.StatusInfo;
@@ -14,11 +15,14 @@ import com.dreamchaser.depository_manage.utils.Md5;
 import com.dreamchaser.depository_manage.utils.ObjectFormatUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -46,6 +50,18 @@ public class UserController {
      * @param map 参数列表，包括账号（手机注册就是phone，邮箱就是email）、密码
      * @return 成功则返回凭证，否则返回验证失败
      */
+
+    @GetMapping("/get_user_depository")
+    public ResponseEntity<?> getUserDepository(HttpServletRequest request){
+        UserToken userToken =(UserToken) request.getAttribute("userToken");
+        if(userToken != null&& userToken.getUser()!=null){
+            Integer depositoryId = userToken.getUser().getDepositoryId();
+            return new ResponseEntity<>(Collections.singletonMap("depositoryId",depositoryId), HttpStatus.OK);
+        }else {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+    }
+
     @PostMapping("/register")
     public RestResponse register(@RequestBody Map<String,Object>map){
         String principal;

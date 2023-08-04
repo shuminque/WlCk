@@ -310,7 +310,7 @@
                 application_id = #{applicationId},
             </if>
             <if test="atId != null">
-                AND dr.at_id = #{atId}
+                at_id = #{atId},
             </if>
             <if test="mname != null">
                 mname = #{mname},
@@ -376,7 +376,7 @@
                     application_id = #{applicationId},
                 </if>
                 <if test="atId != null">
-                    AND dr.at_id = #{atId}
+                    at_id = #{atId},
                 </if>
                 <if test="mname != null">
                     mname = #{mname},

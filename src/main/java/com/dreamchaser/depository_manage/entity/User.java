@@ -1,5 +1,7 @@
 package com.dreamchaser.depository_manage.entity;
 
+import lombok.Data;
+
 import java.util.Date;
 
 /**
@@ -8,6 +10,7 @@ import java.util.Date;
  * @author bianj
  * @version 1.0.0 2021-05-05
  */
+@Data
 public class User {
 
     /** 用户id */
