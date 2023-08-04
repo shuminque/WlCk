@@ -18,6 +18,8 @@ public class DepositoryRecordP {
      */
     private Integer applicationId;
 
+    private Integer atId;
+
     /**
      * 产品名称
      */
@@ -126,6 +128,7 @@ public class DepositoryRecordP {
     public DepositoryRecordP(DepositoryRecord dr) {
         this.id = dr.getId();
         this.applicationId = dr.getApplicationId();
+        this.atId=dr.getAtId();
         this.mname = dr.getMname();
         this.depositoryId = dr.getDepositoryId();
         this.type = dr.getType();

@@ -16,6 +16,7 @@
     <resultMap id="depositoryRecordMap" type="com.dreamchaser.depository_manage.entity.DepositoryRecord">
         <id column="id" property="id" jdbcType="INTEGER" />
         <result column="application_id" property="applicationId" jdbcType="INTEGER" />
+        <result column="at_id" property="atId" jdbcType="INTEGER" />
         <result column="mname" property="mname" jdbcType="VARCHAR" />
         <result column="depository_id" property="depositoryId" jdbcType="INTEGER" />
         <result column="type" property="type" jdbcType="INTEGER" />
@@ -42,7 +43,7 @@
     </sql>
     <!-- 表查询字段 -->
     <sql id="allColumns">
-        dr.id, dr.application_id, dr.mname, dr.depository_id, dr.type, dr.quantity, dr.price, dr.state,
+        dr.id, dr.application_id, dr.at_id, dr.mname, dr.depository_id, dr.type, dr.quantity, dr.price, dr.state,
         dr.applicant_id, dr.apply_remark, dr.apply_time, dr.reviewer_id, dr.review_remark, dr.review_time, dr.review_pass,
         dr.checker_id, dr.check_remark, dr.check_time, dr.check_pass
     </sql>
@@ -73,6 +74,9 @@
         FROM depository_record dr WHERE 1 = 1
         <if test="applicationId != null">
             AND dr.application_id = #{applicationId}
+        </if>
+        <if test="atId != null">
+            AND dr.at_id = #{atId}
         </if>
         <if test="mname != null and mname != ''">
             AND dr.mname LIKE CONCAT('%', #{mname}, '%')
@@ -165,6 +169,9 @@
         <if test="applicationId != null">
             AND dr.application_id = #{applicationId}
         </if>
+        <if test="atId != null">
+            AND dr.at_id = #{atId}
+        </if>
         <if test="mname != null and mname != ''">
             AND dr.mname LIKE CONCAT('%', #{mname}, '%')
         </if>
@@ -234,13 +241,14 @@
     <!-- 插入数据 -->
     <insert id="insertDepositoryRecord" parameterType="map" useGeneratedKeys="true" keyProperty="id">
         INSERT INTO depository_record (
-            id, application_id, mname, depository_id, type, quantity, price, state,
+            id, application_id, at_id,  mname, depository_id, type, quantity, price, state,
             applicant_id, apply_remark, apply_time,
             reviewer_id, review_remark, review_time,review_pass, checker_id, check_remark,
             check_time,check_pass
         ) VALUES (
             #{id},
             #{applicationId},
+            #{atId},
             #{mname},
             #{depositoryId},
             #{type},
@@ -264,7 +272,7 @@
     <!-- 批量插入数据 -->
     <insert id="insertDepositoryRecords" parameterType="list">
         INSERT INTO depository_record (
-        id, application_id, mname, depository_id, type, quantity, price, state,
+        id, application_id, mname, at_id, depository_id, type, quantity, price, state,
         applicant_id, apply_remark, apply_time, reviewer_id, review_remark, review_time,review_pass, checker_id, check_remark,
         check_time,check_pass
         ) VALUES
@@ -272,6 +280,7 @@
             (
                 #{id},
                 #{applicationId},
+                #{atId},
                 #{mname},
                 #{depositoryId},
                 #{type},
@@ -299,6 +308,9 @@
         <set>
             <if test="applicationId != null">
                 application_id = #{applicationId},
+            </if>
+            <if test="atId != null">
+                AND dr.at_id = #{atId}
             </if>
             <if test="mname != null">
                 mname = #{mname},
@@ -362,6 +374,9 @@
             <set>
                 <if test="applicationId != null">
                     application_id = #{applicationId},
+                </if>
+                <if test="atId != null">
+                    AND dr.at_id = #{atId}
                 </if>
                 <if test="mname != null">
                     mname = #{mname},

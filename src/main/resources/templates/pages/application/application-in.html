@@ -33,6 +33,7 @@
                                         <label class="layui-form-label">品名:</label>
                                         <div class="layui-input-block">
                                             <input name="mname" type="text" id="materialSelect" placeholder="请填写品名" readonly class="layui-input" lay-verify="required"  />
+                                            <input name="atId"  type="text" id='atIdSelect' placeholder="AT号" readonly class="layui-input" />
                                         </div>
                                     </div>
                                     <div class="layui-form-item">
@@ -173,7 +174,6 @@
             searchType: 'more',
             searchList : [
                 {searchKey: 'atId', searchPlaceholder: "搜索物品AT号"},
-                {searchKey: 'mname', searchPlaceholder: "搜索物品名称"},
             ],
             table: { // 定义表格参数
                 url: '/material', // 你的数据源URL
@@ -217,6 +217,7 @@
 
                 // 获取物品的厂区名称
                 var depositoryName = selectedData.depositoryName; // 请确保这是正确的属性名
+                var atId = selectedData.atId; // 请确保这是正确的属性名
 
                 // 使用厂区名称来设置选择框的值
                 $("#depositorySelect option").each(function() {
@@ -224,8 +225,14 @@
                         $(this).prop("selected", true);
                     }
                 });
+                $("#atIdSelect input").each(function() {
+                    if ($(this).text() === atId) {
+                        $(this).prop("selected", true);
+                    }
+                });
                 // 重新渲染表单
                 layui.form.render('select');
+                layui.form.render('input');
             }
         });
 

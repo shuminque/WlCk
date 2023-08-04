@@ -77,13 +77,13 @@ public class DepositoryRecordServiceImpl implements DepositoryRecordService {
             if (reviewPass==1){
                 DepositoryRecord record=depositoryRecordMapper.findDepositoryRecordById(ObjectFormatUtil.toInteger(map.get("id")));
                 map.put("depositoryId",record.getDepositoryId());
+                map.put("atId",record.getAtId());
                 map.put("mname",record.getMname());
                 List<Material> list=materialMapper.findMaterialByCondition(map);
                 Material material=list.get(0);
                 if (1 == record.getType()){
                     map.put("state","已入库");
                     //这里貌似会引起并发问题
-//                    material.setPrice(material.getPrice()+record.getPrice()); //总数
 //                    material.setUnitPrice((material.getPrice()+(record.getPrice()*record.getQuantity()))/(material.getQuantity()+record.getQuantity()));
 //                    material.setPrice(material.getPrice()+(record.getQuantity()*record.getPrice())) ;  //总价=原总+入单*入数
                     double totalPrice = material.getPrice() + (record.getPrice() * record.getQuantity());

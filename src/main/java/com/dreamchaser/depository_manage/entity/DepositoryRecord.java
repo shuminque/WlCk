@@ -20,6 +20,9 @@ public class DepositoryRecord {
     /** 申请编号 */
     private Integer applicationId;
 
+    /**AT号*/
+    private Integer atId;
+
     /** 产品名称 */
     private String mname;
 
