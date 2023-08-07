@@ -2,7 +2,7 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="utf-8">
-    <title>layui</title>
+    <title>库存查询</title>
     <meta name="renderer" content="webkit">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
@@ -18,24 +18,27 @@
                 <form class="layui-form layui-form-pane" action="">
                     <div class="layui-form-item">
                         <div class="layui-inline">
-                            <label class="layui-form-label">仓库</label>
+                            <label class="layui-form-label">厂区</label>
                             <div class="layui-input-inline">
                                 <select name="depositoryId" >
-                                    <option value="" selected>请选择仓库</option>
+                                    <option value="" selected>请选择厂区</option>
                                     <option th:each="depository,iterStar:${depositories}" th:value="${depository?.getId()}" th:text="${depository?.getDname()}" >外芯仓库</option>
                                 </select>
                             </div>
                         </div>
                         <div class="layui-inline">
-                            <label class="layui-form-label">AT号</label>
                             <div class="layui-input-inline">
-                                <input type="text" name="atId" autocomplete="off" class="layui-input">
+                                <input type="text" name="atId" autocomplete="off" class="layui-input" placeholder="搜索AT号">
                             </div>
                         </div>
                         <div class="layui-inline">
-                            <label class="layui-form-label">品名</label>
                             <div class="layui-input-inline">
-                                <input type="text" name="mname" autocomplete="off" class="layui-input">
+                                <input type="text" name="mname" autocomplete="off" class="layui-input" placeholder="搜索品名">
+                            </div>
+                        </div>
+                        <div class="layui-inline">
+                            <div class="layui-input-inline">
+                                <input type="text" name="model" autocomplete="off" class="layui-input" placeholder="搜索规格">
                             </div>
                         </div>
 
@@ -124,6 +127,9 @@
                     }
                     if (data.atId!==''){
                         req.atId = data.atId;
+                    }
+                    if (data.model!==''){
+                        req.model=data.model;
                     }
                     if (data.depositoryId!==''){
                         req.depositoryId=data.depositoryId;

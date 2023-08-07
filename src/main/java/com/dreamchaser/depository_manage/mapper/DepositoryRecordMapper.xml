@@ -155,11 +155,9 @@
         FROM depository_record dr WHERE 1=1
         <if test='isDone == "0"'>
             and (dr.review_time is null and dr.reviewer_id =#{userId})
-
         </if>
         <if test='isDone == "1"'>
             and (dr.review_time is not null and dr.reviewer_id =#{userId})
-
         </if>
         <if test="begin != null and size != null">
             LIMIT #{begin},#{size}
