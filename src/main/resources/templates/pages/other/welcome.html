@@ -231,17 +231,11 @@
                 area: '300px;',
                 shade: 0.8,
                 id: 'layuimini-notice',
-                btn: ['查看', '取消'],
+                btn: ['取消'],
                 btnAlign: 'c',
                 moveType: 1,
                 content:html,
-                success: function (layero) {
-                    var btn = layero.find('.layui-layer-btn');
-                    btn.find('.layui-layer-btn0').attr({
-                        href: 'https://gitee.com/zhongshaofa/layuimini',
-                        target: '_blank'
-                    });
-                }
+
             });
         });
 
