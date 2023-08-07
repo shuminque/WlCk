@@ -78,6 +78,7 @@ public class DepositoryRecordServiceImpl implements DepositoryRecordService {
                 DepositoryRecord record=depositoryRecordMapper.findDepositoryRecordById(ObjectFormatUtil.toInteger(map.get("id")));
                 map.put("depositoryId",record.getDepositoryId());
                 map.put("atId",record.getAtId());
+                map.put("model",record.getModel());
                 map.put("mname",record.getMname());
                 List<Material> list=materialMapper.findMaterialByCondition(map);
                 Material material=list.get(0);

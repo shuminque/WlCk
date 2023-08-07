@@ -36,10 +36,9 @@
                                             <!-- 隐藏的输入字段用于传递AT号和厂区ID -->
                                             <input name="atId" type="hidden" id="atIdSelect" />
                                             <input name="depositoryId" type="hidden" id="depositorySelect" />
-
+                                            <input name="model" type="hidden" id="modelSelect" />
                                         </div>
                                     </div>
-
                                     <div class="layui-form-item">
                                         <label class="layui-form-label">数量:</label>
                                         <div class="layui-input-block">
@@ -82,7 +81,7 @@
                                     <div class="layui-form-item">
                                         <div class="layui-input-block">
                                             <button class="layui-btn" lay-submit lay-filter="formStep">
-                                                &emsp;提交申请&emsp;
+                                                &emsp;提交&emsp;
                                             </button>
                                         </div>
                                     </div>
@@ -116,7 +115,7 @@
     </div>
 </div>
 <script type="text/javascript" src="/static/js/lay-config.js?v=1.0.4" charset="utf-8"></script>
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script type="text/javascript" src="/static/js/http_ajax.googleapis.com_ajax_libs_jquery_3.5.1_jquery.js" charset="utf-8"></script>
 <script>
     var depositoryMapping = {
         'SAB': 1, // 你的实际映射
@@ -194,7 +193,7 @@
                     checkedKey: 'id', // 表格的唯一建值
                     searchType: 'more',
                     searchList : [
-                        {searchKey: 'atId', searchPlaceholder: "搜索物品AT号"},
+                        {searchKey: 'atId', searchPlaceholder: "搜索AT号"},
                         {searchKey: 'mname', searchPlaceholder: "搜索品名"},
                     ],
                     table: { // 定义表格参数
@@ -223,8 +222,8 @@
                             {field: 'depositoryName', width:'6%', title: '厂区'},
                             {field: 'atId', width:'6%', title: 'AT'},
                             {field: 'mname', width:'12%', title: '品名'},
-                            {field: 'model', title: '型号'},
-                            {field: 'typeName',  title: '材料类型'},
+                            {field: 'model', title: '规格'},
+                            {field: 'typeName',  title: '类型'},
                             {field: 'enginName',title: '工程'},
                         ]],
                         limits: [10, 15, 20, 25, 50],
@@ -233,14 +232,13 @@
                         skin: 'line'
                     },
                     done: function (elem, data) {
-
                         // 获取选中的数据
-                        var selectedData = data.data[0];// 设置品名输入框的值
+                        var selectedData = data.data[0];
                         $('#materialSelect').val(selectedData.mname);
-                        $('#atIdSelect').val(selectedData.atId); // 请确保这是正确的属性名
+                        $('#atIdSelect').val(selectedData.atId);
+                        $('#modelSelect').val(selectedData.model);
                         var depositoryId = depositoryMapping[selectedData.depositoryName];
                         $('#depositorySelect').val(depositoryId);
-
                         // // 获取物品的厂区名称
                         // var depositoryName = selectedData.depositoryName; // 请确保这是正确的属性名
                         //
@@ -271,7 +269,6 @@
         $('.next').click(function () {
             step.next('#stepForm');
         });
-
     });
     $(document).ready(function() {
         // 获取URL中的查询参数
@@ -289,8 +286,6 @@
                 $('input[name="price"]').val(data.price);
                 $('select[name="applyRemark"]').val(data.applyRemark);
                 $('select[name="reviewerId"]').val(data.reviewerId);
-                // 其他字段...
-
                 // 重新渲染表单
                 layui.form.render();
             });

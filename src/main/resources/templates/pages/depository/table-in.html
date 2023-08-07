@@ -18,14 +18,13 @@
                 <form class="layui-form layui-form-pane" action="">
                     <div class="layui-form-item">
                         <div class="layui-inline">
-                            <label class="layui-form-label">起止日期</label>
+                            <label class="layui-form-label">日期</label>
                             <div class="layui-input-block">
                                 <input type="text" name="applyTime" id="date"  placeholder="请选择起止日期"
                                        autocomplete="off" class="layui-input">
                             </div>
                         </div>
                         <div class="layui-inline">
-                            <label class="layui-form-label">厂区</label>
                             <div class="layui-input-inline">
                                 <select name="depositoryId" >
                                     <option value="" selected>请选择厂区</option>
@@ -34,15 +33,18 @@
                             </div>
                         </div>
                         <div class="layui-inline">
-                            <label class="layui-form-label">品名</label>
                             <div class="layui-input-inline">
-                                <input type="text" name="mname" autocomplete="off" class="layui-input">
+                                <input type="text" name="mname" autocomplete="off" class="layui-input" placeholder="搜索品名">
                             </div>
                         </div>
                         <div class="layui-inline">
-                            <label class="layui-form-label">AT号</label>
                             <div class="layui-input-inline">
-                                <input type="text" name="atId" autocomplete="off" class="layui-input">
+                                <input type="text" name="atId" autocomplete="off" class="layui-input" placeholder="搜索AT号">
+                            </div>
+                        </div>
+                        <div class="layui-inline">
+                            <div class="layui-input-inline">
+                                <input type="text" name="model" autocomplete="off" class="layui-input" placeholder="搜索规格">
                             </div>
                         </div>
                         <div class="layui-inline">
@@ -74,6 +76,7 @@
 </div>
 <script src="/static/lib/layui-v2.6.3/layui.js" charset="utf-8"></script>
 <script>
+    var data;
     layui.use(['form', 'table','laydate'], function () {
         var $ = layui.jquery,
             form = layui.form,
@@ -129,17 +132,18 @@
                     //这里layui和thymeleaf冲突了，要加个空格
                     cols: [ [
                         {type: "checkbox", width: 50},
-                        {field: 'id', width: 100, title: '申请编号', sort: true},
-                        {field: 'atId', width: 100, title: 'AT号', sort: true},
-                        {field: 'mname', width: 120, title: '材料名称'},
-                        {field: 'depositoryName', width: 120, title: '仓库名称', sort: true},
+                        {field: 'id', width: 60, title: '序号'},
+                        {field: 'depositoryName', width: 60, title: '厂区'},
+                        {field: 'atId', width: 60, title: 'AT'},
+                        {field: 'mname', width: 120, title: '品名'},
+                        {field: 'model', width: 120, title: '规格'},
                         {field: 'quantity', width: 80, title: '数量', sort: true},
                         {field: 'price', title: '金额', minWidth: 80, sort: true},
-                        {field: 'applyRemark', title: '类型', minWidth: 120, sort: true},
-                        {field: 'state', width: 150, title: '流程状态', sort: true},
-                        {field: 'applicantName', width: 150, title: '申请人', sort: true},
+                        {field: 'applyRemark', title: '类型', minWidth: 120},
+                        {field: 'state', width: 60, title: '流程状态'},
+                        {field: 'applicantName', width: 60, title: '申请人'},
                         {field: 'applyTime', width: 170, title: '申请时间', sort: true},
-                        {title: '操作', minWidth: 200, toolbar: '#currentTableBar', align: "center"}
+                        {title: '操作 ', minWidth: 200, toolbar: '#currentTableBar', align: "center"}
                     ]],
                     limits: [10, 15, 20, 25, 50],
                     limit: 10,
@@ -160,6 +164,9 @@
                     }
                     if (data.depositoryId!==''){
                         req.depositoryId=data.depositoryId;
+                    }
+                    if (data.model!==''){
+                        req.model=data.model;
                     }
                     if (data.applyTime!==''){
                         var dates = data.applyTime.split(' - ');
@@ -249,7 +256,6 @@
 
         table.on('tool(currentTableFilter)', function (obj) {
             let data = obj.data;
-
             if (obj.event === 'detail') {
                 var index = layer.open({
                     title: '入库信息详情',
@@ -267,7 +273,7 @@
             } else if (obj.event === 'delete') {
                 var req={};
                 req.id=data.id;
-                layer.confirm('真的删除么', {icon: 2, title: '提示'}, function (index) {
+                layer.confirm('确认删除', {icon: 2, title: '提示'}, function (index) {
                     $.ajax({
                         url: '/depositoryRecord',
                         type: 'delete',

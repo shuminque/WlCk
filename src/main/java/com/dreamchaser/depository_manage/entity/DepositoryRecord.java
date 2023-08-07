@@ -32,6 +32,9 @@ public class DepositoryRecord {
     /** 调度记录类型（购入/退料/转入,退还/领料/转出) */
     private Integer type;
 
+    /**型号/规格*/
+    private String model;
+
     /** 数量 */
     private Double quantity;
 

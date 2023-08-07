@@ -40,6 +40,9 @@ public class DepositoryRecordP {
      */
     private Integer type;
 
+    /**型号/规格*/
+    private String model;
+
     /**
      * 数量
      */
@@ -132,6 +135,7 @@ public class DepositoryRecordP {
         this.mname = dr.getMname();
         this.depositoryId = dr.getDepositoryId();
         this.type = dr.getType();
+        this.model = dr.getModel();
         this.quantity = dr.getQuantity();
         this.price = dr.getPrice();
         this.state = dr.getState();

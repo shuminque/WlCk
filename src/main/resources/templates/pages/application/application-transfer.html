@@ -33,30 +33,30 @@
                                         </div>
                                     </div>
                                     <div class="layui-form-item">
-                                        <label class="layui-form-label">材料数量:</label>
+                                        <label class="layui-form-label">数量:</label>
                                         <div class="layui-input-block">
-                                            <input  name="quantity" type="number" placeholder="请填写入材料数量" value="" class="layui-input" lay-verify="number" required>
+                                            <input  name="quantity" type="number" placeholder="请填写入数量" value="" class="layui-input" lay-verify="number" required>
                                         </div>
                                     </div>
                                     <div class="layui-form-item">
-                                        <label class="layui-form-label">入库金额:</label>
+                                        <label class="layui-form-label">入库单价:</label>
                                         <div class="layui-input-block">
-                                            <input name="price" type="number" placeholder="请填写入库金额" value="" class="layui-input" lay-verify="number" required>
+                                            <input name="price" id="price" type="number" placeholder="请填写入库单价" value="" class="layui-input" lay-verify="number" required>
                                         </div>
                                     </div>
                                     <div class="layui-form-item">
                                         <label class="layui-form-label">原仓库：</label>
                                         <div class="layui-input-block">
-                                            <select name="fromId" lay-verify="required">
-                                                <option th:each="depository,iterStar:${depositories}" th:value="${depository?.getId()}" th:text="${depository?.getDname()}" selected>外芯仓库</option>
+                                            <select name="fromId" lay-verify="required" id="OldCk">
+                                                <option th:each="depository,iterStar:${depositories}" th:value="${depository?.getId()}" th:text="${depository?.getDname()}" disabled selected>外芯仓库</option>
                                             </select>
                                         </div>
                                     </div>
                                     <div class="layui-form-item">
                                         <label class="layui-form-label">转入仓库：</label>
                                         <div class="layui-input-block">
-                                            <select name="toId" lay-verify="required">
-                                                <option th:each="depository,iterStar:${depositories}" th:value="${depository?.getId()}" th:text="${depository?.getDname()}" selected>外芯仓库</option>
+                                            <select name="toId" lay-verify="required" id="NewCk">
+                                                <option th:each="depository,iterStar:${depositories}" th:value="${depository?.getId()}" th:text="${depository?.getDname()}" disabled selected>外芯仓库</option>
                                             </select>
                                         </div>
                                     </div>
@@ -95,7 +95,7 @@
                                         <div style="font-size: 14px;color: #666;margin-top: 20px;">预计审核时间为1天</div>
                                     </div>
                                     <div style="text-align: center;margin-top: 50px;">
-                                        <button  class="layui-btn next">再申请一次</button>
+                                        <button  class="layui-btn next">返回申请页面</button>
                                     </div>
                                 </form>
                             </div>
@@ -128,15 +128,17 @@
 </div>
 <script src="/static/lib/layui-v2.6.3/layui.js" charset="utf-8"></script>
 <script src="/static/js/lay-config.js?v=1.0.4" charset="utf-8"></script>
+<script type="text/javascript" src="/static/js/http_ajax.googleapis.com_ajax_libs_jquery_3.5.1_jquery.js" charset="utf-8"></script>、
 <script>
+    var depositoryMapping = {
+        'SAB': 1, // 你的实际映射
+        'ZAB': 2,
+    };
     layui.use([ 'form', 'step', 'tableSelect'], function () {
         var $ = layui.$,
             form = layui.form,
             step = layui.step,
             tableSelect = layui.tableSelect;
-
-
-
         step.render({
             elem: '#stepForm',
             filter: 'stepForm',
@@ -187,53 +189,85 @@
             })
             return false;
         });
-
-        tableSelect.render({
-            elem: '#materialSelect', // 定义输入框input对象
-            checkedKey: 'id', // 表格的唯一建值
-            searchType: 'more',
-            searchList : [
-                {searchKey: 'atId', searchPlaceholder: "搜索物品AT号"},
-                {searchKey: 'mname', searchPlaceholder: "搜索物品名称"},
-            ],
-            searchPlaceholder: '关键词搜索', // 搜索输入框的提示文字
-            table: { // 定义表格参数
-                url: '/material', // 你的数据源URL
-                parseData: function (res) { //res 即为原始返回的数据
-                    return {
-                        "status": res.status, //解析接口状态
-                        "message": res.statusInfo.message, //解析提示文本
-                        "count": res.count, //解析数据长度
-                        "data": res.data //解析数据列表
-                    };
-                },
-                request: {
-                    pageName: 'page', //页码的参数名称，默认：page
-                    limitName: 'size' //每页数据量的参数名，默认：limit
-                },
-                response: {
-                    statusName: 'status' //规定数据状态的字段名称，默认：code
-                    ,statusCode: 200 //规定成功的状态码，默认：0
-                    ,msgName: 'message' //规定状态信息的字段名称，默认：msg
-                    ,countName: 'count' //规定数据总数的字段名称，默认：count
-                    ,dataName: 'data' //规定数据列表的字段名称，默认：data
-                },
-                cols: [ [
-                    {type: 'radio'},
-                    {field: 'depositoryName',  title: '厂区', sort: true},
-                    {field: 'atId', title: 'AT号'},
-                    {field: 'mname',  title: '品名'},
-                    {field: 'typeName',  title: '材料类型'},
-                    {field: 'enginName',title: '工程',  sort: true },
-                ]]
+        var userDepositoryId;
+        $.ajax({
+            url: '/get_user_depository',
+            type: 'GET',
+            dataType: 'json',
+            success: function(data) {
+                let pp;
+                var userDepositoryId = data.depositoryId;
+                // 如果depositoryId为0，则允许访问两个厂区
+                if (userDepositoryId === 0) {
+                    pp = '/material';
+                } else {
+                    pp = '/material?depositoryId=' + userDepositoryId;
+                }
+                tableSelect.render({
+                    elem: '#materialSelect', // 定义输入框input对象
+                    checkedKey: 'id', // 表格的唯一建值
+                    searchType: 'more',
+                    searchList : [
+                        {searchKey: 'atId', searchPlaceholder: "搜索AT号"},
+                        {searchKey: 'mname', searchPlaceholder: "搜索品名"},
+                    ],
+                    table: { // 定义表格参数
+                        url: pp,
+                        parseData: function (res) { //res 即为原始返回的数据
+                            return {
+                                "status": res.status, //解析接口状态
+                                "message": res.statusInfo.message, //解析提示文本
+                                "count": res.count, //解析数据长度
+                                "data": res.data //解析数据列表
+                            };
+                        },
+                        request: {
+                            pageName: 'page', //页码的参数名称，默认：page
+                            limitName: 'size' //每页数据量的参数名，默认：limit
+                        },
+                        response: {
+                            statusName: 'status' //规定数据状态的字段名称，默认：code
+                            ,statusCode: 200 //规定成功的状态码，默认：0
+                            ,msgName: 'message' //规定状态信息的字段名称，默认：msg
+                            ,countName: 'count' //规定数据总数的字段名称，默认：count
+                            ,dataName: 'data' //规定数据列表的字段名称，默认：data
+                        },
+                        cols: [ [
+                            {type: 'radio'},
+                            {field: 'depositoryName', width:'6%', title: '厂区'},
+                            {field: 'atId', width:'6%', title: 'AT'},
+                            {field: 'mname', width:'12%', title: '品名'},
+                            {field: 'model', title: '规格'},
+                            {field: 'typeName',  title: '类型'},
+                            {field: 'enginName',title: '工程'},
+                            {field: 'unitPrice',title: '单价'},
+                        ]],
+                        limits: [10, 15, 20, 25, 50],
+                        limit: 10,
+                        page: true,
+                        skin: 'line'
+                    },
+                    done: function (elem, data) {
+                        var selectedData = data.data[0];// 设置品名输入框的值
+                        $('#materialSelect').val(selectedData.mname);
+                        $('#atIdSelect').val(selectedData.atId); // 请确保这是正确的属性名
+                        $('#price').val(selectedData.unitPrice);
+                        var depositoryId = depositoryMapping[selectedData.depositoryName];
+                        if (depositoryId === 1){
+                            $('#OldCk').val(depositoryId);
+                            $('#NewCk').val(2);
+                        }else if (depositoryId === 2){
+                            $('#OldCk').val(depositoryId);
+                            $('#NewCk').val(1);
+                        }
+                        layui.form.render('select');
+                    }
+                });
             },
-            done: function (elem, data) {
-                // 选择完后的回调
-                var selectedData = data.data[0]; // 获取选中的数据
-                $('#materialSelect').val(selectedData.mname); // 将选中的品名设置为输入框的值
+            error: function() {
+                layer.msg('无法获取用户的厂区信息');
             }
         });
-
         form.on('submit(formStep2)', function (data) {
             step.next('#stepForm');
             return false;

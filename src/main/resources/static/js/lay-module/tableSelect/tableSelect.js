@@ -236,7 +236,6 @@ layui.define(['table', 'jquery', 'form'], function (exports) {
                 selectDone(checkStatus);
             })
 
-
             //按钮选中
             tableBox.find('.tableSelect_btn_select').on('click', function() {
                 var checkStatus = table.checkStatus(tableName);
