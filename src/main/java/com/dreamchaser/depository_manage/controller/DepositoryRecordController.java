@@ -31,12 +31,14 @@ public class DepositoryRecordController {
         String dateRange = (String) map.get("applyTime");
         if (dateRange !=null && dateRange.contains(" - ")){
             String[] dates = dateRange.split(" - ");
-            map.put("startDate",dates[0]);
-            map.put("endDate",dates[1]);
+            map.put("startDate", dates[0] + " 00:00:00");
+            // 将 endDate 的时间部分设置为 "23:59:59"
+            map.put("endDate", dates[1] + " 23:59:59");
         }
         List<DepositoryRecordP> list=depositoryRecordService.findDepositoryRecordPByCondition(map);
         return new RestResponse(list,depositoryRecordService.findCountByCondition(map),200);
-    }//方法处理GET请求到/depositoryRecord的路径。这个方法接收一组查询参数，然后调用DepositoryRecordService.findDepositoryRecordPByCondition方法来查询满足条件的仓库记录。
+    }
+    //方法处理GET请求到/depositoryRecord的路径。这个方法接收一组查询参数，然后调用DepositoryRecordService.findDepositoryRecordPByCondition方法来查询满足条件的仓库记录。
     @GetMapping("/myApply")
     public RestResponse findDepositoryRecordByCondition(@RequestParam Map<String,Object> map,HttpServletRequest request){
         UserToken userToken= (UserToken) request.getAttribute("userToken");

@@ -200,20 +200,42 @@ layui.define(['table', 'jquery', 'form'], function (exports) {
 
             //关键词搜索
             form.on('submit(tableSelect_btn_search)', function(data){
+                var searchData = {};
+                for (var key in data.field) {
+                    if (data.field[key]) {
+                        searchData[key] = data.field[key];
+                    }
+                }
                 tableSelect_table.reload({
-                    where: data.field,
+                    where: searchData,
                     page: {
                         curr: 1
                     }
                 });
                 return false;
             });
+            // 单击行选中单选框
+            table.on('row('+tableName+')', function(obj){
+                var index = obj.tr.data('index');
+                var radio = $(`[lay-id="${tableName}"] .layui-table-body tr[data-index="${index}"] input[type="radio"]`);
 
-            //双击行选中
+                // 取消其他行的选中状态
+                $(`[lay-id="${tableName}"] .layui-table-body tr input[type="radio"]`).each(function() {
+                    $(this).prop('checked', false);
+                    $(this).next().removeClass('layui-form-radioed');
+                });
+
+                // 选中当前行
+                radio.prop('checked', true);
+                radio.next().addClass('layui-form-radioed');
+            })
+
+            // 双击行选中
             table.on('rowDouble('+tableName+')', function(obj){
                 var checkStatus = {data:[obj.data]};
                 selectDone(checkStatus);
             })
+
 
             //按钮选中
             tableBox.find('.tableSelect_btn_select').on('click', function() {
@@ -249,6 +271,7 @@ layui.define(['table', 'jquery', 'form'], function (exports) {
                 }
             });
         })
+
     }
 
     /**

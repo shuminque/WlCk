@@ -195,8 +195,8 @@
                     searchType: 'more',
                     searchList : [
                         {searchKey: 'atId', searchPlaceholder: "搜索物品AT号"},
+                        {searchKey: 'mname', searchPlaceholder: "搜索品名"},
                     ],
-
                     table: { // 定义表格参数
                         url: pp,
                         parseData: function (res) { //res 即为原始返回的数据
@@ -220,12 +220,12 @@
                         },
                         cols: [ [
                             {type: 'radio'},
-                            {field: 'depositoryName',  title: '厂区', sort: true},
-                            {field: 'atId', title: 'AT号'},
-                            {field: 'mname',  title: '品名'},
+                            {field: 'depositoryName', width:'6%', title: '厂区'},
+                            {field: 'atId', width:'6%', title: 'AT'},
+                            {field: 'mname', width:'12%', title: '品名'},
                             {field: 'model', title: '型号'},
                             {field: 'typeName',  title: '材料类型'},
-                            {field: 'enginName',title: '工程',  sort: true },
+                            {field: 'enginName',title: '工程'},
                         ]],
                         limits: [10, 15, 20, 25, 50],
                         limit: 10,
@@ -250,7 +250,6 @@
                         //         $(this).prop("selected", true);
                         //     }
                         // });
-
                         // 重新渲染表单
                         layui.form.render('select');
                     }
@@ -261,14 +260,10 @@
                 layer.msg('无法获取用户的厂区信息');
             }
         });
-
-
         form.on('submit(formStep2)', function (data) {
             step.next('#stepForm');
             return false;
         });
-
-
         $('.pre').click(function () {
             step.pre('#stepForm');
         });
@@ -282,7 +277,6 @@
         // 获取URL中的查询参数
         var urlParams = new URLSearchParams(window.location.search);
         var id = urlParams.get('id');
-
         // 如果存在ID，则加载对应的数据
         if (id) {
             $.get('/get_record?id=' + id, function(data) {

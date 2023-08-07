@@ -1,10 +1,11 @@
+
 {
   "homeInfo": {
     "title": "首页",
     "href": "/welcome"
   },
   "logoInfo": {
-    "title": "Repository",
+    "title": "ZAB",
     "image": "static/images/xuri-logo.jpeg",
     "href": ""
   },
@@ -64,12 +65,6 @@
               "href": "/table_in",
               "icon": "fa fa-th-list",
               "target": "_self"
-            },
-            {
-              "title": "入库可视化",
-              "href": "/chart_in",
-              "icon": "fa fa-bar-chart",
-              "target": "_self"
             }
           ]
         },
@@ -83,12 +78,6 @@
               "href": "/table_out",
               "icon": "fa fa-th-list",
               "target": "_self"
-            },
-            {
-              "title": "出库可视化",
-              "href": "/chart_out",
-              "icon": "fa fa-pie-chart",
-              "target": "_self"
             }
           ]
         },
@@ -101,12 +90,6 @@
               "title": "库存查询",
               "href": "/table_stock",
               "icon": "fa fa-th-list",
-              "target": "_self"
-            },
-            {
-              "title": "库存可视化",
-              "href": "/chart_stock",
-              "icon": "fa fa-area-chart",
               "target": "_self"
             }
           ]
@@ -136,31 +119,10 @@
           "target": "_self",
           "href": "/my_task"
         },
-
         {
           "title": "申请记录",
           "href": "/my_apply",
           "icon": "fa fa-paper-plane",
-          "target": "_self"
-        }
-      ]
-    },
-    {
-      "title": "辅助管理",
-      "icon": "fa fa-slideshare",
-      "href": "",
-      "target": "_self",
-      "child": [
-        {
-          "title": "人员管理",
-          "href": "/table_user",
-          "icon": "fa fa-group",
-          "target": ""
-        },
-        {
-          "title": "公告发布",
-          "href": "/notice_edit",
-          "icon": "fa fa-superpowers",
           "target": "_self"
         }
       ]

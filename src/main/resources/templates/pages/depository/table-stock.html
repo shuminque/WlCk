@@ -27,15 +27,15 @@
                             </div>
                         </div>
                         <div class="layui-inline">
-                            <label class="layui-form-label">材料名称</label>
-                            <div class="layui-input-inline">
-                                <input type="text" name="mname" autocomplete="off" class="layui-input">
-                            </div>
-                        </div>
-                        <div class="layui-inline">
                             <label class="layui-form-label">AT号</label>
                             <div class="layui-input-inline">
                                 <input type="text" name="atId" autocomplete="off" class="layui-input">
+                            </div>
+                        </div>
+                        <div class="layui-inline">
+                            <label class="layui-form-label">品名</label>
+                            <div class="layui-input-inline">
+                                <input type="text" name="mname" autocomplete="off" class="layui-input">
                             </div>
                         </div>
 
@@ -97,7 +97,7 @@
                     },
                     toolbar: ['filter', 'exports', 'print'],
                     cols: [ [
-                        {field: 'id', width: '4%', title: '编号'},
+                        {field: 'id', width: '6%', title: '序号'},
                         {field: 'depositoryName', width: '6%', title: '厂区', sort: true},
                         {field: 'atId', width: '6%', title: 'AT号'},
                         {field: 'mname', width: '10%', title: '品名'},

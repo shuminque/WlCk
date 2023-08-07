@@ -8,9 +8,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
     <link rel="stylesheet" href="/static/lib/layui-v2.6.3/css/layui.css" media="all">
     <link rel="stylesheet" href="/static/css/public.css" media="all">
-
 </head>
-
 <div class="layui-bg-gray" style="padding: 10px;">
     <fieldset class="layui-elem-field layui-field-title">
         <legend>未完成任务</legend>
@@ -41,18 +39,14 @@
         </tbody>
     </table>
 </div>
-
-
 </body>
 <script src="/static/lib/layui-v2.6.3/layui.js" charset="utf-8"></script>
 <script src="/static/js/lay-config.js?v=1.0.4" charset="utf-8"></script>
 <script>
     var data= {};
-
     //先声明
     function openDetail1(data) {
     };
-
     //先声明
     function openDetail2(data) {
     };
@@ -140,9 +134,7 @@
                 });
             }
         });
-
         openDetail1 = function (item) {
-
             var index = layer.open({
                 title: '请求详情',
                 type: 2,
@@ -170,7 +162,6 @@
                 layer.full(index);
             });
         }
-
     });
 </script>
 </html>

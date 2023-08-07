@@ -76,8 +76,8 @@
                         </dd>
                     </dl>
                 </li>
-                <li class="layui-nav-item layuimini-select-bgcolor" lay-unselect>
-                    <a href="javascript:;" data-bgcolor="配色方案"><i class="fa fa-ellipsis-v"></i></a>
+                <li class="layui-nav-item" lay-unselect>
+                    <a data-bgcolor="配色方案"><i></i></a>
                 </li>
             </ul>
         </div>
@@ -124,7 +124,6 @@
                 <div id="layuiminiHomeTabIframe" class="layui-tab-item layui-show"></div>
             </div>
         </div>
-
     </div>
 </div>
 <script src="/static/lib/layui-v2.6.3/layui.js" charset="utf-8"></script>
@@ -135,19 +134,42 @@
             layer = layui.layer,
             miniAdmin = layui.miniAdmin,
             miniTongji = layui.miniTongji;
+        $.ajax({
+            url: '/get_user_depository',
+            type: 'GET',
+            dataType: 'json',
+            success: function(data) {
+                let pp;
+                var userDepositoryId = data.depositoryId;
+                // 如果depositoryId为0，则允许访问两个厂区
+                if (userDepositoryId === 0) {
+                    pp = "/static/api/menu_ALL.json";
+                } else if (userDepositoryId === 1) {
+                    pp = "/static/api/menu_SAB.json"
+                } else {
+                    pp = "/static/api/menu_ZAB.json"
+                }
+                var options = {
+                    // iniUrl: "/static/api/init.json",    // 初始化接口
+                    iniUrl: pp,
+                    clearUrl: "/static/api/clear.json", // 缓存清理接口
+                    urlHashLocation: true,      // 是否打开hash定位
+                    bgColorDefault: false,      // 主题默认配置
+                    multiModule: true,          // 是否开启多模块
+                    menuChildOpen: false,       // 是否默认展开菜单
+                    loadingTime: 0,             // 初始化加载时间
+                    pageAnim: true,             // iframe窗口动画
+                    maxTabNum: 20,              // 最大的tab打开数量
+                };
+                miniAdmin.render(options);
+            },
+            error: function() {
+                // 处理错误，例如显示一个消息
+                alert('无法获取初始化数据');
+            }
+        });
 
-        var options = {
-            iniUrl: "/static/api/init.json",    // 初始化接口
-            clearUrl: "/static/api/clear.json", // 缓存清理接口
-            urlHashLocation: true,      // 是否打开hash定位
-            bgColorDefault: false,      // 主题默认配置
-            multiModule: true,          // 是否开启多模块
-            menuChildOpen: false,       // 是否默认展开菜单
-            loadingTime: 0,             // 初始化加载时间
-            pageAnim: true,             // iframe窗口动画
-            maxTabNum: 20,              // 最大的tab打开数量
-        };
-        miniAdmin.render(options);
+
 
         // 百度统计代码，只统计指定域名
         miniTongji.render({

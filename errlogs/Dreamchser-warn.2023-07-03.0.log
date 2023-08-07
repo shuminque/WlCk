@@ -1,2 +1,0 @@
-2023-07-03 09:40:10.578  WARN 10100 --- [http-nio-8080-exec-3] org.springframework.web.servlet.PageNotFound : No mapping for GET /favicon.ico
-2023-07-03 16:10:03.027  WARN 20932 --- [http-nio-8080-exec-2] org.springframework.web.servlet.PageNotFound : No mapping for GET /favicon.ico

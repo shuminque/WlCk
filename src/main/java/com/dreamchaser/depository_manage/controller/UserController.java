@@ -13,6 +13,7 @@ import com.dreamchaser.depository_manage.service.UserService;
 import com.dreamchaser.depository_manage.utils.CrudUtil;
 import com.dreamchaser.depository_manage.utils.Md5;
 import com.dreamchaser.depository_manage.utils.ObjectFormatUtil;
+import com.fasterxml.jackson.core.type.TypeReference;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -21,10 +22,15 @@ import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletRequest;
-import java.util.Collections;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.Map;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import javax.servlet.http.HttpServletRequest;
+import java.util.*;
 
 import static com.dreamchaser.depository_manage.utils.CrudUtil.deleteHandle;
 
@@ -45,12 +51,6 @@ public class UserController {
     @Value("${spring.mail.username}")
     private String fromEmail;
 
-    /**
-     * 注册用户（通常为手机或者邮箱注册）
-     * @param map 参数列表，包括账号（手机注册就是phone，邮箱就是email）、密码
-     * @return 成功则返回凭证，否则返回验证失败
-     */
-
     @GetMapping("/get_user_depository")
     public ResponseEntity<?> getUserDepository(HttpServletRequest request){
         UserToken userToken =(UserToken) request.getAttribute("userToken");
@@ -61,7 +61,11 @@ public class UserController {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
     }
-
+    /**
+     * 注册用户（通常为手机或者邮箱注册）
+     * @param map 参数列表，包括账号（手机注册就是phone，邮箱就是email）、密码
+     * @return 成功则返回凭证，否则返回验证失败
+     */
     @PostMapping("/register")
     public RestResponse register(@RequestBody Map<String,Object>map){
         String principal;
@@ -277,4 +281,7 @@ public class UserController {
             throw new MyException(e.toString());
         }
     }
+
+
+
 }

@@ -102,8 +102,8 @@
         <if test="applyRemark != null and applyRemark != ''">
             AND dr.apply_remark LIKE CONCAT('%', #{applyRemark}, '%')
         </if>
-        <if test="applyTime != null">
-            AND dr.apply_time >= #{applyTime}
+        <if test="startDate != null and endDate != null">
+            AND DATE(dr.apply_time) BETWEEN #{startDate} AND #{endDate}
         </if>
         <if test="reviewerId != null">
             AND dr.reviewer_id = #{reviewerId}
@@ -197,7 +197,7 @@
             AND dr.apply_remark LIKE CONCAT('%', #{applyRemark}, '%')
         </if>
         <if test="startDate != null and endDate != null">
-            AND dr.apply_time BETWEEN #{startDate} AND #{endDate}
+            AND DATE(dr.apply_time) BETWEEN #{startDate} AND #{endDate}
         </if>
         <if test="reviewerId != null">
             AND dr.reviewer_id = #{reviewerId}

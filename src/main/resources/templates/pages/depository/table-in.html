@@ -18,17 +18,17 @@
                 <form class="layui-form layui-form-pane" action="">
                     <div class="layui-form-item">
                         <div class="layui-inline">
-                            <label class="layui-form-label">开始日期</label>
+                            <label class="layui-form-label">起止日期</label>
                             <div class="layui-input-block">
-                                <input type="text" name="applyTime" id="date"  placeholder="请选择开始日期"
+                                <input type="text" name="applyTime" id="date"  placeholder="请选择起止日期"
                                        autocomplete="off" class="layui-input">
                             </div>
                         </div>
                         <div class="layui-inline">
-                            <label class="layui-form-label">仓库</label>
+                            <label class="layui-form-label">厂区</label>
                             <div class="layui-input-inline">
                                 <select name="depositoryId" >
-                                    <option value="" selected>请选择仓库</option>
+                                    <option value="" selected>请选择厂区</option>
                                     <option th:each="depository,iterStar:${depositories}" th:value="${depository?.getId()}" th:text="${depository?.getDname()}" >外芯仓库</option>
                                 </select>
                             </div>
