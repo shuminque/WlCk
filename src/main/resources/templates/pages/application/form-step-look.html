@@ -27,15 +27,15 @@
 
                                 <tbody>
                                 <tr>
-                                    <td>申请编号</td>
+                                    <td>序号</td>
                                     <td id="applicationId" th:text="${record.getId()}">123456</td>
                                 </tr>
                                 <tr>
-                                    <td>材料名称</td>
+                                    <td>品名</td>
                                     <td id="materialName" th:text="${record.getMname()}">骁龙888芯片</td>
                                 </tr>
                                 <tr>
-                                    <td>仓库名称</td>
+                                    <td>厂区</td>
                                     <td id="depositoryName" th:text="${record.getDepositoryName()}">外芯仓库</td>
                                 </tr>
                                 <tr>
@@ -43,11 +43,11 @@
                                     <td id="quantity" th:text="${record.getQuantity()}">409</td>
                                 </tr>
                                 <tr>
-                                    <td>金额</td>
+                                    <td>单价</td>
                                     <td id="price" th:text="${record.getPrice()}">2016-11-28</td>
                                 </tr>
                                 <tr>
-                                    <td>类型</td>
+                                    <td>库操作</td>
                                     <td id="type" th:text="${record.getType()}==1?'入库':'出库'">入库</td>
                                 </tr>
                                 <tr>
@@ -63,7 +63,7 @@
                                     <td id="applyTime" th:text="${record.getApplyTime()}">2016-11-28</td>
                                 </tr>
                                 <tr>
-                                    <td>申请备注</td>
+                                    <td>操作类型</td>
                                     <td id="applyRemarks" th:text="${record.getApplyRemark()}">2016-11-28</td>
                                 </tr>
                                 <tr>
@@ -78,18 +78,18 @@
                                     <td>审核时间</td>
                                     <td id="reviewTime" th:text="${record.getReviewTime()}">2016-11-28</td>
                                 </tr>
-                                <tr id="checkerNameT" style="display: none">
-                                    <td>验收人</td>
-                                    <td id="checkerName" th:text="${record.getCheckerName()}">2016-11-28</td>
-                                </tr>
-                                <tr id="checkRemarkT" style="display: none">
-                                    <td>验收备注</td>
-                                    <td id="checkRemark" th:text="${record.getCheckRemark()}">2016-11-28</td>
-                                </tr>
-                                <tr id="checkTimeT" style="display: none">
-                                    <td>验收时间</td>
-                                    <td id="checkTime" th:text="${record.getCheckTime()}">2016-11-28</td>
-                                </tr>
+<!--                                <tr id="checkerNameT" style="display: none">-->
+<!--                                    <td>验收人</td>-->
+<!--                                    <td id="checkerName" th:text="${record.getCheckerName()}">2016-11-28</td>-->
+<!--                                </tr>-->
+<!--                                <tr id="checkRemarkT" style="display: none">-->
+<!--                                    <td>验收备注</td>-->
+<!--                                    <td id="checkRemark" th:text="${record.getCheckRemark()}">2016-11-28</td>-->
+<!--                                </tr>-->
+<!--                                <tr id="checkTimeT" style="display: none">-->
+<!--                                    <td>验收时间</td>-->
+<!--                                    <td id="checkTime" th:text="${record.getCheckTime()}">2016-11-28</td>-->
+<!--                                </tr>-->
 
                                 </tbody>
                             </table>

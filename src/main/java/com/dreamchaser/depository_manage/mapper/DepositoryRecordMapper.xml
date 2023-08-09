@@ -11,6 +11,10 @@
         <result column="applicant_id" property="applicantId" jdbcType="INTEGER" />
         <result column="apply_remark" property="applyRemark" jdbcType="VARCHAR" />
         <result column="apply_time" property="applyTime" jdbcType="TIMESTAMP" />
+        <result column="at_id" property="atId" jdbcType="INTEGER" />
+        <result column="mname" property="mname" jdbcType="VARCHAR" />
+        <result column="model" property="model" jdbcType="VARCHAR" />
+        <result column="quantity" property="quantity" jdbcType="VARCHAR" />
     </resultMap>
     <!-- 字段映射 -->
     <resultMap id="depositoryRecordMap" type="com.dreamchaser.depository_manage.entity.DepositoryRecord">
@@ -40,7 +44,7 @@
 
     <!-- 表查询字段 -->
     <sql id="simpleColumns">
-        dr.id, dr.type, dr.applicant_id, dr.apply_remark, dr.apply_time
+        dr.id, dr.type, dr.applicant_id, dr.apply_remark, dr.apply_time, dr.at_id, dr.mname, dr.model, dr.quantity
     </sql>
     <!-- 表查询字段 -->
     <sql id="allColumns">
@@ -159,6 +163,7 @@
         <if test='isDone == "1"'>
             and (dr.review_time is not null and dr.reviewer_id =#{userId})
         </if>
+        ORDER BY dr.id DESC
         <if test="begin != null and size != null">
             LIMIT #{begin},#{size}
         </if>
@@ -228,6 +233,7 @@
         <if test="checkPass != null">
             AND dr.check_pass = #{checkPass}
         </if>
+        ORDER BY dr.id DESC
         <if test="begin != null and size != null">
             LIMIT #{begin},#{size}
         </if>

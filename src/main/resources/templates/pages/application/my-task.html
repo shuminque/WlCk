@@ -8,11 +8,56 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
     <link rel="stylesheet" href="/static/lib/layui-v2.6.3/css/layui.css" media="all">
     <link rel="stylesheet" href="/static/css/public.css" media="all">
+    <script src="/static/js/lay-config.js?v=1.0.4" charset="utf-8"></script>
+    <script type="text/javascript" src="/static/js/http_ajax.googleapis.com_ajax_libs_jquery_3.5.1_jquery.js" charset="utf-8"></script>
 </head>
-<div class="layui-bg-gray" style="padding: 10px;">
-    <fieldset class="layui-elem-field layui-field-title">
-        <legend>待审批</legend>
-    </fieldset>
+<body>
+    <div class="layui-bg-gray" style="padding: 10px;">
+    <div class="layuimini-main">
+        <fieldset class="table-search-fieldset">
+            <legend>搜索栏</legend>
+            <div style="margin: 10px 10px 10px 10px">
+                <form class="layui-form layui-form-pane" action="">
+                    <div class="layui-form-item">
+                        <div class="layui-inline">
+                            <div class="layui-input-inline">
+                                <input type="text" name="applicantName" autocomplete="off" class="layui-input" placeholder="搜索申请人">
+                            </div>
+                        </div>
+                        <div class="layui-inline">
+                            <div class="layui-input-inline">
+                                <input type="text" name="atId" autocomplete="off" class="layui-input" placeholder="搜索AT号">
+                            </div>
+                        </div>
+                        <div class="layui-inline">
+                            <div class="layui-input-inline">
+                                <input type="text" name="mname" autocomplete="off" class="layui-input" placeholder="搜索品名">
+                            </div>
+                        </div>
+                        <div class="layui-inline">
+                            <div class="layui-input-inline">
+                                <input type="text" name="model" autocomplete="off" class="layui-input" placeholder="搜索规格">
+                            </div>
+                        </div>
+                        <div class="layui-inline">
+                            <button type="submit" class="layui-btn layui-btn-primary" lay-submit
+                                    lay-filter="data-search-btn"><i class="layui-icon"></i> 搜 索
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </fieldset>
+        <table class="layui-hide" id="taskTableId" lay-filter="taskTableFilter"></table>
+        <script type="text/html" id="currentTableBar">
+            <a class="layui-btn layui-btn-normal layui-btn-xs data-count-edit" lay-event="detail">审批</a>
+        </script>
+    </div>
+</div>
+<!--<div class="layui-bg-gray" style="padding: 10px;">-->
+<!--    <fieldset class="layui-elem-field layui-field-title">-->
+<!--        <legend>已审批</legend>-->
+<!--    </fieldset>-->
 <!--    <table class="layui-table">-->
 <!--        <colgroup>-->
 <!--            <col width="25%">-->
@@ -20,33 +65,13 @@
 <!--            <col width="25%">-->
 <!--            <col width="25%">-->
 <!--        </colgroup>-->
-<!--        <tbody id="LAY_floor1">-->
+<!--        <tbody id="LAY_floor2">-->
 <!--        </tbody>-->
 <!--    </table>-->
-    <table class="layui-hide" id="taskTableId" lay-filter="taskTableFilter"></table>
-</div>
-<div class="layui-bg-gray" style="padding: 10px;">
-    <fieldset class="layui-elem-field layui-field-title">
-        <legend>已审批</legend>
-    </fieldset>
-    <table class="layui-table">
-        <colgroup>
-            <col width="25%">
-            <col width="25%">
-            <col width="25%">
-            <col width="25%">
-        </colgroup>
-        <tbody id="LAY_floor2">
-        </tbody>
-    </table>
-    <script type="text/html" id="currentTableBar">
-        <a class="layui-btn layui-btn-normal layui-btn-xs data-count-edit" lay-event="detail">审批</a>
-    </script>
-</div>
-</body>
+<!--</div>-->
 <script src="/static/lib/layui-v2.6.3/layui.js" charset="utf-8"></script>
-<script src="/static/js/lay-config.js?v=1.0.4" charset="utf-8"></script>
 <script>
+
     var data= {};
     //先声明
     function openDetail1(data) {
@@ -54,11 +79,12 @@
     //先声明
     function openDetail2(data) {
     };
-    layui.use(['flow', 'layer', 'table', 'flow', 'util'], function () {
+    layui.use(['flow', 'layer', 'table', 'form', 'util'], function () {
         var $ = layui.jquery,
             layer = layui.layer,
             flow = layui.flow,
             table = layui.table,
+            form = layui.form,
             util = layui.util;
 
         table.render({
@@ -83,21 +109,84 @@
                 ,countName: 'count' //规定数据总数的字段名称，默认：count
                 ,dataName: 'data' //规定数据列表的字段名称，默认：data
             },
-            toolbar: '#toolbarDemo',
-            defaultToolbar: ['filter', 'exports', 'print'],
             cols: [ [
+                {type: "checkbox", width: 50},
+                {field: 'id', title: '序号'},
                 {field: 'applicantName', title: '申请人'},
                 {field: 'applyRemark', title: '出/入库类型'},
+                {field: 'atId', title: 'AT号'},
+                {field: 'mname', title: '品名'},
+                {field: 'model', title: '规格'},
+                {field: 'quantity', title: '数量'},
                 {field: 'applyTime', title: '申请时间'},
-                {field: 'type', title: '出/入库'},
                 {title: '操作 ', minWidth: 200, toolbar: '#currentTableBar', align: "center"}
                 // 添加更多的列来匹配你的任务数据...
             ]],
+            where: {
+                type: "1"
+            },
+            limits: [10, 15, 20, 25, 50],
+            limit: 10,
             page: true,
+            skin: 'line'
         });
-        //每页的数量
-        var size=8;
-        let pre1=0,pre2=0;
+
+        form.on('submit(data-search-btn)', function (data) {
+            var req={};
+            data=data.field;
+            req.type=1;
+            if (data.atId!==''){
+                req.atId=data.atId;
+            }
+            if (data.mname!==''){
+                req.mname=data.mname;
+            }
+            if (data.applicantName!==''){
+                req.applicantName=data.applicantName;
+            }
+            if (data.model!==''){
+                req.model=data.model;
+            }
+            // if (data.applyTime!==''){
+            //     var dates = data.applyTime.split(' - ');
+            //     req.startDate = dates[0];
+            //     req.endDate = dates[1];
+            // }
+            //执行搜索重载
+            table.reload('taskTableId', {
+                url: '/myTask',
+                page: {
+                    curr: 1
+                },
+                where: req
+            }, 'data');
+            return false;
+        });
+        table.on('tool(taskTableFilter)', function (obj) {
+            var data = obj.data;
+            var layEvent = obj.event;
+            var layerIndex;
+            if (layEvent === 'detail') {
+                layerIndex = layer.open({
+                    title: '请求详情',
+                    type: 2,
+                    shade: 0.2,
+                    maxmin: true,
+                    shadeClose: true,
+                    area: ['100%', '100%'],
+                    content: '/application_review?id=' + data.id,
+                    end: function() {
+                        // 弹窗关闭后刷新当前页面
+                        location.reload();
+                    }
+                });
+                $(window).on("resize", function () {
+                    layer.full(layerIndex);
+                });
+            }
+        });
+        // var size=8;
+        // let pre1=0,pre2=0;
         // flow.load({
         //     elem: '#LAY_floor1' //流加载容器
         //     ,scrollElem: '#LAY_floor1' //滚动条所在元素，一般不用填，此处只是演示需要。
@@ -136,60 +225,44 @@
         //         });
         //     }
         // });
-        flow.load({
-            elem: '#LAY_floor2' //流加载容器
-            ,scrollElem: '#LAY_floor2' //滚动条所在元素，一般不用填，此处只是演示需要。
-            ,isAuto:false
-            ,done: function(page, next){ //执行下一页的回调
-                let lis = [];
-                let result;
-                $.get('/myTask?page='+page+'&size='+size+'&isDone=1', function(res){
-                    result=res.data;
-                    for (let i=0;i<result.length;i++){
-                        if (i%4===0){
-                            lis.push('<tr>');
-                        }
-                        lis.push('<td><div class="layui-card  my-shadow my-card flow1" onclick="openDetail2('
-                            +result[i].id+')"><div class="layui-card-header"><h2>'
-                            +result[i].applicantName+'的')
-                        if (result[i].type===1){
-                            lis.push('入库请求</h2></div>');
-                        }else {
-                            lis.push('出库请求</h2></div>');
-                        }
-                        lis.push('<div class="layui-card-body">'+result[i].applyRemark
-                            +'</div><div class="layui-col-md4 my-time" style="margin-left: 15px; color: #999;font-size: 12px;">'
-                            +result[i].applyTime+'</div></div></td>');
-                        if (i%4===3){
-                            lis.push('</tr>');
-                        }
-                    }
-                    if (result.length%4!==0){
-                        lis.push('</tr>');
-                    }
-                    pre2+=result.length;
-                    //执行下一页渲染，第二参数为：满足“加载更多”的条件，即后面仍有分页
-                    //pages为Ajax返回的总页数，只有当前页小于总页数的情况下，才会继续出现加载更多
-                    next(lis.join(''), pre2 < res.count);
-                });
-            }
-        });
-        table.on('toolbar(currentTableFilter)', function (obj) {
-            if (obj.event === 'detail') {
-                var index = layer.open({
-                    title: '请求详情',
-                    type: 2,
-                    shade: 0.2,
-                    maxmin: true,
-                    shadeClose: true,
-                    area: ['100%', '100%'],
-                    content: '/application_review?id='+item,
-                });
-                $(window).on("resize", function () {
-                    layer.full(index);
-                });
-            }
-        },
+        // flow.load({
+        //     elem: '#LAY_floor2' //流加载容器
+        //     ,scrollElem: '#LAY_floor2' //滚动条所在元素，一般不用填，此处只是演示需要。
+        //     ,isAuto:false
+        //     ,done: function(page, next){ //执行下一页的回调
+        //         let lis = [];
+        //         let result;
+        //         $.get('/myTask?page='+page+'&size='+size+'&isDone=1', function(res){
+        //             result=res.data;
+        //             for (let i=0;i<result.length;i++){
+        //                 if (i%4===0){
+        //                     lis.push('<tr>');
+        //                 }
+        //                 lis.push('<td><div class="layui-card  my-shadow my-card flow1" onclick="openDetail2('
+        //                     +result[i].id+')"><div class="layui-card-header"><h2>'
+        //                     +result[i].applicantName+'的')
+        //                 if (result[i].type===1){
+        //                     lis.push('入库请求</h2></div>');
+        //                 }else {
+        //                     lis.push('出库请求</h2></div>');
+        //                 }
+        //                 lis.push('<div class="layui-card-body">'+result[i].applyRemark
+        //                     +'</div><div class="layui-col-md4 my-time" style="margin-left: 15px; color: #999;font-size: 12px;">'
+        //                     +result[i].applyTime+'</div></div></td>');
+        //                 if (i%4===3){
+        //                     lis.push('</tr>');
+        //                 }
+        //             }
+        //             if (result.length%4!==0){
+        //                 lis.push('</tr>');
+        //             }
+        //             pre2+=result.length;
+        //             //执行下一页渲染，第二参数为：满足“加载更多”的条件，即后面仍有分页
+        //             //pages为Ajax返回的总页数，只有当前页小于总页数的情况下，才会继续出现加载更多
+        //             next(lis.join(''), pre2 < res.count);
+        //         });
+        //     }
+        // });
         // openDetail1 = function (item) {
         //     var index = layer.open({
         //         title: '请求详情',
@@ -204,20 +277,22 @@
         //         layer.full(index);
         //     });
         // }
-        openDetail2 = function (item) {
-            var index = layer.open({
-                title: '请求详情',
-                type: 2,
-                shade: 0.2,
-                maxmin: true,
-                shadeClose: true,
-                area: ['100%', '100%'],
-                content: '/form_step_look?id='+item,
-            });
-            $(window).on("resize", function () {
-                layer.full(index);
-            });
-        })
+        // openDetail2 = function (item) {
+        //     var index = layer.open({
+        //         title: '请求详情',
+        //         type: 2,
+        //         shade: 0.2,
+        //         maxmin: true,
+        //         shadeClose: true,
+        //         area: ['100%', '100%'],
+        //         content: '/form_step_look?id='+item,
+        //     });
+        //     $(window).on("resize", function () {
+        //         layer.full(index);
+        //     });
+        // }
     });
 </script>
+
+</body>
 </html>

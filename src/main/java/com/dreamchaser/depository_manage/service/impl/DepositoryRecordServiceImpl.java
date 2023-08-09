@@ -85,8 +85,8 @@ public class DepositoryRecordServiceImpl implements DepositoryRecordService {
                 if (1 == record.getType()){
                     map.put("state","已入库");
                     //这里貌似会引起并发问题
-//                    material.setUnitPrice((material.getPrice()+(record.getPrice()*record.getQuantity()))/(material.getQuantity()+record.getQuantity()));
-//                    material.setPrice(material.getPrice()+(record.getQuantity()*record.getPrice())) ;  //总价=原总+入单*入数
+                    //material.setUnitPrice((material.getPrice()+(record.getPrice()*record.getQuantity()))/(material.getQuantity()+record.getQuantity()));
+                    //material.setPrice(material.getPrice()+(record.getQuantity()*record.getPrice())) ;  //总价=原总+入单*入数
                     double totalPrice = material.getPrice() + (record.getPrice() * record.getQuantity());
                     BigDecimal bdTotalPrice = new BigDecimal(totalPrice);
                     bdTotalPrice = bdTotalPrice.setScale(5, RoundingMode.HALF_UP); // 保留两位小数，四舍五入
@@ -98,9 +98,7 @@ public class DepositoryRecordServiceImpl implements DepositoryRecordService {
                     BigDecimal bdUnitPrice = new BigDecimal(unitPrice);
                     bdUnitPrice = bdUnitPrice.setScale(5, RoundingMode.HALF_UP); // 保留两位小数，四舍五入
                     material.setUnitPrice(bdUnitPrice.doubleValue());
-
                     material.setQuantity(material.getQuantity()+record.getQuantity());
-
                     materialMapper.updateMaterial(material);
                 }else {
                     if (material.getQuantity() > record.getQuantity()) {

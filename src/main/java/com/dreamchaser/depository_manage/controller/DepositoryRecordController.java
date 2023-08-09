@@ -32,7 +32,6 @@ public class DepositoryRecordController {
         if (dateRange !=null && dateRange.contains(" - ")){
             String[] dates = dateRange.split(" - ");
             map.put("startDate", dates[0] + " 00:00:00");
-            // 将 endDate 的时间部分设置为 "23:59:59"
             map.put("endDate", dates[1] + " 23:59:59");
         }
         List<DepositoryRecordP> list=depositoryRecordService.findDepositoryRecordPByCondition(map);

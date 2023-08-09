@@ -56,22 +56,18 @@
                 </form>
             </div>
         </fieldset>
-
         <script type="text/html" id="toolbarDemo">
             <div class="layui-btn-container">
 <!--                <button class="layui-btn layui-btn-normal layui-btn-sm data-add-btn" lay-event="add"> 添加</button>-->
                 <button class="layui-btn layui-btn-sm layui-btn-danger data-delete-btn" lay-event="delete"> 删除</button>
             </div>
         </script>
-
         <table class="layui-hide" id="currentTableId" lay-filter="currentTableFilter"></table>
-
         <script type="text/html" id="currentTableBar">
             <a class="layui-btn layui-btn-normal layui-btn-xs data-count-edit" lay-event="detail">详情</a>
             <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
             <a class="layui-btn layui-btn-xs layui-btn-danger data-count-delete" lay-event="delete">删除</a>
         </script>
-
     </div>
 </div>
 <script src="/static/lib/layui-v2.6.3/layui.js" charset="utf-8"></script>
@@ -309,6 +305,10 @@
                         shadeClose: true,
                         area: ['100%', '100%'],
                         content: '/application_in?id=' + data.id,
+                        end: function() {
+                            // 弹窗关闭后刷新当前页面
+                            location.reload();
+                        }
                     });
                     $(window).on("resize", function () {
                         layer.full(index);

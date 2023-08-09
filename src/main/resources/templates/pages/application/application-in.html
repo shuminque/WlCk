@@ -171,7 +171,8 @@
                             time: 500 //1秒关闭（如果不配置，默认是3秒）
                         }, function(){
                             if (method === 'PUT') {
-                                window.location.href = '/table_in' ; // 返回编辑页面
+                                // window.location.href = '/table_in' ; // 返回编辑页面
+                                parent.layer.closeAll(); // 关闭所有父页面的弹窗
                             } else if (method === 'POST') {
                                 step.next('#stepForm'); // 进入下一步
                             }
@@ -280,6 +281,7 @@
         $('.next').click(function () {
             step.next('#stepForm');
         });
+
         $(document).ready(function() {
             // 获取URL中的查询参数
             var urlParams = new URLSearchParams(window.location.search);

@@ -24,4 +24,14 @@ public class SimpleDepositoryRecord {
 
     /** 申请时间 */
     private Date applyTime;
+
+    /**AT号*/
+    private Integer atId;
+    /** 产品名称 */
+    private String mname;
+    /**型号/规格*/
+    private String model;
+
+    /** 数量 */
+    private Double quantity;
 }
