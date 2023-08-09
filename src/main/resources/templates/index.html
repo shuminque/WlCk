@@ -141,13 +141,22 @@
             success: function(data) {
                 let pp;
                 var userDepositoryId = data.depositoryId;
+                var userAuthority =data.authority;
                 // 如果depositoryId为0，则允许访问两个厂区
                 if (userDepositoryId === 0) {
                     pp = "/static/api/menu_ALL.json";
                 } else if (userDepositoryId === 1) {
-                    pp = "/static/api/menu_SAB.json"
+                    if(userAuthority ==='审核人'){
+                        pp = "/static/api/menu_SAB_sh.json";
+                    }else {
+                        pp = "/static/api/menu_SAB_cg.json";
+                    }
                 } else {
-                    pp = "/static/api/menu_ZAB.json"
+                    if(userAuthority ==='审核人'){
+                        pp = "/static/api/menu_ZAB_sh.json";
+                    }else {
+                        pp = "/static/api/menu_ZAB_cg.json";
+                    }
                 }
                 var options = {
                     // iniUrl: "/static/api/init.json",    // 初始化接口
@@ -168,9 +177,6 @@
                 alert('无法获取初始化数据');
             }
         });
-
-
-
         // 百度统计代码，只统计指定域名
         miniTongji.render({
             specific: true,

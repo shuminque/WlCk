@@ -2,7 +2,7 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="utf-8">
-    <title>分步表单</title>
+    <title>出库申请</title>
     <meta name="renderer" content="webkit">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
@@ -49,12 +49,13 @@
                                     <div class="layui-form-item">
                                         <label class="layui-form-label">出库类型:</label>
                                         <div class="layui-input-block">
-                                            <select name="applyRemark" class="layui-select">
-                                                <option value="领用出库">领用出库</option>
+                                            <select name="applyRemark" class="layui-select" lay-filter="applyRemarkFilter">
                                                 <option value="销售出库">销售出库</option>
+                                                <option value="领用出库">领用出库</option>
                                             </select>
                                         </div>
                                     </div>
+                                    <div class="layui-form-item" id="outLocationContainer"></div>
                                     <div class="layui-form-item">
                                         <label class="layui-form-label">审核人:</label>
                                         <div class="layui-input-block">
@@ -240,7 +241,32 @@
             step.next('#stepForm');
             return false;
         });
+        form.on('select(applyRemarkFilter)', function(data){
+            var selectedValue = data.value;
 
+            if(selectedValue === '领用出库') {
+                // 插入出库地点的选择
+                var outLocationSelect = `
+                <label class="layui-form-label">领用地点:</label>
+                <div class="layui-input-block">
+                    <select name="outLocation" class="layui-select">
+                        <option value="地点2">地点1</option>
+                        <option value="地点2">地点2</option>
+                        <option value="地点2">地点3</option>
+                        <option value="地点2">地点4</option>
+                        <option value="地点2">地点5</option>
+                        <option value="地点2">地点6</option>
+                        <option value="地点2">地点7</option>
+                    </select>
+                </div>`;
+                document.getElementById('outLocationContainer').innerHTML = outLocationSelect;
+                // 重新渲染表单，使新添加的选择生效
+                form.render('select');
+            } else {
+                // 清空出库地点选择
+                document.getElementById('outLocationContainer').innerHTML = '';
+            }
+        });
 
         $('.pre').click(function () {
             step.pre('#stepForm');
@@ -258,14 +284,15 @@
         if (id) {
             $.get('/get_record?id=' + id, function(data) {
                 // 填充表单
-                $('select[name="depositoryId"]').val(data.depositoryId);
-                $('select[name="atId"]').val(data.atId);
+                $('input[name="depositoryId"]').val(data.depositoryId);
+                $('input[name="atId"]').val(data.atId);
                 $('input[name="mname"]').val(data.mname);
                 $('input[name="quantity"]').val(data.quantity);
                 $('select[name="currency"]').val(data.currency);
-                $('input[name="price"]').val(data.unitPrice);
+                $('input[name="price"]').val(data.price);
                 $('select[name="applyRemark"]').val(data.applyRemark);
                 $('select[name="reviewerId"]').val(data.reviewerId);
+                $('input[name="model"]').val(data.model);
                 // 重新渲染表单
                 layui.form.render();
             });

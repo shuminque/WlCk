@@ -2,7 +2,7 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="utf-8">
-    <title>入库分步表单</title>
+    <title>入库申请</title>
     <meta name="renderer" content="webkit">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
@@ -145,12 +145,18 @@
         form.on('submit(formStep)', function (data) {
             data=data.field;
             data.type=1;
+            var urlParams = new URLSearchParams(window.location.search);
+            var id = urlParams.get('id');
+            var currentPage = sessionStorage.getItem('currentPage');
+            var isEditing = id != null;
+            var url = isEditing ? '/depositoryRecord/' + id : '/depositoryRecord';
+            var method = isEditing ? 'PUT' : 'POST';
             $.ajax({
-                url:"/depositoryRecord",
-                type:'post',
-                dataType:'json',
+                url: url,
+                type: method,
+                dataType: 'json',
                 contentType: "application/json;charset=utf-8",
-                data:JSON.stringify(data),
+                data: JSON.stringify(data),
                 beforeSend:function () {
                     this.layerIndex = layer.load(0, { shade: [0.5, '#393D49'] });
                 },
@@ -164,7 +170,12 @@
                             icon: 6,//成功的表情
                             time: 500 //1秒关闭（如果不配置，默认是3秒）
                         }, function(){
-                            step.next('#stepForm');
+                            if (method === 'PUT') {
+                                window.location.href = '/table_in' ; // 返回编辑页面
+                            } else if (method === 'POST') {
+                                step.next('#stepForm'); // 进入下一步
+                            }
+
                         });
                     }
                 },
@@ -269,28 +280,30 @@
         $('.next').click(function () {
             step.next('#stepForm');
         });
+        $(document).ready(function() {
+            // 获取URL中的查询参数
+            var urlParams = new URLSearchParams(window.location.search);
+            var id = urlParams.get('id');
+            // 如果存在ID，则加载对应的数据
+            if (id) {
+                $.get('/get_record?id=' + id, function(data) {
+                    // 填充表单
+                    $('input[name="depositoryId"]').val(data.depositoryId);
+                    $('input[name="atId"]').val(data.atId);
+                    $('input[name="mname"]').val(data.mname);
+                    $('input[name="quantity"]').val(data.quantity);
+                    $('select[name="currency"]').val(data.currency);
+                    $('input[name="price"]').val(data.price);
+                    $('select[name="applyRemark"]').val(data.applyRemark);
+                    $('select[name="reviewerId"]').val(data.reviewerId);
+                    $('input[name="model"]').val(data.model);
+                    // 重新渲染表单
+                    layui.form.render();
+                });
+            }
+        });
     });
-    $(document).ready(function() {
-        // 获取URL中的查询参数
-        var urlParams = new URLSearchParams(window.location.search);
-        var id = urlParams.get('id');
-        // 如果存在ID，则加载对应的数据
-        if (id) {
-            $.get('/get_record?id=' + id, function(data) {
-                // 填充表单
-                $('select[name="depositoryId"]').val(data.depositoryId);
-                $('select[name="atId"]').val(data.atId);
-                $('input[name="mname"]').val(data.mname);
-                $('input[name="quantity"]').val(data.quantity);
-                $('select[name="currency"]').val(data.currency);
-                $('input[name="price"]').val(data.price);
-                $('select[name="applyRemark"]').val(data.applyRemark);
-                $('select[name="reviewerId"]').val(data.reviewerId);
-                // 重新渲染表单
-                layui.form.render();
-            });
-        }
-    });
+
 </script>
 </body>
 </html>

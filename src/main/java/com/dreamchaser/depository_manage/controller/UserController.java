@@ -52,15 +52,20 @@ public class UserController {
     private String fromEmail;
 
     @GetMapping("/get_user_depository")
-    public ResponseEntity<?> getUserDepository(HttpServletRequest request){
-        UserToken userToken =(UserToken) request.getAttribute("userToken");
-        if(userToken != null&& userToken.getUser()!=null){
+    public ResponseEntity<?> getUserDepository(HttpServletRequest request) {
+        UserToken userToken = (UserToken) request.getAttribute("userToken");
+        if (userToken != null && userToken.getUser() != null) {
             Integer depositoryId = userToken.getUser().getDepositoryId();
-            return new ResponseEntity<>(Collections.singletonMap("depositoryId",depositoryId), HttpStatus.OK);
-        }else {
+            String authority = userToken.getUser().getAuthority();
+            Map<String, Object> responseMap = new HashMap<>();
+            responseMap.put("depositoryId", depositoryId);
+            responseMap.put("authority", authority);
+            return new ResponseEntity<>(responseMap, HttpStatus.OK);
+        } else {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
     }
+
     /**
      * 注册用户（通常为手机或者邮箱注册）
      * @param map 参数列表，包括账号（手机注册就是phone，邮箱就是email）、密码

@@ -17,7 +17,7 @@ public interface DepositoryRecordService {
      * @param map 仓库调度信息
      * @return 受影响的行数
      */
-    Integer apply(Map<String,Object> map);
+    Integer apply(Map<String,Object> map );
 
     /**
      * 转移申请
