@@ -134,7 +134,7 @@
             stepWidth: '750px',
             height: '600px',
             stepItems: [{
-                title: '填写申请信息'
+                title: '申请中'
             }, {
                 title: '审核中'
             }, {
@@ -176,7 +176,6 @@
                             } else if (method === 'POST') {
                                 step.next('#stepForm'); // 进入下一步
                             }
-
                         });
                     }
                 },
@@ -286,7 +285,6 @@
             // 获取URL中的查询参数
             var urlParams = new URLSearchParams(window.location.search);
             var id = urlParams.get('id');
-            // 如果存在ID，则加载对应的数据
             if (id) {
                 $.get('/get_record?id=' + id, function(data) {
                     // 填充表单
