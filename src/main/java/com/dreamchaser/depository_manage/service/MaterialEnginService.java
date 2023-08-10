@@ -11,4 +11,6 @@ public interface MaterialEnginService {
     List<MaterialEngin> findMaterialEnginAll();
     Integer findCountByCondition(Map<String,Object> map);
     public List<MaterialEnginP> findMaterialEnginPByCondition(Map<String, Object> map);
+
+    Integer deleteMaterialEngin(int id);
 }

@@ -20,4 +20,9 @@ public class MaterialEnginController {
     public RestResponse findMaterialEngin(@RequestParam Map<String,Object> map){
         return new RestResponse(materialEnginService.findMaterialEnginAll(),materialEnginService.findCountByCondition(map),200);
     }
+    @DeleteMapping("/materialEngin/{id}")
+    public RestResponse deleteMaterialEngin(@PathVariable int id) {
+        int result = materialEnginService.deleteMaterialEngin(id);
+        return CrudUtil.deleteHandle(result,1);
+    }
 }

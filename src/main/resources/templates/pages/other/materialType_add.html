@@ -23,16 +23,16 @@
                         <div>
                             <form class="layui-form" lay-filter="form1" style="margin: 0 auto;max-width: 460px;padding-top: 100px; padding-bottom: 200px">
                                 <div class="layui-form-item">
-                                    <label class="layui-form-label">型号:</label>
+                                    <label class="layui-form-label">编号:</label>
                                     <div class="layui-input-block">
-                                        <input type="text" placeholder="请填写型号" class="layui-input" name="tname"
+                                        <input type="text" placeholder="请填写编号" class="layui-input" name="id"
                                                lay-verify="required"/>
                                     </div>
                                 </div>
                                 <div class="layui-form-item">
-                                    <label class="layui-form-label">型号介绍:</label>
+                                    <label class="layui-form-label">型号:</label>
                                     <div class="layui-input-block">
-                                        <input type="text" placeholder="请填写入型号介绍" name="introduce" class="layui-input"
+                                        <input type="text" placeholder="请填写型号" name="tname" class="layui-input"
                                                lay-verify="required" required>
                                     </div>
                                 </div>
@@ -124,7 +124,8 @@
                     },
                     complete: function () {
                         form.val("form1", {
-                            "tname": "" // "name": "value"
+                            'id': ""
+                            ,"tname": ""
                             ,"introduce": ""
                         })
                     }

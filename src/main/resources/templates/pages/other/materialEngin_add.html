@@ -51,7 +51,10 @@
                 </div>
             </div>
         </fieldset>
-
+        <script type="text/html" id="operation-bar">
+            <!--            <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>-->
+            <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="delete">删除</a>
+        </script>
     </div>
 </div>
 <script src="/static/lib/layui-v2.6.3/layui.js" charset="utf-8"></script>
@@ -89,6 +92,7 @@
             cols: [ [
                 {field: 'id', width: '25%', title: '编号'},
                 {field: 'ename', width: '25%', title: '工程名称', sort: true},
+                {title: '操作', width: '15%', align: 'center', toolbar: '#operation-bar'}
             ]],
             limits: [10, 15, 20, 25, 50],
             limit: 10,
@@ -116,10 +120,12 @@
                             icon: 6,//成功的表情
                             time: 1000 //1秒关闭（如果不配置，默认是3秒）
                         });
+                        table.reload('currentTableId'); // 重新加载表格
                     }
                 },
                 complete: function () {
                     form.val("form1", {
+                        'id':"",
                         "ename": "" // "name": "value"
                         ,"introduce": ""
                     })
@@ -127,7 +133,34 @@
             })
             return false;
         });
+        table.on('tool(currentTableFilter)', function(obj) {
+            var data = obj.data; // 获取当前行的数据
+            var layEvent = obj.event; // 获取当前事件名称
 
+            if (layEvent === 'edit') {
+                // 执行编辑操作
+                editModel(data);
+            } else if (layEvent === 'delete') {
+                // 执行删除操作
+                deleteModel(data.id);
+            }
+        });
+        function deleteModel(id) {
+            layer.confirm('确定要删除吗？', function(index) {
+                $.ajax({
+                    url: "/materialEngin/" + id,
+                    type: 'DELETE',
+                    success: function(data) {
+                        layer.msg('删除成功！');
+                        table.reload('currentTableId'); // 重新加载表格
+                    },
+                    error: function() {
+                        layer.msg('删除失败！');
+                    }
+                });
+                layer.close(index);
+            });
+        }
     });
 </script>
 

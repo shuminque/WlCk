@@ -118,6 +118,12 @@
             "target": "_self",
             "child": [
               {
+                "title": "物品信息",
+                "href": "/material_add",
+                "icon": "layui-icon layui-icon-list",
+                "target": "_self"
+              },
+              {
                 "title": "型号信息",
                 "href": "/materialType_add",
                 "icon": "layui-icon layui-icon-list",

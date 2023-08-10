@@ -43,6 +43,12 @@ public class MaterialEnginServiceImpl implements MaterialEnginService {
         List<MaterialEngin> list=materialEnginMapper.findMaterialEnginByCondition(map);
         return pack(list);
     }
+
+    @Override
+    public Integer deleteMaterialEngin(int id) {
+        return materialEnginMapper.deleteMaterialEnginById(id);
+    }
+
     private List<MaterialEnginP> pack(List<MaterialEngin> list){
         List<MaterialEnginP> result=new ArrayList<>(list.size());
         for (MaterialEngin materialEngin: list){

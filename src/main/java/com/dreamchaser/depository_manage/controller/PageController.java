@@ -79,6 +79,14 @@ public class PageController {
     public String materialEngin_add() {
         return "pages/other/materialEngin_add";
     }
+    @GetMapping("/material_add")
+    public ModelAndView material_add() {
+        ModelAndView mv = new ModelAndView();
+        mv.setViewName("pages/other/material_add");
+        mv.addObject("depositories", depositoryService.findDepositoryAll());
+
+        return mv;
+    }
 
     @GetMapping("/application_in")
     public ModelAndView application_in() {

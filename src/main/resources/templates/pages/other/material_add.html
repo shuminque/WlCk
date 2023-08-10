@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <title>库信息</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="stylesheet" href="/static/lib/layui-v2.6.3/css/layui.css" media="all">
+    <link rel="stylesheet" href="/static/css/public.css" media="all">
+</head>
+<body>
+<div class="layuimini-container">
+    <div class="layuimini-main">
+        <fieldset class="table-search-fieldset">
+            <legend>搜索信息</legend>
+            <div style="margin: 10px 10px 10px 10px">
+                <form class="layui-form layui-form-pane" action="">
+                    <div class="layui-form-item">
+                        <div class="layui-inline">
+                            <label class="layui-form-label">厂区</label>
+                            <div class="layui-input-inline">
+                                <select name="depositoryId" >
+                                    <option value="" selected>请选择厂区</option>
+                                    <option th:each="depository,iterStar:${depositories}" th:value="${depository?.getId()}" th:text="${depository?.getDname()}" >外芯仓库</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="layui-inline">
+                            <div class="layui-input-inline">
+                                <input type="text" name="atId" autocomplete="off" class="layui-input" placeholder="搜索AT号">
+                            </div>
+                        </div>
+                        <div class="layui-inline">
+                            <div class="layui-input-inline">
+                                <input type="text" name="mname" autocomplete="off" class="layui-input" placeholder="搜索品名">
+                            </div>
+                        </div>
+                        <div class="layui-inline">
+                            <div class="layui-input-inline">
+                                <input type="text" name="model" autocomplete="off" class="layui-input" placeholder="搜索规格">
+                            </div>
+                        </div>
+                        <div class="layui-inline">
+                            <button type="submit" class="layui-btn layui-btn-primary" lay-submit
+                                    lay-filter="data-search-btn"><i class="layui-icon"></i> 搜 索
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </fieldset>
+
+        <table class="layui-hide" id="currentTableId" lay-filter="currentTableFilter"></table>
+        <script type="text/html" id="operation-bar">
+            <!--            <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>-->
+            <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="delete">删除</a>
+        </script>
+    </div>
+</div>
+<script src="/static/lib/layui-v2.6.3/layui.js" charset="utf-8"></script>
+<script>
+    var data;
+    layui.use(['form', 'table'], function () {
+        var $ = layui.jquery,
+            form = layui.form,
+            table = layui.table;
+
+        $.ajax({
+            url: '/get_user_depository',
+            type: 'GET',
+            dataType: 'json',
+            success: function(data) {
+                let pp;
+                var userDepositoryId = data.depositoryId;
+                // 如果depositoryId为0，则允许访问两个厂区
+                if (userDepositoryId === 0) {
+                    pp = '/material';
+                } else {
+                    pp = '/material?depositoryId=' + userDepositoryId;
+                }
+                table.render({
+                    elem: "#currentTableId",
+                    url: pp,
+                    parseData: function (res) { //res 即为原始返回的数据
+                        return {
+                            "status": res.status, //解析接口状态
+                            "message": res.statusInfo.message, //解析提示文本
+                            "count": res.count, //解析数据长度
+                            "data": res.data //解析数据列表
+                        };
+                    },
+                    request: {
+                        pageName: 'page', //页码的参数名称，默认：page
+                        limitName: 'size' //每页数据量的参数名，默认：limit
+                    },
+                    response: {
+                        statusName: 'status' //规定数据状态的字段名称，默认：code
+                        ,statusCode: 200 //规定成功的状态码，默认：0
+                        ,msgName: 'message' //规定状态信息的字段名称，默认：msg
+                        ,countName: 'count' //规定数据总数的字段名称，默认：count
+                        ,dataName: 'data' //规定数据列表的字段名称，默认：data
+                    },
+                    toolbar: ['filter', 'exports', 'print'],
+                    cols: [ [
+                        {field: 'id', width: '6%', title: '序号'},
+                        {field: 'depositoryName', width: '6%', title: '厂区', sort: true},
+                        {field: 'atId', width: '6%', title: 'AT号'},
+                        {field: 'mname', width: '10%', title: '品名'},
+                        {field: 'model', width: '7%', title: '规格'},
+                        {field: 'typeName', width: '18%', title: '型号'},
+                        {field: 'enginName',title: '工程', width:'12%', sort: true },
+                        {field: 'stateName',title: '状态', width:'16%', sort: true },
+                        {title: '操作', width: '15%', align: 'center', toolbar: '#operation-bar'}
+                    ]],
+                    limits: [10, 15, 20, 25, 50],
+                    limit: 10,
+                    page: true,
+                    skin: 'line'
+                });
+
+                // 监听搜索操作
+                form.on('submit(data-search-btn)', function (data) {
+                    var req={};
+                    data=data.field;
+                    if (data.mname!==''){
+                        req.mname=data.mname;
+                    }
+                    if (data.atId!==''){
+                        req.atId = data.atId;
+                    }
+                    if (data.model!==''){
+                        req.model=data.model;
+                    }
+                    if (data.depositoryId!==''){
+                        req.depositoryId=data.depositoryId;
+                    }
+
+                    //执行搜索重载
+                    table.reload('currentTableId', {
+                        url: pp,
+                        page: {
+                            curr: 1
+                        }
+                        , where: req
+                    }, 'data');
+                    return false;
+                });
+                table.on('tool(currentTableFilter)', function(obj) {
+                    var data = obj.data; // 获取当前行的数据
+                    var layEvent = obj.event; // 获取当前事件名称
+
+                    if (layEvent === 'edit') {
+                        // 执行编辑操作
+                        editModel(data);
+                    } else if (layEvent === 'delete') {
+                        // 执行删除操作
+                        deleteModel(data.id);
+                    }
+                });
+
+                function deleteModel(id) {
+                    layer.confirm('确定要删除吗？', function(index) {
+                        $.ajax({
+                            url: "/material/" + id,
+                            type: 'DELETE',
+                            success: function(data) {
+                                layer.msg('删除成功！');
+                                table.reload('currentTableId'); // 重新加载表格
+                            },
+                            error: function() {
+                                layer.msg('删除失败！');
+                            }
+                        });
+                        layer.close(index);
+                    });
+                }
+            },
+            error: function() {
+                // 处理错误，例如显示一个消息
+                layer.msg('无法获取用户的厂区信息');
+            }
+        });
+
+    });
+</script>
+
+</body>
+</html>
