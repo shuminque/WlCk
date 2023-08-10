@@ -20,5 +20,9 @@ public class MaterialTypeController {
     public RestResponse findMaterialType(@RequestParam Map<String,Object> map){
         return new RestResponse(materialTypeService.findMaterialTypeAll(),materialTypeService.findCountByCondition(map),200);
     }
-
+    @DeleteMapping("/materialType/{id}")
+    public RestResponse deleteMaterialType(@PathVariable int id) {
+        int result = materialTypeService.deleteMaterialType(id);
+        return CrudUtil.deleteHandle(result,1);
+    }
 }

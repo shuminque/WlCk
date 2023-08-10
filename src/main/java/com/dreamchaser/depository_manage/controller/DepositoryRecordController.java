@@ -49,6 +49,12 @@ public class DepositoryRecordController {
     public RestResponse myTask(@RequestParam Map<String,Object> map,HttpServletRequest request){
         UserToken userToken= (UserToken) request.getAttribute("userToken");
         map.put("userId",userToken.getUser().getId());
+        String dateRange = (String) map.get("applyTime");
+        if (dateRange !=null && dateRange.contains(" - ")){
+            String[] dates = dateRange.split(" - ");
+            map.put("startDate", dates[0] + " 00:00:00");
+            map.put("endDate", dates[1] + " 23:59:59");
+        }
         return new RestResponse(depositoryRecordService.findMyTask(map)
                 ,depositoryRecordService.findMyTaskCount(map),200);
     }

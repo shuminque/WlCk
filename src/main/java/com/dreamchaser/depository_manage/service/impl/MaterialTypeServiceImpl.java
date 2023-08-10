@@ -1,6 +1,5 @@
 package com.dreamchaser.depository_manage.service.impl;
 
-
 import com.dreamchaser.depository_manage.entity.MaterialType;
 import com.dreamchaser.depository_manage.mapper.MaterialTypeMapper;
 import com.dreamchaser.depository_manage.pojo.MaterialTypeP;
@@ -45,6 +44,11 @@ public class MaterialTypeServiceImpl implements MaterialTypeService {
         }
         List<MaterialType> list=materialTypeMapper.findMaterialTypeByCondition(map);
         return pack(list);
+    }
+
+    @Override
+    public Integer deleteMaterialType(int id) {
+        return materialTypeMapper.deleteMaterialTypeById(id);
     }
 
     private List<MaterialTypeP> pack(List<MaterialType> list){

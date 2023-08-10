@@ -75,6 +75,11 @@ public class PageController {
         return "pages/other/materialType_add";
     }
 
+    @GetMapping("/materialEngin_add")
+    public String materialEngin_add() {
+        return "pages/other/materialEngin_add";
+    }
+
     @GetMapping("/application_in")
     public ModelAndView application_in() {
         ModelAndView mv = new ModelAndView();

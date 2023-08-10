@@ -89,14 +89,14 @@ public class DepositoryRecordServiceImpl implements DepositoryRecordService {
                     //material.setPrice(material.getPrice()+(record.getQuantity()*record.getPrice())) ;  //总价=原总+入单*入数
                     double totalPrice = material.getPrice() + (record.getPrice() * record.getQuantity());
                     BigDecimal bdTotalPrice = new BigDecimal(totalPrice);
-                    bdTotalPrice = bdTotalPrice.setScale(5, RoundingMode.HALF_UP); // 保留两位小数，四舍五入
+                    bdTotalPrice = bdTotalPrice.setScale(2, RoundingMode.HALF_UP); // 保留两位小数，四舍五入
                     material.setPrice(bdTotalPrice.doubleValue());
                     // 计算新的总数量
                     double totalQuantity = material.getQuantity() + record.getQuantity();
                     // 计算新的均价
                     double unitPrice = totalPrice / totalQuantity;
                     BigDecimal bdUnitPrice = new BigDecimal(unitPrice);
-                    bdUnitPrice = bdUnitPrice.setScale(5, RoundingMode.HALF_UP); // 保留两位小数，四舍五入
+                    bdUnitPrice = bdUnitPrice.setScale(2, RoundingMode.HALF_UP); // 保留两位小数，四舍五入
                     material.setUnitPrice(bdUnitPrice.doubleValue());
                     material.setQuantity(material.getQuantity()+record.getQuantity());
                     materialMapper.updateMaterial(material);

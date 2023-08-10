@@ -54,4 +54,5 @@ public interface MaterialEnginMapper {
      */
     List<MaterialEngin> findMaterialEnginByCondition(Map<String,Object> map);
     List<MaterialEngin> findMaterialEnginAll();
+    Integer findCountByCondition(Map<String,Object> map);
 }

@@ -163,6 +163,9 @@
         <if test='isDone == "1"'>
             and (dr.review_time is not null and dr.reviewer_id =#{userId})
         </if>
+        <if test="startDate != null and endDate != null">
+            AND DATE(dr.apply_time) BETWEEN #{startDate} AND #{endDate}
+        </if>
         ORDER BY dr.id DESC
         <if test="begin != null and size != null">
             LIMIT #{begin},#{size}
