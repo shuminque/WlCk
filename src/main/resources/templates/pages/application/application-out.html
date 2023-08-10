@@ -126,10 +126,12 @@
             height: '600px',
             stepItems: [{
                 title: '申请中'
-            }, {
-                title: '审核中'
-            }, {
-                title: '等待出库'
+            },
+            //     {
+            //     title: '审核中'
+            // },
+                {
+                title: '出库'
             }]
         });
 
@@ -257,7 +259,6 @@
         });
         form.on('select(applyRemarkFilter)', function(data){
             var selectedValue = data.value;
-
             if(selectedValue === '领用出库') {
                 // 插入出库地点的选择
                 var outLocationSelect = `
