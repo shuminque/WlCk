@@ -48,7 +48,7 @@
                                     <div class="layui-form-item">
                                         <label class="layui-form-label">货币类型:</label>
                                         <div class="layui-input-block">
-                                            <select name="currency" class="layui-select">
+                                            <select name="currency" class="layui-select" lay-filter="currencyFilter">
                                                 <option value="CNY">人民币</option>
                                                 <option value="JPY">日元</option>
                                             </select>
@@ -74,7 +74,8 @@
                                         <label class="layui-form-label">审核人:</label>
                                         <div class="layui-input-block">
                                             <select name="reviewerId" lay-verify="required">
-                                                <option th:each="reviewer,iterStat:${reviewers}" th:value="${reviewer?.getId()}" th:text="${reviewer?.getUname()}" selected>张三</option>
+<!--                                                <option th:each="reviewer,iterStat:${reviewers}" th:value="${reviewer?.getId()}" th:text="${reviewer?.getUname()}" selected>张三</option>-->
+                                                <option value="21">李二</option>
                                             </select>
                                         </div>
                                     </div>
@@ -138,7 +139,7 @@
             }, {
                 title: '审核中'
             }, {
-                title: '等待入库'
+                title: '入库'
             }]
         });
 
@@ -184,6 +185,24 @@
                 }
             })
             return false;
+        });
+        form.on('select(currencyFilter)', function (data) {
+            // 获取选择的货币类型
+            var currency = data.value;
+
+            // 获取当前单价输入框的值
+            var price = parseFloat($('input[name="price"]').val());
+
+            // 如果选择了日元，则将单价换算为人民币
+            if (currency === 'JPY') {
+                // 假设1日元等于0.06人民币，你可以根据实际汇率进行调整
+                var exchangeRate = 0.05;
+                price = price * exchangeRate;
+
+                // 更新单价输入框的值
+                $('input[name="price"]').val(price.toFixed(2));
+            }
+            // 如果选择了其他货币类型，你可以添加相应的逻辑
         });
         var userDepositoryId;
         $.ajax({
@@ -269,6 +288,7 @@
                 layer.msg('无法获取用户的厂区信息');
             }
         });
+
         form.on('submit(formStep2)', function (data) {
             step.next('#stepForm');
             return false;

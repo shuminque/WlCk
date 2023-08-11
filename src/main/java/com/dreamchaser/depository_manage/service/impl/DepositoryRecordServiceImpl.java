@@ -13,8 +13,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.math.RoundingMode;
-import javax.xml.crypto.Data;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -41,6 +41,61 @@ public class DepositoryRecordServiceImpl implements DepositoryRecordService {
         map.put("state","待审核");
         return depositoryRecordMapper.insertDepositoryRecord(map);
     }
+    @Override
+    @Transactional
+    public Integer applyAndReview(Map<String, Object> map, Integer userId) {
+        // 设置申请时间和已出库状态
+        map.put("applyTime", new Date());
+        map.put("state", "已出库");
+
+        // 设置申请人ID和审核人ID
+        map.put("applicantId", userId);
+        map.put("reviewerId", userId);
+
+        // 插入出库申请记录
+        depositoryRecordMapper.insertDepositoryRecord(map);
+
+        BigInteger recordIdBigInteger = (BigInteger) map.get("id");
+        Integer recordId = recordIdBigInteger.intValue();
+
+        // 获取刚插入的出库记录
+        DepositoryRecord record = depositoryRecordMapper.findDepositoryRecordById(recordId);
+
+        // 设置出库相关信息
+        map.put("depositoryId", record.getDepositoryId());
+        map.put("atId", record.getAtId());
+        map.put("model", record.getModel());
+        map.put("mname", record.getMname());
+
+        // 执行出库逻辑
+        List<Material> list = materialMapper.findMaterialByCondition(map);
+        Material material = list.get(0);
+        if (material.getQuantity() > record.getQuantity()) {
+            // 计算新的总数量
+            double newQuantity = material.getQuantity() - record.getQuantity();
+            // 计算出库的总价
+            double outPrice = record.getPrice() * record.getQuantity();
+            // 计算新的总价
+            double newPrice = material.getPrice() - outPrice;
+            BigDecimal bdNewPrice = new BigDecimal(newPrice);
+            bdNewPrice = bdNewPrice.setScale(2, RoundingMode.HALF_UP); // 保留两位小数，四舍五入
+            // 计算新的均价
+            double newUnitPrice = newPrice / newQuantity;
+            BigDecimal bdNewUnitPrice = new BigDecimal(newUnitPrice);
+            bdNewUnitPrice = bdNewUnitPrice.setScale(2, RoundingMode.HALF_UP); // 保留两位小数，四舍五入
+            // 更新物料
+            material.setPrice(bdNewPrice.doubleValue());
+            material.setQuantity(newQuantity);
+            material.setUnitPrice(bdNewUnitPrice.doubleValue());
+            materialMapper.updateMaterial(material);
+        } else if (material.getQuantity().equals(record.getQuantity())) {
+            materialMapper.deleteMaterialById(material.getId());
+        } else {
+            throw new MyException("库存不足于该出库请求");
+        }
+        return 1; // 返回值可以根据你的需求进行调整
+    }
+
 
     /**
      * 转移申请
@@ -130,7 +185,7 @@ public class DepositoryRecordServiceImpl implements DepositoryRecordService {
                 map.put("state","审核未通过");
             }
         }
-        return depositoryRecordMapper.updateDepositoryRecord(map);
+            return depositoryRecordMapper.updateDepositoryRecord(map);
     }
 
     @Override
@@ -204,6 +259,8 @@ public class DepositoryRecordServiceImpl implements DepositoryRecordService {
     public Integer findCountByCondition(Map<String, Object> map) {
         return depositoryRecordMapper.findCountByCondition(map);
     }
+
+
 
     /**
      * 对查出来的记录进行包装，包装成前端需要的数据

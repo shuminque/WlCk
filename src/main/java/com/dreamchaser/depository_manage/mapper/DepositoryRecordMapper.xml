@@ -253,7 +253,7 @@
     </select>
     
     <!-- 插入数据 -->
-    <insert id="insertDepositoryRecord" parameterType="map" useGeneratedKeys="true" keyProperty="id">
+    <insert id="insertDepositoryRecord" parameterType="map" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
         INSERT INTO depository_record (
             id, application_id, at_id,  mname, depository_id, type, model, quantity, price, state,
             applicant_id, apply_remark, apply_time,

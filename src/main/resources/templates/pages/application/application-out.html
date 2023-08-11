@@ -127,50 +127,42 @@
             stepItems: [{
                 title: '申请中'
             },
-            //     {
-            //     title: '审核中'
-            // },
+                {
+                title: '审核中'
+            },
                 {
                 title: '出库'
             }]
         });
 
-
         form.on('submit(formStep)', function (data) {
-            data=data.field;
-            data.type=0;
-            data.state=0;
-            var urlParams = new URLSearchParams(window.location.search);
-            var id = urlParams.get('id');
-            var currentPage = sessionStorage.getItem('currentPage');
-            var isEditing = id != null;
-            var url = isEditing ? '/depositoryRecord/' + id : '/depositoryRecord';
-            var method = isEditing ? 'PUT' : 'POST';
+            data = data.field;
+            data.type = 0;
+            data.state = 0;
+            if (data.applyRemark === '领用出库') {
+                data.applyRemark += ': ' + data.outLocation;
+            }
+            var url = '/depositoryRecord'; // 统一URL
             $.ajax({
                 url: url,
-                type: method,
-                dataType:'json',
+                type: 'POST',
+                dataType: 'json',
                 contentType: "application/json;charset=utf-8",
-                data:JSON.stringify(data),
-                beforeSend:function () {
+                data: JSON.stringify(data),
+                beforeSend: function () {
                     this.layerIndex = layer.load(0, { shade: [0.5, '#393D49'] });
                 },
-                success:function(data){
+                success: function (data) {
                     layer.close(this.layerIndex);
-                    if(data.status >= 300){
+                    if (data.status >= 300) {
                         layer.msg(data.statusInfo.message);//失败的表情
                         return;
-                    }else{
+                    } else {
                         layer.msg("申请提交成功", {
-                            icon: 6,//成功的表情
+                            icon: 6, //成功的表情
                             time: 500 //1秒关闭（如果不配置，默认是3秒）
-                        }, function(){
-                            if (method === 'PUT') {
-                                // window.location.href = '/table_in' ; // 返回编辑页面
-                                parent.layer.closeAll(); // 关闭所有父页面的弹窗
-                            } else if (method === 'POST') {
-                                step.next('#stepForm'); // 进入下一步
-                            }
+                        }, function () {
+                            location.reload(); // 关闭所有父页面的弹窗
                         });
                     }
                 },
@@ -180,6 +172,51 @@
             })
             return false;
         });
+
+        // form.on('submit(formStep)', function (data) {
+        //     data=data.field;
+        //     data.type=0;
+        //     data.state=0;
+        //     var urlParams = new URLSearchParams(window.location.search);
+        //     var id = urlParams.get('id');
+        //     var currentPage = sessionStorage.getItem('currentPage');
+        //     var isEditing = id != null;
+        //     var url = isEditing ? '/depositoryRecord/' + id : '/depositoryRecord';
+        //     var method = isEditing ? 'PUT' : 'POST';
+        //     $.ajax({
+        //         url: url,
+        //         type: method,
+        //         dataType:'json',
+        //         contentType: "application/json;charset=utf-8",
+        //         data:JSON.stringify(data),
+        //         beforeSend:function () {
+        //             this.layerIndex = layer.load(0, { shade: [0.5, '#393D49'] });
+        //         },
+        //         success:function(data){
+        //             layer.close(this.layerIndex);
+        //             if(data.status >= 300){
+        //                 layer.msg(data.statusInfo.message);//失败的表情
+        //                 return;
+        //             }else{
+        //                 layer.msg("申请提交成功", {
+        //                     icon: 6,//成功的表情
+        //                     time: 500 //1秒关闭（如果不配置，默认是3秒）
+        //                 }, function(){
+        //                     if (method === 'PUT') {
+        //                         // window.location.href = '/table_in' ; // 返回编辑页面
+        //                         parent.layer.closeAll(); // 关闭所有父页面的弹窗
+        //                     } else if (method === 'POST') {
+        //                         step.next('#stepForm'); // 进入下一步
+        //                     }
+        //                 });
+        //             }
+        //         },
+        //         complete: function () {
+        //             layer.close(this.layerIndex);
+        //         }
+        //     })
+        //     return false;
+        // });
         var userDepositoryId;
         $.ajax({
             url: '/get_user_depository',
@@ -241,6 +278,7 @@
                     $('#materialSelect').val(selectedData.mname);
                     $('#atIdSelect').val(selectedData.atId); // 请确保这是正确的属性名
                     $('#price').val(selectedData.unitPrice);
+                    $('#modelSelect').val(selectedData.model);
                     var depositoryId = depositoryMapping[selectedData.depositoryName];
                     $('#depositorySelect').val(depositoryId);
                     // 重新渲染表单
@@ -262,26 +300,27 @@
             if(selectedValue === '领用出库') {
                 // 插入出库地点的选择
                 var outLocationSelect = `
-                <label class="layui-form-label">领用地点:</label>
-                <div class="layui-input-block">
-                    <select name="outLocation" class="layui-select">
-                        <option value="地点2">地点1</option>
-                        <option value="地点2">地点2</option>
-                        <option value="地点2">地点3</option>
-                        <option value="地点2">地点4</option>
-                        <option value="地点2">地点5</option>
-                        <option value="地点2">地点6</option>
-                        <option value="地点2">地点7</option>
-                    </select>
-                </div>`;
+        <label class="layui-form-label">领用地点:</label>
+        <div class="layui-input-block">
+            <select name="outLocation" class="layui-select">
+                <option value="地点1">地点1</option>
+                <option value="地点2">地点2</option>
+                <option value="地点3">地点3</option>
+                <option value="地点4">地点4</option>
+                <option value="地点5">地点5</option>
+                <option value="地点6">地点6</option>
+                <option value="地点7">地点7</option>
+            </select>
+        </div>`;
                 document.getElementById('outLocationContainer').innerHTML = outLocationSelect;
                 // 重新渲染表单，使新添加的选择生效
-                form.render('select');
+                form.render('select'); // 重新渲染选择框
             } else {
                 // 清空出库地点选择
                 document.getElementById('outLocationContainer').innerHTML = '';
             }
         });
+
 
         $('.pre').click(function () {
             step.pre('#stepForm');

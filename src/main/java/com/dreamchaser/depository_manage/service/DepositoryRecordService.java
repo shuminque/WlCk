@@ -101,4 +101,6 @@ public interface DepositoryRecordService {
      * @return 条数
      */
     Integer findCountByCondition(Map<String,Object> map);
+
+    Integer applyAndReview(Map<String, Object> map, Integer request);
 }

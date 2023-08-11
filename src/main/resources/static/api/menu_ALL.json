@@ -148,12 +148,6 @@
             "icon": "fa fa-tasks",
             "target": "_self",
             "href": "/my_task"
-          },
-          {
-            "title": "申请记录",
-            "href": "/my_apply",
-            "icon": "fa fa-paper-plane",
-            "target": "_self"
           }
         ]
       },

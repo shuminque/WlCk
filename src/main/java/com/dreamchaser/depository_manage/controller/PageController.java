@@ -1,5 +1,6 @@
 package com.dreamchaser.depository_manage.controller;
 
+import com.dreamchaser.depository_manage.entity.Material;
 import com.dreamchaser.depository_manage.entity.User;
 import com.dreamchaser.depository_manage.exception.MyException;
 import com.dreamchaser.depository_manage.pojo.DepositoryRecordP;
@@ -26,6 +27,8 @@ public class PageController {
     private DepositoryService depositoryService;
     @Autowired
     private UserService userService;
+    @Autowired
+    private MaterialService materialService;
     @Autowired
     private DepositoryRecordService depositoryRecordService;
     @Autowired
@@ -62,6 +65,7 @@ public class PageController {
         };
         mv.addObject("notices", noticeService.findNoticeByCondition(map));
         mv.addObject("depositories", depositoryService.findDepositoryAll());
+        mv.addObject("materials", materialService.findMaterialAll());
         return mv;
     }
 

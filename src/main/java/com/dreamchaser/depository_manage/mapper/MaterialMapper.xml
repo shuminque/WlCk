@@ -133,7 +133,7 @@
     </select>
 
     <!-- 插入数据 -->
-    <insert id="insertMaterial" parameterType="map">
+    <insert id="insertMaterial" parameterType="map" useGeneratedKeys="true">
         INSERT INTO material (
             id, at_id, depository_id, mname, model, quantity, price, unit_price, type_id, state_id, enign_id
         ) VALUES (

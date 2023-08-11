@@ -58,16 +58,18 @@
                                             <select name="toId" lay-verify="required" id="NewCk">
                                                 <option th:each="depository,iterStar:${depositories}" th:value="${depository?.getId()}" th:text="${depository?.getDname()}" disabled selected>外芯仓库</option>
                                             </select>
+                                            <input name="reviewerId" type="hidden" value="21" />
+
                                         </div>
                                     </div>
-                                    <div class="layui-form-item">
-                                        <label class="layui-form-label">审核人:</label>
-                                        <div class="layui-input-block">
-                                            <select name="reviewerId" lay-verify="required">
-                                                <option th:each="reviewer,iterStat:${reviewers}" th:value="${reviewer?.getId()}" th:text="${reviewer?.getUname()}" selected>张三</option>
-                                            </select>
-                                        </div>
-                                    </div>
+<!--                                    <div class="layui-form-item">-->
+<!--                                        <label class="layui-form-label">审核人:</label>-->
+<!--                                        <div class="layui-input-block">-->
+<!--                                            <select name="reviewerId" lay-verify="required">-->
+<!--                                                <option th:each="reviewer,iterStat:${reviewers}" th:value="${reviewer?.getId()}" th:text="${reviewer?.getUname()}" selected>张三</option>-->
+<!--                                            </select>-->
+<!--                                        </div>-->
+<!--                                    </div>-->
 
                                     <div class="layui-form-item">
                                         <label class="layui-form-label">备注说明:</label>
@@ -146,7 +148,7 @@
             stepWidth: '750px',
             height: '600px',
             stepItems: [{
-                title: '填写申请信息'
+                title: '申请'
             }, {
                 title: '审核中'
             }, {
