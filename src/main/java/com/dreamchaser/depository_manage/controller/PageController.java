@@ -83,6 +83,10 @@ public class PageController {
     public String materialEngin_add() {
         return "pages/other/materialEngin_add";
     }
+    @GetMapping("/rate_add")
+    public String rate_add() {
+        return "pages/other/rate_add";
+    }
     @GetMapping("/material_add")
     public ModelAndView material_add() {
         ModelAndView mv = new ModelAndView();

@@ -9,48 +9,85 @@
     <link rel="stylesheet" href="/static/lib/layui-v2.6.3/css/layui.css" media="all">
     <link rel="stylesheet" href="/static/css/public.css" media="all">
     <link rel="stylesheet" href="/static/js/lay-module/step-lay/step.css" media="all">
+    <style>
+        .review-buttons .layui-input-block {
+            text-align: center; /* 设置居中 */
+        }
+    </style>
+
 </head>
 <body>
 <div class="layuimini-container">
     <div class="layuimini-main">
         <div class="layui-fluid">
             <div class="layui-card">
-                <div class="layui-card-body" style="padding-top: 40px;">
+                <div class="layui-card-body" style="padding-top: 5px;">
                     <div id="stepForm" lay-filter="stepForm" style="margin: 0 auto;">
-                        <div style="margin-top: 30px">
+                        <div style="margin-top: 5px">
                             <table id="demo" class="layui-table"
-                                   style="margin: 0 auto;max-width: 800px;padding-top: 40px;">
+                                   style="margin: 0 auto;max-width: 800px;padding-top: 5px;">
                                 <colgroup>
                                     <col width="150">
                                     <col width="200">
                                     <col>
                                 </colgroup>
-
+                                <div id="review">
+                                    <div class="layui-form" style="margin: 0 auto;max-width: 900px;padding-right: 150px;">
+                                        <!--                            <div class=" layui-inline" >-->
+                                        <!--                                <label class="layui-form-label">选择验收人:</label>-->
+                                        <!--                                <div class="layui-inline" style="margin-bottom: 10px">-->
+                                        <!--                                    <select id="checkerIdF" name="checkerId" class="layui-input-inline" lay-verify="">-->
+                                        <!--                                        <option th:each="checker,iterStar:${checkers}" th:value="${checker.getId()}" th:text="${checker.getUname()}">张三</option>-->
+                                        <!--                                    </select>-->
+                                        <!--                                </div>-->
+                                        <!--                            </div>-->
+                                        <!--                            <div class="layui-form-item">-->
+                                        <!--                                <label class="layui-form-label">审核备注:</label>-->
+                                        <!--                                <div class="layui-input-block">-->
+                                        <!--                                    <textarea id="reviewRemarkF"  name="reviewRemark" placeholder="如需填写相关原因及申请原因" value="" class="layui-textarea"></textarea>-->
+                                        <!--                                </div>-->
+                                        <!--                            </div>-->
+                                        <div class="layui-form-item review-buttons">
+                                            <div class="layui-input-block">
+                                                <button id="reviewPass1" class="layui-btn" onclick="review(1)">
+                                                    &emsp;审核通过&emsp;
+                                                </button>
+                                                <button class="layui-btn layui-btn-danger" onclick="review(0)">
+                                                    &emsp;审核不通过&emsp;
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                                 <tbody>
                                 <tr>
                                     <td>序号</td>
                                     <td id="id" th:text="${record.getId()}">123456</td>
                                 </tr>
                                 <tr>
+                                    <td>厂区</td>
+                                    <td id="depositoryName" th:text="${record.getDepositoryName()}">外芯仓库</td>
+                                </tr>
+                                <tr>
                                     <td>品名</td>
                                     <td id="materialName" th:text="${record.getMname()}">骁龙888芯片</td>
                                 </tr>
                                 <tr>
-                                    <td>厂区名称</td>
-                                    <td id="depositoryName" th:text="${record.getDepositoryName()}">外芯仓库</td>
-                                </tr>
-                                <tr>
-                                    <td>数量</td>
-                                    <td id="quantity" th:text="${record.getQuantity()}">409</td>
+                                    <td>规格</td>
+                                    <td id="model" th:text="${record.getModel()}">骁龙888芯片</td>
                                 </tr>
                                 <tr>
                                     <td>单价</td>
                                     <td id="price" th:text="${record.getPrice()}">2016-11-28</td>
                                 </tr>
                                 <tr>
-                                    <td>类型</td>
-                                    <td id="type" th:text="${record.getType()}==1?'入库':'出库'">入库</td>
+                                    <td>数量</td>
+                                    <td id="quantity" th:text="${record.getQuantity()}">409</td>
                                 </tr>
+<!--                                <tr>-->
+<!--                                    <td>类型</td>-->
+<!--                                    <td id="type" th:text="${record.getType()}==1?'入库':'出库'">入库</td>-->
+<!--                                </tr>-->
                                 <tr>
                                     <td>状态</td>
                                     <td id="state" th:text="${record.getState()}">2016-11-28</td>
@@ -65,7 +102,7 @@
                                 </tr>
 
                                 <tr>
-                                    <td>申请备注</td>
+                                    <td>申请类型</td>
                                     <td id="applyRemarks" th:text="${record.getApplyRemark()}">2016-11-28</td>
                                 </tr>
                                 <tr>
@@ -89,34 +126,7 @@
                             </table>
                         </div>
                     </div>
-                    <div id="review">
-                        <div class="layui-form" style="margin: 0 auto;max-width: 900px;padding-top: 40px;">
-<!--                            <div class=" layui-inline" >-->
-<!--                                <label class="layui-form-label">选择验收人:</label>-->
-<!--                                <div class="layui-inline" style="margin-bottom: 10px">-->
-<!--                                    <select id="checkerIdF" name="checkerId" class="layui-input-inline" lay-verify="">-->
-<!--                                        <option th:each="checker,iterStar:${checkers}" th:value="${checker.getId()}" th:text="${checker.getUname()}">张三</option>-->
-<!--                                    </select>-->
-<!--                                </div>-->
-<!--                            </div>-->
-<!--                            <div class="layui-form-item">-->
-<!--                                <label class="layui-form-label">审核备注:</label>-->
-<!--                                <div class="layui-input-block">-->
-<!--                                    <textarea id="reviewRemarkF"  name="reviewRemark" placeholder="如需填写相关原因及申请原因" value="" class="layui-textarea"></textarea>-->
-<!--                                </div>-->
-<!--                            </div>-->
-                            <div class="layui-form-item">
-                                <div class="layui-input-block">
-                                    <button id="reviewPass1" class="layui-btn"  onclick="review(1)">
-                                        &emsp;审核通过&emsp;
-                                    </button>
-                                    <button class="layui-btn layui-btn-danger" onclick="review(0)">
-                                        &emsp;审核不通过&emsp;
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+
 <!--                    <div id="check" style="display: none">-->
 <!--                        <div class="layui-form" style="margin: 0 auto;max-width: 900px;padding-top: 40px;">-->
 <!--                            <div class="layui-form-item">-->

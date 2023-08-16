@@ -1,6 +1,5 @@
 package com.dreamchaser.depository_manage.mapper;
 
-import com.dreamchaser.depository_manage.entity.Depository;
 import com.dreamchaser.depository_manage.entity.MaterialType;
 import org.apache.ibatis.annotations.Mapper;
 import org.springframework.stereotype.Repository;
