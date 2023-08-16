@@ -1,0 +1,68 @@
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Currency Conversion</title>
+    <link rel="stylesheet" href="https://www.layuicdn.com/layui-v2.6.8/css/layui.css">
+</head>
+
+<body>
+    <form class="layui-form">
+        <div class="layui-form-item">
+            <label class="layui-form-label">货币类型:</label>
+            <div class="layui-input-block">
+                <select name="currency" class="layui-select" lay-filter="currencyFilter">
+                    <option value="CNY">人民币</option>
+                    <option value="JPY">日元</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="layui-form-item">
+            <label class="layui-form-label">入库单价:</label>
+            <div class="layui-input-block">
+                <input name="price" type="number" placeholder="请填写入库单价" value="" class="layui-input" lay-verify="number" required oninput="calculateConversion()">
+            </div>
+        </div>
+        
+        <div class="layui-form-item" id="conversionDiv" style="display: none;">
+            <label class="layui-form-label">转为人民币:</label>
+            <div class="layui-input-block">
+                <input name="conversion" type="text" placeholder="转换后的人民币" value="" class="layui-input" readonly>
+            </div>
+        </div>
+    </form>
+
+    <script src="https://www.layuicdn.com/layui-v2.6.8/layui.all.js"></script>
+    <script>
+        // Define the conversion rate from JPY to CNY
+        var conversionRate = 0.06;
+
+        layui.use('form', function () {
+            var form = layui.form;
+
+            // Listen to currency change
+            form.on('select(currencyFilter)', function (data) {
+                if (data.value === 'JPY') {
+                    document.getElementById('conversionDiv').style.display = 'block';
+                } else {
+                    document.getElementById('conversionDiv').style.display = 'none';
+                }
+                calculateConversion();
+            });
+        });
+
+        function calculateConversion() {
+            var currency = document.getElementsByName('currency')[0].value;
+            var price = document.getElementsByName('price')[0].value;
+            if (currency === 'JPY') {
+                document.getElementsByName('conversion')[0].value = (price * conversionRate).toFixed(2);
+            }
+        }
+    </script>
+</body>
+
+</html>
