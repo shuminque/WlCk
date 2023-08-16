@@ -1,16 +1,12 @@
 package com.dreamchaser.depository_manage.pojo;
 
 import com.dreamchaser.depository_manage.entity.MaterialEngin;
-import com.dreamchaser.depository_manage.entity.MaterialType;
 import lombok.Data;
 
 @Data
 public class MaterialEnginP {
     private Integer id;
-
     private String ename;
-
-
     public MaterialEnginP(Integer id, String ename) {
         this.id=id;
         this.ename=ename;

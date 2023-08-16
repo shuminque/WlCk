@@ -2,12 +2,14 @@ package com.dreamchaser.depository_manage.service.impl;
 
 import com.dreamchaser.depository_manage.entity.DepositoryRecord;
 import com.dreamchaser.depository_manage.entity.Material;
+import com.dreamchaser.depository_manage.entity.Notification;
 import com.dreamchaser.depository_manage.entity.SimpleDepositoryRecord;
 import com.dreamchaser.depository_manage.exception.MyException;
 import com.dreamchaser.depository_manage.mapper.*;
 import com.dreamchaser.depository_manage.pojo.DepositoryRecordP;
 import com.dreamchaser.depository_manage.pojo.SimpleDepositoryRecordP;
 import com.dreamchaser.depository_manage.service.DepositoryRecordService;
+import com.dreamchaser.depository_manage.service.NotificationService;
 import com.dreamchaser.depository_manage.utils.ObjectFormatUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -35,12 +37,16 @@ public class DepositoryRecordServiceImpl implements DepositoryRecordService {
     private UserMapper userMapper;
     @Autowired
     private MaterialMapper materialMapper;
+    @Autowired
+    private NotificationService notificationService;
+
     @Override
     public Integer apply(Map<String, Object> map) {
         map.put("applyTime",new Date());
         map.put("state","待审核");
         return depositoryRecordMapper.insertDepositoryRecord(map);
     }
+
     @Override
     @Transactional
     public Integer applyAndReview(Map<String, Object> map, Integer userId) {
@@ -96,7 +102,6 @@ public class DepositoryRecordServiceImpl implements DepositoryRecordService {
         return 1; // 返回值可以根据你的需求进行调整
     }
 
-
     /**
      * 转移申请
      * @param map 仓库调度信息
@@ -125,20 +130,21 @@ public class DepositoryRecordServiceImpl implements DepositoryRecordService {
     @Override
     @Transactional
     public Integer review(Map<String, Object> map,Integer userid) {
-        if (map.containsKey("reviewPass")){
-            map.put("reviewTime",new Date());
-            map.put("reviewerId",userid);
-            Integer reviewPass= (Integer) map.get("reviewPass");
-            if (reviewPass==1){
-                DepositoryRecord record=depositoryRecordMapper.findDepositoryRecordById(ObjectFormatUtil.toInteger(map.get("id")));
-                map.put("depositoryId",record.getDepositoryId());
-                map.put("atId",record.getAtId());
-                map.put("model",record.getModel());
-                map.put("mname",record.getMname());
-                List<Material> list=materialMapper.findMaterialByCondition(map);
-                Material material=list.get(0);
-                if (1 == record.getType()){
-                    map.put("state","已入库");
+        if (map.containsKey("reviewPass")) {
+            map.put("reviewTime", new Date());
+            map.put("reviewerId", userid);
+            Integer reviewPass = (Integer) map.get("reviewPass");
+            DepositoryRecord record;
+            if (reviewPass == 1) {
+                record = depositoryRecordMapper.findDepositoryRecordById(ObjectFormatUtil.toInteger(map.get("id")));
+                map.put("depositoryId", record.getDepositoryId());
+                map.put("atId", record.getAtId());
+                map.put("model", record.getModel());
+                map.put("mname", record.getMname());
+                List<Material> list = materialMapper.findMaterialByCondition(map);
+                Material material = list.get(0);
+                if (1 == record.getType()) {
+                    map.put("state", "已入库");
                     //这里貌似会引起并发问题
                     //material.setUnitPrice((material.getPrice()+(record.getPrice()*record.getQuantity()))/(material.getQuantity()+record.getQuantity()));
                     //material.setPrice(material.getPrice()+(record.getQuantity()*record.getPrice())) ;  //总价=原总+入单*入数
@@ -153,9 +159,9 @@ public class DepositoryRecordServiceImpl implements DepositoryRecordService {
                     BigDecimal bdUnitPrice = new BigDecimal(unitPrice);
                     bdUnitPrice = bdUnitPrice.setScale(2, RoundingMode.HALF_UP); // 保留两位小数，四舍五入
                     material.setUnitPrice(bdUnitPrice.doubleValue());
-                    material.setQuantity(material.getQuantity()+record.getQuantity());
+                    material.setQuantity(material.getQuantity() + record.getQuantity());
                     materialMapper.updateMaterial(material);
-                }else {
+                } else {
                     if (material.getQuantity() > record.getQuantity()) {
                         // 计算新的总数量
                         double newQuantity = material.getQuantity() - record.getQuantity();
@@ -181,8 +187,20 @@ public class DepositoryRecordServiceImpl implements DepositoryRecordService {
                     }
                     map.put("state", "已出库");
                 }
-            }else {
-                map.put("state","审核未通过");
+            } else {
+                record = depositoryRecordMapper.findDepositoryRecordById(ObjectFormatUtil.toInteger(map.get("id")));
+                map.put("state", "审核未通过");
+                // 添加通知
+                Integer atId = record.getAtId();  // 假设这是AT号
+                String mname = record.getMname();  // 假设这是品名
+                String notificationContent = "申请已被拒绝,AT号:" + atId + ", 品名: " + mname;
+
+                Notification notification = new Notification();
+                notification.setUserId(record.getApplicantId());  // 假设申请人的ID是这样获取的
+                notification.setContent(notificationContent);
+                notification.setDateCreated(new Date());
+                notification.setIsRead(false);
+                notificationService.insertNotification(notification);
             }
         }
             return depositoryRecordMapper.updateDepositoryRecord(map);

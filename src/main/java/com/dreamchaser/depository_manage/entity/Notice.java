@@ -12,7 +12,6 @@ public class Notice implements java.io.Serializable {
     /** 版本号 */
     private static final long serialVersionUID = -2744388334561767209L;
 
-
     /** 公告主键 */
     private Integer id;
 

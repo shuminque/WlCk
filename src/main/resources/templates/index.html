@@ -22,6 +22,7 @@
     <script src="/static/js/otherJs/cdn.staticfile.org_respond.js_1.4.2_respond.min.js"></script>
     <![endif]-->
     <style id="layuimini-bg-color">
+
     </style>
 </head>
 <body class="layui-layout-body layuimini-all">
@@ -49,6 +50,17 @@
             </ul>
 
             <ul class="layui-nav layui-layout-right">
+
+                <li class="layui-nav-item" lay-unselect>
+                    <a href="javascript:;" id="notification-icon">
+                        <i class="fa fa-bell" style="margin-left: -10px"></i>
+                        <span class="layui-badge" id="notification-count" style="margin-left: -40px"></span>
+                    </a>
+                    <dl class="layui-nav-child" id="notification-list">
+                        <!-- 通知内容将在这里动态加载 -->
+                    </dl>
+                </li>
+
                 <li class="layui-nav-item" lay-unselect>
                     <a href="javascript:;" data-refresh="刷新"><i class="fa fa-refresh"></i></a>
                 </li>
@@ -176,6 +188,35 @@
                 alert('无法获取初始化数据');
             }
         });
+
+        $(document).ready(function() {
+            // 页面加载时获取通知
+            $.ajax({
+                url: '/notifications/unread',  // 假设这是后端提供的获取通知的API
+                type: 'GET',
+                dataType: 'json',
+                success: function(data) {
+                    var notifications = data.data;  // 获取通知数组
+
+                    // 更新通知数量
+                    if (notifications.length === 0) {
+                        $("#notification-list").append('<dd><a href="javascript:;">没有新的通知</a></dd>');
+                        $("#notification-count").text('');  // 清空通知数量
+                    } else {
+                        notifications.forEach(function(notification) {
+                            $("#notification-list").append('<dd><a href="javascript:;">' + notification.content + '</a></dd>');
+                        });
+                        $("#notification-count").text(notifications.length);  // 显示通知数量
+                    }
+                },
+                error: function() {
+                    layer.msg('获取通知失败');
+                }
+            });
+        });
+
+
+
         // 百度统计代码，只统计指定域名
         miniTongji.render({
             specific: true,

@@ -8,8 +8,6 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.Map;
 
-
-
 /**
  * 仓库调度类
  * @author Dreamchaser
