@@ -128,7 +128,7 @@
                     //这里layui和thymeleaf冲突了，要加个空格
                     cols: [ [
                         {type: "checkbox", width: 50},
-                        {field: 'id', width: 60, title: '序号'},
+                        // {field: 'id', width: 60, title: '序号'},
                         // {field: 'depositoryName', width: 60, title: '厂区'},
                         {field: 'atId', width: 60, title: 'AT'},
                         {field: 'mname', width: 120, title: '品名'},
@@ -139,6 +139,7 @@
                         {field: 'state', width: 60, title: '流程状态'},
                         {field: 'applicantName', width: 60, title: '申请人'},
                         {field: 'applyTime', width: 170, title: '申请时间', sort: true},
+                        {field: 'reviewTime', width: 170, title: '审核时间', sort: true},
                         {title: '操作 ', minWidth: 200, toolbar: '#currentTableBar', align: "center"}
                     ]],
                     limits: [10, 15, 20, 25, 50],

@@ -60,9 +60,13 @@
                                     </div>
                                 </div>
                                 <tbody>
+<!--                                <tr>-->
+<!--                                    <td>序号</td>-->
+<!--                                    <td id="id" th:text="${record.getId()}">123456</td>-->
+<!--                                </tr>-->
                                 <tr>
-                                    <td>序号</td>
-                                    <td id="id" th:text="${record.getId()}">123456</td>
+                                    <td>AT</td>
+                                    <td id="atId" th:text="${record.getAtId()}">123456</td>
                                 </tr>
                                 <tr>
                                     <td>厂区</td>
@@ -75,6 +79,10 @@
                                 <tr>
                                     <td>规格</td>
                                     <td id="model" th:text="${record.getModel()}">骁龙888芯片</td>
+                                </tr>
+                                <tr>
+                                    <td>工程</td>
+                                    <td id="engin" th:text="${record.getModel()}">骁龙888芯片</td>
                                 </tr>
                                 <tr>
                                     <td>单价</td>
@@ -105,10 +113,10 @@
                                     <td>申请类型</td>
                                     <td id="applyRemarks" th:text="${record.getApplyRemark()}">2016-11-28</td>
                                 </tr>
-                                <tr>
-                                    <td>审核人</td>
-                                    <td id="reviewerName" th:text="${record.getReviewerName()}">2016-11-28</td>
-                                </tr>
+<!--                                <tr>-->
+<!--                                    <td>审核人</td>-->
+<!--                                    <td id="reviewerName" th:text="${record.getReviewerName()}">2016-11-28</td>-->
+<!--                                </tr>-->
                                 <tr id="reviewRemarksT" style="display: none">
                                     <td>审核意见</td>
                                     <td id="reviewRemark" th:text="${record.getReviewRemark()}">2016-11-28</td>
