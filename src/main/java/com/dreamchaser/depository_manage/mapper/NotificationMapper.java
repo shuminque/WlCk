@@ -70,3 +70,4 @@ public interface NotificationMapper {
      */
     Integer markNotificationAsRead(Integer id);
 }
+

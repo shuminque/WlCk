@@ -11,4 +11,5 @@ public class Rate {
     private String currency_from;
     private String currency_to;
     private Double rate;
+
 }

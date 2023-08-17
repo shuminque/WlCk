@@ -12,54 +12,46 @@
 <body>
 <div class="layuimini-container">
     <div class="layuimini-main">
-        <table class="layui-hide" id="currentTableId" lay-filter="currentTableFilter">
-            <legend>汇率信息</legend>
-        </table>
-        <fieldset class="table-search-fieldset">
-            <legend>汇率增加</legend>
-            <div class="layui-fluid">
-                <div class="layui-card">
-                    <div class="layui-card-body" style="padding-top: 40px;">
-                        <div>
-                            <form class="layui-form" lay-filter="form1" style="margin: 0 auto;max-width: 460px;padding-top: 100px; padding-bottom: 200px">
-                                <div class="layui-form-item">
-                                    <label class="layui-form-label">编号:</label>
-                                    <div class="layui-input-block">
-<!--                                        <input type="text" placeholder="请填写编号" class="layui-input" name="id"-->
-<!--                                               lay-verify="required"/>-->
-                                        <input name="currency_from" type="hidden" id="currency_from" value="JPY"/>
-                                        <input name="currency_to" type="hidden" id="currency_to"  value="CNY"/>
+        <button id="addRateBtn" class="layui-btn">添加汇率</button>
+        <table class="layui-hide" id="currentTableId" lay-filter="currentTableFilter">  </table>
+        <div id="rateAddForm" style="display: none;">
+            <fieldset class="table-search-fieldset">
+                <div class="layui-fluid">
+                    <div class="layui-card">
+                        <div class="layui-card-body" style="padding-top: 40px;">
+                            <div>
+                                <form class="layui-form" lay-filter="form1" style="margin: 0 auto;max-width: 460px;padding-top: 100px; padding-bottom: 200px">
+                                    <div class="layui-form-item">
+                                        <label class="layui-form-label">日期:</label>
+                                        <div class="layui-input-block">
+                                            <input type="text" placeholder="请填写日期" name="date" class="layui-input"
+                                                   lay-verify="required" required>
+                                            <input name="currency_from" type="hidden" id="currency_from" value="JPY"/>
+                                            <input name="currency_to" type="hidden" id="currency_to"  value="CNY"/>
+                                        </div>
                                     </div>
-                                </div>
-                                <div class="layui-form-item">
-                                    <label class="layui-form-label">日期:</label>
-                                    <div class="layui-input-block">
-                                        <input type="text" placeholder="请填写日期" name="date" class="layui-input"
-                                               lay-verify="required" required>
+                                    <div class="layui-form-item">
+                                        <label class="layui-form-label">汇率:</label>
+                                        <div class="layui-input-block">
+                                            <input type="text" placeholder="请填写汇率" name="rate" class="layui-input"
+                                                   lay-verify="required" required>
+                                        </div>
                                     </div>
-                                </div>
-                                <div class="layui-form-item">
-                                    <label class="layui-form-label">汇率:</label>
-                                    <div class="layui-input-block">
-                                        <input type="text" placeholder="请填写汇率" name="rate" class="layui-input"
-                                               lay-verify="required" required>
+                                    <div class="layui-form-item">
+                                        <div class="layui-input-block">
+                                            <button class="layui-btn" lay-submit lay-filter="formStep">
+                                                &emsp;增加汇率&emsp;
+                                            </button>
+                                        </div>
                                     </div>
-                                </div>
-
-                                <div class="layui-form-item">
-                                    <div class="layui-input-block">
-                                        <button class="layui-btn" lay-submit lay-filter="formStep">
-                                            &emsp;增加汇率&emsp;
-                                        </button>
-                                    </div>
-                                </div>
-                            </form>
+                                </form>
+                            </div>
                         </div>
+                        <hr>
                     </div>
-                    <hr>
                 </div>
-            </div>
-        </fieldset>
+            </fieldset>
+        </div>
         <script type="text/html" id="operation-bar">
 <!--            <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>-->
             <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="delete">删除</a>
@@ -112,7 +104,17 @@
                 page: true,
                 skin: 'line'
             });
-
+            $('#addRateBtn').on('click', function() {
+                layer.open({
+                    type: 1,  // 页面层
+                    title: '汇率增加',  // 标题
+                    area: ['500px', '400px'],  // 宽高
+                    content: $('#rateAddForm'),  // 内容，这里是一个jQuery选择器，选择ID为rateAddForm的元素
+                    success: function(layero, index) {
+                        // 这里可以添加一些弹出层打开后的初始化代码，如果需要的话
+                    }
+                });
+            });
             form.on('submit(formStep)', function (data) {
                 $.ajax({
                     url:"/rate",

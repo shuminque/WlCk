@@ -155,7 +155,7 @@
         });
         // 定义货币转换函数
         function convertCurrency(amount, rate) {
-            return amount / rate;
+            return amount * rate;
         }
         layui.form.on('select(currencyFilter)', function(data){
             if (data.value === 'JPY') {

@@ -204,7 +204,7 @@
                         $("#notification-count").text('');  // 清空通知数量
                     } else {
                         notifications.forEach(function(notification) {
-                            $("#notification-list").append('<dd><a href="javascript:;">' + notification.content + '</a></dd>');
+                            $("#notification-list").append('<dd data-id="' + notification.id + '"><a href="javascript:;">' + notification.content + '</a></dd>');
                         });
                         $("#notification-count").text(notifications.length);  // 显示通知数量
                     }
@@ -214,7 +214,25 @@
                 }
             });
         });
-
+        $("#notification-list").on("click", "dd", function() {
+            var notificationId = $(this).data("id");
+            console.log(notificationId);
+            $.ajax({
+                url: '/notifications/mark-as-read/{id}',
+                type: 'PUT',
+                data: { id: notificationId },
+                success: function() {
+                    // 移除点击的通知
+                    $(this).remove();
+                    // 更新通知数量
+                    var count = parseInt($("#notification-count").text()) - 1;
+                    $("#notification-count").text(count > 0 ? count : '');
+                },
+                error: function() {
+                    layer.msg('标记为已读失败');
+                }
+            });
+        });
 
 
         // 百度统计代码，只统计指定域名

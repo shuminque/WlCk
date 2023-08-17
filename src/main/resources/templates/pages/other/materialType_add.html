@@ -12,10 +12,10 @@
 <body>
 <div class="layuimini-container">
     <div class="layuimini-main">
-        <table class="layui-hide" id="currentTableId" lay-filter="currentTableFilter">
-            <legend>型号信息</legend>
-        </table>
-        <fieldset class="table-search-fieldset">
+        <button id="addTypeBtn" class="layui-btn">添加型号</button>
+        <table class="layui-hide" id="currentTableId" lay-filter="currentTableFilter"></table>
+        <div id="typeAddForm" style="display: none;">
+            <fieldset class="table-search-fieldset">
             <legend>型号增加</legend>
             <div class="layui-fluid">
                 <div class="layui-card">
@@ -51,6 +51,7 @@
                 </div>
             </div>
         </fieldset>
+        </div>
         <script type="text/html" id="operation-bar">
 <!--            <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>-->
             <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="delete">删除</a>
@@ -94,12 +95,19 @@
                     {field: 'tname', width: '25%', title: '型号', sort: true},
                     {title: '操作', width: '15%', align: 'center', toolbar: '#operation-bar'}
                 ]],
-                limits: [10, 15, 20, 25, 50],
-                limit: 10,
-                page: true,
-                skin: 'line'
-            });
 
+            });
+            $('#addTypeBtn').on('click', function() {
+                layer.open({
+                    type: 1,  // 页面层
+                    title: '型号增加',  // 标题
+                    area: ['500px', '400px'],  // 宽高
+                    content: $('#typeAddForm'),  // 内容，这里是一个jQuery选择器，选择ID为rateAddForm的元素
+                    success: function(layero, index) {
+                        // 这里可以添加一些弹出层打开后的初始化代码，如果需要的话
+                    }
+                });
+            });
             form.on('submit(formStep)', function (data) {
                 $.ajax({
                     url:"/materialType",
@@ -120,6 +128,7 @@
                                 icon: 6,//成功的表情
                                 time: 1000 //1秒关闭（如果不配置，默认是3秒）
                             });
+                            table.reload('currentTableId'); // 重新加载表格
                         }
                     },
                     complete: function () {
