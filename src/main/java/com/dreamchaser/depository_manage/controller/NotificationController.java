@@ -60,6 +60,7 @@ public class NotificationController {
 
     @PutMapping("/mark-as-read/{id}")
     public Integer markNotificationAsRead(@PathVariable Integer id) {
+
         return notificationService.markNotificationAsRead(id);
     }
 }

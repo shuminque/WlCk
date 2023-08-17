@@ -10,7 +10,7 @@
         <result column="user_id" property="userId" jdbcType="INTEGER" />
         <result property="content" column="content" jdbcType="LONGVARCHAR" />
         <result column="date_created" property="dateCreated" jdbcType="TIMESTAMP" />
-        <result column="is_read" property="isRead" jdbcType="BOOLEAN" />
+        <result column="is_read" property="isRead" jdbcType="INTEGER" />
     </resultMap>
 
     <!-- 表查询字段 -->
@@ -61,12 +61,12 @@
     <!-- 根据用户ID查询未读的通知记录 -->
     <select id="findUnreadNotificationsByUserId" resultMap="notificationMap">
         SELECT <include refid="notificationColumns" />
-        FROM notifications WHERE user_id = #{userId} AND is_read = FALSE
+        FROM notifications WHERE user_id = #{userId} AND is_read = 0
     </select>
 
     <!-- 根据id标记通知为已读 -->
     <update id="markNotificationAsRead">
-        UPDATE notifications SET is_read = TRUE WHERE id = #{id}
+        UPDATE notifications SET is_read = 1 WHERE id = #{id}
     </update>
 
 </mapper>
