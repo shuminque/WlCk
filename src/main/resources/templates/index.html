@@ -190,23 +190,28 @@
         });
 
         $(document).ready(function() {
-            function loadNotifications(){
+            function loadNotifications() {
                 $.ajax({
-                    url: '/notifications/unread',  // 假设这是后端提供的获取通知的API
+                    url: '/notifications/unread',
                     type: 'GET',
                     dataType: 'json',
                     success: function(data) {
-                        var notifications = data.data;  // 获取通知数组
+                        var notifications = data.data;
                         $("#notification-list").empty();
-                        // 更新通知数量
                         if (notifications.length === 0) {
                             $("#notification-list").append('<dd><a href="javascript:;">没有新的通知</a></dd>');
-                            $("#notification-count").text('');  // 清空通知数量
+                            $("#notification-count").text('');
                         } else {
                             notifications.forEach(function(notification) {
-                                $("#notification-list").append('<dd data-id="' + notification.id + '"><a href="javascript:;">' + notification.content + '</a></dd>');
+                                $("#notification-list").append('<dd data-id="' + notification.id + '">' +
+                                    '<a href="javascript:;">' + notification.content + '</a></dd>');
+
+                                // $("#notification-list").append('<dd data-id="' + notification.id + '" ' +
+                                //     'data-link="' + notification.link + '"><a href="javascript:;">' +
+                                //     notification.content + '</a></dd>');
+
                             });
-                            $("#notification-count").text(notifications.length);  // 显示通知数量
+                            $("#notification-count").text(notifications.length);
                         }
                     },
                     error: function() {
@@ -217,17 +222,26 @@
             loadNotifications();
             $("#notification-list").on("click", "dd", function() {
                 var notificationId = $(this).data("id");
+                var content = $(this).text();
+
                 $.ajax({
                     url: '/notifications/mark-as-read/' + notificationId,
                     type: 'PUT',
                     success: function() {
                         loadNotifications();
+                        if (content.includes("[OUT]")) {
+                            window.location.href = "index#//application_out";
+                        } else if (content.includes("[IN]")) {
+                            window.location.href = "index#//application_in";
+                        }
+                        window.location.reload();
                     },
                     error: function() {
                         layer.msg('标记为已读失败');
                     }
                 });
             });
+
         });
 
 

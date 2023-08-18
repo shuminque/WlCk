@@ -196,9 +196,12 @@ public class DepositoryRecordServiceImpl implements DepositoryRecordService {
                 record = depositoryRecordMapper.findDepositoryRecordById(ObjectFormatUtil.toInteger(map.get("id")));
                 map.put("state", "审核未通过");
                 // 添加通知
+
                 Integer atId = record.getAtId();  // 假设这是AT号
                 String mname = record.getMname();  // 假设这是品名
-                String notificationContent = "申请已被拒绝,AT号:" + atId + ", 品名: " + mname;
+                Integer type = record.getType();
+                String typeTag = type == 0 ? "[OUT]" : "[IN]";
+                String notificationContent = typeTag + " 申请已被拒绝,AT号:" + atId + ", 品名: " + mname;
 
                 Notification notification = new Notification();
                 notification.setUserId(record.getApplicantId());  // 假设申请人的ID是这样获取的
