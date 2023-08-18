@@ -33,10 +33,11 @@
                                         <label class="layui-form-label">品名:</label>
                                         <div class="layui-input-block">
                                             <input name="mname" type="text" id="materialSelect" placeholder="请填写品名" readonly class="layui-input" lay-verify="required" />
-                                            <!-- 隐藏的输入字段用于传递AT号和厂区ID -->
                                             <input name="atId" type="hidden" id="atIdSelect" />
                                             <input name="depositoryId" type="hidden" id="depositorySelect" />
                                             <input name="model" type="hidden" id="modelSelect" />
+                                            <input name="enginName" type="hidden" id="enginSelect" />
+                                            <input name="typeName" type="hidden" id="typeSelect" />
                                         </div>
                                     </div>
                                     <div class="layui-form-item">
@@ -282,9 +283,12 @@
                     done: function (elem, data) {
                         // 获取选中的数据
                         var selectedData = data.data[0];
+                        console.log(selectedData.enginName);
                         $('#materialSelect').val(selectedData.mname);
                         $('#atIdSelect').val(selectedData.atId);
                         $('#modelSelect').val(selectedData.model);
+                        $('#enginSelect').val(selectedData.enginName);
+                        $('#typeSelect').val(selectedData.typeName);
                         var depositoryId = depositoryMapping[selectedData.depositoryName];
                         $('#depositorySelect').val(depositoryId);
                         // // 获取物品的厂区名称
@@ -335,6 +339,8 @@
                     $('select[name="applyRemark"]').val(data.applyRemark);
                     $('select[name="reviewerId"]').val(data.reviewerId);
                     $('input[name="model"]').val(data.model);
+                    $('input[name="enginName"]').val(data.enginName);
+                    $('input[name="typeName"]').val(data.typeName);
                     // 重新渲染表单
                     layui.form.render();
                 });

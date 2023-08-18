@@ -26,6 +26,16 @@
                         </div>
                         <div class="layui-inline">
                             <div class="layui-input-inline">
+                                <select id="state" name="state">
+                                    <option value="" selected>请选择状态</option>
+                                    <option value="已入库">已入库</option>
+                                    <option value="审核未通过">审核未通过</option>
+                                    <option value="待审核">待审核</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="layui-inline">
+                            <div class="layui-input-inline">
                                 <select name="depositoryId" >
                                     <option value="" selected>请选择厂区</option>
                                     <option th:each="depository,iterStar:${depositories}" th:value="${depository?.getId()}" th:text="${depository?.getDname()}" >外芯仓库</option>
@@ -133,12 +143,14 @@
                         {field: 'atId', width: 60, title: 'AT'},
                         {field: 'mname', width: 120, title: '品名'},
                         {field: 'model', width: 120, title: '规格'},
+                        {field: 'typeName', width: 120, title: '型号'},
+                        {field: 'enginName', width: 120, title: '工程'},
                         {field: 'quantity', width: 80, title: '数量', sort: true},
                         {field: 'price', title: '单价', minWidth: 80, sort: true},
                         {field: 'applyRemark', title: '类型', minWidth: 120},
                         {field: 'state', width: 60, title: '流程状态'},
                         {field: 'applicantName', width: 60, title: '申请人'},
-                        {field: 'applyTime', width: 170, title: '申请时间', sort: true},
+                        // {field: 'applyTime', width: 170, title: '申请时间', sort: true},
                         {field: 'reviewTime', width: 170, title: '审核时间', sort: true},
                         {title: '操作 ', minWidth: 200, toolbar: '#currentTableBar', align: "center"}
                     ]],
@@ -158,6 +170,9 @@
                     }
                     if (data.mname!==''){
                         req.mname=data.mname;
+                    }
+                    if (data.state!==''){
+                        req.state=data.state;
                     }
                     if (data.depositoryId!==''){
                         req.depositoryId=data.depositoryId;

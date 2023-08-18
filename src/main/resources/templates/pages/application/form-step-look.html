@@ -26,10 +26,7 @@
                                 </colgroup>
 
                                 <tbody>
-<!--                                <tr>-->
-<!--                                    <td>序号</td>-->
-<!--                                    <td id="id" th:text="${record.getId()}">123456</td>-->
-<!--                                </tr>-->
+                                <td id="id" style="display: none;" th:text="${record.getId()}">123456</td>
                                 <tr>
                                     <td>AT</td>
                                     <td id="atId" th:text="${record.getAtId()}">123456</td>
@@ -48,7 +45,7 @@
                                 </tr>
                                 <tr>
                                     <td>工程</td>
-                                    <td id="engin" th:text="${record.getModel()}">骁龙888芯片</td>
+                                    <td id="enginName" th:text="${record.getEnginName()}">骁龙888芯片</td>
                                 </tr>
                                 <tr>
                                     <td>单价</td>
@@ -63,22 +60,22 @@
                                 <!--                                    <td id="type" th:text="${record.getType()}==1?'入库':'出库'">入库</td>-->
                                 <!--                                </tr>-->
                                 <tr>
-                                    <td>状态</td>
-                                    <td id="state" th:text="${record.getState()}">2016-11-28</td>
+                                    <td>申请类型</td>
+                                    <td id="applyRemarks" th:text="${record.getApplyRemark()}">2016-11-28</td>
+                                </tr>
+                                <tr>
+                                    <td>申请提交时间</td>
+                                    <td id="applyTime" th:text="${record.getApplyTime()}">2016-11-28</td>
                                 </tr>
                                 <tr>
                                     <td>申请人</td>
                                     <td id="applicantName" th:text="${record.getApplicantName()}">2016-11-28</td>
                                 </tr>
                                 <tr>
-                                    <td>请求提交时间</td>
-                                    <td id="applyTime" th:text="${record.getApplyTime()}">2016-11-28</td>
+                                    <td>进度</td>
+                                    <td id="state" th:text="${record.getState()}">2016-11-28</td>
                                 </tr>
 
-                                <tr>
-                                    <td>申请类型</td>
-                                    <td id="applyRemarks" th:text="${record.getApplyRemark()}">2016-11-28</td>
-                                </tr>
 <!--                                <tr>-->
 <!--                                    <td>审核人</td>-->
 <!--                                    <td id="reviewerName" th:text="${record.getReviewerName()}">2016-11-28</td>-->
@@ -91,11 +88,10 @@
                                     <td>审核时间</td>
                                     <td id="reviewTime" th:text="${record.getReviewTime()}">2016-11-28</td>
                                 </tr>
-                                <!--                                <tr id="checkerNameT" style="display: none">-->
-                                <!--                                    <td>验收人</td>-->
-                                <!--                                    <td id="checkerName" th:text="${record.getCheckerName()}">2016-11-28</td>-->
-                                <!--                                </tr>-->
-
+<!--                                <tr id="checkerNameT" style="display: none">-->
+<!--                                    <td>验收人</td>-->
+<!--                                    <td id="checkerName" th:text="${record.getCheckerName()}">2016-11-28</td>-->
+<!--                                </tr>-->
                                 </tbody>
                             </table>
                         </div>

@@ -35,6 +35,8 @@
                                             <input name="atId" type="hidden" id="atIdSelect" />
                                             <input name="depositoryId" type="hidden" id="depositorySelect" />
                                             <input name="model" type="hidden" id="modelSelect" />
+                                            <input name="enginName" type="hidden" id="enginSelect" />
+                                            <input name="typeName" type="hidden" id="typeSelect" />
                                         </div>
                                     </div>
                                     <div class="layui-form-item">
@@ -279,6 +281,8 @@
                     $('#atIdSelect').val(selectedData.atId); // 请确保这是正确的属性名
                     $('#price').val(selectedData.unitPrice);
                     $('#modelSelect').val(selectedData.model);
+                    $('#enginSelect').val(selectedData.enginName);
+                    $('#typeSelect').val(selectedData.typeName);
                     var depositoryId = depositoryMapping[selectedData.depositoryName];
                     $('#depositorySelect').val(depositoryId);
                     // 重新渲染表单
@@ -347,6 +351,8 @@
                 $('select[name="applyRemark"]').val(data.applyRemark);
                 $('select[name="reviewerId"]').val(data.reviewerId);
                 $('input[name="model"]').val(data.model);
+                $('input[name="enginName"]').val(data.enginName);
+                $('input[name="typeName"]').val(data.typeName);
                 // 重新渲染表单
                 layui.form.render();
             });

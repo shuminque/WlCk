@@ -34,6 +34,9 @@ public class DepositoryRecord {
 
     /**型号/规格*/
     private String model;
+    private String enginName;
+    private String typeName;
+
 
     /** 数量 */
     private Double quantity;

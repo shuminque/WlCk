@@ -25,6 +25,8 @@
         <result column="depository_id" property="depositoryId" jdbcType="INTEGER" />
         <result column="type" property="type" jdbcType="INTEGER" />
         <result column="model" property="model" jdbcType="VARCHAR" />
+        <result column="type_name" property="typeName" jdbcType="VARCHAR" />
+        <result column="engin_name" property="enginName" jdbcType="VARCHAR" />
         <result column="quantity" property="quantity" jdbcType="VARCHAR" />
         <result column="price" property="price" jdbcType="VARCHAR" />
         <result column="state" property="state" jdbcType="VARCHAR" />
@@ -48,7 +50,7 @@
     </sql>
     <!-- 表查询字段 -->
     <sql id="allColumns">
-        dr.id, dr.application_id, dr.at_id, dr.mname, dr.depository_id, dr.type, dr.model, dr.quantity, dr.price, dr.state,
+        dr.id, dr.application_id, dr.at_id, dr.mname, dr.depository_id, dr.type, dr.model, dr.type_name, dr.engin_name, dr.quantity, dr.price, dr.state,
         dr.applicant_id, dr.apply_remark, dr.apply_time, dr.reviewer_id, dr.review_remark, dr.review_time, dr.review_pass,
         dr.checker_id, dr.check_remark, dr.check_time, dr.check_pass
     </sql>
@@ -94,6 +96,12 @@
         </if>
         <if test="model != null and model != ''">
             AND dr.model LIKE CONCAT('%', #{model}, '%')
+        </if>
+        <if test="typeName != null and typeName != ''">
+            AND dr.type_name LIKE CONCAT('%', #{typeName}, '%')
+        </if>
+        <if test="enginName != null and enginName != ''">
+            AND dr.engin_name LIKE CONCAT('%', #{enginName}, '%')
         </if>
         <if test="quantity != null">
             AND dr.quantity = #{quantity}
@@ -194,6 +202,12 @@
         <if test="model != null and model != ''">
             AND dr.model LIKE CONCAT('%', #{model}, '%')
         </if>
+        <if test="typeName != null and typeName != ''">
+            AND dr.type_name LIKE CONCAT('%', #{typeName}, '%')
+        </if>
+        <if test="enginName != null and enginName != ''">
+            AND dr.engin_name LIKE CONCAT('%', #{enginName}, '%')
+        </if>
         <if test="quantity != null">
             AND dr.quantity = #{quantity}
         </if>
@@ -255,7 +269,7 @@
     <!-- 插入数据 -->
     <insert id="insertDepositoryRecord" parameterType="map" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
         INSERT INTO depository_record (
-            id, application_id, at_id,  mname, depository_id, type, model, quantity, price, state,
+            id, application_id, at_id,  mname, depository_id, type, model, type_name, engin_name, quantity, price, state,
             applicant_id, apply_remark, apply_time,
             reviewer_id, review_remark, review_time,review_pass, checker_id, check_remark,
             check_time,check_pass
@@ -267,6 +281,8 @@
             #{depositoryId},
             #{type},
             #{model},
+            #{typeName},
+            #{enginName},
             #{quantity},
             #{price},
             #{state},
@@ -287,7 +303,7 @@
     <!-- 批量插入数据 -->
     <insert id="insertDepositoryRecords" parameterType="list">
         INSERT INTO depository_record (
-        id, application_id, mname, at_id, depository_id, type, model, quantity, price, state,
+        id, application_id, mname, at_id, depository_id, type, model, type_name, engin_name, quantity, price, state,
         applicant_id, apply_remark, apply_time, reviewer_id, review_remark, review_time,review_pass, checker_id, check_remark,
         check_time,check_pass
         ) VALUES
@@ -300,6 +316,8 @@
                 #{depositoryId},
                 #{type},
                 #{model},
+                #{typeName},
+                #{enginName},
                 #{quantity},
                 #{price},
                 #{state},
@@ -339,6 +357,12 @@
             </if>
             <if test="model != null">
                 model = #{model},
+            </if>
+            <if test="typeName != null">
+                type_name = #{typeName},
+            </if>
+            <if test="enginName != null">
+                engin_name = #{enginName},
             </if>
             <if test="quantity != null">
                 quantity = #{quantity},
@@ -408,6 +432,12 @@
                 </if>
                 <if test="model != null">
                     model = #{model},
+                </if>
+                <if test="typeName != null">
+                    type_name = #{typeName},
+                </if>
+                <if test="enginName != null">
+                    engin_name = #{enginName},
                 </if>
                 <if test="quantity != null">
                     quantity = #{quantity},

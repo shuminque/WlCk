@@ -39,6 +39,11 @@ public class DepositoryRecordServiceImpl implements DepositoryRecordService {
     private MaterialMapper materialMapper;
     @Autowired
     private NotificationService notificationService;
+    @Autowired
+    private MaterialEnginMapper materialEnginMapper;
+    @Autowired
+    private MaterialTypeMapper materialTypeMapper;
+
 
     @Override
     public Integer apply(Map<String, Object> map) {
