@@ -190,45 +190,46 @@
         });
 
         $(document).ready(function() {
-            // 页面加载时获取通知
-            $.ajax({
-                url: '/notifications/unread',  // 假设这是后端提供的获取通知的API
-                type: 'GET',
-                dataType: 'json',
-                success: function(data) {
-                    var notifications = data.data;  // 获取通知数组
-
-                    // 更新通知数量
-                    if (notifications.length === 0) {
-                        $("#notification-list").append('<dd><a href="javascript:;">没有新的通知</a></dd>');
-                        $("#notification-count").text('');  // 清空通知数量
-                    } else {
-                        notifications.forEach(function(notification) {
-                            $("#notification-list").append('<dd data-id="' + notification.id + '"><a href="javascript:;">' + notification.content + '</a></dd>');
-                        });
-                        $("#notification-count").text(notifications.length);  // 显示通知数量
+            function loadNotifications(){
+                $.ajax({
+                    url: '/notifications/unread',  // 假设这是后端提供的获取通知的API
+                    type: 'GET',
+                    dataType: 'json',
+                    success: function(data) {
+                        var notifications = data.data;  // 获取通知数组
+                        $("#notification-list").empty();
+                        // 更新通知数量
+                        if (notifications.length === 0) {
+                            $("#notification-list").append('<dd><a href="javascript:;">没有新的通知</a></dd>');
+                            $("#notification-count").text('');  // 清空通知数量
+                        } else {
+                            notifications.forEach(function(notification) {
+                                $("#notification-list").append('<dd data-id="' + notification.id + '"><a href="javascript:;">' + notification.content + '</a></dd>');
+                            });
+                            $("#notification-count").text(notifications.length);  // 显示通知数量
+                        }
+                    },
+                    error: function() {
+                        layer.msg('获取通知失败');
                     }
-                },
-                error: function() {
-                    layer.msg('获取通知失败');
-                }
+                });
+            }
+            loadNotifications();
+            $("#notification-list").on("click", "dd", function() {
+                var notificationId = $(this).data("id");
+                $.ajax({
+                    url: '/notifications/mark-as-read/' + notificationId,
+                    type: 'PUT',
+                    success: function() {
+                        loadNotifications();
+                    },
+                    error: function() {
+                        layer.msg('标记为已读失败');
+                    }
+                });
             });
         });
-        $("#notification-list").on("click", "dd", function() {
-            var notificationId = $(this).data("id");
-            $.ajax({
-                url: '/notifications/mark-as-read/{id}',
-                type: 'PUT',
-                data: { id: notificationId },
-                success: function() {
-                    // 移除点击的通知
-                    $(this).remove();
-                },
-                error: function() {
-                    layer.msg('标记为已读失败');
-                }
-            });
-        });
+
 
 
         // 百度统计代码，只统计指定域名
