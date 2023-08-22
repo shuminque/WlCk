@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>total_table</title>
+</head>
+<body>
+<div>
+    <form action="/api/export/report" method="get">
+        <select name="depository_id">
+            <option value="1">SAB</option>
+            <option value="2">ZAB</option>
+        </select>
+        <button onclick="loadReport()">查看并导出</button>
+<!--        <input type="submit" value="导出Excel">-->
+    </form>
+</div>
+<table id="reportTable" border="1">
+    <!-- 表格数据由JavaScript动态生成 -->
+</table>
+
+<script>
+    function loadReport() {
+        let depositoryId = document.querySelector("select[name='depository_id']").value;
+        fetch('/api/report?depositoryId=' + depositoryId)
+            .then(response => response.json())
+            .then(data => {
+                let table = document.getElementById('reportTable');
+                table.innerHTML = ''; // 清除旧数据
+
+                // 创建表头
+                let thead = document.createElement('thead');
+                let headerRow = document.createElement('tr');
+                Object.keys(data[0]).forEach(colName => {
+                    let th = document.createElement('th');
+                    th.textContent = colName;
+                    headerRow.appendChild(th);
+                });
+                thead.appendChild(headerRow);
+                table.appendChild(thead);
+
+                // 创建表格主体数据
+                let tbody = document.createElement('tbody');
+                data.forEach(row => {
+                    let tr = document.createElement('tr');
+                    Object.values(row).forEach(cellData => {
+                        let td = document.createElement('td');
+                        td.textContent = cellData;
+                        tr.appendChild(td);
+                    });
+                    tbody.appendChild(tr);
+                });
+                table.appendChild(tbody);
+            })
+            .catch(error => console.error('Error fetching data:', error));
+    }
+</script>
+</body>
+</html>

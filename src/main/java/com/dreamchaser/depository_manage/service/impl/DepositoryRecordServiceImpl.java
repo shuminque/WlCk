@@ -200,7 +200,7 @@ public class DepositoryRecordServiceImpl implements DepositoryRecordService {
                 Integer atId = record.getAtId();  // 假设这是AT号
                 String mname = record.getMname();  // 假设这是品名
                 Integer type = record.getType();
-                String typeTag = type == 0 ? "[OUT]" : "[IN]";
+                String typeTag = type == 0 ? "[出库]" : "[入库]";
                 String notificationContent = typeTag + " 申请已被拒绝,AT号:" + atId + ", 品名: " + mname;
 
                 Notification notification = new Notification();

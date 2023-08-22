@@ -135,7 +135,7 @@
     <!-- 插入数据 -->
     <insert id="insertMaterial" parameterType="map" useGeneratedKeys="true">
         INSERT INTO material (
-            id, at_id, depository_id, mname, model, quantity, price, unit_price, type_id, state_id, enign_id
+            id, at_id, depository_id, mname, model, quantity, price, unit_price, type_id, state_id, engin_id
         ) VALUES (
             #{id},
             #{atId},
@@ -147,14 +147,14 @@
             #{unitPrice},
             #{typeId},
             #{stateId},
-            #{enignId},
+            #{enginId},
         )
     </insert>
 
     <!-- 批量插入数据 -->
     <insert id="insertMaterials" parameterType="list">
         INSERT INTO material (
-            id, at_id, depository_id, mname, model, quantity, price, unit_price, type_id, state_id, enign_id
+            id, at_id, depository_id, mname, model, quantity, price, unit_price, type_id, state_id, engin_id
         ) VALUES
         <foreach collection="list" index="index" item="item" separator=",">
             (
@@ -168,7 +168,7 @@
                 #{item.unitPrice},
                 #{item.typeId},
                 #{item.stateId},
-                #{item.enignId},
+                #{item.enginId},
             )
         </foreach>
     </insert>
@@ -217,7 +217,7 @@
         <set>
 
             <if test='state == "已入库"'>
-                <if test="price != null">
+                <if test="quantity != null">
                     quantity = quantity+#{quantity},
                 </if>
                 <if test="price != null">
@@ -225,17 +225,16 @@
                 </if>
             </if>
             <if test='state == "已出库"'>
-                <if test="price != null">
+                <if test="quantity != null">
                     quantity = quantity - #{quantity},
                 </if>
                 <if test="price != null">
                     price = price - #{price},
                 </if>
             </if>
-
         </set>
         WHERE
-        depository_id = #{depositoryId} and mname = #{mname},
+        depository_id = #{depositoryId} and mname = #{mname}
     </update>
 
     <!-- 批量修改数据 -->

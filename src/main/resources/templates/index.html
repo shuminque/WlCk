@@ -229,9 +229,9 @@
                     type: 'PUT',
                     success: function() {
                         loadNotifications();
-                        if (content.includes("[OUT]")) {
+                        if (content.includes("[出库]")) {
                             window.location.href = "index#//application_out";
-                        } else if (content.includes("[IN]")) {
+                        } else if (content.includes("[入库]")) {
                             window.location.href = "index#//application_in";
                         }
                         window.location.reload();
@@ -241,9 +241,7 @@
                     }
                 });
             });
-
         });
-
 
 
         // 百度统计代码，只统计指定域名

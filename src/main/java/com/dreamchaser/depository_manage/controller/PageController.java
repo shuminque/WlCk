@@ -83,6 +83,10 @@ public class PageController {
     public String materialEngin_add() {
         return "pages/other/materialEngin_add";
     }
+    @GetMapping("/total_table")
+    public String total_table() {
+        return "pages/chart/total_table";
+    }
     @GetMapping("/rate_add")
     public String rate_add() {
         return "pages/other/rate_add";
