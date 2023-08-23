@@ -25,10 +25,11 @@ public class ExcelExportController {
     private ReportService reportService;
 
     @GetMapping("/report")
-    public ResponseEntity<ByteArrayResource> exportReportToExcel(@RequestParam("depository_id") int depositoryId) throws Exception {
-
-        List<Map<String, Object>> data = reportService.fetchReportData(depositoryId);
-
+    public ResponseEntity<ByteArrayResource> exportReportToExcel(
+            @RequestParam("year") int year,
+            @RequestParam("month") int month,
+            @RequestParam("depositoryId") int depositoryId) throws Exception {
+        List<Map<String, Object>> data = reportService.fetchReportData(year, month, depositoryId);
         XSSFWorkbook workbook = new XSSFWorkbook();
         XSSFSheet sheet = workbook.createSheet("Report");
         // Create header row
@@ -56,6 +57,45 @@ public class ExcelExportController {
             row.createCell(7).setCellValue(((Double) getOrDefault(record, "存储数量", 0.0)).doubleValue());
             row.createCell(8).setCellValue(((Double) getOrDefault(record, "总金额", 0.0)).doubleValue());
         }
+
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        workbook.write(outputStream);
+        workbook.close();
+
+        ByteArrayResource resource = new ByteArrayResource(outputStream.toByteArray());
+        return ResponseEntity.ok()
+                .header("Content-Disposition", "attachment; filename=report.xlsx")
+                .body(resource);
+    }
+
+
+    @GetMapping("/every")
+    public ResponseEntity<ByteArrayResource> everyTypeToExcel(
+            @RequestParam("year") int year,
+            @RequestParam("month") int month,
+            @RequestParam("depositoryId") int depositoryId) throws Exception {
+        List<Map<String, Object>> data = reportService.everyTypeData(year, month, depositoryId);
+        XSSFWorkbook workbook = new XSSFWorkbook();
+        XSSFSheet sheet = workbook.createSheet("Report");
+        // Create header row
+        XSSFRow headerRow = sheet.createRow(0);
+        headerRow.createCell(0).setCellValue("日期");
+        headerRow.createCell(1).setCellValue("分类");
+        headerRow.createCell(2).setCellValue("入库金额");
+        headerRow.createCell(3).setCellValue("出库金额");
+        headerRow.createCell(4).setCellValue("在库金额");
+
+
+        for (int i = 0; i < data.size(); i++) {
+            Map<String, Object> record = data.get(i);
+            XSSFRow row = sheet.createRow(i + 1);
+            row.createCell(0).setCellValue((String) getOrDefault(record, "日期", ""));
+            row.createCell(1).setCellValue((String) getOrDefault(record, "材料类型", "aaa"));
+            row.createCell(2).setCellValue(((Double) getOrDefault(record, "入库金额", 0.0)).doubleValue());
+            row.createCell(3).setCellValue(((Double) getOrDefault(record, "出库金额", 0.0)).doubleValue());
+            row.createCell(4).setCellValue(((Double) getOrDefault(record, "在库金额", 0.0)).doubleValue());
+
+           }
 
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         workbook.write(outputStream);

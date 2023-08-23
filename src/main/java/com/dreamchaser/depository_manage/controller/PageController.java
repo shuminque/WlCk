@@ -87,6 +87,10 @@ public class PageController {
     public String total_table() {
         return "pages/chart/total_table";
     }
+    @GetMapping("/every_type")
+    public String every_type() {
+        return "pages/chart/every_type";
+    }
     @GetMapping("/rate_add")
     public String rate_add() {
         return "pages/other/rate_add";

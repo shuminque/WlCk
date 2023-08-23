@@ -31,7 +31,7 @@
         console.log(year,month);
         const depositorySelect = document.querySelector("[name='depository_id']");
         const depositoryId = depositorySelect.value;
-        fetch(`/api/report?depositoryId=${depositoryId}&year=${year}&month=${month}`)
+        fetch(`/api/every?depositoryId=${depositoryId}&year=${year}&month=${month}`)
             .then(response => response.json())
             .then(data => {
                 let table = document.getElementById('reportTable');
@@ -73,7 +73,7 @@
         const month = selectedMonth.split('-')[1];
         const depositorySelect = document.querySelector("[name='depository_id']");
         const depositoryId = depositorySelect.value;
-        const exportUrl = `/api/export/report?depositoryId=${depositoryId}&year=${year}&month=${month}`;
+        const exportUrl = `/api/export/every?depositoryId=${depositoryId}&year=${year}&month=${month}`;
         window.location.href = exportUrl;  // 这将触发文件下载
     }
 
