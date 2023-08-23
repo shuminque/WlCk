@@ -26,8 +26,8 @@ public class ReportService {
                 "ELSE m.mname = dr.mname AND m.model = dr.model END " +
                 "AND m.depository_id = dr.depository_id " +
                 "AND dr.review_pass = 1 " +
-                "AND YEAR(dr.apply_time) = ? " +
-                "AND MONTH(dr.apply_time) = ? " +
+                "AND YEAR(dr.review_time) = ? " +
+                "AND MONTH(dr.review_time) = ? " +
                 "WHERE m.depository_id = ? " +
                 "GROUP BY m.at_id, m.mname, m.model, m.quantity, m.price";
         return jdbcTemplate.queryForList(sql, year, month, depositoryId);
@@ -42,12 +42,12 @@ public class ReportService {
                         "        mt.tname AS material_type_name,\n" +
                         "        COALESCE(SUM(CASE WHEN dr.type = 1 THEN dr.price * dr.quantity ELSE 0 END), 0) AS 入库金额,\n" +
                         "        COALESCE(SUM(CASE WHEN dr.type = 0 THEN dr.price * dr.quantity ELSE 0 END), 0) AS 出库金额,\n" +
-                        "        IFNULL(YEAR(dr.apply_time), ?) AS report_year,\n" +
-                        "        IFNULL(MONTH(dr.apply_time), ?) AS report_month\n" +
+                        "        IFNULL(YEAR(dr.review_time), ?) AS report_year,\n" +
+                        "        IFNULL(MONTH(dr.review_time), ?) AS report_month\n" +
                         "    FROM material_type mt\n" +
                         "    LEFT JOIN depository_record dr ON mt.tname = dr.type_name\n" +
-                        "                               AND MONTH(dr.apply_time) = ?" +
-                        "                               AND YEAR(dr.apply_time) = ?" +
+                        "                               AND MONTH(dr.review_time) = ?" +
+                        "                               AND YEAR(dr.review_time) = ?" +
                         "                               AND dr.review_pass = 1" +
                         "                               AND dr.depository_id = ?" +
                         "    GROUP BY mt.tname, mt.id, report_year, report_month\n" +
@@ -67,7 +67,7 @@ public class ReportService {
                         "FinalData AS (\n" +
                         "    SELECT\n" +
                         "        CONCAT(cd.report_year, '/', cd.report_month) AS 日期,\n" +
-                        "        cd.material_type_name AS 分类,\n" +
+                        "        cd.material_type_name AS 材料类型,\n" +
                         "        cd.入库金额,\n" +
                         "        cd.出库金额,\n" +
                         "        COALESCE(s.在库金额, 0) AS 在库金额,\n" +
@@ -81,7 +81,7 @@ public class ReportService {
                         "\n" +
                         "    SELECT\n" +
                         "        CONCAT(cd.report_year, '/', cd.report_month) AS 日期,\n" +
-                        "        cd.material_type_name AS 分类,\n" +
+                        "        cd.material_type_name AS 材料类型,\n" +
                         "        cd.入库金额,\n" +
                         "        cd.出库金额,\n" +
                         "        COALESCE(s.在库金额, 0) AS 在库金额,\n" +
@@ -94,8 +94,8 @@ public class ReportService {
                         "\n" +
                         "Totals AS (\n" +
                         "    SELECT\n" +
-                        "        CONCAT(cd.report_year, '/', cd.report_month) AS 日期,\n" +
-                        "        '总计' AS 分类,\n" +
+                        "        '总计' AS 日期,\n" +
+                        "        ' ' AS 材料类型,\n" +
                         "        SUM(cd.入库金额) AS 入库金额,\n" +
                         "        SUM(cd.出库金额) AS 出库金额,\n" +
                         "        SUM(COALESCE(s.在库金额, 0)) AS 在库金额,\n" +
@@ -106,14 +106,14 @@ public class ReportService {
                         "    GROUP BY cd.report_year, cd.report_month, cd.is_import\n" +
                         ")\n" +
                         "\n" +
-                        "SELECT 日期, 分类, 入库金额, 出库金额, 在库金额\n" +
+                        "SELECT 日期, 材料类型, 入库金额, 出库金额, 在库金额\n" +
                         "FROM (\n" +
-                        "    SELECT 日期, 分类, 入库金额, 出库金额, 在库金额, is_import, type_id\n" +
+                        "    SELECT 日期, 材料类型, 入库金额, 出库金额, 在库金额, is_import, type_id\n" +
                         "    FROM FinalData\n" +
                         "\n" +
                         "    UNION ALL\n" +
                         "\n" +
-                        "    SELECT 日期, 分类, 入库金额, 出库金额, 在库金额, is_import, type_id\n" +
+                        "    SELECT 日期, 材料类型, 入库金额, 出库金额, 在库金额, is_import, type_id\n" +
                         "    FROM Totals\n" +
                         ") AS SubQuery\n" +
                         "ORDER BY is_import DESC, type_id ASC, 日期 DESC;";
@@ -121,3 +121,4 @@ public class ReportService {
         return jdbcTemplate.queryForList(sql, year, month, month, year, depositoryId, depositoryId);
     }
 }
+
