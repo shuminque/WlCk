@@ -116,6 +116,7 @@ public class DepositoryRecordServiceImpl implements DepositoryRecordService {
     @Transactional
     public Integer transferApply(Map<String, Object> map) {
         map.put("state","待审核");
+        map.put("applyTime",new Date());
         map.put("type",0);
         map.put("depositoryId",map.get("fromId"));
         depositoryRecordMapper.insertDepositoryRecord(map);

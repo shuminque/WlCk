@@ -137,7 +137,7 @@
           ]
         },
         {
-          "title": "报表查看",
+          "title": " 报表查看",
           "icon": "layui-icon layui-icon-chart-screen",
           "target": "_self",
           "child": [
