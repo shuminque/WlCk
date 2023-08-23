@@ -129,6 +129,25 @@
               "target": "_self"
             }
           ]
+        },
+        {
+          "title": "报表查看",
+          "icon": "layui-icon layui-icon-chart-screen",
+          "target": "_self",
+          "child": [
+            {
+              "title": "各类总表",
+              "href": "/every_type",
+              "icon": "layui-icon layui-icon-list",
+              "target": "_self"
+            },
+            {
+              "title": "细化表",
+              "href": "/total_table",
+              "icon": "layui-icon layui-icon-list",
+              "target": "_self"
+            }
+          ]
         }
       ]
     }

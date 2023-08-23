@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.core.io.ByteArrayResource;
 
 import java.io.ByteArrayOutputStream;
+import java.net.URLEncoder;
 import java.util.Map;
 import java.util.List;
 
@@ -62,9 +63,11 @@ public class ExcelExportController {
         workbook.write(outputStream);
         workbook.close();
 
+        String filename = String.format("%d-%02d物品库存报表.xlsx", year, month);
+        String encodedFilename = URLEncoder.encode(filename, "UTF-8").replace("+", "%20");
         ByteArrayResource resource = new ByteArrayResource(outputStream.toByteArray());
         return ResponseEntity.ok()
-                .header("Content-Disposition", "attachment; filename=report.xlsx")
+                .header("Content-Disposition", "attachment; filename*=UTF-8''" + encodedFilename)
                 .body(resource);
     }
 
@@ -90,20 +93,22 @@ public class ExcelExportController {
             Map<String, Object> record = data.get(i);
             XSSFRow row = sheet.createRow(i + 1);
             row.createCell(0).setCellValue((String) getOrDefault(record, "日期", ""));
-            row.createCell(1).setCellValue((String) getOrDefault(record, "材料类型", "aaa"));
+            row.createCell(1).setCellValue((String) getOrDefault(record, "分类", "aaa"));
             row.createCell(2).setCellValue(((Double) getOrDefault(record, "入库金额", 0.0)).doubleValue());
             row.createCell(3).setCellValue(((Double) getOrDefault(record, "出库金额", 0.0)).doubleValue());
             row.createCell(4).setCellValue(((Double) getOrDefault(record, "在库金额", 0.0)).doubleValue());
 
-           }
+        }
 
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         workbook.write(outputStream);
         workbook.close();
 
+        String filename = String.format("%d-%02d各类型报表.xlsx", year, month);
+        String encodedFilename = URLEncoder.encode(filename, "UTF-8").replace("+", "%20");
         ByteArrayResource resource = new ByteArrayResource(outputStream.toByteArray());
         return ResponseEntity.ok()
-                .header("Content-Disposition", "attachment; filename=report.xlsx")
+                .header("Content-Disposition", "attachment; filename*=UTF-8''" + encodedFilename)
                 .body(resource);
     }
 

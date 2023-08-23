@@ -69,7 +69,6 @@
                 layer = layui.layer;
             laydate.render({
                 elem: 'input[name="date"]', // 指定元素
-                type: 'month'
             });
             table.render({
                 elem: "#currentTableId",
@@ -96,7 +95,11 @@
                 toolbar: ['filter', 'exports', 'print'],
                 cols: [ [
                     {field: 'id', width: '25%', title: '编号'},
-                    {field: 'date', width: '25%', title: '时间', sort: true},
+                    {field: 'date', width: '25%', title: '时间', sort: true,templet: function(d) {
+                            // 以下是一个简单的例子，根据实际的日期格式进行调整
+                            var date = new Date(d.date);
+                            return date.getFullYear() + '-' + (date.getMonth() + 1).toString().padStart(2, '0');
+                        }},
                     {field: 'rate', width: '25%', title: '汇率', sort: true},
                     {title: '操作', width: '15%', align: 'center', toolbar: '#operation-bar'}
                 ]],
@@ -129,15 +132,22 @@
                     success:function(data){
                         layer.close(this.layerIndex);
                         if(data.status >= 300){
-                            layer.msg(data.statusInfo.message);//失败的表情
+                            layer.msg(data.statusInfo.message); // 这里已经有了一个错误提示
                             return;
                         }else{
                             layer.msg("添加成功！", {
-                                icon: 6,//成功的表情
+                                icon: 6, //成功的表情
                                 time: 1000 //1秒关闭（如果不配置，默认是3秒）
                             });
                             table.reload('currentTableId'); // 重新加载表格
                         }
+                    },
+                    error: function(jqXHR, textStatus, errorThrown) {
+                        layer.close(this.layerIndex);
+                        layer.msg('错误的操作，错误信息：' + errorThrown, {
+                            icon: 5, //失败的表情
+                            time: 3000 //3秒关闭
+                        });
                     },
                     complete: function () {
                         form.val("form1", {
@@ -149,6 +159,7 @@
                 })
                 return false;
             });
+
             table.on('tool(currentTableFilter)', function(obj) {
                 var data = obj.data; // 获取当前行的数据
                 var layEvent = obj.event; // 获取当前事件名称

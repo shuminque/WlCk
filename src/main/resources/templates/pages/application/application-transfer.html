@@ -30,6 +30,12 @@
                                         <label class="layui-form-label">品名:</label>
                                         <div class="layui-input-block">
                                             <input name="mname" type="text" id="materialSelect" placeholder="请填写品名" readonly class="layui-input" lay-verify="required"  />
+                                            <input name="atId" type="hidden" id="atIdSelect" />
+                                            <input name="depositoryId" type="hidden" id="depositorySelect" />
+                                            <input name="model" type="hidden" id="modelSelect" />
+                                            <input name="enginName" type="hidden" id="enginSelect" />
+                                            <input name="typeName" type="hidden" id="typeSelect" />
+                                            <input name="applyRemark" value="转移" type="hidden" />
                                         </div>
                                     </div>
                                     <div class="layui-form-item">
@@ -71,12 +77,12 @@
 <!--                                        </div>-->
 <!--                                    </div>-->
 
-                                    <div class="layui-form-item">
-                                        <label class="layui-form-label">备注说明:</label>
-                                        <div class="layui-input-block">
-                                            <textarea name="applyRemark" placeholder="请填写相关原因及申请原因" value="" class="layui-textarea"></textarea>
-                                        </div>
-                                    </div>
+<!--                                    <div class="layui-form-item">-->
+<!--                                        <label class="layui-form-label">备注说明:</label>-->
+<!--                                        <div class="layui-input-block">-->
+<!--                                            <textarea name="applyRemark" placeholder="请填写相关原因及申请原因" value="" class="layui-textarea"></textarea>-->
+<!--                                        </div>-->
+<!--                                    </div>-->
                                     <div class="layui-form-item">
                                         <div class="layui-input-block">
                                             <button class="layui-btn" lay-submit lay-filter="formStep">
@@ -254,6 +260,9 @@
                         $('#materialSelect').val(selectedData.mname);
                         $('#atIdSelect').val(selectedData.atId); // 请确保这是正确的属性名
                         $('#price').val(selectedData.unitPrice);
+                        $('#modelSelect').val(selectedData.model);
+                        $('#enginSelect').val(selectedData.enginName);
+                        $('#typeSelect').val(selectedData.typeName);
                         var depositoryId = depositoryMapping[selectedData.depositoryName];
                         if (depositoryId === 1){
                             $('#OldCk').val(depositoryId);

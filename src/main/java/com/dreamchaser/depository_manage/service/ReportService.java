@@ -67,7 +67,7 @@ public class ReportService {
                         "FinalData AS (\n" +
                         "    SELECT\n" +
                         "        CONCAT(cd.report_year, '/', cd.report_month) AS 日期,\n" +
-                        "        cd.material_type_name AS 材料类型,\n" +
+                        "        cd.material_type_name AS 分类,\n" +
                         "        cd.入库金额,\n" +
                         "        cd.出库金额,\n" +
                         "        COALESCE(s.在库金额, 0) AS 在库金额,\n" +
@@ -81,7 +81,7 @@ public class ReportService {
                         "\n" +
                         "    SELECT\n" +
                         "        CONCAT(cd.report_year, '/', cd.report_month) AS 日期,\n" +
-                        "        cd.material_type_name AS 材料类型,\n" +
+                        "        cd.material_type_name AS 分类,\n" +
                         "        cd.入库金额,\n" +
                         "        cd.出库金额,\n" +
                         "        COALESCE(s.在库金额, 0) AS 在库金额,\n" +
@@ -95,7 +95,7 @@ public class ReportService {
                         "Totals AS (\n" +
                         "    SELECT\n" +
                         "        CONCAT(cd.report_year, '/', cd.report_month) AS 日期,\n" +
-                        "        '总计' AS 材料类型,\n" +
+                        "        '总计' AS 分类,\n" +
                         "        SUM(cd.入库金额) AS 入库金额,\n" +
                         "        SUM(cd.出库金额) AS 出库金额,\n" +
                         "        SUM(COALESCE(s.在库金额, 0)) AS 在库金额,\n" +
@@ -106,14 +106,14 @@ public class ReportService {
                         "    GROUP BY cd.report_year, cd.report_month, cd.is_import\n" +
                         ")\n" +
                         "\n" +
-                        "SELECT 日期, 材料类型, 入库金额, 出库金额, 在库金额\n" +
+                        "SELECT 日期, 分类, 入库金额, 出库金额, 在库金额\n" +
                         "FROM (\n" +
-                        "    SELECT 日期, 材料类型, 入库金额, 出库金额, 在库金额, is_import, type_id\n" +
+                        "    SELECT 日期, 分类, 入库金额, 出库金额, 在库金额, is_import, type_id\n" +
                         "    FROM FinalData\n" +
                         "\n" +
                         "    UNION ALL\n" +
                         "\n" +
-                        "    SELECT 日期, 材料类型, 入库金额, 出库金额, 在库金额, is_import, type_id\n" +
+                        "    SELECT 日期, 分类, 入库金额, 出库金额, 在库金额, is_import, type_id\n" +
                         "    FROM Totals\n" +
                         ") AS SubQuery\n" +
                         "ORDER BY is_import DESC, type_id ASC, 日期 DESC;";
@@ -121,4 +121,3 @@ public class ReportService {
         return jdbcTemplate.queryForList(sql, year, month, month, year, depositoryId, depositoryId);
     }
 }
-
