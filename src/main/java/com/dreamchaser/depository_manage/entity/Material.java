@@ -36,6 +36,9 @@ public class Material {
     /** 材料种类id */
     private Integer typeId;
 
+    /**图号*/
+    private String picNum;
+
     /**材料状态id*/
     private Integer stateId;
 
