@@ -112,8 +112,50 @@ public class ExcelExportController {
                 .body(resource);
     }
 
+
+    @GetMapping("/transfer")
+    public ResponseEntity<ByteArrayResource> transferToExcel(
+            @RequestParam("year") int year,
+            @RequestParam("month") int month) throws Exception {
+        List<Map<String, Object>> data = reportService.transferData(year, month);
+        XSSFWorkbook workbook = new XSSFWorkbook();
+        XSSFSheet sheet = workbook.createSheet("Report");
+        // Create header row
+        XSSFRow headerRow = sheet.createRow(0);
+        headerRow.createCell(0).setCellValue("日期");
+        headerRow.createCell(1).setCellValue("品名");
+        headerRow.createCell(2).setCellValue("型号");
+        headerRow.createCell(3).setCellValue("单价");
+        headerRow.createCell(4).setCellValue("数量");
+        headerRow.createCell(5).setCellValue("总价");
+        headerRow.createCell(6).setCellValue("备注");
+
+        for (int i = 0; i < data.size(); i++) {
+            Map<String, Object> record = data.get(i);
+            XSSFRow row = sheet.createRow(i + 1);
+            row.createCell(0).setCellValue((String) getOrDefault(record, "日期", ""));
+            row.createCell(1).setCellValue((String) getOrDefault(record, "品名", "aaa"));
+            row.createCell(2).setCellValue((String) getOrDefault(record, "型号", "aaa"));
+            row.createCell(3).setCellValue(((Double) getOrDefault(record, "单价", 0.0)).doubleValue());
+            row.createCell(4).setCellValue(((Double) getOrDefault(record, "数量", 0.0)).doubleValue());
+            row.createCell(5).setCellValue(((Double) getOrDefault(record, "总价", 0.0)).doubleValue());
+            row.createCell(6).setCellValue((String) getOrDefault(record, "备注", "aaa"));
+
+        }
+
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        workbook.write(outputStream);
+        workbook.close();
+
+        String filename = String.format("%d-%02d转移报表.xlsx", year, month);
+        String encodedFilename = URLEncoder.encode(filename, "UTF-8").replace("+", "%20");
+        ByteArrayResource resource = new ByteArrayResource(outputStream.toByteArray());
+        return ResponseEntity.ok()
+                .header("Content-Disposition", "attachment; filename*=UTF-8''" + encodedFilename)
+                .body(resource);
+    }
+
     private Object getOrDefault(Map<String, Object> map, String key, Object defaultValue) {
         return map.containsKey(key) && map.get(key) != null ? map.get(key) : defaultValue;
     }
-
 }

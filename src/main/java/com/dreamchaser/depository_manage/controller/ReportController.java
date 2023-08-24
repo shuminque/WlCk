@@ -43,5 +43,17 @@ public class ReportController {
         }
         return reportService.everyTypeData(year, month , depositoryId);
     }
+    @GetMapping("/transfer")
+    public List<Map<String, Object>> transferData(
+            @RequestParam(name = "year", required = false, defaultValue = "-1") int year,
+            @RequestParam(name = "month", required = false, defaultValue = "-1") int month){
+        if (year == -1) {
+            year = LocalDate.now().getYear();
+        }
+        if (month == -1) {
+            month = LocalDate.now().getMonthValue();
+        }
+        return reportService.transferData(year, month);
+    }
 }
 

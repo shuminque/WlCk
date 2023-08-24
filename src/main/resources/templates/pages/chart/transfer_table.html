@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>every_type</title>
+</head>
+<body>
+<div>
+    <form action="/api/export/transfer" method="get">
+        <select name="depository_id">
+            <option value="1">SAB</option>
+            <option value="2">ZAB</option>
+        </select>
+        <input type="month" id="monthPicker">
+        <button type="button" onclick="loadReport()">查看</button>
+        <button type="button" onclick="exportReport()">导出</button>
+    </form>
+</div>
+<table id="reportTable" border="1">
+    <!-- 表格数据由JavaScript动态生成 -->
+</table>
+
+<script>
+    function loadReport() {
+        const selectedMonth = document.getElementById('monthPicker').value;
+        if (!selectedMonth) {
+            alert("请选择一个月份!");
+            return;
+        }
+        const year = selectedMonth.split('-')[0];
+        const month = selectedMonth.split('-')[1];
+        console.log(year,month);
+        const depositorySelect = document.querySelector("[name='depository_id']");
+        const depositoryId = depositorySelect.value;
+        fetch(`/api/transfer?depositoryId=${depositoryId}&year=${year}&month=${month}`)
+            .then(response => response.json())
+            .then(data => {
+                let table = document.getElementById('reportTable');
+                table.innerHTML = ''; // 清除旧数据
+
+                // 创建表头
+                let thead = document.createElement('thead');
+                let headerRow = document.createElement('tr');
+                Object.keys(data[0]).forEach(colName => {
+                    let th = document.createElement('th');
+                    th.textContent = colName;
+                    headerRow.appendChild(th);
+                });
+                thead.appendChild(headerRow);
+                table.appendChild(thead);
+
+                // 创建表格主体数据
+                let tbody = document.createElement('tbody');
+                data.forEach(row => {
+                    let tr = document.createElement('tr');
+                    Object.values(row).forEach(cellData => {
+                        let td = document.createElement('td');
+                        td.textContent = cellData;
+                        tr.appendChild(td);
+                    });
+                    tbody.appendChild(tr);
+                });
+                table.appendChild(tbody);
+            })
+            .catch(error => console.error('Error fetching data:', error));
+    }
+    function exportReport() {
+        const selectedMonth = document.getElementById('monthPicker').value;
+        if (!selectedMonth) {
+            alert("请先选择一个月份!");
+            return;
+        }
+        const year = selectedMonth.split('-')[0];
+        const month = selectedMonth.split('-')[1];
+        const depositorySelect = document.querySelector("[name='depository_id']");
+        const depositoryId = depositorySelect.value;
+        const exportUrl = `/api/export/transfer?depositoryId=${depositoryId}&year=${year}&month=${month}`;
+        window.location.href = exportUrl;  // 这将触发文件下载
+    }
+
+</script>
+</body>
+</html>

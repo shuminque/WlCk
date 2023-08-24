@@ -91,6 +91,10 @@ public class PageController {
     public String every_type() {
         return "pages/chart/every_type";
     }
+    @GetMapping("/transfer_table")
+    public String transfer_table() {
+        return "pages/chart/transfer_table";
+    }
     @GetMapping("/rate_add")
     public String rate_add() {
         return "pages/other/rate_add";

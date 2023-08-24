@@ -132,7 +132,7 @@
         },
         {
           "title": "报表查看",
-          "icon": "layui-icon layui-icon-chart-screen",
+          "icon": "fa fa-map",
           "target": "_self",
           "child": [
             {
