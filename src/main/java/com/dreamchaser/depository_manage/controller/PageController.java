@@ -59,15 +59,21 @@ public class PageController {
         mv.setViewName("pages/other/welcome");
         Map<String, Object> map = new HashMap<String, Object>(2) {
             {
-                put("beigin", 0);
+                put("begin", 0);
                 put("size",6);
             }
         };
         mv.addObject("notices", noticeService.findNoticeByCondition(map));
         mv.addObject("depositories", depositoryService.findDepositoryAll());
         mv.addObject("materials", materialService.findMaterialAll());
+
+        // 添加 materials 的总数
+        int count = materialService.findCount();
+        mv.addObject("count", count);
+
         return mv;
     }
+
 
     @GetMapping("/depository_add")
     public String depository_add() {
