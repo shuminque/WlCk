@@ -143,7 +143,6 @@ public class ExcelExportController {
 //            row.createCell(6).setCellValue((String) getOrDefault(record, "备注", "aaa"));
 //
 //        }
-        // ... [前面的代码不变]
 
 // 分割数据
         List<Map<String, Object>> zabToSabData = data.stream()
@@ -157,21 +156,17 @@ public class ExcelExportController {
         int currentRowIndex = 0;
         XSSFRow titleRowZabToSab = sheet.createRow(currentRowIndex++);
         titleRowZabToSab.createCell(0).setCellValue("SAB向ZAB借用物资清单");
-        currentRowIndex += 2; // 留空一行
+//        currentRowIndex += 2; // 留空一行
         createHeaderRow(sheet, currentRowIndex++);
         currentRowIndex = fillDataRows(sheet, currentRowIndex, zabToSabData);
-
         currentRowIndex += 2; // 留空一行
 
 // 创建 SAB向ZAB部分
         XSSFRow titleRowSabToZab = sheet.createRow(currentRowIndex++);
         titleRowSabToZab.createCell(0).setCellValue("ZAB向SAB借用物资清单");
-        currentRowIndex += 2; // 留空一行
+//        currentRowIndex += 2; // 留空一行
         createHeaderRow(sheet, currentRowIndex++);
         fillDataRows(sheet, currentRowIndex, sabToZabData);
-
-// ... [后面的代码不变]
-
 
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         workbook.write(outputStream);
