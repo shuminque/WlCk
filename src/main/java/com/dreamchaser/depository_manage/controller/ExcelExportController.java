@@ -15,6 +15,7 @@ import org.springframework.core.io.ByteArrayResource;
 
 import java.io.ByteArrayOutputStream;
 import java.net.URLEncoder;
+import java.text.DecimalFormat;
 import java.util.Map;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -53,13 +54,13 @@ public class ExcelExportController {
             row.createCell(1).setCellValue((String) getOrDefault(record, "mname", "aaa"));
             row.createCell(2).setCellValue((String) getOrDefault(record, "model", ""));
             row.createCell(3).setCellValue(((Double) getOrDefault(record, "入库数量", 0.0)).doubleValue());
-            row.createCell(4).setCellValue(((Double) getOrDefault(record, "入库金额", 0.0)).doubleValue());
+            row.createCell(4).setCellValue((String) getOrDefault(record, "入库金额", "0.00"));
             row.createCell(5).setCellValue(((Double) getOrDefault(record, "出库数量", 0.0)).doubleValue());
-            row.createCell(6).setCellValue(((Double) getOrDefault(record, "出库金额", 0.0)).doubleValue());
+            row.createCell(6).setCellValue((String) getOrDefault(record, "出库金额", "0.00"));
             row.createCell(7).setCellValue(((Double) getOrDefault(record, "存储数量", 0.0)).doubleValue());
-            row.createCell(8).setCellValue(((Double) getOrDefault(record, "总金额", 0.0)).doubleValue());
-        }
+            row.createCell(8).setCellValue((String) getOrDefault(record, "总金额", "0.00"));
 
+        }
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         workbook.write(outputStream);
         workbook.close();
@@ -213,4 +214,5 @@ public class ExcelExportController {
     private Object getOrDefault(Map<String, Object> map, String key, Object defaultValue) {
         return map.containsKey(key) && map.get(key) != null ? map.get(key) : defaultValue;
     }
+
 }
