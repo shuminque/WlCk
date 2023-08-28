@@ -86,6 +86,9 @@
                     selectElem.innerHTML = '<option value="1">SAB</option>';
                 } else if (depositoryId === 2) {
                     selectElem.innerHTML = '<option value="2">ZAB</option>';
+                } else if (depositoryId ===0){
+                    selectElem.innerHTML = '<option value="1">SAB</option>' +
+                        '<option value="2">ZAB</option>'
                 }
                 // 如果还有其他的depository_id, 可以继续添加其他分支
             })
