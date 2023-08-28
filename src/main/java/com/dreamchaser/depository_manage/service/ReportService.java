@@ -15,15 +15,15 @@ public class ReportService {
     public List<Map<String, Object>> fetchReportData(int year, int month, int depositoryId) {
         String sql =
                 "SELECT\n" +
-                        "    m.at_id,\n" +
-                        "    m.mname,\n" +
-                        "    COALESCE(LEFT(m.model, 30), 'N/A') AS model,\n" +
+                        "    m.at_id as AT号,\n" +
+                        "    m.mname as 品名,\n" +
+                        "    COALESCE(LEFT(m.model, 30), 'N/A')  AS 规格,\n" +
                         "    SUM(CASE WHEN dr.type = 1 THEN dr.quantity ELSE 0 END) AS 入库数量,\n" +
                         "    FORMAT(ROUND((SUM(CASE WHEN dr.type = 1 THEN dr.price * dr.quantity ELSE 0 END)),2), 2) AS 入库金额,\n" +
                         "    SUM(CASE WHEN dr.type = 0 THEN dr.quantity ELSE 0 END) AS 出库数量,\n" +
                         "    FORMAT(ROUND((SUM(CASE WHEN dr.type = 0 THEN dr.price * dr.quantity ELSE 0 END)),2), 2) AS 出库金额,\n" +
-                        "    m.quantity AS 存储数量,\n" +
-                        "    FORMAT(ROUND(m.price,2), 2) AS 总金额\n" +
+                        "    m.quantity AS 库存数量,\n" +
+                        "    FORMAT(ROUND(m.price,2), 2) AS 在库金额\n" +
                         "FROM\n" +
                         "    material m\n" +
                         "LEFT JOIN\n" +
@@ -36,7 +36,7 @@ public class ReportService {
                         "    AND MONTH(dr.review_time) = ?\n" +
                         "WHERE m.depository_id = ?\n" +
                         "GROUP BY\n" +
-                        "    m.at_id, m.mname, m.model, m.quantity, m.price;";
+                        "m.at_id, m.mname, m.model, m.quantity, m.price;";
 
         return jdbcTemplate.queryForList(sql, year, month, depositoryId);
     }
@@ -76,7 +76,7 @@ public class ReportService {
                         "FinalData AS (\n" +
                         "    SELECT\n" +
                         "        CONCAT(cd.report_year, '/', cd.report_month) AS 日期,\n" +
-                        "        cd.material_type_name AS 材料类型,\n" +
+                        "        cd.material_type_name AS 分类,\n" +
                         "        cd.入库金额,\n" +
                         "        cd.出库金额,\n" +
                         "        COALESCE(s.在库金额, 0) AS 在库金额,\n" +
@@ -88,7 +88,7 @@ public class ReportService {
                         "Totals AS (\n" +
                         "    SELECT\n" +
                         "        '总计' AS 日期,\n" +
-                        "        ' ' AS 材料类型,\n" +
+                        "        ' ' AS 分类,\n" +
                         "        FORMAT(SUM(cd.raw_in_money), 2) AS 入库金额,\n" +
                         "        FORMAT(SUM(cd.raw_out_money), 2) AS 出库金额,\n" +
                         "        FORMAT(SUM(COALESCE(s.raw_stock_money, 0)), 2) AS 在库金额,\n" +
@@ -98,12 +98,12 @@ public class ReportService {
                         "    LEFT JOIN StockValue s ON cd.type_id = s.type_id\n" +
                         "    GROUP BY cd.is_import\n" +
                         ")\n" +
-                        "SELECT 日期, 材料类型, 入库金额, 出库金额, 在库金额\n" +
+                        "SELECT 日期, 分类, 入库金额, 出库金额, 在库金额\n" +
                         "FROM (\n" +
-                        "    SELECT 日期, 材料类型, 入库金额, 出库金额, 在库金额, is_import, type_id\n" +
+                        "    SELECT 日期, 分类, 入库金额, 出库金额, 在库金额, is_import, type_id\n" +
                         "    FROM FinalData\n" +
                         "    UNION ALL\n" +
-                        "    SELECT 日期, 材料类型, 入库金额, 出库金额, 在库金额, is_import, type_id\n" +
+                        "    SELECT 日期, 分类, 入库金额, 出库金额, 在库金额, is_import, type_id\n" +
                         "    FROM Totals\n" +
                         ") AS SubQuery\n" +
                         "ORDER BY is_import DESC, type_id ASC, 日期 DESC;";

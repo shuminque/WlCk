@@ -37,28 +37,28 @@ public class ExcelExportController {
         XSSFSheet sheet = workbook.createSheet("Report");
         // Create header row
         XSSFRow headerRow = sheet.createRow(0);
-        headerRow.createCell(0).setCellValue("AT ID");
-        headerRow.createCell(1).setCellValue("MNAME");
-        headerRow.createCell(2).setCellValue("MODEL");
+        headerRow.createCell(0).setCellValue("AT号");
+        headerRow.createCell(1).setCellValue("品名");
+        headerRow.createCell(2).setCellValue("规格");
         headerRow.createCell(3).setCellValue("入库数量");
         headerRow.createCell(4).setCellValue("入库金额");
         headerRow.createCell(5).setCellValue("出库数量");
         headerRow.createCell(6).setCellValue("出库金额");
-        headerRow.createCell(7).setCellValue("存储数量");
-        headerRow.createCell(8).setCellValue("总金额");
+        headerRow.createCell(7).setCellValue("库存数量");
+        headerRow.createCell(8).setCellValue("在库金额");
 
         for (int i = 0; i < data.size(); i++) {
             Map<String, Object> record = data.get(i);
             XSSFRow row = sheet.createRow(i + 1);
-            row.createCell(0).setCellValue(((Integer) getOrDefault(record, "at_id", 0)).intValue());
-            row.createCell(1).setCellValue((String) getOrDefault(record, "mname", "aaa"));
-            row.createCell(2).setCellValue((String) getOrDefault(record, "model", ""));
+            row.createCell(0).setCellValue(((Integer) getOrDefault(record, "AT号", 0)).intValue());
+            row.createCell(1).setCellValue((String) getOrDefault(record, "品名", "aaa"));
+            row.createCell(2).setCellValue((String) getOrDefault(record, "规格", ""));
             row.createCell(3).setCellValue(((Double) getOrDefault(record, "入库数量", 0.0)).doubleValue());
             row.createCell(4).setCellValue((String) getOrDefault(record, "入库金额", "0.00"));
             row.createCell(5).setCellValue(((Double) getOrDefault(record, "出库数量", 0.0)).doubleValue());
             row.createCell(6).setCellValue((String) getOrDefault(record, "出库金额", "0.00"));
-            row.createCell(7).setCellValue(((Double) getOrDefault(record, "存储数量", 0.0)).doubleValue());
-            row.createCell(8).setCellValue((String) getOrDefault(record, "总金额", "0.00"));
+            row.createCell(7).setCellValue(((Double) getOrDefault(record, "库存数量", 0.0)).doubleValue());
+            row.createCell(8).setCellValue((String) getOrDefault(record, "在库金额", "0.00"));
 
         }
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
@@ -96,9 +96,9 @@ public class ExcelExportController {
             XSSFRow row = sheet.createRow(i + 1);
             row.createCell(0).setCellValue((String) getOrDefault(record, "日期", ""));
             row.createCell(1).setCellValue((String) getOrDefault(record, "分类", "aaa"));
-            row.createCell(2).setCellValue(((Double) getOrDefault(record, "入库金额", 0.0)).doubleValue());
-            row.createCell(3).setCellValue(((Double) getOrDefault(record, "出库金额", 0.0)).doubleValue());
-            row.createCell(4).setCellValue(((Double) getOrDefault(record, "在库金额", 0.0)).doubleValue());
+            row.createCell(2).setCellValue((String) getOrDefault(record, "入库金额", "0.00"));
+            row.createCell(3).setCellValue((String) getOrDefault(record, "出库金额", "0.00"));
+            row.createCell(4).setCellValue((String) getOrDefault(record, "在库金额", "0.00"));
 
         }
 
@@ -198,9 +198,9 @@ public class ExcelExportController {
             row.createCell(0).setCellValue((String) getOrDefault(record, "日期", ""));
             row.createCell(1).setCellValue((String) getOrDefault(record, "品名", "aaa"));
             row.createCell(2).setCellValue((String) getOrDefault(record, "型号", "aaa"));
-            row.createCell(3).setCellValue(((Double) getOrDefault(record, "单价", 0.0)).doubleValue());
+            row.createCell(3).setCellValue((String) getOrDefault(record, "单价", "0.00"));
             row.createCell(4).setCellValue(((Double) getOrDefault(record, "数量", 0.0)).doubleValue());
-            row.createCell(5).setCellValue(((Double) getOrDefault(record, "总价", 0.0)).doubleValue());
+            row.createCell(5).setCellValue((String) getOrDefault(record, "总价", "0.00"));
             row.createCell(6).setCellValue((String) getOrDefault(record, "备注", "aaa"));
         }
         return rowIndex;
