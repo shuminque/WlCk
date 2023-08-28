@@ -165,6 +165,12 @@
                 "href": "/total_table",
                 "icon": "layui-icon layui-icon-list",
                 "target": "_self"
+              },
+              {
+                "title": "转移表",
+                "href": "/transfer_table",
+                "icon": "layui-icon layui-icon-list",
+                "target": "_self"
               }
             ]
           },
