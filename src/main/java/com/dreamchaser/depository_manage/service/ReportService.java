@@ -115,9 +115,9 @@ public class ReportService {
                 "    DATE_FORMAT(o.apply_time, '%d/%m/%Y') AS 日期,\n" +
                 "    o.mname AS 品名,\n" +
                 "    o.type_name AS 型号,\n" +
-                "    o.price AS 单价,\n" +
+                "    FORMAT(o.price, 2) AS 单价,\n" +
                 "    o.quantity AS 数量,\n" +
-                "    ROUND(o.price * o.quantity, 2) AS 总价,  -- 使用ROUND函数保留两位小数\n" +
+                "    FORMAT(ROUND(o.price * o.quantity, 2), 2) AS 总价,\n" +
                 "    o.apply_remark AS 备注\n" +
                 "FROM\n" +
                 "    depository_record AS o -- 出库记录\n" +
