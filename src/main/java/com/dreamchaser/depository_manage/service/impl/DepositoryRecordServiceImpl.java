@@ -117,7 +117,7 @@ public class DepositoryRecordServiceImpl implements DepositoryRecordService {
         map.put("fromId",map.get("id"));
 
         // 执行出库逻辑
-        List<Material> list = materialMapper.findMaterialByCondition(map);
+        List<Material> list = materialMapper.findMaterialForOutbound(map);
         if (list.isEmpty()) {
             throw new MyException("未找到匹配的物料");
         }
