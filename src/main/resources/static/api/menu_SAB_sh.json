@@ -95,12 +95,6 @@
             ]
           },
           {
-            "title": "任务审批",
-            "icon": "fa fa-tasks",
-            "target": "_self",
-            "href": "/my_task"
-          },
-          {
             "title": "基础数据",
             "icon": "fa fa-wrench",
             "target": "_self",
@@ -160,6 +154,12 @@
                 "target": "_self"
               }
             ]
+          },
+          {
+            "title": "任务审批",
+            "icon": "fa fa-tasks",
+            "target": "_self",
+            "href": "/my_task"
           }
         ]
       },
