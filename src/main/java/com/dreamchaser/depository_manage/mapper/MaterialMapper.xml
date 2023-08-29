@@ -172,7 +172,7 @@
             #{typeId},
             #{picNum},
             #{stateId},
-            #{enginId},
+            #{enginId}
         )
     </insert>
 
@@ -192,13 +192,21 @@
                 #{item.price},
                 #{item.unitPrice},
                 #{item.typeId},
-                #{picNum},
+                #{item.picNum},
                 #{item.stateId},
-                #{item.enginId},
+                #{item.enginId}
             )
         </foreach>
     </insert>
-
+    <select id="findTypeIdByTypeName" resultType="java.lang.Integer">
+        SELECT id FROM material_type WHERE tname = #{typeName}
+    </select>
+    <select id="findEnginIdByEnginName" resultType="java.lang.Integer">
+        SELECT id FROM material_engin WHERE ename = #{enginName}
+    </select>
+    <select id="findStateIdByStateName" resultType="java.lang.Integer">
+        SELECT id FROM material_state WHERE sname = #{stateName}
+    </select>
     <!-- 修改数据 -->
     <update id="updateMaterial">
         UPDATE material

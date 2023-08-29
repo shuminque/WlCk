@@ -77,6 +77,7 @@ public interface MaterialMapper {
      * @return 库存信息
      */
     Material findMaterialByIds(List<Integer> ids);
+    Integer findTypeIdByTypeName(String typeName);
 
     /**
      * 查询所有库存条数
@@ -90,4 +91,8 @@ public interface MaterialMapper {
      * @return 符合条件的记录行数
      */
     Integer findCountByCondition(Map<String,Object> map);
+
+    Integer findEnginIdByEnginName(String enginName);
+
+    Integer findStateIdByStateName(String stateName);
 }

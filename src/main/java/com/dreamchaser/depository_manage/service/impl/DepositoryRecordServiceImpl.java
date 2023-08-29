@@ -17,10 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author Dreamchaser
@@ -164,7 +161,7 @@ public class DepositoryRecordServiceImpl implements DepositoryRecordService {
 
     @Override
     @Transactional
-    public Integer review(Map<String, Object> map,Integer userid) {
+    public Integer review(Map<String, Object> map, Integer userid) {
         if (map.containsKey("reviewPass")) {
             map.put("reviewTime", new Date());
             map.put("reviewerId", userid);
@@ -172,55 +169,76 @@ public class DepositoryRecordServiceImpl implements DepositoryRecordService {
             DepositoryRecord record;
             if (reviewPass == 1) {
                 record = depositoryRecordMapper.findDepositoryRecordById(ObjectFormatUtil.toInteger(map.get("id")));
-                map.put("depositoryId", record.getDepositoryId());
-                map.put("atId", record.getAtId());
-                map.put("model", record.getModel());
-                map.put("mname", record.getMname());
-                List<Material> list = materialMapper.findMaterialForOutbound(map);
-                Material material = list.get(0);
-                if (1 == record.getType()) {
+
+                // 创建一个新的查询条件map
+                Map<String, Object> queryMap = new HashMap<>();
+                queryMap.put("depositoryId", record.getDepositoryId());
+                queryMap.put("atId", record.getAtId());
+                queryMap.put("model", record.getModel());
+                queryMap.put("mname", record.getMname());
+
+                List<Material> list = materialMapper.findMaterialByCondition(queryMap);
+
+                if (list.isEmpty()) {
+                    // 如果目标仓库中没有该物品，则添加新的物料记录
+                    Map<String, Object> materialMap = new HashMap<>();
                     map.put("state", "已入库");
-                    //这里貌似会引起并发问题
-                    //material.setUnitPrice((material.getPrice()+(record.getPrice()*record.getQuantity()))/(material.getQuantity()+record.getQuantity()));
-                    //material.setPrice(material.getPrice()+(record.getQuantity()*record.getPrice())) ;  //总价=原总+入单*入数
-                    double totalPrice = material.getPrice() + (record.getPrice() * record.getQuantity());
-                    BigDecimal bdTotalPrice = new BigDecimal(totalPrice);
-                    bdTotalPrice = bdTotalPrice.setScale(2, RoundingMode.HALF_UP); // 保留两位小数，四舍五入
-                    material.setPrice(bdTotalPrice.doubleValue());
-                    // 计算新的总数量
-                    double totalQuantity = material.getQuantity() + record.getQuantity();
-                    // 计算新的均价
-                    double unitPrice = totalPrice / totalQuantity;
-                    BigDecimal bdUnitPrice = new BigDecimal(unitPrice);
-                    bdUnitPrice = bdUnitPrice.setScale(2, RoundingMode.HALF_UP); // 保留两位小数，四舍五入
-                    material.setUnitPrice(bdUnitPrice.doubleValue());
-                    material.setQuantity(material.getQuantity() + record.getQuantity());
-                    materialMapper.updateMaterial(material);
+                    materialMap.put("mname", record.getMname());
+                    materialMap.put("model", record.getModel());
+                    materialMap.put("quantity", record.getQuantity());
+                    materialMap.put("price", record.getPrice() * record.getQuantity());
+                    materialMap.put("unitPrice", record.getPrice());
+                    Integer typeId = materialMapper.findTypeIdByTypeName(record.getTypeName());
+                    Integer enginId = materialMapper.findEnginIdByEnginName(record.getEnginName());
+                    materialMap.put("typeId", typeId);
+                    materialMap.put("enginId", enginId);
+                    materialMap.put("stateId", 1);
+                    materialMap.put("depositoryId", record.getDepositoryId());
+                    // 插入新的物料记录
+                    materialMapper.insertMaterial(materialMap);
                 } else {
-                    if (material.getQuantity() > record.getQuantity()) {
+                    Material material = list.get(0);
+                    if (1 == record.getType()) {
+                        map.put("state", "已入库");
+                        double totalPrice = material.getPrice() + (record.getPrice() * record.getQuantity());
+                        BigDecimal bdTotalPrice = new BigDecimal(totalPrice);
+                        bdTotalPrice = bdTotalPrice.setScale(2, RoundingMode.HALF_UP); // 保留两位小数，四舍五入
+                        material.setPrice(bdTotalPrice.doubleValue());
                         // 计算新的总数量
-                        double newQuantity = material.getQuantity() - record.getQuantity();
-                        // 计算出库的总价
-                        double outPrice = record.getPrice() * record.getQuantity();
-                        // 计算新的总价
-                        double newPrice = material.getPrice() - outPrice;
-                        BigDecimal bdNewPrice = new BigDecimal(newPrice);
-                        bdNewPrice = bdNewPrice.setScale(2, RoundingMode.HALF_UP); // 保留两位小数，四舍五入
+                        double totalQuantity = material.getQuantity() + record.getQuantity();
                         // 计算新的均价
-                        double newUnitPrice = newPrice / newQuantity;
-                        BigDecimal bdNewUnitPrice = new BigDecimal(newUnitPrice);
-                        bdNewUnitPrice = bdNewUnitPrice.setScale(2, RoundingMode.HALF_UP); // 保留两位小数，四舍五入
-                        // 更新物料
-                        material.setPrice(bdNewPrice.doubleValue());
-                        material.setQuantity(newQuantity);
-                        material.setUnitPrice(bdNewUnitPrice.doubleValue());
+                        double unitPrice = totalPrice / totalQuantity;
+                        BigDecimal bdUnitPrice = new BigDecimal(unitPrice);
+                        bdUnitPrice = bdUnitPrice.setScale(2, RoundingMode.HALF_UP); // 保留两位小数，四舍五入
+                        material.setUnitPrice(bdUnitPrice.doubleValue());
+                        material.setQuantity(material.getQuantity() + record.getQuantity());
                         materialMapper.updateMaterial(material);
-                    } else if (material.getQuantity().equals(record.getQuantity())) {
-                        materialMapper.deleteMaterialById(material.getId());
                     } else {
-                        throw new MyException("库存不足于该出库请求");
+                        if (material.getQuantity() > record.getQuantity()) {
+                            // 计算新的总数量
+                            double newQuantity = material.getQuantity() - record.getQuantity();
+                            // 计算出库的总价
+                            double outPrice = record.getPrice() * record.getQuantity();
+                            // 计算新的总价
+                            double newPrice = material.getPrice() - outPrice;
+                            BigDecimal bdNewPrice = new BigDecimal(newPrice);
+                            bdNewPrice = bdNewPrice.setScale(2, RoundingMode.HALF_UP); // 保留两位小数，四舍五入
+                            // 计算新的均价
+                            double newUnitPrice = newPrice / newQuantity;
+                            BigDecimal bdNewUnitPrice = new BigDecimal(newUnitPrice);
+                            bdNewUnitPrice = bdNewUnitPrice.setScale(2, RoundingMode.HALF_UP); // 保留两位小数，四舍五入
+                            // 更新物料
+                            material.setPrice(bdNewPrice.doubleValue());
+                            material.setQuantity(newQuantity);
+                            material.setUnitPrice(bdNewUnitPrice.doubleValue());
+                            materialMapper.updateMaterial(material);
+                        } else if (material.getQuantity().equals(record.getQuantity())) {
+                            materialMapper.deleteMaterialById(material.getId());
+                        } else {
+                            throw new MyException("库存不足于该出库请求");
+                        }
+                        map.put("state", "已出库");
                     }
-                    map.put("state", "已出库");
                 }
             } else {
                 record = depositoryRecordMapper.findDepositoryRecordById(ObjectFormatUtil.toInteger(map.get("id")));

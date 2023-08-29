@@ -42,7 +42,9 @@ public class DepositoryRecordP {
 
     /**型号/规格*/
     private String model;
-
+    private Integer enginId;
+    private Integer typeId;
+    private Integer stateId;
     private String enginName;
     private String typeName;
 
@@ -131,7 +133,7 @@ public class DepositoryRecordP {
      */
     private Integer checkPass;
 
-    public DepositoryRecordP(DepositoryRecord dr) {
+    public DepositoryRecordP(DepositoryRecord dr ) {
         this.id = dr.getId();
         this.applicationId = dr.getApplicationId();
         this.atId=dr.getAtId();
