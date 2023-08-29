@@ -108,22 +108,51 @@ public class DepositoryRecordServiceImpl implements DepositoryRecordService {
     @Override
     @Transactional
     public Integer transferApply(Map<String, Object> map) {
+        // 设置出库状态和申请时间
         map.put("state","待审核");
         map.put("applyTime",new Date());
         map.put("type",0);
         map.put("depositoryId",map.get("fromId"));
         depositoryRecordMapper.insertDepositoryRecord(map);
         map.put("fromId",map.get("id"));
-        //清除主键
+
+        // 执行出库逻辑
+        List<Material> list = materialMapper.findMaterialByCondition(map);
+        if (list.isEmpty()) {
+            throw new MyException("未找到匹配的物料");
+        }
+        Material material = list.get(0);
+        double recordQuantity = Double.parseDouble(String.valueOf(map.get("quantity")));
+        double recordPrice = Double.parseDouble(String.valueOf(map.get("price")));
+        if (material.getQuantity() > recordQuantity) {
+            // 计算新的总数量
+            double newQuantity = material.getQuantity() - recordQuantity;
+            // 计算出库的总价
+            double outPrice = recordPrice * recordQuantity;
+            // 计算新的总价
+            double newPrice = material.getPrice() - outPrice;
+            BigDecimal bdNewPrice = new BigDecimal(newPrice);
+            bdNewPrice = bdNewPrice.setScale(2, RoundingMode.HALF_UP);
+            // 更新物料
+            material.setPrice(bdNewPrice.doubleValue());
+            material.setQuantity(newQuantity);
+            materialMapper.updateMaterial(material);
+        } else {
+            throw new MyException("库存不足于该出库请求");
+        }
+
+        // 清除主键
         map.remove("id");
+        // 设置入库状态和申请时间
         map.put("depositoryId",map.get("toId"));
         map.put("type",1);
         depositoryRecordMapper.insertDepositoryRecord(map);
         map.put("toId",map.get("id"));
-        //清除主键
+        // 清除主键
         map.remove("id");
         return transferRecordMapper.addTransferRecord(map);
     }
+
 
 
     @Override
