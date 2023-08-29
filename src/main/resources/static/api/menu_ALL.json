@@ -179,6 +179,19 @@
             "icon": "fa fa-tasks",
             "target": "_self",
             "href": "/my_task"
+          },
+          {
+            "title": "一次性相关",
+            "icon": "fa fa-tasks",
+            "target": "_self",
+            "child": [
+              {
+                "title": "一次性填写",
+                "href": "/welcome",
+                "icon": "layui-icon layui-icon-list",
+                "target": "_self"
+              }
+            ]
           }
         ]
       },
