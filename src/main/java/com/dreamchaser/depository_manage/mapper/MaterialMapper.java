@@ -57,6 +57,7 @@ public interface MaterialMapper {
      * @return 符合条件的库存信息
      */
     List<Material> findMaterialByCondition(Map<String,Object>map);
+    List<Material> findMaterialForOutbound(Map<String,Object>map);
 
     /**
      * 查询所有的库存信息

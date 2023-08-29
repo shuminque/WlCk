@@ -78,6 +78,23 @@
         count(*)
         FROM material m
     </select>
+    <select id="findMaterialForOutbound" resultMap="materialMap" parameterType="map">
+        SELECT
+        <include refid="allColumns" />
+        FROM material m WHERE 1 = 1
+        <if test="depositoryId != null">
+            AND m.depository_id = #{depositoryId}
+        </if>
+        <if test="atId != null">
+            AND m.at_id = #{atId}
+        </if>
+        <if test="mname != null and mname != ''">
+            AND m.mname LIKE CONCAT('%', #{mname}, '%')
+        </if>
+        <if test="model != null and model != ''">
+            AND m.model LIKE CONCAT('%', #{model}, '%')
+        </if>
+    </select>
 
     <!-- 根据条件参数查询数据列表 -->
     <select id="findMaterialByCondition" resultMap="materialMap" parameterType="map">

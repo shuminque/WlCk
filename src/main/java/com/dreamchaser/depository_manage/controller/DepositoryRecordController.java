@@ -64,12 +64,14 @@ public class DepositoryRecordController {
         map.put("applicantId",userToken.getUser().getId());
         return CrudUtil.postHandle(depositoryRecordService.apply(map),1);
     }
-//    @PostMapping("/depositoryRecord")
-//    public RestResponse insertDepositoryRecord2(@RequestBody Map<String, Object> map, HttpServletRequest request) {
-//        UserToken userToken = (UserToken) request.getAttribute("userToken");
-//        Integer userId = userToken.getUser().getId();
-//        return CrudUtil.postHandle(depositoryRecordService.applyAndReview(map, userId), 1);
-//    }
+    @PostMapping("/OutdepositoryRecord")
+    public RestResponse insertDepositoryRecord2(@RequestBody Map<String, Object> map, HttpServletRequest request) {
+        UserToken userToken = (UserToken) request.getAttribute("userToken");
+        map.put("applicantId",userToken.getUser().getId());
+        map.put("reviewerId",userToken.getUser().getId());
+        Integer result = depositoryRecordService.applyDirectOutbound(map);
+        return CrudUtil.postHandle(result, 1);
+    }
     @PutMapping("/depositoryRecord/{id}")
     public RestResponse updateDepositoryRecord(@PathVariable Integer id, @RequestBody Map<String,Object> map, HttpServletRequest request){
         // 这里可以添加逻辑来更新现有记录

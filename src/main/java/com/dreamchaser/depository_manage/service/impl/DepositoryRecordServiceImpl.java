@@ -51,60 +51,53 @@ public class DepositoryRecordServiceImpl implements DepositoryRecordService {
         map.put("state","待审核");
         return depositoryRecordMapper.insertDepositoryRecord(map);
     }
-
-    @Override
-    @Transactional
-    public Integer applyAndReview(Map<String, Object> map, Integer userId) {
-        // 设置申请时间和已出库状态
-        map.put("applyTime", new Date());
+    public Integer applyDirectOutbound(Map<String, Object> map  ) {
+        // 设置为已审核状态
         map.put("state", "已出库");
+        // 设置其他需要的默认值，如申请时间等
+        map.put("applyTime", new Date());
+        map.put("reviewTime", new Date());
+        map.put("reviewPass", "1");
+        // 插入数据
+        Integer result = depositoryRecordMapper.insertDepositoryRecord(map);
 
-        // 设置申请人ID和审核人ID
-        map.put("applicantId", userId);
-        map.put("reviewerId", userId);
+        // 如果插入成功，执行出库操作
+        if (result == 1) {
+            List<Material> list = materialMapper.findMaterialForOutbound(map);
+            if (list.isEmpty()) {
+                throw new MyException("未找到匹配的物料");
+            }
+            Material material = list.get(0);
+            // 此处应该获取新插入的记录，但我假设您的map中已经有了需要的数据
+            double recordQuantity = Double.parseDouble(String.valueOf(map.get("quantity")));
+            double recordPrice = Double.parseDouble(String.valueOf(map.get("price")));
 
-        // 插入出库申请记录
-        depositoryRecordMapper.insertDepositoryRecord(map);
 
-        BigInteger recordIdBigInteger = (BigInteger) map.get("id");
-        Integer recordId = recordIdBigInteger.intValue();
+            if (material.getQuantity() > recordQuantity) {
+                // 计算新的总数量
+                double newQuantity = material.getQuantity() - recordQuantity;
+                // 计算出库的总价
+                double outPrice = recordPrice * recordQuantity;
+                // 计算新的总价
+                double newPrice = material.getPrice() - outPrice;
+                BigDecimal bdNewPrice = new BigDecimal(newPrice);
+                bdNewPrice = bdNewPrice.setScale(2, RoundingMode.HALF_UP);
+                // 计算新的均价
+                double newUnitPrice = newPrice / newQuantity;
+                BigDecimal bdNewUnitPrice = new BigDecimal(newUnitPrice);
+                bdNewUnitPrice = bdNewUnitPrice.setScale(2, RoundingMode.HALF_UP);
 
-        // 获取刚插入的出库记录
-        DepositoryRecord record = depositoryRecordMapper.findDepositoryRecordById(recordId);
-
-        // 设置出库相关信息
-        map.put("depositoryId", record.getDepositoryId());
-        map.put("atId", record.getAtId());
-        map.put("model", record.getModel());
-        map.put("mname", record.getMname());
-
-        // 执行出库逻辑
-        List<Material> list = materialMapper.findMaterialByCondition(map);
-        Material material = list.get(0);
-        if (material.getQuantity() > record.getQuantity()) {
-            // 计算新的总数量
-            double newQuantity = material.getQuantity() - record.getQuantity();
-            // 计算出库的总价
-            double outPrice = record.getPrice() * record.getQuantity();
-            // 计算新的总价
-            double newPrice = material.getPrice() - outPrice;
-            BigDecimal bdNewPrice = new BigDecimal(newPrice);
-            bdNewPrice = bdNewPrice.setScale(2, RoundingMode.HALF_UP); // 保留两位小数，四舍五入
-            // 计算新的均价
-            double newUnitPrice = newPrice / newQuantity;
-            BigDecimal bdNewUnitPrice = new BigDecimal(newUnitPrice);
-            bdNewUnitPrice = bdNewUnitPrice.setScale(2, RoundingMode.HALF_UP); // 保留两位小数，四舍五入
-            // 更新物料
-            material.setPrice(bdNewPrice.doubleValue());
-            material.setQuantity(newQuantity);
-            material.setUnitPrice(bdNewUnitPrice.doubleValue());
-            materialMapper.updateMaterial(material);
-        } else if (material.getQuantity().equals(record.getQuantity())) {
-            materialMapper.deleteMaterialById(material.getId());
-        } else {
-            throw new MyException("库存不足于该出库请求");
+                // 更新物料
+                material.setPrice(bdNewPrice.doubleValue());
+                material.setQuantity(newQuantity);
+                material.setUnitPrice(bdNewUnitPrice.doubleValue());
+                materialMapper.updateMaterial(material);
+            } else {
+                throw new MyException("库存不足于该出库请求");
+            }
         }
-        return 1; // 返回值可以根据你的需求进行调整
+
+        return result;
     }
 
     /**

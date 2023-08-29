@@ -102,5 +102,8 @@ public interface DepositoryRecordService {
      */
     Integer findCountByCondition(Map<String,Object> map);
 
-    Integer applyAndReview(Map<String, Object> map, Integer request);
+    Integer applyDirectOutbound(Map<String, Object> map);
+
+
+//    Integer applyAndReview(Map<String, Object> map, Integer userId, Integer did);
 }
