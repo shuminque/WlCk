@@ -29,10 +29,10 @@ public class ExcelExportController {
 
     @GetMapping("/report")
     public ResponseEntity<ByteArrayResource> exportReportToExcel(
-            @RequestParam("year") int year,
-            @RequestParam("month") int month,
+            @RequestParam("startDate") String startDate,
+            @RequestParam("endDate") String endDate,
             @RequestParam("depositoryId") int depositoryId) throws Exception {
-        List<Map<String, Object>> data = reportService.fetchReportData(year, month, depositoryId);
+        List<Map<String, Object>> data = reportService.fetchReportData(startDate, endDate, depositoryId);
         XSSFWorkbook workbook = new XSSFWorkbook();
         XSSFSheet sheet = workbook.createSheet("Report");
         // Create header row
@@ -65,7 +65,7 @@ public class ExcelExportController {
         workbook.write(outputStream);
         workbook.close();
 
-        String filename = String.format("%d-%02d物品库存报表.xlsx", year, month);
+        String filename = String.format("物品库存报表_%s_to_%s.xlsx", startDate, endDate);
         String encodedFilename = URLEncoder.encode(filename, "UTF-8").replace("+", "%20");
         ByteArrayResource resource = new ByteArrayResource(outputStream.toByteArray());
         return ResponseEntity.ok()
@@ -76,10 +76,10 @@ public class ExcelExportController {
 
     @GetMapping("/every")
     public ResponseEntity<ByteArrayResource> everyTypeToExcel(
-            @RequestParam("year") int year,
-            @RequestParam("month") int month,
+            @RequestParam("startDate") String startDate,
+            @RequestParam("endDate") String endDate,
             @RequestParam("depositoryId") int depositoryId) throws Exception {
-        List<Map<String, Object>> data = reportService.everyTypeData(year, month, depositoryId);
+        List<Map<String, Object>> data = reportService.fetchReportData(startDate, endDate, depositoryId);
         XSSFWorkbook workbook = new XSSFWorkbook();
         XSSFSheet sheet = workbook.createSheet("Report");
         // Create header row
@@ -106,7 +106,7 @@ public class ExcelExportController {
         workbook.write(outputStream);
         workbook.close();
 
-        String filename = String.format("%d-%02d各类型报表.xlsx", year, month);
+        String filename = String.format("分类报表_%s_to_%s.xlsx", startDate, endDate);
         String encodedFilename = URLEncoder.encode(filename, "UTF-8").replace("+", "%20");
         ByteArrayResource resource = new ByteArrayResource(outputStream.toByteArray());
         return ResponseEntity.ok()
@@ -117,34 +117,12 @@ public class ExcelExportController {
 
     @GetMapping("/transfer")
     public ResponseEntity<ByteArrayResource> transferToExcel(
-            @RequestParam("year") int year,
-            @RequestParam("month") int month) throws Exception {
-        List<Map<String, Object>> data = reportService.transferData(year, month);
+            @RequestParam("startDate") String startDate,
+            @RequestParam("endDate") String endDate,
+            @RequestParam("depositoryId") int depositoryId) throws Exception {
+        List<Map<String, Object>> data = reportService.fetchReportData(startDate, endDate, depositoryId);
         XSSFWorkbook workbook = new XSSFWorkbook();
         XSSFSheet sheet = workbook.createSheet("Report");
-//        // Create header row
-//        XSSFRow headerRow = sheet.createRow(0);
-//        headerRow.createCell(0).setCellValue("日期");
-//        headerRow.createCell(1).setCellValue("品名");
-//        headerRow.createCell(2).setCellValue("型号");
-//        headerRow.createCell(3).setCellValue("单价");
-//        headerRow.createCell(4).setCellValue("数量");
-//        headerRow.createCell(5).setCellValue("总价");
-//        headerRow.createCell(6).setCellValue("备注");
-//
-//        for (int i = 0; i < data.size(); i++) {
-//            Map<String, Object> record = data.get(i);
-//            XSSFRow row = sheet.createRow(i + 1);
-//            row.createCell(0).setCellValue((String) getOrDefault(record, "日期", ""));
-//            row.createCell(1).setCellValue((String) getOrDefault(record, "品名", "aaa"));
-//            row.createCell(2).setCellValue((String) getOrDefault(record, "型号", "aaa"));
-//            row.createCell(3).setCellValue(((Double) getOrDefault(record, "单价", 0.0)).doubleValue());
-//            row.createCell(4).setCellValue(((Double) getOrDefault(record, "数量", 0.0)).doubleValue());
-//            row.createCell(5).setCellValue(((Double) getOrDefault(record, "总价", 0.0)).doubleValue());
-//            row.createCell(6).setCellValue((String) getOrDefault(record, "备注", "aaa"));
-//
-//        }
-
 // 分割数据
         List<Map<String, Object>> zabToSabData = data.stream()
                 .filter(record -> "ZAB转入SAB".equals(record.get("备注")))
@@ -173,7 +151,8 @@ public class ExcelExportController {
         workbook.write(outputStream);
         workbook.close();
 
-        String filename = String.format("%d-%02d转移报表.xlsx", year, month);
+        String filename = String.format("物品转移报表_%s_to_%s.xlsx", startDate, endDate);
+
         String encodedFilename = URLEncoder.encode(filename, "UTF-8").replace("+", "%20");
         ByteArrayResource resource = new ByteArrayResource(outputStream.toByteArray());
         return ResponseEntity.ok()

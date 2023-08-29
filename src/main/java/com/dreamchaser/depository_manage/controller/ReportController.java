@@ -19,33 +19,47 @@ public class ReportController {
     @Autowired
     private ReportService reportService;
 
-    @GetMapping("/report")
-    public List<Map<String, Object>> getReportData(
-            @RequestParam(name = "year", required = false, defaultValue = "-1") int year,
-            @RequestParam(name = "month", required = false, defaultValue = "-1") int month,
-            @RequestParam(name = "depositoryId") int depositoryId) {
-        return fetchData(year, month, date -> reportService.fetchReportData(date[0], date[1], depositoryId));
-    }
+//    @GetMapping("/report")
+//    public List<Map<String, Object>> getReportData(
+//            @RequestParam(name = "year", required = false, defaultValue = "-1") int year,
+//            @RequestParam(name = "month", required = false, defaultValue = "-1") int month,
+//            @RequestParam(name = "depositoryId") int depositoryId) {
+//        return fetchData(year, month, date -> reportService.fetchReportData(date[0], date[1], depositoryId));
+//    }
+@GetMapping("/report")
+public List<Map<String, Object>> getReportData(
+        @RequestParam(name = "startDate") String startDate,
+        @RequestParam(name = "endDate") String endDate,
+        @RequestParam(name = "depositoryId") int depositoryId) {
+
+    // 根据您的服务方法的定义，您可能需要将字符串日期转换为特定的日期格式
+    // 如LocalDate，Date等。在此示例中，我将其保持为字符串。
+
+    return reportService.fetchReportData(startDate, endDate, depositoryId);
+}
 
     @GetMapping("/every")
     public List<Map<String, Object>> everyTypeData(
-            @RequestParam(name = "year", required = false, defaultValue = "-1") int year,
-            @RequestParam(name = "month", required = false, defaultValue = "-1") int month,
+            @RequestParam(name = "startDate") String startDate,
+            @RequestParam(name = "endDate") String endDate,
             @RequestParam(name = "depositoryId") int depositoryId) {
-        return fetchData(year, month, date -> reportService.everyTypeData(date[0], date[1], depositoryId));
+        return fetchData(startDate, endDate, date -> reportService.everyTypeData(date[0], date[1], depositoryId));
     }
+
 
     @GetMapping("/transfer")
     public List<Map<String, Object>> transferData(
-            @RequestParam(name = "year", required = false, defaultValue = "-1") int year,
-            @RequestParam(name = "month", required = false, defaultValue = "-1") int month) {
-        return fetchData(year, month, date -> reportService.transferData(date[0], date[1]));
+            @RequestParam(name = "startDate") String startDate,
+            @RequestParam(name = "endDate") String endDate) {
+        return fetchData(startDate, endDate, date -> reportService.transferData(date[0], date[1]));
     }
 
-    private List<Map<String, Object>> fetchData(int year, int month, Function<int[], List<Map<String, Object>>> fetcher) {
-        int[] currentYearMonth = setCurrentYearAndMonth(year, month);
-        return fetcher.apply(currentYearMonth);
+
+    public List<Map<String, Object>> fetchData(String startDate, String endDate,
+                                               Function<String[], List<Map<String, Object>>> dataFetcher) {
+        return dataFetcher.apply(new String[]{startDate, endDate});
     }
+
 
     private int[] setCurrentYearAndMonth(int year, int month) {
         if (year == -1) {

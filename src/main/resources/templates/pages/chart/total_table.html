@@ -51,7 +51,11 @@
         <select name="depository_id" id="depositorySelect">
             <!-- 初始值，稍后会根据用户信息进行更新 -->
         </select>
-        <input type="month" id="monthPicker">
+
+<!--        <input type="month" id="monthPicker">-->
+        开始日期：<input type="date" id="startDatePicker">
+        结束日期：<input type="date" id="endDatePicker">
+
         <button type="button" onclick="loadReport()">查看</button>
         <button type="button" onclick="exportReport()">导出</button>
     </form>
@@ -91,18 +95,29 @@
                 console.error('Error fetching data:', error);
             });
     });
+    // function loadReport() {
+    //     const selectedMonth = document.getElementById('monthPicker').value;
+    //     if (!selectedMonth) {
+    //         alert("请选择一个月份!");
+    //         return;
+    //     }
+    //     const year = selectedMonth.split('-')[0];
+    //     const month = selectedMonth.split('-')[1];
+    //     console.log(year,month);
+    //     const depositorySelect = document.querySelector("[name='depository_id']");
+    //     const depositoryId = depositorySelect.value;
+    //     fetch(`/api/report?depositoryId=${depositoryId}&year=${year}&month=${month}`)
+    //         .then(response => response.json())
     function loadReport() {
-        const selectedMonth = document.getElementById('monthPicker').value;
-        if (!selectedMonth) {
-            alert("请选择一个月份!");
+        const startDate = document.getElementById('startDatePicker').value;
+        const endDate = document.getElementById('endDatePicker').value;
+        if (!startDate || !endDate) {
+            alert("请确保选择了开始和结束日期!");
             return;
         }
-        const year = selectedMonth.split('-')[0];
-        const month = selectedMonth.split('-')[1];
-        console.log(year,month);
         const depositorySelect = document.querySelector("[name='depository_id']");
         const depositoryId = depositorySelect.value;
-        fetch(`/api/report?depositoryId=${depositoryId}&year=${year}&month=${month}`)
+        fetch(`/api/report?depositoryId=${depositoryId}&startDate=${startDate}&endDate=${endDate}`)
             .then(response => response.json())
             .then(data => {
                 let table = document.getElementById('reportTable');
@@ -134,19 +149,29 @@
             })
             .catch(error => console.error('Error fetching data:', error));
     }
+    // function exportReport() {
+    //     const selectedMonth = document.getElementById('monthPicker').value;
+    //     if (!selectedMonth) {
+    //         alert("请选择一个月份!");
+    //         return;
+    //     }
+    //     const year = selectedMonth.split('-')[0];
+    //     const month = selectedMonth.split('-')[1];
+    //     const depositorySelect = document.querySelector("[name='depository_id']");
+    //     const depositoryId = depositorySelect.value;
+    //     window.location.href = `/api/export/report?depositoryId=${depositoryId}&year=${year}&month=${month}`;
+    // }
     function exportReport() {
-        const selectedMonth = document.getElementById('monthPicker').value;
-        if (!selectedMonth) {
-            alert("请选择一个月份!");
+        const startDate = document.getElementById('startDatePicker').value;
+        const endDate = document.getElementById('endDatePicker').value;
+        if (!startDate || !endDate) {
+            alert("请确保选择了开始和结束日期!");
             return;
         }
-        const year = selectedMonth.split('-')[0];
-        const month = selectedMonth.split('-')[1];
         const depositorySelect = document.querySelector("[name='depository_id']");
         const depositoryId = depositorySelect.value;
-        window.location.href = `/api/export/report?depositoryId=${depositoryId}&year=${year}&month=${month}`;
+        window.location.href = `/api/export/report?depositoryId=${depositoryId}&startDate=${startDate}&endDate=${endDate}`;
     }
-
 </script>
 </body>
 </html>
