@@ -109,8 +109,10 @@ public class DepositoryRecordServiceImpl implements DepositoryRecordService {
     @Transactional
     public Integer transferApply(Map<String, Object> map) {
         // 设置出库状态和申请时间
-        map.put("state","待审核");
-        map.put("applyTime",new Date());
+        map.put("state","已出库");
+        map.put("applyTime", new Date());
+        map.put("reviewTime", new Date());
+        map.put("reviewPass", "1");
         map.put("type",0);
         map.put("depositoryId",map.get("fromId"));
         depositoryRecordMapper.insertDepositoryRecord(map);
@@ -143,6 +145,11 @@ public class DepositoryRecordServiceImpl implements DepositoryRecordService {
 
         // 清除主键
         map.remove("id");
+        map.put("state", "待审核");
+        // 设置其他需要的默认值，如申请时间等
+        map.put("applyTime", new Date());
+        map.remove("reviewTime");
+        map.remove("reviewPass");
         // 设置入库状态和申请时间
         map.put("depositoryId",map.get("toId"));
         map.put("type",1);
@@ -169,7 +176,7 @@ public class DepositoryRecordServiceImpl implements DepositoryRecordService {
                 map.put("atId", record.getAtId());
                 map.put("model", record.getModel());
                 map.put("mname", record.getMname());
-                List<Material> list = materialMapper.findMaterialByCondition(map);
+                List<Material> list = materialMapper.findMaterialForOutbound(map);
                 Material material = list.get(0);
                 if (1 == record.getType()) {
                     map.put("state", "已入库");
