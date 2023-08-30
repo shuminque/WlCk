@@ -35,10 +35,14 @@
                                             <input name="mname" type="text" id="materialSelect" placeholder="请填写品名" readonly class="layui-input" lay-verify="required" />
                                             <input name="atId" type="hidden" id="atIdSelect" />
                                             <input name="depositoryId" type="hidden" id="depositorySelect" />
-                                            <input name="model" type="hidden" id="modelSelect" />
                                             <input name="enginName" type="hidden" id="enginSelect" />
                                             <input name="typeName" type="hidden" id="typeSelect" />
                                         </div>
+                                    </div>
+                                    <div class="layui-form-item">
+                                        <label class="layui-form-label">规格:</label>
+                                        <div class="layui-input-block">
+                                            <input name="model" type="text" id="modelSelect" placeholder="相关规格" readonly class="layui-input"/>                                        </div>
                                     </div>
                                     <div class="layui-form-item">
                                         <label class="layui-form-label">数量:</label>
@@ -268,11 +272,11 @@
                         },
                         cols: [ [
                             {type: 'radio'},
-                            {field: 'depositoryName', width:'6%', title: '厂区'},
-                            {field: 'atId', width:'6%', title: 'AT'},
-                            {field: 'mname', width:'12%', title: '品名'},
+                            {field: 'depositoryName', width:'8%', title: '厂区'},
+                            {field: 'atId', width:'8%', title: 'AT'},
+                            {field: 'mname', width:'15%', title: '品名'},
                             {field: 'model', title: '规格'},
-                            {field: 'typeName',  title: '类型'},
+                            {field: 'typeName',  title: '分类'},
                             {field: 'enginName',title: '工程'},
                         ]],
                         limits: [10, 15, 20, 25, 50],
