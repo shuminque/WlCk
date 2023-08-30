@@ -20,14 +20,6 @@
                         <div carousel-item>
                             <div>
                                 <form class="layui-form" style="margin: 0 auto;max-width: 460px;padding-top: 40px;">
-<!--                                    <div class="layui-form-item">-->
-<!--                                        <label class="layui-form-label">厂区:</label>-->
-<!--                                        <div class="layui-input-block">-->
-<!--                                            <select name="depositoryId" lay-verify="required" id="depositorySelect">-->
-<!--                                                <option th:each="depository,iterStar:${depositories}" th:value="${depository?.getId()}" th:text="${depository?.getDname()}"></option>-->
-<!--                                            </select>-->
-<!--                                        </div>-->
-<!--                                    </div>-->
                                     <div class="layui-form-item">
                                         <label class="layui-form-label">品名:</label>
                                         <div class="layui-input-block">
@@ -55,8 +47,8 @@
                                         <label class="layui-form-label">出库类型:</label>
                                         <div class="layui-input-block">
                                             <select name="applyRemark" class="layui-select" lay-filter="applyRemarkFilter">
+                                                <option value="领用出库" selected>领用出库</option>
                                                 <option value="销售出库">销售出库</option>
-                                                <option value="领用出库">领用出库</option>
                                             </select>
                                         </div>
                                     </div>
@@ -103,7 +95,6 @@
                 </div>
             </div>
         </div>
-
     </div>
 </div>
 <script src="/static/lib/layui-v2.6.3/layui.js" charset="utf-8"></script>
@@ -119,7 +110,6 @@
             form = layui.form,
             step = layui.step,
             tableSelect = layui.tableSelect;
-
         step.render({
             elem: '#stepForm',
             filter: 'stepForm',
@@ -136,7 +126,6 @@
                 title: '出库'
             }]
         });
-
         form.on('submit(formStep)', function (data) {
             data = data.field;
             data.type = 0;
@@ -174,51 +163,6 @@
             })
             return false;
         });
-
-        // form.on('submit(formStep)', function (data) {
-        //     data=data.field;
-        //     data.type=0;
-        //     data.state=0;
-        //     var urlParams = new URLSearchParams(window.location.search);
-        //     var id = urlParams.get('id');
-        //     var currentPage = sessionStorage.getItem('currentPage');
-        //     var isEditing = id != null;
-        //     var url = isEditing ? '/depositoryRecord/' + id : '/depositoryRecord';
-        //     var method = isEditing ? 'PUT' : 'POST';
-        //     $.ajax({
-        //         url: url,
-        //         type: method,
-        //         dataType:'json',
-        //         contentType: "application/json;charset=utf-8",
-        //         data:JSON.stringify(data),
-        //         beforeSend:function () {
-        //             this.layerIndex = layer.load(0, { shade: [0.5, '#393D49'] });
-        //         },
-        //         success:function(data){
-        //             layer.close(this.layerIndex);
-        //             if(data.status >= 300){
-        //                 layer.msg(data.statusInfo.message);//失败的表情
-        //                 return;
-        //             }else{
-        //                 layer.msg("申请提交成功", {
-        //                     icon: 6,//成功的表情
-        //                     time: 500 //1秒关闭（如果不配置，默认是3秒）
-        //                 }, function(){
-        //                     if (method === 'PUT') {
-        //                         // window.location.href = '/table_in' ; // 返回编辑页面
-        //                         parent.layer.closeAll(); // 关闭所有父页面的弹窗
-        //                     } else if (method === 'POST') {
-        //                         step.next('#stepForm'); // 进入下一步
-        //                     }
-        //                 });
-        //             }
-        //         },
-        //         complete: function () {
-        //             layer.close(this.layerIndex);
-        //         }
-        //     })
-        //     return false;
-        // });
         var userDepositoryId;
         $.ajax({
             url: '/get_user_depository',
@@ -299,31 +243,53 @@
             step.next('#stepForm');
             return false;
         });
-        form.on('select(applyRemarkFilter)', function(data){
-            var selectedValue = data.value;
+        function checkInitialOutType() {
+            var selectElem = document.querySelector('[name="applyRemark"]');
+            handleOutTypeChange(selectElem.value);
+        }
+
+        function handleOutTypeChange(selectedValue) {
             if(selectedValue === '领用出库') {
                 // 插入出库地点的选择
                 var outLocationSelect = `
-        <label class="layui-form-label">领用地点:</label>
-        <div class="layui-input-block">
-            <select name="outLocation" class="layui-select">
-                <option value="地点1">地点1</option>
-                <option value="地点2">地点2</option>
-                <option value="地点3">地点3</option>
-                <option value="地点4">地点4</option>
-                <option value="地点5">地点5</option>
-                <option value="地点6">地点6</option>
-                <option value="地点7">地点7</option>
-            </select>
-        </div>`;
+                <label class="layui-form-label">领用地点:</label>
+                <div class="layui-input-block">
+                    <select name="outLocation" class="layui-select">
+                        <option value="地点1">地点1</option>
+                        <option value="地点2">地点2</option>
+                        <option value="地点3">地点3</option>
+                        <option value="地点4">地点4</option>
+                        <option value="地点5">地点5</option>
+                        <option value="地点6">地点6</option>
+                        <option value="地点7">地点7</option>
+                    </select>
+                </div>`;
                 document.getElementById('outLocationContainer').innerHTML = outLocationSelect;
-                // 重新渲染表单，使新添加的选择生效
+                form.render('select'); // 重新渲染选择框
+            } else if (selectedValue === '销售出库') {
+                var xiaoshouSelect = `
+                <label class="layui-form-label">销售方:</label>
+                <div class="layui-input-block">
+                    <select name="xiaoshouParty" class="layui-select">
+                        <option value="销售方1">销售方1</option>
+                        <option value="销售方2">销售方2</option>
+                        <option value="销售方3">销售方3</option>
+                        <option value="销售方4">销售方4</option>
+                    </select>
+                </div>`;
+                document.getElementById('outLocationContainer').innerHTML = xiaoshouSelect;
                 form.render('select'); // 重新渲染选择框
             } else {
                 // 清空出库地点选择
                 document.getElementById('outLocationContainer').innerHTML = '';
             }
+        }
+
+        form.on('select(applyRemarkFilter)', function(data){
+            handleOutTypeChange(data.value);
         });
+
+        window.onload = checkInitialOutType;
 
 
         $('.pre').click(function () {
@@ -333,31 +299,7 @@
         $('.next').click(function () {
             step.next('#stepForm');
         });
-
     })
-    // $(document).ready(function() {
-    //     // 获取URL中的查询参数
-    //     var urlParams = new URLSearchParams(window.location.search);
-    //     var id = urlParams.get('id');
-    //     if (id) {
-    //         $.get('/get_record?id=' + id, function(data) {
-    //             // 填充表单
-    //             $('input[name="depositoryId"]').val(data.depositoryId);
-    //             $('input[name="atId"]').val(data.atId);
-    //             $('input[name="mname"]').val(data.mname);
-    //             $('input[name="quantity"]').val(data.quantity);
-    //             $('select[name="currency"]').val(data.currency);
-    //             $('input[name="price"]').val(data.price);
-    //             $('select[name="applyRemark"]').val(data.applyRemark);
-    //             $('select[name="reviewerId"]').val(data.reviewerId);
-    //             $('input[name="model"]').val(data.model);
-    //             $('input[name="enginName"]').val(data.enginName);
-    //             $('input[name="typeName"]').val(data.typeName);
-    //             // 重新渲染表单
-    //             layui.form.render();
-    //         });
-    //     }
-    // });
 </script>
 </body>
 </html>
