@@ -21,7 +21,18 @@ public class MaterialController {
     @PostMapping("/material")
     public RestResponse insertMaterial(@RequestParam Map<String,Object> map){
         return CrudUtil.postHandle(materialService.insertMaterial(map),1);
-    }@DeleteMapping("/material/{id}")
+    }
+    @PostMapping("/instmaterial")
+    public RestResponse addinsertMaterial(@RequestBody Map<String,Object> map) {
+        for(Map.Entry<String, Object> entry : map.entrySet()){
+            if("".equals(entry.getValue())){
+                map.put(entry.getKey(), null);
+            }
+        }
+        return CrudUtil.postHandle(materialService.insertMaterial(map),1);
+    }
+
+    @DeleteMapping("/material/{id}")
     public RestResponse deleteMaterial(@PathVariable int id){
         int result = materialService.deleteMaterialById(id);
         return CrudUtil.deleteHandle(result,1);

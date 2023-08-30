@@ -50,6 +50,7 @@
                 </form>
             </div>
         </fieldset>
+        <table class="layui-hide" id="currentTableId" lay-filter="currentTableFilter"></table>
         <button id="addEnginBtn" class="layui-btn">添加部品</button>
         <div id="enginAddForm" style="display: none;">
             <fieldset class="table-search-fieldset">
@@ -59,45 +60,37 @@
                             <div>
                                 <form class="layui-form" lay-filter="form1" style="margin: 0 auto;max-width: 460px;padding-top: 100px; padding-bottom: 200px">
                                     <div class="layui-form-item">
-                                        <label class="layui-form-label">工程编号:</label>
+                                        <label class="layui-form-label">工程at号:</label>
                                         <div class="layui-input-block">
-                                            <input type="text" placeholder="请填写at号" class="layui-input" name="atId"
-                                                   lay-verify="required"/>
+                                            <input type="text" placeholder="请填写at号" class="layui-input" name="atId"/>
                                         </div>
                                         <label class="layui-form-label">工程名称:</label>
                                         <div class="layui-input-block">
-                                            <input type="text" placeholder="请填写部品名称" name="mname" class="layui-input"
-                                                   lay-verify="required" >
+                                            <input type="text" placeholder="请填写部品名称" name="mname" class="layui-input">
                                         </div>
                                         <label class="layui-form-label">工程名称:</label>
                                         <div class="layui-input-block">
-                                            <input type="text" placeholder="请填写规格" name="model" class="layui-input"
-                                                   lay-verify="required" >
+                                            <input type="text" placeholder="请填写规格" name="model" class="layui-input">
                                         </div>
                                         <label class="layui-form-label">工程名称:</label>
                                         <div class="layui-input-block">
-                                            <input type="text" placeholder="请填写分类" name="typeId" class="layui-input"
-                                                   lay-verify="required" >
+                                            <input type="text" placeholder="请填写分类" name="typeId" class="layui-input">
                                         </div>
                                         <label class="layui-form-label">工程名称:</label>
                                         <div class="layui-input-block">
-                                            <input type="text" placeholder="请填写图号" name="picNum" class="layui-input"
-                                                   lay-verify="required" >
+                                            <input type="text" placeholder="请填写图号" name="picNum" class="layui-input">
                                         </div>
                                         <label class="layui-form-label">工程名称:</label>
                                         <div class="layui-input-block">
-                                            <input type="text" placeholder="请填写工程id" name="enginId" class="layui-input"
-                                                   lay-verify="required" >
+                                            <input type="text" placeholder="请填写工程id" name="enginId" class="layui-input">
                                         </div>
                                         <label class="layui-form-label">工程名称:</label>
                                         <div class="layui-input-block">
-                                            <input type="text" placeholder="请填写状态id" name="stateId" class="layui-input"
-                                                   lay-verify="required" >
+                                            <input type="text" placeholder="请填写状态id" name="stateId" class="layui-input">
                                         </div>
                                         <label class="layui-form-label">工程名称:</label>
                                         <div class="layui-input-block">
-                                            <input type="text" placeholder="请填写厂区id" name="depositoryId" class="layui-input"
-                                                   lay-verify="required" >
+                                            <input type="text" placeholder="请填写厂区id" name="depositoryId" class="layui-input">
                                         </div>
                                     </div>
                                     <div class="layui-form-item">
@@ -115,7 +108,6 @@
                 </div>
             </fieldset>
         </div>
-        <table class="layui-hide" id="currentTableId" lay-filter="currentTableFilter"></table>
         <script type="text/html" id="operation-bar">
             <!--            <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>-->
             <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="delete">删除</a>
@@ -221,9 +213,8 @@
                 });
                 form.on('submit(formStep)', function (data) {
                     console.log(data.field);
-
                     $.ajax({
-                        url:"/material",
+                        url:"/instmaterial",
                         type:'post',
                         dataType:'json',
                         contentType: "application/json;charset=utf-8",
