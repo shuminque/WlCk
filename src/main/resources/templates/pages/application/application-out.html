@@ -61,9 +61,9 @@
                                         </div>
                                     </div>
                                     <div class="layui-form-item" id="outLocationContainer"></div>
-                                    <div class="layui-form-item">
+                                    <div class="layui-form-item" style="display:none">
                                         <label class="layui-form-label">审核人:</label>
-                                        <div class="layui-input-block">
+                                        <div class="layui-input-block" >
                                             <select name="reviewerId" lay-verify="required">
                                                 <option th:each="reviewer,iterStat:${reviewers}" th:value="${reviewer?.getId()}" th:text="${reviewer?.getUname()}" selected>张三</option>
                                             </select>

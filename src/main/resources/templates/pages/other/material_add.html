@@ -45,7 +45,75 @@
                             <button type="submit" class="layui-btn layui-btn-primary" lay-submit
                                     lay-filter="data-search-btn"><i class="layui-icon"></i> 搜 索
                             </button>
-                            <button id="addEnginBtn" class="layui-btn">添加物品</button>
+                            <button id="addEnginBtn" class="layui-btn">添加部品</button>
+                            <div id="enginAddForm" style="display: none;">
+                                <fieldset class="table-search-fieldset">
+                                    <div class="layui-fluid">
+                                        <div class="layui-card">
+                                            <div class="layui-card-body" style="padding-top: 40px;">
+                                                <div>
+                                                    <form class="layui-form" lay-filter="form1" style="margin: 0 auto;max-width: 460px;padding-top: 100px; padding-bottom: 200px">
+                                                        <div class="layui-form-item">
+                                                            <label class="layui-form-label">工程编号:</label>
+                                                            <div class="layui-input-block">
+                                                                <input type="text" placeholder="请填写at号" class="layui-input" name="atId"
+                                                                       lay-verify="required"/>
+                                                            </div>
+                                                            <label class="layui-form-label">工程名称:</label>
+                                                            <div class="layui-input-block">
+                                                                <input type="text" placeholder="请填写部品名称" name="mname" class="layui-input"
+                                                                       lay-verify="required" >
+                                                            </div>
+                                                            <label class="layui-form-label">工程名称:</label>
+                                                            <div class="layui-input-block">
+                                                                <input type="text" placeholder="请填写规格" name="model" class="layui-input"
+                                                                       lay-verify="required" >
+                                                            </div>
+                                                            <label class="layui-form-label">工程名称:</label>
+                                                            <div class="layui-input-block">
+                                                                <input type="text" placeholder="请填写分类" name="typeId" class="layui-input"
+                                                                       lay-verify="required" >
+                                                            </div>
+                                                            <label class="layui-form-label">工程名称:</label>
+                                                            <div class="layui-input-block">
+                                                                <input type="text" placeholder="请填写图号" name="picNum" class="layui-input"
+                                                                       lay-verify="required" >
+                                                            </div>
+                                                            <label class="layui-form-label">工程名称:</label>
+                                                            <div class="layui-input-block">
+                                                                <input type="text" placeholder="请填写工程id" name="enginId" class="layui-input"
+                                                                       lay-verify="required" >
+                                                            </div>
+                                                            <label class="layui-form-label">工程名称:</label>
+                                                            <div class="layui-input-block">
+                                                                <input type="text" placeholder="请填写状态id" name="stateId" class="layui-input"
+                                                                       lay-verify="required" >
+                                                            </div>
+                                                            <label class="layui-form-label">工程名称:</label>
+                                                            <div class="layui-input-block">
+                                                                <input type="text" placeholder="请填写厂区id" name="depositoryId" class="layui-input"
+                                                                       lay-verify="required" >
+                                                            </div>
+                                                        </div>
+                                                        <div class="layui-form-item">
+
+                                                        </div>
+
+                                                        <div class="layui-form-item">
+                                                            <div class="layui-input-block">
+                                                                <button class="layui-btn" lay-submit lay-filter="formStep">
+                                                                    &emsp;增添部品&emsp;
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                            <hr>
+                                        </div>
+                                    </div>
+                                </fieldset>
+                            </div>
                         </div>
                     </div>
                 </form>
@@ -61,10 +129,11 @@
 <script src="/static/lib/layui-v2.6.3/layui.js" charset="utf-8"></script>
 <script>
     var data;
-    layui.use(['form', 'table'], function () {
+    layui.use(['form', 'table','layer'], function () {
         var $ = layui.jquery,
             form = layui.form,
-            table = layui.table;
+            table = layui.table,
+            layer = layui.layer;
 
         $.ajax({
             url: '/get_user_depository',
@@ -144,6 +213,50 @@
                         }
                         , where: req
                     }, 'data');
+                    return false;
+                });
+                $('#addEnginBtn').on('click', function() {
+                    layer.open({
+                        type: 1,  // 页面层
+                        title: '部品增加',  // 标题
+                        area: ['500px', '400px'],  // 宽高
+                        content: $('#enginAddForm'),
+                        success: function(layero, index) {
+                            // 这里可以添加一些弹出层打开后的初始化代码，如果需要的话
+                        }
+                    });
+                });
+                form.on('submit(formStep)', function (data) {
+                    $.ajax({
+                        url:"/material",
+                        type:'post',
+                        dataType:'json',
+                        contentType: "application/json;charset=utf-8",
+                        data:JSON.stringify(data.field),
+                        beforeSend:function () {
+                            this.layerIndex = layer.load(0, { shade: [0.5, '#393D49'] });
+                        },
+                        success:function(data){
+                            layer.close(this.layerIndex);
+                            if(data.status >= 300){
+                                layer.msg(data.statusInfo.message);//失败的表情
+                                return;
+                            }else{
+                                layer.msg("添加成功！", {
+                                    icon: 6,//成功的表情
+                                    time: 1000 //1秒关闭（如果不配置，默认是3秒）
+                                });
+                                table.reload('currentTableId'); // 重新加载表格
+                            }
+                        },
+                        complete: function () {
+                            form.val("form1", {
+                                'id':"",
+                                "ename": "" // "name": "value"
+                                ,"introduce": ""
+                            })
+                        }
+                    })
                     return false;
                 });
                 table.on('tool(currentTableFilter)', function(obj) {
