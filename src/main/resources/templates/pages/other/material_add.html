@@ -47,67 +47,65 @@
                             </button>
                         </div>
                     </div>
+
                 </form>
             </div>
         </fieldset>
-        <table class="layui-hide" id="currentTableId" lay-filter="currentTableFilter"></table>
         <button id="addEnginBtn" class="layui-btn">添加部品</button>
+
+        <table class="layui-hide" id="currentTableId" lay-filter="currentTableFilter"></table>
         <div id="enginAddForm" style="display: none;">
             <fieldset class="table-search-fieldset">
                 <div class="layui-fluid">
                     <div class="layui-card">
-                        <div class="layui-card-body" style="padding-top: 40px;">
-                            <div>
-                                <form class="layui-form" lay-filter="form1" style="margin: 0 auto;max-width: 460px;padding-top: 100px; padding-bottom: 200px">
-                                    <div class="layui-form-item">
-                                        <label class="layui-form-label">工程at号:</label>
-                                        <div class="layui-input-block">
-                                            <input type="text" placeholder="请填写at号" class="layui-input" name="atId"/>
-                                        </div>
-                                        <label class="layui-form-label">工程名称:</label>
-                                        <div class="layui-input-block">
-                                            <input type="text" placeholder="请填写部品名称" name="mname" class="layui-input">
-                                        </div>
-                                        <label class="layui-form-label">工程名称:</label>
-                                        <div class="layui-input-block">
-                                            <input type="text" placeholder="请填写规格" name="model" class="layui-input">
-                                        </div>
-                                        <label class="layui-form-label">工程名称:</label>
-                                        <div class="layui-input-block">
-                                            <input type="text" placeholder="请填写分类" name="typeId" class="layui-input">
-                                        </div>
-                                        <label class="layui-form-label">工程名称:</label>
-                                        <div class="layui-input-block">
-                                            <input type="text" placeholder="请填写图号" name="picNum" class="layui-input">
-                                        </div>
-                                        <label class="layui-form-label">工程名称:</label>
-                                        <div class="layui-input-block">
-                                            <input type="text" placeholder="请填写工程id" name="enginId" class="layui-input">
-                                        </div>
-                                        <label class="layui-form-label">工程名称:</label>
-                                        <div class="layui-input-block">
-                                            <input type="text" placeholder="请填写状态id" name="stateId" class="layui-input">
-                                        </div>
-                                        <label class="layui-form-label">工程名称:</label>
-                                        <div class="layui-input-block">
-                                            <input type="text" placeholder="请填写厂区id" name="depositoryId" class="layui-input">
-                                        </div>
+                        <div class="layui-card-body">
+                            <form class="layui-form" lay-filter="form1" style="margin: 0 auto; max-width: 460px;">
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label">工程at号:</label>
+                                    <div class="layui-input-block">
+                                        <input type="text" placeholder="请填写at号" class="layui-input" name="atId"/>
                                     </div>
-                                    <div class="layui-form-item">
-                                        <div class="layui-input-block">
-                                            <button class="layui-btn" lay-submit lay-filter="formStep">
-                                                &emsp;增添部品&emsp;
-                                            </button>
-                                        </div>
+                                    <label class="layui-form-label">部品名称:</label>
+                                    <div class="layui-input-block">
+                                        <input type="text" placeholder="请填写部品名称" name="mname" class="layui-input">
                                     </div>
-                                </form>
-                            </div>
+                                    <label class="layui-form-label">规格:</label>
+                                    <div class="layui-input-block">
+                                        <input type="text" placeholder="请填写规格" name="model" class="layui-input">
+                                    </div>
+                                    <label class="layui-form-label">分类:</label>
+                                    <div class="layui-input-block">
+                                        <input type="text" placeholder="请填写分类" name="typeId" class="layui-input">
+                                    </div>
+                                    <label class="layui-form-label">图号:</label>
+                                    <div class="layui-input-block">
+                                        <input type="text" placeholder="请填写图号" name="picNum" class="layui-input">
+                                    </div>
+                                    <label class="layui-form-label">工程ID:</label>
+                                    <div class="layui-input-block">
+                                        <input type="text" placeholder="请填写工程id" name="enginId" class="layui-input">
+                                    </div>
+                                    <label class="layui-form-label">状态ID:</label>
+                                    <div class="layui-input-block">
+                                        <input type="text" placeholder="请填写状态id" name="stateId" class="layui-input">
+                                    </div>
+                                    <label class="layui-form-label">厂区ID:</label>
+                                    <div class="layui-input-block">
+                                        <input type="text" placeholder="请填写厂区id" name="depositoryId" class="layui-input">
+                                    </div>
+                                </div>
+                                <div class="layui-form-item" style="text-align: center;">
+                                    <button class="layui-btn" lay-submit lay-filter="formStep">
+                                        增添部品
+                                    </button>
+                                </div>
+                            </form>
                         </div>
-                        <hr>
                     </div>
                 </div>
             </fieldset>
         </div>
+
         <script type="text/html" id="operation-bar">
             <!--            <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>-->
             <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="delete">删除</a>
@@ -204,7 +202,7 @@
                     layer.open({
                         type: 1,  // 页面层
                         title: '部品增加',  // 标题
-                        area: ['500px', '400px'],  // 宽高
+                        area: ['500px', '500px'],  // 宽高
                         content: $('#enginAddForm'),
                         success: function(layero, index) {
                             // 这里可以添加一些弹出层打开后的初始化代码，如果需要的话
@@ -236,10 +234,15 @@
                             }
                         },
                         complete: function () {
-                            form.val("form1", {
-                                'id':"",
-                                "ename": "" // "name": "value"
-                                ,"introduce": ""
+                            form.val("form1", { // "yourFormName"需要替换为您的实际表单名称或ID
+                                'atId': "",
+                                'mname': "",
+                                'model': "",
+                                'typeId': "",
+                                'picNum': "",
+                                'enginId': "",
+                                'stateId': "",
+                                'depositoryId': ""
                             })
                         }
                     })
