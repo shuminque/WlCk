@@ -22,6 +22,8 @@ public class User {
     /** 表示权限等级 */
     private String authority;
 
+    private Integer review_group_id;
+
     /** 用户登录密码（数据库存储的是加密后的） */
     private String pwd;
 
@@ -42,7 +44,7 @@ public class User {
 
     /**
      * 获取用户id
-     * 
+     *
      * @return 用户id
      */
     public Integer getId() {

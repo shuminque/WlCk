@@ -20,7 +20,7 @@ public class UserP {
 
     /** 表示权限等级 */
     private String authority;
-
+    private Integer review_group_id;
     /** 性别 */
     private String sex;
 
@@ -44,6 +44,7 @@ public class UserP {
         this.id = user.getId();
         this.uname = user.getUname();
         this.authority = user.getAuthority();
+        this.review_group_id = user.getReview_group_id();
         this.sex = user.getSex();
         this.depositoryId = user.getDepositoryId();
         this.entryDate = DateUtil.getSimpleDate(user.getEntryDate());

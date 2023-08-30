@@ -22,6 +22,8 @@ public class SimpleDepositoryRecord {
     /** 申请备注 */
     private String applyRemark;
 
+    private Integer review_group_id;
+
     /** 申请时间 */
     private Date applyTime;
 

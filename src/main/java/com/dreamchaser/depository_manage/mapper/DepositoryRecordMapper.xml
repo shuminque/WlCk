@@ -15,6 +15,7 @@
         <result column="mname" property="mname" jdbcType="VARCHAR" />
         <result column="model" property="model" jdbcType="VARCHAR" />
         <result column="quantity" property="quantity" jdbcType="VARCHAR" />
+        <result column="review_group_id" property="review_group_id" jdbcType="INTEGER" />
     </resultMap>
     <!-- 字段映射 -->
     <resultMap id="depositoryRecordMap" type="com.dreamchaser.depository_manage.entity.DepositoryRecord">
@@ -33,6 +34,7 @@
         <result column="applicant_id" property="applicantId" jdbcType="INTEGER" />
         <result column="apply_remark" property="applyRemark" jdbcType="VARCHAR" />
         <result column="apply_time" property="applyTime" jdbcType="TIMESTAMP" />
+        <result column="review_group_id" property="review_group_id" jdbcType="INTEGER" />
         <result column="reviewer_id" property="reviewerId" jdbcType="INTEGER" />
         <result column="review_remark" property="reviewRemark" jdbcType="VARCHAR" />
         <result column="review_time" property="reviewTime" jdbcType="TIMESTAMP" />
@@ -46,13 +48,13 @@
 
     <!-- 表查询字段 -->
     <sql id="simpleColumns">
-        dr.id, dr.type, dr.applicant_id, dr.apply_remark, dr.apply_time, dr.at_id, dr.mname, dr.model, dr.quantity
+        dr.id, dr.type, dr.applicant_id, dr.apply_remark, dr.apply_time, dr.review_group_id, dr.at_id, dr.mname, dr.model, dr.quantity
     </sql>
     <!-- 表查询字段 -->
     <sql id="allColumns">
         dr.id, dr.application_id, dr.at_id, dr.mname, dr.depository_id, dr.type, dr.model, dr.type_name, dr.engin_name, dr.quantity, dr.price, dr.state,
         dr.applicant_id, dr.apply_remark, dr.apply_time, dr.reviewer_id, dr.review_remark, dr.review_time, dr.review_pass,
-        dr.checker_id, dr.check_remark, dr.check_time, dr.check_pass
+        dr.checker_id, dr.check_remark, dr.review_group_id,  dr.check_time, dr.check_pass
     </sql>
     <!-- 查询所有数据行数 -->
     <select id="findCount" resultType="integer">
@@ -164,12 +166,24 @@
     <select id="findMyTask" resultMap="simpleDepositoryRecordMap" parameterType="map">
         SELECT
         <include refid="simpleColumns" />
-        FROM depository_record dr WHERE 1=1
+        FROM depository_record dr
+        INNER JOIN user u ON dr.applicant_id = u.id
+        WHERE 1=1
         <if test='isDone == "0"'>
-            and (dr.review_time is null and dr.reviewer_id =#{userId})
+            <choose>
+                <!-- 当reviewGroup为3时，匹配1或2的任务 -->
+                <when test='reviewGroup == "3"'>
+                    AND (dr.review_time is null AND dr.review_group_id IN (1, 2))
+                </when>
+                <!-- 其他情况，匹配指定的reviewGroup -->
+                <otherwise>
+                    AND (dr.review_time is null AND dr.review_group_id = #{reviewGroup})
+                </otherwise>
+            </choose>
         </if>
+
         <if test='isDone == "1"'>
-            and (dr.review_time is not null and dr.reviewer_id =#{userId})
+            AND (dr.review_time is not null AND ( dr.review_group_id = #{reviewGroup}))
         </if>
         <if test="startDate != null and endDate != null">
             AND DATE(dr.apply_time) BETWEEN #{startDate} AND #{endDate}
@@ -272,7 +286,7 @@
             id, application_id, at_id,  mname, depository_id, type, model, type_name, engin_name, quantity, price, state,
             applicant_id, apply_remark, apply_time,
             reviewer_id, review_remark, review_time,review_pass, checker_id, check_remark,
-            check_time,check_pass
+            check_time,check_pass,review_group_id
         ) VALUES (
             #{id},
             #{applicationId},
@@ -296,7 +310,8 @@
             #{checkerId},
             #{checkRemark},
             #{checkTime},
-            #{checkPass}
+            #{checkPass},
+            #{review_group_id}
         )
     </insert>
     
@@ -305,7 +320,7 @@
         INSERT INTO depository_record (
         id, application_id, mname, at_id, depository_id, type, model, type_name, engin_name, quantity, price, state,
         applicant_id, apply_remark, apply_time, reviewer_id, review_remark, review_time,review_pass, checker_id, check_remark,
-        check_time,check_pass
+        check_time,check_pass,review_group_id
         ) VALUES
         <foreach collection="list" index="index" item="item" separator=",">
             (
@@ -331,7 +346,8 @@
                 #{checkerId},
                 #{checkRemark},
                 #{checkTime},
-                #{checkPass}
+                #{checkPass},
+                #{review_group_id},
             )
         </foreach>
     </insert>

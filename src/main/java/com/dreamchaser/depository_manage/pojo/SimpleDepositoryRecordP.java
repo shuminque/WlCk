@@ -24,6 +24,8 @@ public class SimpleDepositoryRecordP {
     /** 申请备注 */
     private String applyRemark;
 
+    private Integer review_group_id;
+
     /** 申请时间 */
     private String applyTime;
     /**AT号*/
@@ -40,6 +42,7 @@ public class SimpleDepositoryRecordP {
         this.id=d.getId();
         this.type = d.getType();
         this.applyRemark = d.getApplyRemark();
+        this.review_group_id = d.getReview_group_id();
         this.applyTime = DateUtil.getSimpleTime(d.getApplyTime());
         this.atId = d.getAtId();
         this.mname = d.getMname();

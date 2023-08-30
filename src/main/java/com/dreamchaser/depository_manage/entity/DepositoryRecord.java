@@ -55,6 +55,7 @@ public class DepositoryRecord {
 
     /** 申请时间 */
     private Date applyTime;
+    private Integer review_group_id;
 
     /** 审核人id */
     private Integer reviewerId;

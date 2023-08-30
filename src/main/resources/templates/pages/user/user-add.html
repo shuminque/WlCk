@@ -41,6 +41,19 @@
             </select>
         </div>
     </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label required">审核组:</label>
+        <div class="layui-input-block">
+            <select name="review_group_id" lay-verify="required">
+                <option value="">请选择审核组</option>
+                <option value="0">非审核组</option>
+                <option value="1">SAB审核组</option>
+                <option value="2">ZAB审核组</option>
+                <option value="3">全部审核组</option>
+            </select>
+        </div>
+    </div>
+
     <div class=" layui-form-item" >
         <label class="layui-form-label required">负责厂区:</label>
         <div class="layui-inline" style="margin-bottom: 10px">
@@ -71,7 +84,7 @@
         </div>
     </div>
     <div class="layui-form-item">
-        <label class="layui-form-label required">入职时间</label>
+        <label class="layui-form-label required">创建时间</label>
         <div class="layui-input-block">
             <input type="text" name="entryDate" id="date" lay-verify="date" placeholder="创建时间" autocomplete="off" class="layui-input">
         </div>
@@ -79,7 +92,7 @@
 
     <div class="layui-form-item">
         <div class="layui-input-block">
-            <button class="layui-btn layui-btn-normal" lay-submit lay-filter="saveBtn">确认保存</button>
+            <button class="layui-btn layui-btn-normal" lay-submit lay-filter="saveBtn">确认添加</button>
         </div>
     </div>
 </div>

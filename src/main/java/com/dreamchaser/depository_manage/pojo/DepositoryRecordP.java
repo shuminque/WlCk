@@ -83,6 +83,8 @@ public class DepositoryRecordP {
      */
     private String applyTime;
 
+    private Integer review_group_id;
+
     /**
      * 审核人id
      */
@@ -149,6 +151,7 @@ public class DepositoryRecordP {
         this.applicantId = dr.getApplicantId();
         this.applyRemark = dr.getApplyRemark();
         this.applyTime = DateUtil.getSimpleTime(dr.getApplyTime());
+        this.review_group_id = dr.getReview_group_id();
         this.reviewerId = dr.getReviewerId();
         this.reviewRemark = dr.getReviewRemark();
         this.reviewTime = DateUtil.getSimpleTime(dr.getReviewTime());

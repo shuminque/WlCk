@@ -44,10 +44,18 @@ public class DepositoryRecordServiceImpl implements DepositoryRecordService {
 
     @Override
     public Integer apply(Map<String, Object> map) {
-        map.put("applyTime",new Date());
-        map.put("state","待审核");
+        // ... 其他的赋值
+        map.put("applyTime", new Date());
+        map.put("state", "待审核");
+
+        // 确保传入的map有审核组ID
+        if (!map.containsKey("review_group_id")) {
+            throw new IllegalArgumentException("审核组信息缺失");
+        }
+
         return depositoryRecordMapper.insertDepositoryRecord(map);
     }
+
     public Integer applyDirectOutbound(Map<String, Object> map  ) {
         // 设置为已审核状态
         map.put("state", "已出库");

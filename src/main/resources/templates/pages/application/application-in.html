@@ -10,6 +10,7 @@
     <link rel="stylesheet" href="/static/css/public.css" media="all">
     <link rel="stylesheet" href="/static/js/lay-module/step-lay/step.css" media="all">
     <script src="/static/lib/layui-v2.6.3/layui.js" charset="utf-8"></script>
+
 </head>
 <body>
 <div class="layuimini-container">
@@ -77,12 +78,24 @@
                                             </select>
                                         </div>
                                     </div>
+<!--                                    <div class="layui-form-item">-->
+<!--                                        <label class="layui-form-label">审核人:</label>-->
+<!--                                        <div class="layui-input-block">-->
+<!--                                            <select name="reviewerId"  style="width: 100%; height: 100px;">-->
+<!--                                                <option value="21">李二</option>-->
+<!--                                                <option value="22">王五</option>-->
+<!--                                                <option value="23">赵六</option>-->
+<!--                                                &lt;!&ndash; 其他选项... &ndash;&gt;-->
+<!--                                            </select>-->
+<!--                                        </div>-->
+<!--                                    </div>-->
                                     <div class="layui-form-item">
-                                        <label class="layui-form-label">审核人:</label>
+                                        <label class="layui-form-label">审核组:</label>
                                         <div class="layui-input-block">
-                                            <select name="reviewerId" lay-verify="required">
-<!--                                                <option th:each="reviewer,iterStat:${reviewers}" th:value="${reviewer?.getId()}" th:text="${reviewer?.getUname()}" selected>张三</option>-->
-                                                <option value="21">李二</option>
+                                            <select name="review_group_id" style="width: 100%; height: 100px;">
+                                                <option value="1">SAB审核组</option>
+                                                <option value="2">ZAB审核组</option>
+                                                <option value="3">全部审核组</option>
                                             </select>
                                         </div>
                                     </div>
