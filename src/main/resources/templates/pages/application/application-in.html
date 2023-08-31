@@ -256,6 +256,9 @@
                 else {
                     $('select[name="review_group_id"]').val('1');
                 }
+                if (userDepositoryId === 1 || userDepositoryId === 2) {
+                    $('select[name="review_group_id"]').prop('disabled', true);
+                }
                 // 刷新layui的选择框组件，以显示新的选中值
                 layui.form.render('select');
                 // 如果depositoryId为0，则允许访问两个厂区
