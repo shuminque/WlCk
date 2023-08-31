@@ -58,8 +58,9 @@
         <div class="layui-inline" style="margin-bottom: 10px">
             <select name="depositoryId" th:value="${user.getDepositoryId()}" lay-verify="required">
                 <option value="">请选择厂区</option>
-                <option value="0">全部厂区</option>
-                <option th:each="depository,iterStar:${depositories}" th:value="${depository?.getId()}" th:text="${depository?.getDname()}" selected>外芯仓库</option>
+                <option value="0" th:selected="${user.getDepositoryId()} == 0">全部厂区</option>
+                <option value="1" th:selected="${user.getDepositoryId()} == 1">SAB</option>
+                <option value="2" th:selected="${user.getDepositoryId()} == 2">ZAB</option>
             </select>
         </div>
     </div>
