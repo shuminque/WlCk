@@ -215,6 +215,10 @@
                     shadeClose: true,
                     area: ['100%', '100%'],
                     content: '/user_edit?id='+data.id,
+                    end: function() {
+                        // 弹窗关闭后刷新当前页面
+                        location.reload();
+                    }
                 });
                 $(window).on("resize", function () {
                     layer.full(index);

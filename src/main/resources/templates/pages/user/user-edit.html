@@ -130,9 +130,12 @@
                             icon: 6,//成功的表情
                             time: 500 //1秒关闭（如果不配置，默认是3秒）
                         },function(){
-                            window.location='/table_user'
+                            parent.layer.closeAll(); // 关闭所有父页面的弹窗
                         })
                     }
+                },
+                complete: function () {
+                    layer.close(this.layerIndex);
                 }
             })
             return false;
