@@ -18,23 +18,23 @@
 <form class="layui-form layuimini-form" lay-filter="example">
     <input type="hidden" id="id" name="id" th:value="${user.getId()}"/>
     <div class="layui-form-item">
-        <label class="layui-form-label required">用户名</label>
+        <label class="layui-form-label required">修改用户名</label>
         <div class="layui-input-block">
             <input type="text" name="uname" th:value="${user.getUname()}" lay-verify="required" lay-reqtext="用户名不能为空" placeholder="请输入用户名" value="" class="layui-input">
             <tip>填写自己管理账号的名称。</tip>
         </div>
     </div>
     <div class="layui-form-item">
-        <label class="layui-form-label required">性别</label>
+        <label class="layui-form-label required">修改性别</label>
         <div class="layui-input-block">
             <input type="radio" name="sex" value="男" title="男" th:checked="${user.getSex()}=='男'">
             <input type="radio" name="sex" value="女" title="女"  th:checked="${user.getSex()}=='女'">
         </div>
     </div>
     <div class=" layui-form-item" >
-        <label class="layui-form-label required">身份:</label>
+        <label class="layui-form-label required">修改身份:</label>
         <div class="layui-inline " style="margin-bottom: 10px">
-            <select name="authority" class="layui-input-inline" lay-verify="required">
+            <select name="authority" th:value="${user.getAuthority()}" class="layui-input-inline" lay-verify="required">
                 <option value="系统管理员" th:selected="${user.getAuthority()}=='系统管理员'">系统管理员</option>
                 <option value="审核人" th:selected="${user.getAuthority()}=='审核人'">审核人</option>
                 <option value="仓管员" th:selected="${user.getAuthority()}=='仓管员'">仓管员</option>
@@ -42,19 +42,19 @@
         </div>
     </div>
     <div class="layui-form-item">
-        <label class="layui-form-label">审核组:</label>
+        <label class="layui-form-label">修改审核组:</label>
         <div class="layui-input-block">
-            <select name="review_group_id" style="width: 100%; height: 100px;">
+            <select name="review_group_id" th:value="${user.getReview_group_id()}" style="width: 100%; height: 100px;">
                 <option value="0" th:selected="${user.getReview_group_id()} == 1">非审核组</option>
-                <option value="1" th:selected="${user.getReview_group_id()} == 1">SAB审核组</option>
-                <option value="2" th:selected="${user.getReview_group_id()} == 2">ZAB审核组</option>
-                <option value="3" th:selected="${user.getReview_group_id()} == 2">全部审核组</option>
+                <option value="1" th:selected="${user.getReview_group_id()} == 1">SAB</option>
+                <option value="2" th:selected="${user.getReview_group_id()} == 2">ZAB</option>
+                <option value="3" th:selected="${user.getReview_group_id()} == 2">全部</option>
             </select>
         </div>
     </div>
 
     <div class=" layui-form-item" >
-        <label class="layui-form-label required">负责厂区:</label>
+        <label class="layui-form-label required">修改负责厂区:</label>
         <div class="layui-inline" style="margin-bottom: 10px">
             <select name="depositoryId" th:value="${user.getDepositoryId()}" lay-verify="required">
                 <option value="">请选择厂区</option>
@@ -65,29 +65,29 @@
     </div>
 
     <div class="layui-form-item">
-        <label class="layui-form-label required">手机</label>
+        <label class="layui-form-label required">修改手机号</label>
         <div class="layui-input-block">
             <input type="number" name="phone" th:value="${user.getPhone()}"   placeholder="请输入手机号" value="" class="layui-input">
         </div>
     </div>
     <div class="layui-form-item">
-        <label class="layui-form-label required">账号</label>
+        <label class="layui-form-label required">修改账号</label>
         <div class="layui-input-block">
             <input name="email" th:value="${user.getEmail()}"  placeholder="请输入账号" value="" class="layui-input">
         </div>
     </div>
     <div class="layui-form-item">
-        <label class="layui-form-label ">密码</label>
+        <label class="layui-form-label ">修改密码</label>
         <div class="layui-input-block">
             <input type="text" name="pwd" placeholder="请输入密码" value="" class="layui-input">
         </div>
     </div>
-    <div class="layui-form-item">
-        <label class="layui-form-label required">创建时间</label>
-        <div class="layui-input-block">
-            <input id="entryDate" type="text" name="entryDate" th:value="${user.getEntryDate()}"  lay-verify="date" placeholder="输入创建时间" autocomplete="off" class="layui-input">
-        </div>
-    </div>
+<!--    <div class="layui-form-item">-->
+<!--        <label class="layui-form-label required">创建时间</label>-->
+<!--        <div class="layui-input-block">-->
+<!--            <input id="entryDate" type="text" name="entryDate" th:value="${user.getEntryDate()}"  lay-verify="date" placeholder="输入创建时间" autocomplete="off" class="layui-input">-->
+<!--        </div>-->
+<!--    </div>-->
 
     <div class="layui-form-item">
         <div class="layui-input-block">
