@@ -95,7 +95,6 @@
                                             <select name="review_group_id" style="width: 100%; height: 100px;">
                                                 <option value="1">SAB审核组</option>
                                                 <option value="2">ZAB审核组</option>
-                                                <option value="3">全部审核组</option>
                                             </select>
                                         </div>
                                     </div>
@@ -246,8 +245,19 @@
             type: 'GET',
             dataType: 'json',
             success: function(data) {
+
                 let pp;
                 var userDepositoryId = data.depositoryId;
+                // 如果 depositoryId 为1，则自动选择 SAB审核组
+                if (userDepositoryId === 1) {
+                    $('select[name="review_group_id"]').val('1');
+                }
+                // 如果 depositoryId 为2，则自动选择 ZAB审核组
+                else {
+                    $('select[name="review_group_id"]').val('2');
+                }
+                // 刷新layui的选择框组件，以显示新的选中值
+                layui.form.render('select');
                 // 如果depositoryId为0，则允许访问两个厂区
                 if (userDepositoryId === 0) {
                     pp = '/material';
