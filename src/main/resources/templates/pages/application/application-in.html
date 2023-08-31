@@ -249,12 +249,12 @@
                 let pp;
                 var userDepositoryId = data.depositoryId;
                 // 如果 depositoryId 为1，则自动选择 SAB审核组
-                if (userDepositoryId === 1) {
-                    $('select[name="review_group_id"]').val('1');
+                if (userDepositoryId === 2) {
+                    $('select[name="review_group_id"]').val('2');
                 }
                 // 如果 depositoryId 为2，则自动选择 ZAB审核组
                 else {
-                    $('select[name="review_group_id"]').val('2');
+                    $('select[name="review_group_id"]').val('1');
                 }
                 // 刷新layui的选择框组件，以显示新的选中值
                 layui.form.render('select');

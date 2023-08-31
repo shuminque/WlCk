@@ -36,6 +36,7 @@
                                             <input name="enginName" type="hidden" id="enginSelect" />
                                             <input name="typeName" type="hidden" id="typeSelect" />
                                             <input name="applyRemark" value="转移" type="hidden" id="applyRemarkSelect" />
+                                            <input name="review_group_id" type="hidden" id="groupSelect">
                                         </div>
                                     </div>
                                     <div class="layui-form-item">
@@ -267,10 +268,12 @@
                         if (depositoryId === 1){
                             $('#OldCk').val(depositoryId);
                             $('#NewCk').val(2);
+                            $('#groupSelect').val(1);
                             $('#applyRemarkSelect').val("SAB转入ZAB");
                         }else if (depositoryId === 2){
                             $('#OldCk').val(depositoryId);
                             $('#NewCk').val(1);
+                            $('#groupSelect').val(2);
                             $('#applyRemarkSelect').val("ZAB转入SAB");
                         }
                         layui.form.render('select');
