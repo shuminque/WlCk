@@ -59,7 +59,6 @@
         <div class="layui-inline" style="margin-bottom: 10px">
             <select name="depositoryId" lay-verify="required">
                 <option value="">请选择厂区</option>
-                <option value="0">全部厂区</option>
                 <option th:each="depository,iterStar:${depositories}" th:value="${depository?.getId()}" th:text="${depository?.getDname()}" selected>外芯仓库</option>
             </select>
         </div>
@@ -135,9 +134,12 @@
                             icon: 6,//成功的表情
                             time: 500 //1秒关闭（如果不配置，默认是3秒）
                         },function(){
-                            window.location='/table_user'
+                            parent.layer.closeAll(); // 关闭所有父页面的弹窗
                         })
                     }
+                },
+                complete: function () {
+                    layer.close(this.layerIndex);
                 }
             })
             return false;
