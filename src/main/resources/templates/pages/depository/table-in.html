@@ -72,12 +72,7 @@
                 <button class="layui-btn layui-btn-sm layui-btn-danger data-delete-btn" lay-event="delete"> 删除</button>
             </div>
         </script>
-        <table class="layui-hide" id="currentTableId" lay-filter="currentTableFilter"></table>
-        <script type="text/html" id="currentTableBar">
-            <a class="layui-btn layui-btn-normal layui-btn-xs data-count-edit" lay-event="detail">详情</a>
-            <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
-            <a class="layui-btn layui-btn-xs layui-btn-danger data-count-delete" lay-event="delete">删除</a>
-        </script>
+        <div class="layui-hide" id="currentTableId" style="display: none;" lay-filter="currentTableFilter"></div>
     </div>
 </div>
 <script src="/static/lib/layui-v2.6.3/layui.js" charset="utf-8"></script>
@@ -102,6 +97,33 @@
             success: function(data) {
                 let pp;
                 var userDepositoryId = data.depositoryId;
+                var toolbarTemplate;
+                var globalToolbarTemplate;
+                if (userDepositoryId === 1 || userDepositoryId === 2) {
+                    // 不包含删除按钮的模板
+                    toolbarTemplate = `
+                <a class="layui-btn layui-btn-normal layui-btn-xs data-count-edit" lay-event="detail">详情</a>
+                <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
+            `;      globalToolbarTemplate = `
+                <div class="layui-btn-container">
+                    <!-- 其他按钮可以放在这里 -->
+                </div>
+            `;
+                } else {
+                    // 包含删除按钮的模板
+                    toolbarTemplate = `
+                <a class="layui-btn layui-btn-normal layui-btn-xs data-count-edit" lay-event="detail">详情</a>
+                <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
+                <a class="layui-btn layui-btn-xs layui-btn-danger data-count-delete" lay-event="delete">删除</a>
+            `;      globalToolbarTemplate = `
+                <div class="layui-btn-container">
+                    <!-- 其他按钮可以放在这里 -->
+                    <button class="layui-btn layui-btn-sm layui-btn-danger data-delete-btn" lay-event="delete"> 删除</button>
+                </div>
+            `;
+                }
+                $("#currentTableId").html(toolbarTemplate);
+                $("#toolbarDemo").html(globalToolbarTemplate);
                 // 如果depositoryId为0，则允许访问两个厂区
                 if (userDepositoryId === 0) {
                     pp = '/depositoryRecord';
@@ -152,7 +174,7 @@
                         {field: 'applicantName', width: 60, title: '申请人'},
                         // {field: 'applyTime', width: 170, title: '申请时间', sort: true},
                         {field: 'reviewTime', width: 170, title: '审核时间', sort: true},
-                        {title: '操作 ', minWidth: 200, toolbar: '#currentTableBar', align: "center"}
+                        {title: '操作 ', minWidth: 200, toolbar: '#currentTableId', align: "center"}
                     ]],
                     limits: [10, 15, 20, 25, 50],
                     limit: 10,
