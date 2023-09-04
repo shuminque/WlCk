@@ -226,9 +226,7 @@ public class UserController {
             //验证码错误
             return CrudUtil.CODE_ERROR;
         }
-
     }
-
 
     /**
      * 将生成的令牌拿去认证，如果认证成功则返回带有token凭证响应，否则返回用户密码错误的响应
@@ -286,7 +284,4 @@ public class UserController {
             throw new MyException(e.toString());
         }
     }
-
-
-
 }
