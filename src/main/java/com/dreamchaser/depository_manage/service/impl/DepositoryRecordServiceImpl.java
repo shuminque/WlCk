@@ -47,12 +47,10 @@ public class DepositoryRecordServiceImpl implements DepositoryRecordService {
         // ... 其他的赋值
         map.put("applyTime", new Date());
         map.put("state", "待审核");
-
         // 确保传入的map有审核组ID
         if (!map.containsKey("review_group_id")) {
             throw new IllegalArgumentException("审核组信息缺失");
         }
-
         return depositoryRecordMapper.insertDepositoryRecord(map);
     }
 
@@ -164,7 +162,6 @@ public class DepositoryRecordServiceImpl implements DepositoryRecordService {
         map.remove("id");
         return transferRecordMapper.addTransferRecord(map);
     }
-
 
 
     @Override
