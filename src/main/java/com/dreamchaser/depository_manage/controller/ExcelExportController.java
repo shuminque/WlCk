@@ -79,7 +79,7 @@ public class ExcelExportController {
             @RequestParam("startDate") String startDate,
             @RequestParam("endDate") String endDate,
             @RequestParam("depositoryId") int depositoryId) throws Exception {
-        List<Map<String, Object>> data = reportService.fetchReportData(startDate, endDate, depositoryId);
+        List<Map<String, Object>> data = reportService.everyTypeData(startDate, endDate, depositoryId);
         XSSFWorkbook workbook = new XSSFWorkbook();
         XSSFSheet sheet = workbook.createSheet("Report");
         // Create header row
@@ -89,8 +89,6 @@ public class ExcelExportController {
         headerRow.createCell(2).setCellValue("入库金额");
         headerRow.createCell(3).setCellValue("出库金额");
         headerRow.createCell(4).setCellValue("在库金额");
-
-
         for (int i = 0; i < data.size(); i++) {
             Map<String, Object> record = data.get(i);
             XSSFRow row = sheet.createRow(i + 1);
@@ -99,13 +97,10 @@ public class ExcelExportController {
             row.createCell(2).setCellValue((String) getOrDefault(record, "入库金额", "0.00"));
             row.createCell(3).setCellValue((String) getOrDefault(record, "出库金额", "0.00"));
             row.createCell(4).setCellValue((String) getOrDefault(record, "在库金额", "0.00"));
-
         }
-
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         workbook.write(outputStream);
         workbook.close();
-
         String filename = String.format("分类报表_%s_to_%s.xlsx", startDate, endDate);
         String encodedFilename = URLEncoder.encode(filename, "UTF-8").replace("+", "%20");
         ByteArrayResource resource = new ByteArrayResource(outputStream.toByteArray());
@@ -120,7 +115,7 @@ public class ExcelExportController {
             @RequestParam("startDate") String startDate,
             @RequestParam("endDate") String endDate,
             @RequestParam("depositoryId") int depositoryId) throws Exception {
-        List<Map<String, Object>> data = reportService.fetchReportData(startDate, endDate, depositoryId);
+        List<Map<String, Object>> data = reportService.transferData(startDate, endDate);
         XSSFWorkbook workbook = new XSSFWorkbook();
         XSSFSheet sheet = workbook.createSheet("Report");
 // 分割数据

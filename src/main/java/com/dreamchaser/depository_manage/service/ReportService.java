@@ -32,8 +32,7 @@ public class ReportService {
                         "    AND (m.model IS NULL OR m.model = dr.model)\n" +
                         "    AND m.depository_id = dr.depository_id\n" +
                         "    AND dr.review_pass = 1\n" +
-                        "    AND dr.review_time BETWEEN ? AND ?\n" + // Replace the YEAR and MONTH lines
-
+                        "    AND dr.review_time >= ? AND dr.review_time < DATE_ADD(?, INTERVAL 1 DAY)\n" +
                         "WHERE m.depository_id = ?\n" +
                         "GROUP BY\n" +
                         "m.at_id, m.mname, m.model, m.quantity, m.price;";
@@ -55,13 +54,13 @@ public class ReportService {
                         "        FORMAT(COALESCE(SUM(CASE WHEN dr.type = 0 THEN dr.price * dr.quantity ELSE 0 END), 0), 2) AS 出库金额\n" +
                         "    FROM material_type mt\n" +
                         "    LEFT JOIN depository_record dr ON mt.tname = dr.type_name\n" +
-                        "                               AND dr.review_time BETWEEN ? AND ?\n" +
+                        "                               AND dr.review_time >= ? AND dr.review_time < DATE_ADD(?, INTERVAL 1 DAY)\n" + // 修改时间
                         "                               AND dr.review_pass = 1\n" +
                         "                               AND dr.depository_id = ?\n" +
                         "    GROUP BY mt.tname, mt.id\n" +
                         "),\n" +
                         "StockValue AS (\n" +
-                        "                       SELECT +\n" +
+                        "                       SELECT \n" +
                         "                                mt.id AS type_id,\n" +
                         "                              SUM(m.price) AS raw_stock_money,\n" +
                         "                               FORMAT(SUM(m.price), 2) AS 在库金额,\n" +
@@ -74,7 +73,7 @@ public class ReportService {
                         "FinalData AS (\n" +
                         "       SELECT\n" +
                         "                                CONCAT(?, ' 至 ', ?) AS 日期,\n" +
-                        "                                cd.material_type_name AS 材料类型,\n" +
+                        "                                cd.material_type_name AS 分类,\n" +
                         "                                cd.入库金额,\n" +
                         "                                cd.出库金额,\n" +
                         "                                COALESCE(s.在库金额, 0) AS 在库金额,\n" +
@@ -86,7 +85,7 @@ public class ReportService {
                         "Totals AS (\n" +
                         "        SELECT\n" +
                         "                               '总计' AS 日期,\n" +
-                        "                               ' ' AS 材料类型,\n" +
+                        "                               ' ' AS 分类,\n" +
                         "                            FORMAT(SUM(cd.raw_in_money), 2) AS 入库金额,\n" +
                         "                               FORMAT(SUM(cd.raw_out_money), 2) AS 出库金额,\n" +
                         "                               FORMAT(SUM(COALESCE(s.raw_stock_money, 0)), 2) AS 在库金额,\n" +
@@ -96,12 +95,12 @@ public class ReportService {
                         "                           LEFT JOIN StockValue s ON cd.type_id = s.type_id\n" +
                         "                            GROUP BY cd.is_import\n" +
                         ")\n" +
-                        "SELECT 日期, 材料类型, 入库金额, 出库金额, 在库金额\n" +
+                        "SELECT 日期, 分类, 入库金额, 出库金额, 在库金额\n" +
                         "                        FROM (\n" +
-                        "                            SELECT 日期, 材料类型, 入库金额, 出库金额, 在库金额, is_import, type_id\n" +
+                        "                            SELECT 日期, 分类, 入库金额, 出库金额, 在库金额, is_import, type_id\n" +
                         "                            FROM FinalData\n" +
                         "                            UNION ALL\n" +
-                        "                            SELECT 日期, 材料类型, 入库金额, 出库金额, 在库金额, is_import, type_id\n" +
+                        "                            SELECT 日期, 分类, 入库金额, 出库金额, 在库金额, is_import, type_id\n" +
                         "                            FROM Totals\n" +
                         "                        ) AS SubQuery\n" +
                         "                        ORDER BY is_import DESC, type_id ASC, 日期 DESC;\n";
@@ -129,7 +128,7 @@ public class ReportService {
                 "    AND o.price = i.price\n" +
                 "    AND o.applicant_id = i.applicant_id\n" +
                 "WHERE\n" +
-                "    o.apply_time BETWEEN ? AND ?\n" +
+                "    o.apply_time >= ? AND o.apply_time < DATE_ADD(?, INTERVAL 1 DAY)\n" +
                 "    AND (\n" +
                 "        (o.apply_remark = 'SAB转入ZAB' OR i.apply_remark = 'SAB转入ZAB')\n" +
                 "        OR (o.apply_remark = 'ZAB转入SAB' OR i.apply_remark = 'ZAB转入SAB')\n" +
