@@ -10,7 +10,6 @@
     <link rel="stylesheet" href="/static/css/public.css" media="all">
     <link rel="stylesheet" href="/static/js/lay-module/step-lay/step.css" media="all">
     <script src="/static/lib/layui-v2.6.3/layui.js" charset="utf-8"></script>
-
 </head>
 <body>
 <div class="layuimini-container">
@@ -165,7 +164,7 @@
         });
         var cnyToJpyRate; // 保存从数据库获取的人民币到日元的汇率
         // 载入页面时获取汇率
-        $.get('http://localhost:8080/rate', function(response) {
+        $.get('/rate', function(response) {
             var rates = response.data;
             rates.sort((a, b) => new Date(b.date) - new Date(a.date));
             cnyToJpyRate = rates[0].rate;
@@ -299,7 +298,7 @@
                         },
                         cols: [ [
                             {type: 'radio'},
-                            {field: 'depositoryName', width:'8%', title: '厂区'},
+                            {field: 'depositoryName', width:'10%', title: '厂区'},
                             {field: 'atId', width:'8%', title: 'AT'},
                             {field: 'mname', width:'15%', title: '品名'},
                             {field: 'model', title: '规格'},
@@ -314,8 +313,7 @@
                     done: function (elem, data) {
                         // 获取选中的数据
                         var selectedData = data.data[0];
-                        console.log(selectedData.enginName);
-                        $('#materialSelect').val(selectedData.mname);
+                            $('#materialSelect').val(selectedData.mname);
                         $('#atIdSelect').val(selectedData.atId);
                         $('#modelSelect').val(selectedData.model);
                         $('#enginSelect').val(selectedData.enginName);
@@ -372,6 +370,7 @@
                     $('input[name="model"]').val(data.model);
                     $('input[name="enginName"]').val(data.enginName);
                     $('input[name="typeName"]').val(data.typeName);
+                    $('input[name="applyTime"]').val(data.applyTime);
                     // 重新渲染表单
                     layui.form.render();
                 });
