@@ -78,17 +78,6 @@
                                             </select>
                                         </div>
                                     </div>
-<!--                                    <div class="layui-form-item">-->
-<!--                                        <label class="layui-form-label">审核人:</label>-->
-<!--                                        <div class="layui-input-block">-->
-<!--                                            <select name="reviewerId"  style="width: 100%; height: 100px;">-->
-<!--                                                <option value="21">李二</option>-->
-<!--                                                <option value="22">王五</option>-->
-<!--                                                <option value="23">赵六</option>-->
-<!--                                                &lt;!&ndash; 其他选项... &ndash;&gt;-->
-<!--                                            </select>-->
-<!--                                        </div>-->
-<!--                                    </div>-->
                                     <div class="layui-form-item">
                                         <label class="layui-form-label">审核组:</label>
                                         <div class="layui-input-block">
@@ -96,6 +85,12 @@
                                                 <option value="1">SAB审核组</option>
                                                 <option value="2">ZAB审核组</option>
                                             </select>
+                                        </div>
+                                    </div>
+                                    <div class="layui-form-item">
+                                        <label class="layui-form-label">入库日期:</label>
+                                        <div class="layui-input-block">
+                                            <input name="applyTime" type="text" id="storageDate" class="layui-input" placeholder="(此空不填，则提交当前时间)">
                                         </div>
                                     </div>
                                     <div class="layui-form-item">
@@ -142,12 +137,18 @@
         'ZAB': 2,
     };
 
-    layui.use([ 'form', 'step', 'tableSelect'], function () {
+    layui.use([ 'form', 'step', 'tableSelect', 'laydate'], function () {
         var $ = layui.$,
             form = layui.form,
             step = layui.step,
-            tableSelect = layui.tableSelect;
+            tableSelect = layui.tableSelect,
+            laydate = layui.laydate;
 
+        laydate.render({
+            elem: '#storageDate',
+            type: 'datetime',  // 允许用户选择日期和时间
+            format: 'yyyy-MM-dd HH:mm:ss'  // 显示的日期时间格式
+        });
         step.render({
             elem: '#stepForm',
             filter: 'stepForm',

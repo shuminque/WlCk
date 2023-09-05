@@ -41,13 +41,14 @@ public class DepositoryRecordServiceImpl implements DepositoryRecordService {
     @Autowired
     private MaterialTypeMapper materialTypeMapper;
 
-
     @Override
     public Integer apply(Map<String, Object> map) {
-        // ... 其他的赋值
-        map.put("applyTime", new Date());
+        // 如果map中没有applyTime，则使用当前时间
+        if (map.get("applyTime") == null || ((String)map.get("applyTime")).trim().isEmpty()) {
+            map.put("applyTime", new Date());
+        }
+
         map.put("state", "待审核");
-        // 确保传入的map有审核组ID
         if (!map.containsKey("review_group_id")) {
             throw new IllegalArgumentException("审核组信息缺失");
         }
@@ -58,8 +59,10 @@ public class DepositoryRecordServiceImpl implements DepositoryRecordService {
         // 设置为已审核状态
         map.put("state", "已出库");
         // 设置其他需要的默认值，如申请时间等
-        map.put("applyTime", new Date());
-        map.put("reviewTime", new Date());
+        if (map.get("applyTime") == null || ((String)map.get("applyTime")).trim().isEmpty()) {
+            map.put("applyTime", new Date());
+        }
+        map.put("reviewTime", map.get("applyTime"));
         map.put("reviewPass", "1");
         // 插入数据
         Integer result = depositoryRecordMapper.insertDepositoryRecord(map);
@@ -145,7 +148,6 @@ public class DepositoryRecordServiceImpl implements DepositoryRecordService {
         } else {
             throw new MyException("库存不足于该出库请求");
         }
-
         // 清除主键
         map.remove("id");
         map.put("state", "待审核");
@@ -162,7 +164,6 @@ public class DepositoryRecordServiceImpl implements DepositoryRecordService {
         map.remove("id");
         return transferRecordMapper.addTransferRecord(map);
     }
-
 
     @Override
     @Transactional

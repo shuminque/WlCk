@@ -1,7 +1,10 @@
 <!DOCTYPE html>
-<html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>transfer_table</title>
+    <link rel="stylesheet" href="/static/lib/layui-v2.6.3/css/layui.css" media="all">
     <style>
         /* 基本的表格样式 */
         table {
@@ -52,16 +55,28 @@
     </style>
 </head>
 <body>
-<div>
-    <form action="/api/export/transfer" method="get">
-        <select name="depository_id" hidden="hidden">
-            <option value="1">SAB</option>
-            <option value="2">ZAB</option>
-        </select>
-        开始日期：<input type="date" id="startDatePicker">
-        结束日期：<input type="date" id="endDatePicker">
-        <button type="button" onclick="loadReport()">查看</button>
-        <button type="button" onclick="exportReport()">导出</button>
+<div class="layui-container" style="margin-top: 20px;">
+    <form class="layui-form" action="/api/export/report" method="get">
+        <div class="layui-form-item">
+            <div class="layui-input-inline" style="display: none">
+                <select name="depository_id" hidden="hidden">
+                    <option value="1">SAB</option>
+                    <option value="2">ZAB</option>
+                </select>
+            </div>
+            <label class="layui-form-label">开始日期</label>
+            <div class="layui-input-inline">
+                <input type="text" class="layui-input" id="startDatePicker" placeholder="选择开始日期">
+            </div>
+            <label class="layui-form-label">结束日期</label>
+            <div class="layui-input-inline">
+                <input type="text" class="layui-input" id="endDatePicker" placeholder="选择结束日期">
+            </div>
+            <div class="layui-input-inline">
+                <button type="button" class="layui-btn" onclick="loadReport()">查看</button>
+                <button type="button" class="layui-btn layui-btn-primary" onclick="exportReport()">导出</button>
+            </div>
+        </div>
     </form>
 </div>
 <div class="table-container">
@@ -69,21 +84,20 @@
         <!-- 表格数据由JavaScript动态生成 -->
     </table>
 </div>
-
+<script src="/static/lib/layui-v2.6.3/layui.js" charset="utf-8"></script>
 <script>
-    // function loadReport() {
-    //     const selectedMonth = document.getElementById('monthPicker').value;
-    //     if (!selectedMonth) {
-    //         alert("请选择一个月份!");
-    //         return;
-    //     }
-    //     const year = selectedMonth.split('-')[0];
-    //     const month = selectedMonth.split('-')[1];
-    //     console.log(year,month);
-    //     const depositorySelect = document.querySelector("[name='depository_id']");
-    //     const depositoryId = depositorySelect.value;
-    //     fetch(`/api/transfer?depositoryId=${depositoryId}&year=${year}&month=${month}`)
-    //         .then(response => response.json())
+    layui.use(['form', 'laydate'], function() {
+        var form = layui.form;  // 添加这行
+        var laydate = layui.laydate;
+
+        // 初始化日期选择器
+        laydate.render({
+            elem: '#startDatePicker'
+        });
+        laydate.render({
+            elem: '#endDatePicker'
+        });
+    });
     function loadReport() {
         const startDate = document.getElementById('startDatePicker').value;
         const endDate = document.getElementById('endDatePicker').value;
@@ -98,7 +112,6 @@
             .then(data => {
                 let table = document.getElementById('reportTable');
                 table.innerHTML = ''; // 清除旧数据
-
                 // 创建表头
                 let thead = document.createElement('thead');
                 let headerRow = document.createElement('tr');
@@ -109,7 +122,6 @@
                 });
                 thead.appendChild(headerRow);
                 table.appendChild(thead);
-
                 // 创建表格主体数据
                 let tbody = document.createElement('tbody');
                 data.forEach(row => {
@@ -125,19 +137,6 @@
             })
             .catch(error => console.error('Error fetching data:', error));
     }
-    // function exportReport() {
-    //     const selectedMonth = document.getElementById('monthPicker').value;
-    //     if (!selectedMonth) {
-    //         alert("请先选择一个月份!");
-    //         return;
-    //     }
-    //     const year = selectedMonth.split('-')[0];
-    //     const month = selectedMonth.split('-')[1];
-    //     const depositorySelect = document.querySelector("[name='depository_id']");
-    //     const depositoryId = depositorySelect.value;
-    //     const exportUrl = `/api/export/transfer?depositoryId=${depositoryId}&year=${year}&month=${month}`;
-    //     window.location.href = exportUrl;  // 这将触发文件下载
-    // }
     function exportReport() {
         const startDate = document.getElementById('startDatePicker').value;
         const endDate = document.getElementById('endDatePicker').value;

@@ -56,6 +56,12 @@
                                             </select>
                                         </div>
                                     </div>
+                                    <div class="layui-form-item">
+                                        <label class="layui-form-label">出库日期:</label>
+                                        <div class="layui-input-block">
+                                            <input name="applyTime" type="text" id="storageDate" class="layui-input" placeholder="(此空不填，则提交当前时间)">
+                                        </div>
+                                    </div>
                                     <div class="layui-form-item" id="outLocationContainer"></div>
                                     <div class="layui-form-item" style="display:none">
                                         <label class="layui-form-label">审核人:</label>
@@ -68,7 +74,7 @@
                                     <div class="layui-form-item">
                                         <div class="layui-input-block">
                                             <button class="layui-btn" lay-submit lay-filter="formStep">
-                                                &emsp;提交申请&emsp;
+                                                &emsp;提交&emsp;
                                             </button>
                                         </div>
                                     </div>
@@ -109,11 +115,17 @@
         'SAB': 1, // 你的实际映射
         'ZAB': 2,
     };
-    layui.use([ 'form', 'step', 'tableSelect'], function () {
+    layui.use([ 'form', 'step', 'tableSelect', 'laydate'], function () {
         var $ = layui.$,
             form = layui.form,
             step = layui.step,
-            tableSelect = layui.tableSelect;
+            tableSelect = layui.tableSelect,
+            laydate = layui.laydate;
+        laydate.render({
+            elem: '#storageDate',
+            type: 'datetime',  // 允许用户选择日期和时间
+            format: 'yyyy-MM-dd HH:mm:ss'  // 显示的日期时间格式
+        });
         step.render({
             elem: '#stepForm',
             filter: 'stepForm',
@@ -121,13 +133,13 @@
             stepWidth: '750px',
             height: '600px',
             stepItems: [{
-                title: '申请中'
-            },
-                {
-                title: '审核中'
+                title: '填写'
             },
                 {
                 title: '出库'
+            },
+                {
+                title: '完成'
             }]
         });
         form.on('submit(formStep)', function (data) {
