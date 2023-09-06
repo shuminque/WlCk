@@ -165,6 +165,12 @@
               "href": "/welcome",
               "icon": "layui-icon layui-icon-list",
               "target": "_self"
+            },
+            {
+              "title": "一次性报表",
+              "href": "/welcome",
+              "icon": "layui-icon layui-icon-list",
+              "target": "_self"
             }
           ]
         }

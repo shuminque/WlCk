@@ -1,5 +1,4 @@
-
-  {
+{
     "homeInfo": {
       "title": "首页",
       "href": "/welcome"
@@ -163,6 +162,12 @@
             "child": [
               {
                 "title": "一次性填写",
+                "href": "/welcome",
+                "icon": "layui-icon layui-icon-list",
+                "target": "_self"
+              },
+              {
+                "title": "一次性报表",
                 "href": "/welcome",
                 "icon": "layui-icon layui-icon-list",
                 "target": "_self"
