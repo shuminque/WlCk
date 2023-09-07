@@ -10,6 +10,50 @@
     <link rel="stylesheet" href="/static/css/public.css" media="all">
     <link rel="stylesheet" href="/static/js/lay-module/step-lay/step.css" media="all">
 </head>
+<style>
+    .custom-input {
+        text-align: left;  /* 使内容左对齐 */
+        font-weight: bold;
+    }
+</style>
+
+<!--<script>-->
+<!--    function handleSubLocationChange(selectedValue) {-->
+<!--        if (selectedValue === "单能线") {-->
+<!--            document.getElementById('subLocationContainer').innerHTML = `-->
+<!--            <label class="layui-form-label">产线:</label>-->
+<!--            <div class="layui-input-block">-->
+<!--                <select name="subLocation" class="layui-select">-->
+<!--                    <option value="A线">A线</option>-->
+<!--                    <option value="B线">B线</option>-->
+<!--                    <option value="C线">C线</option>-->
+<!--                    <option value="D线">D线</option>-->
+<!--                    <option value="E线">E线</option>-->
+<!--                    <option value="G线">G线</option>-->
+<!--                    <option value="H线">H线</option>-->
+<!--                    <option value="I线">I线</option>-->
+<!--                    <option value="K线">K线</option>-->
+<!--                    <option value="L线">L线</option>-->
+<!--                    <option value="M线">M线</option>-->
+<!--                    <option value="N线">N线</option>-->
+<!--                    <option value="O线">O线</option>-->
+<!--                    <option value="P线">P线</option>-->
+<!--                    <option value="Q线">Q线</option>-->
+<!--                    <option value="R线">R线</option>-->
+<!--                    <option value="S线">S线</option>-->
+<!--                    <option value="T线">T线</option>-->
+<!--                    <option value="U线">U线</option>-->
+<!--                    <option value="V线">V线</option>-->
+<!--                </select>-->
+<!--            </div>-->
+<!--        `;-->
+<!--            form.render('select'); // 重新渲染子选择框-->
+<!--        } else {-->
+<!--            // 如果选择的不是“单能线”，则清空子选择框-->
+<!--            document.getElementById('subLocationContainer').innerHTML = '';-->
+<!--        }-->
+<!--    }-->
+<!--</script>-->
 <body>
 <div class="layuimini-container">
     <div class="layuimini-main">
@@ -50,13 +94,18 @@
                                     <div class="layui-form-item">
                                         <label class="layui-form-label">出库类型:</label>
                                         <div class="layui-input-block">
-                                            <select name="applyRemark" class="layui-select" lay-filter="applyRemarkFilter">
-                                                <option value="领用出库">领用出库</option>
-                                                <option value="销售出库">销售出库</option>
-                                            </select>
+<!--                                            <select name="applyRemark" class="layui-select" lay-filter="applyRemarkFilter">-->
+<!--                                                <option value="领用出库">领用出库</option>-->
+<!--                                                <option value="销售出库">销售出库</option>-->
+<!--                                            </select>-->
+                                            <button name="applyRemark" class="layui-input custom-input" id="ID-dropdown-demo-complex">
+                                                选择出库类型
+                                            </button>
+                                            <input type="hidden" name="applyRemark" id="applyRemarkInput" value="">
                                         </div>
                                     </div>
                                     <div class="layui-form-item" id="outLocationContainer"></div>
+                                    <div class="layui-form-item" id="subLocationContainer"></div>
                                     <div class="layui-form-item">
                                         <label class="layui-form-label">出库日期:</label>
                                         <div class="layui-input-block">
@@ -120,7 +169,9 @@
             form = layui.form,
             step = layui.step,
             tableSelect = layui.tableSelect,
-            laydate = layui.laydate;
+            laydate = layui.laydate,
+            dropdown = layui.dropdown,
+            util = layui.util;
         laydate.render({
             elem: '#storageDate',
             type: 'datetime',  // 允许用户选择日期和时间
@@ -252,6 +303,7 @@
                     layui.form.render('select');
                 }
             });
+
         },
         error: function() {
         // 处理错误，例如显示一个消息
@@ -262,43 +314,124 @@
             step.next('#stepForm');
             return false;
         });
-
-        function handleOutTypeChange(selectedValue) {
-            if(selectedValue === '领用出库') {
-                var outLocationSelect = `
-                <label class="layui-form-label">领用地点:</label>
-                <div class="layui-input-block">
-                    <select name="outLocation" class="layui-select">
-                        <option value="地点1">地点1</option>
-                        <option value="地点2">地点2</option>
-                        <option value="地点3">地点3</option>
-                        <option value="地点4">地点4</option>
-                        <option value="地点5">地点5</option>
-                        <option value="地点6">地点6</option>
-                        <option value="地点7">地点7</option>
-                    </select>
-                </div>`;
-                document.getElementById('outLocationContainer').innerHTML = outLocationSelect;
-                form.render('select'); // 重新渲染选择框
-            } else if (selectedValue === '销售出库') {
-                var outLocationSelect = `
-                <label class="layui-form-label">销售方:</label>
-                <div class="layui-input-block">
-                    <select name="outLocation" class="layui-select">
-                        <option value="销售方1">销售方1</option>
-                        <option value="销售方2">销售方2</option>
-                        <option value="销售方3">销售方3</option>
-                        <option value="销售方4">销售方4</option>
-                    </select>
-                </div>`;
-                document.getElementById('outLocationContainer').innerHTML = outLocationSelect;
-                form.render('select'); // 重新渲染选择框
+        var dropData = [
+            {
+                title: '领用出库',
+                child: [
+                    { title: '切断（圆锯机）' },
+                    { title: '切断（冷锯机）' },
+                    { title: '冲床' },
+                    { title: '生研GA' },
+                    { title: '生研CE' },
+                    { title: '刻印' },
+                    { title: 'N沟' },
+                    {
+                        title: '单能线',
+                        child: [
+                            { title: 'A线' },
+                            { title: 'B线' },
+                            { title: 'C线' },
+                            { title: 'D线' },
+                            { title: 'E线' },
+                            { title: 'G线' },
+                            { title: 'H线' },
+                            { title: 'I线' },
+                            { title: 'K线' },
+                            { title: 'L线' },
+                            { title: 'M线' },
+                            { title: 'N线' },
+                            { title: 'O线' },
+                            { title: 'P线' },
+                            { title: 'Q线' },
+                            { title: 'R线' },
+                            { title: 'S线' },
+                            { title: 'T线' },
+                            { title: 'U线' },
+                            { title: 'V线' }
+                        ]
+                    },
+                    { title: '磨刀房' },
+                    { title: '设备课' }
+                ]
+            },
+            {
+                title: '销售出库',
+                child: [
+                    { title: '泰国旭' },
+                    { title: '日本旭' },
+                    { title: '合肥NSK' },
+                    { title: 'SAB' },
+                    { title: 'ZAB' }
+                ]
+            }
+        ];
+        function setParentForChild(data) {
+            for (let i = 0; i < data.length; i++) {
+                if (data[i].child) {
+                    for (let j = 0; j < data[i].child.length; j++) {
+                        data[i].child[j].parent = data[i];
+                    }
+                    setParentForChild(data[i].child);
+                }
             }
         }
-        form.on('select(applyRemarkFilter)', function(data){
-            handleOutTypeChange(data.value);
+        setParentForChild(dropData);
+        dropdown.render({
+            elem: '#ID-dropdown-demo-complex',
+            data: dropData,
+            click: function(item) {
+                let path = item.title;
+                let currentItem = item;
+                while (currentItem.parent) {
+                    path = currentItem.parent.title + "-" + path;
+                    currentItem = currentItem.parent;
+                }
+                document.getElementById('ID-dropdown-demo-complex').innerText = path;
+                document.getElementById('applyRemarkInput').value = path;
+            }
         });
-        window.onload = checkInitialOutType;
+
+        // function handleOutTypeChange(selectedValue) {
+        //     if(selectedValue === '领用出库') {
+        //         var outLocationSelect = `
+        //         <label class="layui-form-label">领用地点:</label>
+        //         <div class="layui-input-block">
+        //             <select name="outLocation" class="layui-select" onchange="handleSubLocationChange(this.value)">
+        //                 <option value="切断（圆锯机）">切断（圆锯机）</option>
+        //                 <option value="切断（冷锯机）">切断（冷锯机）</option>
+        //                 <option value="冲床">冲床</option>
+        //                 <option value="生研GA">生研GA</option>
+        //                 <option value="生研CE">生研CE</option>
+        //                 <option value="刻印">刻印</option>
+        //                 <option value="N沟">N沟</option>
+        //                 <option value="单能线">单能线</option>
+        //                 <option value="磨刀房">磨刀房</option>
+        //                 <option value="设备课">设备课</option>
+        //             </select>
+        //         </div>`;
+        //         document.getElementById('outLocationContainer').innerHTML = outLocationSelect;
+        //         form.render('select'); // 重新渲染选择框
+        //     } else if (selectedValue === '销售出库') {
+        //         var outLocationSelect = `
+        //         <label class="layui-form-label">销售方:</label>
+        //         <div class="layui-input-block">
+        //             <select name="outLocation" class="layui-select">
+        //                 <option value="泰国旭">泰国旭</option>
+        //                 <option value="日本旭">日本旭</option>
+        //                 <option value="合肥NSK">合肥NSK</option>
+        //                 <option value="SAB">SAB</option>
+        //                 <option value="ZAB">ZAB</option>
+        //             </select>
+        //         </div>`;
+        //         document.getElementById('outLocationContainer').innerHTML = outLocationSelect;
+        //         form.render('select'); // 重新渲染选择框
+        //     }
+        // }
+        //
+        // form.on('select(applyRemarkFilter)', function(data){
+        //     handleOutTypeChange(data.value);
+        // });
+        // window.onload = checkInitialOutType;
         function checkInitialOutType() {
             var selectElem = document.querySelector('[name="applyRemark"]');
             handleOutTypeChange(selectElem.value);
