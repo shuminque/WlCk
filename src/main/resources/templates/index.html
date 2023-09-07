@@ -254,6 +254,8 @@
             $("#notification-list").on("click", "dd", function() {
                 var notificationId = $(this).data("id");
                 var content = $(this).text();
+                var applicationIdMatch = content.match(/ID: (\d+)/);
+                var applicationId = applicationIdMatch ? applicationIdMatch[1] : null;
 
                 $.ajax({
                     url: '/notifications/mark-as-read/' + notificationId,
@@ -261,9 +263,9 @@
                     success: function() {
                         loadNotifications();
                         if (content.includes("[出库]")) {
-                            window.location.href = "index#//application_out";
+                            window.location.href = "index#//application_out?id=" + applicationId+ "&refill=true";
                         } else if (content.includes("[入库]")) {
-                            window.location.href = "index#//application_in";
+                            window.location.href = "index#//application_in?id=" + applicationId+ "&refill=true";
                         }
                         window.location.reload();
                     },

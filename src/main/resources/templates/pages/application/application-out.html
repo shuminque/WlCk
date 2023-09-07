@@ -160,6 +160,145 @@
 <script src="/static/js/lay-config.js?v=1.0.4" charset="utf-8"></script>
 <script type="text/javascript" src="/static/js/http_ajax.googleapis.com_ajax_libs_jquery_3.5.1_jquery.js" charset="utf-8"></script>
 <script>
+    var dropDataSAB = [
+        {
+            title: 'SAB领用出库',
+            child: [
+                { title: '切断（圆锯机）' },
+                { title: '切断（冷锯机）' },
+                { title: '冲床' },
+                { title: '生研GA' },
+                { title: '生研CE' },
+                { title: '刻印' },
+                { title: 'N沟' },
+                {
+                    title: '单能线',
+                    child: [
+                        { title: 'A线' },
+                        { title: 'B线' },
+                        { title: 'C线' },
+                        { title: 'D线' },
+                        { title: 'E线' },
+                        { title: 'G线' },
+                        { title: 'H线' },
+                        { title: 'I线' },
+                        { title: 'K线' },
+                        { title: 'L线' },
+                        { title: 'M线' },
+                        { title: 'N线' },
+                        { title: 'O线' },
+                        { title: 'P线' },
+                        { title: 'Q线' },
+                        { title: 'R线' },
+                        { title: 'S线' },
+                        { title: 'T线' },
+                        { title: 'U线' },
+                        { title: 'V线' }
+                    ]
+                },
+                { title: '磨刀房' },
+                { title: '设备课' }
+            ]
+        },
+        {
+            title: '销售出库',
+            child: [
+                { title: '泰国旭' },
+                { title: '日本旭' },
+                { title: '合肥NSK' },
+                { title: 'SAB' },
+                { title: 'ZAB' }
+            ]
+        }
+    ];
+    var dropDataZAB = [
+        {
+            title: 'ZAB领用工程',
+            child: [
+                { title: '切断（圆锯机）' },
+                { title: '切断（冷锯机）' },
+                { title: '切管' },
+                { title: '冲床' },
+                { title: '生研GA' },
+                { title: '生研CE' },
+                { title: '刻印' },
+                { title: 'N沟' },
+                {
+                    title: '单能线A-E',
+                    child: [
+                        { title: 'A1线' },
+                        { title: 'A2前线' },
+                        { title: 'A2后线' },
+                        { title: 'B1线' },
+                        { title: 'B2线' },
+                        { title: 'C1线' },
+                        { title: 'C2线' },
+                        { title: 'D1线' },
+                        { title: 'D2线' },
+                        { title: 'E线' },
+                        { title: 'E1线' },
+                        { title: 'E2线' }
+                    ]
+                },
+                {
+                    title: '单能线F-I',
+                    child: [
+                        { title: 'F线' },
+                        { title: 'G线' },
+                        { title: 'J线' },
+                        { title: 'M线' },
+                        { title: 'N线' },
+                        { title: 'O线' },
+                        { title: 'P线' },
+                        { title: 'Q线' },
+                        { title: 'R线' },
+                        { title: 'I线' }
+                    ]
+                },
+                {
+                    title: '单能线T-W',
+                    child: [
+                        { title: 'TA线' },
+                        { title: 'TB线' },
+                        { title: 'UA线' },
+                        { title: 'UB线' },
+                        { title: 'VA线' },
+                        { title: 'VB线' },
+                        { title: 'WA线' },
+                        { title: 'WB线' }
+                    ]
+                },
+                {
+                    title: '数控NC',
+                    child: [
+                        { title: '4#机' },
+                        { title: '5#机' },
+                        { title: '6#机' },
+                        { title: '7#机' },
+                        { title: '8#机' },
+                        { title: '9#机' },
+                        { title: '10#机' },
+                        { title: '13#机' }
+                    ]
+                },
+                { title: '检测' },
+                { title: '磨刀房' },
+                { title: '设备课' },
+                { title: '金加工' },
+                { title: '大修组' }
+            ]
+        },
+        {
+            title: '销售出库',
+            child: [
+                { title: '泰国旭' },
+                { title: '日本旭' },
+                { title: '合肥NSK' },
+                { title: 'SAB' },
+                { title: 'ZAB' }
+            ]
+        }
+    ];
     var depositoryMapping = {
         'SAB': 1, // 你的实际映射
         'ZAB': 2,
@@ -197,12 +336,11 @@
             data = data.field;
             data.type = 0;
             data.state = 0;
-            if (data.applyRemark === '领用出库') {
-                data.applyRemark += ': ' + data.outLocation;
-            } else if (data.applyRemark === '销售出库') {
-                data.applyRemark += ': ' + data.outLocation;
-            }
-
+            // if (data.applyRemark === '领用出库') {
+            //     data.applyRemark += ': ' + data.outLocation;
+            // } else if (data.applyRemark === '销售出库') {
+            //     data.applyRemark += ': ' + data.outLocation;
+            // }
             var url = '/OutdepositoryRecord'; // 统一URL
             $.ajax({
                 url: url,
@@ -247,6 +385,20 @@
                 } else {
                     pp = '/material?depositoryId=' + userDepositoryId;
                 }
+                function resetOutTypeDropdown() {
+                    // 清除旧的出库类型下拉列表
+                    document.getElementById('ID-dropdown-demo-complex').innerHTML = '';
+                }
+
+                function loadOutTypeDropdown(depositoryId) {
+                    if (depositoryId === '1') {
+                        setParentForChild(dropDataSAB);
+                        loadDepositoryData(dropDataSAB);
+                    } else if (depositoryId === '2') {
+                        setParentForChild(dropDataZAB);
+                        loadDepositoryData(dropDataZAB);
+                    }
+                }
             tableSelect.render({
                 elem: '#materialSelect', // 定义输入框input对象
                 checkedKey: 'id', // 表格的唯一建值
@@ -287,12 +439,13 @@
                         {field: 'unitPrice',title: '单价'},
                     ]]
                 },
+
                 done: function (elem, data) {
                     // 获取选中的数据
                     var selectedData = data.data[0];
                     // 设置品名输入框的值
                     $('#materialSelect').val(selectedData.mname);
-                    $('#atIdSelect').val(selectedData.atId); // 请确保这是正确的属性名
+                    $('#atIdSelect').val(selectedData.atId);
                     $('#price').val(selectedData.unitPrice);
                     $('#modelSelect').val(selectedData.model);
                     $('#enginSelect').val(selectedData.enginName);
@@ -301,9 +454,11 @@
                     $('#depositorySelect').val(depositoryId);
                     // 重新渲染表单
                     layui.form.render('select');
+                    var selectedDepositoryId = $('#depositorySelect').val();
+                    resetOutTypeDropdown();
+                    loadOutTypeDropdown(selectedDepositoryId);
                 }
             });
-
         },
         error: function() {
         // 处理错误，例如显示一个消息
@@ -314,57 +469,6 @@
             step.next('#stepForm');
             return false;
         });
-        var dropData = [
-            {
-                title: '领用出库',
-                child: [
-                    { title: '切断（圆锯机）' },
-                    { title: '切断（冷锯机）' },
-                    { title: '冲床' },
-                    { title: '生研GA' },
-                    { title: '生研CE' },
-                    { title: '刻印' },
-                    { title: 'N沟' },
-                    {
-                        title: '单能线',
-                        child: [
-                            { title: 'A线' },
-                            { title: 'B线' },
-                            { title: 'C线' },
-                            { title: 'D线' },
-                            { title: 'E线' },
-                            { title: 'G线' },
-                            { title: 'H线' },
-                            { title: 'I线' },
-                            { title: 'K线' },
-                            { title: 'L线' },
-                            { title: 'M线' },
-                            { title: 'N线' },
-                            { title: 'O线' },
-                            { title: 'P线' },
-                            { title: 'Q线' },
-                            { title: 'R线' },
-                            { title: 'S线' },
-                            { title: 'T线' },
-                            { title: 'U线' },
-                            { title: 'V线' }
-                        ]
-                    },
-                    { title: '磨刀房' },
-                    { title: '设备课' }
-                ]
-            },
-            {
-                title: '销售出库',
-                child: [
-                    { title: '泰国旭' },
-                    { title: '日本旭' },
-                    { title: '合肥NSK' },
-                    { title: 'SAB' },
-                    { title: 'ZAB' }
-                ]
-            }
-        ];
         function setParentForChild(data) {
             for (let i = 0; i < data.length; i++) {
                 if (data[i].child) {
@@ -375,22 +479,22 @@
                 }
             }
         }
-        setParentForChild(dropData);
-        dropdown.render({
-            elem: '#ID-dropdown-demo-complex',
-            data: dropData,
-            click: function(item) {
-                let path = item.title;
-                let currentItem = item;
-                while (currentItem.parent) {
-                    path = currentItem.parent.title + "-" + path;
-                    currentItem = currentItem.parent;
+        function loadDepositoryData(dropdownData) {
+            dropdown.render({
+                elem: '#ID-dropdown-demo-complex',
+                data: dropdownData,
+                click: function(item) {
+                    let path = item.title;
+                    let currentItem = item;
+                    while (currentItem.parent) {
+                        path = currentItem.parent.title + "-" + path;
+                        currentItem = currentItem.parent;
+                    }
+                    document.getElementById('ID-dropdown-demo-complex').innerText = path;
+                    document.getElementById('applyRemarkInput').value = path;
                 }
-                document.getElementById('ID-dropdown-demo-complex').innerText = path;
-                document.getElementById('applyRemarkInput').value = path;
-            }
-        });
-
+            });
+        }
         // function handleOutTypeChange(selectedValue) {
         //     if(selectedValue === '领用出库') {
         //         var outLocationSelect = `
@@ -432,10 +536,10 @@
         //     handleOutTypeChange(data.value);
         // });
         // window.onload = checkInitialOutType;
-        function checkInitialOutType() {
-            var selectElem = document.querySelector('[name="applyRemark"]');
-            handleOutTypeChange(selectElem.value);
-        }
+        // function checkInitialOutType() {
+        //     var selectElem = document.querySelector('[name="applyRemark"]');
+        //     handleOutTypeChange(selectElem.value);
+        // }
 
         $('.pre').click(function () {
             step.pre('#stepForm');

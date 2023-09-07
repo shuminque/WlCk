@@ -199,8 +199,9 @@
             }
             var urlParams = new URLSearchParams(window.location.search);
             var id = urlParams.get('id');
+            var refill = urlParams.get('refill') === 'true'; // 检查是否为填充模式
             var currentPage = sessionStorage.getItem('currentPage');
-            var isEditing = id != null;
+            var isEditing = !refill && id != null;
             var url = isEditing ? '/depositoryRecord/' + id : '/depositoryRecord';
             var method = isEditing ? 'PUT' : 'POST';
             $.ajax({

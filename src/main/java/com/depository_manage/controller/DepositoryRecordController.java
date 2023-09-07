@@ -80,9 +80,6 @@ public class DepositoryRecordController {
     }
     @PutMapping("/depositoryRecord/{id}")
     public RestResponse updateDepositoryRecord(@PathVariable Integer id, @RequestBody Map<String,Object> map, HttpServletRequest request){
-        // 这里可以添加逻辑来更新现有记录
-        // 例如，你可以调用一个新的服务方法来更新记录
-        // 你也可以在map中添加ID，然后重用现有的服务方法
         map.put("id", id);
         return CrudUtil.postHandle(depositoryRecordService.updateDepositoryRecord(map),1);
     }
