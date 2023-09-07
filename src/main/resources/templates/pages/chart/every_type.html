@@ -5,40 +5,79 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>every_type</title>
     <link rel="stylesheet" href="/static/lib/layui-v2.6.3/css/layui.css" media="all">
+<!--    <style>-->
+<!--        table {-->
+<!--            border-collapse: collapse;-->
+<!--            width: 100%;-->
+<!--        }-->
+<!--        th, td {-->
+<!--            border: 1px solid #ddd;-->
+<!--            padding: 8px;-->
+<!--            text-align: left;-->
+<!--        }-->
+<!--        th {-->
+<!--            background-color: #f2f2f2;-->
+<!--            position: sticky;-->
+<!--            top: 0;-->
+<!--        }-->
+<!--        th:nth-child(1),-->
+<!--        td:nth-child(1) {-->
+<!--            width: 10%;-->
+<!--        }-->
+<!--        th:nth-child(2),-->
+<!--        td:nth-child(2) {-->
+<!--            width: 15%;-->
+<!--        }-->
+<!--        th:nth-child(3),-->
+<!--        td:nth-child(3) {-->
+<!--            width: 20%;-->
+<!--        }-->
+<!--        tr:hover {-->
+<!--            background-color: #f5f5f5;-->
+<!--        }-->
+<!--        .table-container {-->
+<!--            max-height: 500px;-->
+<!--            overflow-y: auto;-->
+<!--        }-->
+<!--    </style>-->
     <style>
+        /* 基本的表格样式 */
         table {
             border-collapse: collapse;
             width: 100%;
+            font-size: 14px;
         }
+
         th, td {
             border: 1px solid #ddd;
-            padding: 8px;
+            padding: 10px 15px; /* 增加内边距 */
             text-align: left;
         }
+
         th {
             background-color: #f2f2f2;
             position: sticky;
             top: 0;
+            font-weight: bold;
         }
-        th:nth-child(1),
-        td:nth-child(1) {
-            width: 10%;
-        }
-        th:nth-child(2),
-        td:nth-child(2) {
-            width: 15%;
-        }
-        th:nth-child(3),
-        td:nth-child(3) {
-            width: 20%;
-        }
+
+        /* 鼠标悬停行高亮 */
         tr:hover {
             background-color: #f5f5f5;
         }
+
+        /* 奇数行和偶数行背景颜色 */
+        tr:nth-child(odd) {
+            background-color: #f9f9f9;
+        }
+
+        /* 表格容器样式，使其可滚动 */
         .table-container {
             max-height: 500px;
             overflow-y: auto;
+            border: 1px solid #ddd;
         }
+
     </style>
 </head>
 <body>
@@ -130,7 +169,7 @@
                 // 创建表头
                 let thead = document.createElement('thead');
                 let headerRow = document.createElement('tr');
-                Object.keys(data[0]).forEach(colName => {
+                Object.keys(data[0]).slice(1).forEach(colName => {
                     let th = document.createElement('th');
                     th.textContent = colName;
                     headerRow.appendChild(th);
@@ -141,7 +180,7 @@
                 let tbody = document.createElement('tbody');
                 data.forEach(row => {
                     let tr = document.createElement('tr');
-                    Object.values(row).forEach(cellData => {
+                    Object.values(row).slice(1).forEach(cellData => {
                         let td = document.createElement('td');
                         td.textContent = cellData;
                         tr.appendChild(td);

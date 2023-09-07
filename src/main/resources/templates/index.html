@@ -150,44 +150,75 @@
             type: 'GET',
             dataType: 'json',
             success: function(data) {
-                let pp;
                 var userDepositoryId = data.depositoryId;
-                var userAuthority =data.authority;
-                // 如果depositoryId为0，则允许访问两个厂区
+                var userAuthority = data.authority;
+                var role;
+
                 if (userDepositoryId === 0) {
-                    pp = "/static/api/menu_ALL.json";
+                    role = "ALL";
                 } else if (userDepositoryId === 1) {
-                    if(userAuthority ==='审核人'){
-                        pp = "/static/api/menu_SAB_sh.json";
-                    }else {
-                        pp = "/static/api/menu_SAB_cg.json";
-                    }
+                    role = userAuthority === '审核人' ? "SAB_sh" : "SAB_cg";
                 } else {
-                    if(userAuthority ==='审核人'){
-                        pp = "/static/api/menu_ZAB_sh.json";
-                    }else {
-                        pp = "/static/api/menu_ZAB_cg.json";
-                    }
+                    role = userAuthority === '审核人' ? "ZAB_sh" : "ZAB_cg";
                 }
-                var options = {
-                    // iniUrl: "/static/api/init.json",    // 初始化接口
-                    iniUrl: pp,
-                    clearUrl: "/static/api/clear.json", // 缓存清理接口
-                    urlHashLocation: true,      // 是否打开hash定位
-                    bgColorDefault: false,      // 主题默认配置
-                    multiModule: true,          // 是否开启多模块
-                    menuChildOpen: false,       // 是否默认展开菜单
-                    loadingTime: 0,             // 初始化加载时间
-                    pageAnim: true,             // iframe窗口动画
-                    maxTabNum: 20,              // 最大的tab打开数量
-                };
-                miniAdmin.render(options);
+                console.log(role);
+                // 加载统一的菜单JSON
+                $.getJSON("/static/api/menu_roles.json", function(menuData) {
+                    if (userDepositoryId === 0) {
+                        menuData.logoInfo.title = "综合仓库";
+                    } else if (userDepositoryId === 1) {
+                        menuData.logoInfo.title = "SAB";
+                    } else if (userDepositoryId === 2) {
+                        menuData.logoInfo.title = "ZAB";
+                    }
+                    // 根据角色过滤菜单
+                    var filteredMenu = filterMenuByRole(menuData, role);
+                    var options = {
+                        iniData: filteredMenu, // Use the filteredMenu data directly
+                        clearUrl: "/static/api/clear.json",
+                        urlHashLocation: true,
+                        bgColorDefault: false,
+                        multiModule: true,
+                        menuChildOpen: false,
+                        loadingTime: 0,
+                        pageAnim: true,
+                        maxTabNum: 20,
+                    };
+                    miniAdmin.render(options);
+                });
             },
             error: function() {
-                // 处理错误，例如显示一个消息
                 alert('无法获取初始化数据');
             }
         });
+        function filterMenuByRole(menuData, role) {
+            var result = {};
+            result.homeInfo = menuData.homeInfo;
+            result.logoInfo = menuData.logoInfo;
+
+            result.menuInfo = menuData.menuInfo.filter(item => {
+                let includeItem = false;
+
+                // 如果菜单项有子项，进一步过滤
+                if (item.child) {
+                    item.child = item.child.filter(subItem => {
+                        // 只有当子菜单项的 roles 和其父菜单项的 roles 都包含指定的 role 时，子菜单项才会被包括
+                        return subItem.roles.includes(role) && item.roles.includes(role);
+                    });
+
+                    // 如果至少有一个子项应该被包括，标记菜单项为应该包括
+                    includeItem = item.child.length > 0;
+                } else if (item.roles && item.roles.includes(role)) {
+                    // 如果没有子项但菜单项包含了 role，也标记为应该包括
+                    includeItem = true;
+                }
+
+                return includeItem;
+            });
+
+            console.log(result.menuInfo);
+            return result;
+        }
 
         $(document).ready(function() {
             function loadNotifications() {

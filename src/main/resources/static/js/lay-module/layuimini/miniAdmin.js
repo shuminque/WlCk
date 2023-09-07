@@ -18,7 +18,6 @@ layui.define(["jquery", "miniMenu", "element","miniTab", "miniTheme"], function 
     }
 
     var miniAdmin = {
-
         /**
          * 后台框架初始化
          * @param options.iniUrl   后台初始化接口地址
@@ -32,6 +31,7 @@ layui.define(["jquery", "miniMenu", "element","miniTab", "miniTheme"], function 
          * @param options.maxTabNum 最大的tab打开数量
          */
         render: function (options) {
+            options.iniData = options.iniData || null;  // 新增的参数
             options.iniUrl = options.iniUrl || null;
             options.clearUrl = options.clearUrl || null;
             options.urlHashLocation = options.urlHashLocation || false;
@@ -41,41 +41,49 @@ layui.define(["jquery", "miniMenu", "element","miniTab", "miniTheme"], function 
             options.loadingTime = options.loadingTime || 1;
             options.pageAnim = options.pageAnim || false;
             options.maxTabNum = options.maxTabNum || 20;
-            $.getJSON(options.iniUrl, function (data) {
-                if (data == null) {
-                    miniAdmin.error('暂无菜单信息')
-                } else {
-                    miniAdmin.renderLogo(data.logoInfo);
-                    miniAdmin.renderClear(options.clearUrl);
-                    miniAdmin.renderHome(data.homeInfo);
-                    miniAdmin.renderAnim(options.pageAnim);
-                    miniAdmin.listen();
-                    miniMenu.render({
-                        menuList: data.menuInfo,
-                        multiModule: options.multiModule,
-                        menuChildOpen: options.menuChildOpen
-                    });
-                    miniTab.render({
-                        filter: 'layuiminiTab',
-                        urlHashLocation: options.urlHashLocation,
-                        multiModule: options.multiModule,
-                        menuChildOpen: options.menuChildOpen,
-                        maxTabNum: options.maxTabNum,
-                        menuList: data.menuInfo,
-                        homeInfo: data.homeInfo,
-                        listenSwichCallback: function () {
-                            miniAdmin.renderDevice();
-                        }
-                    });
-                    miniTheme.render({
-                        bgColorDefault: options.bgColorDefault,
-                        listen: true,
-                    });
-                    miniAdmin.deleteLoader(options.loadingTime);
-                }
-            }).fail(function () {
-                miniAdmin.error('菜单接口有误');
-            });
+
+            if (options.iniData) {  // 如果提供了直接的数据
+                var data = options.iniData;
+                processData(data, options);
+            } else if (options.iniUrl) {  // 如果提供了URL
+                $.getJSON(options.iniUrl, function (data) {
+                    processData(data, options);
+                }).fail(function () {
+                    miniAdmin.error('菜单接口有误');
+                });
+            } else {
+                miniAdmin.error('暂无菜单信息');
+            }
+
+            function processData(data, options) {
+                miniAdmin.renderLogo(data.logoInfo);
+                miniAdmin.renderClear(options.clearUrl);
+                miniAdmin.renderHome(data.homeInfo);
+                miniAdmin.renderAnim(options.pageAnim);
+                miniAdmin.listen();
+                miniMenu.render({
+                    menuList: data.menuInfo,
+                    multiModule: options.multiModule,
+                    menuChildOpen: options.menuChildOpen
+                });
+                miniTab.render({
+                    filter: 'layuiminiTab',
+                    urlHashLocation: options.urlHashLocation,
+                    multiModule: options.multiModule,
+                    menuChildOpen: options.menuChildOpen,
+                    maxTabNum: options.maxTabNum,
+                    menuList: data.menuInfo,
+                    homeInfo: data.homeInfo,
+                    listenSwichCallback: function () {
+                        miniAdmin.renderDevice();
+                    }
+                });
+                miniTheme.render({
+                    bgColorDefault: options.bgColorDefault,
+                    listen: true,
+                });
+                miniAdmin.deleteLoader(options.loadingTime);
+            }
         },
 
         /**

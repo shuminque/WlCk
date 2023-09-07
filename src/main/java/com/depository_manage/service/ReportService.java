@@ -70,18 +70,31 @@ public class ReportService {
                         "                           WHERE m.depository_id = ?\n" +
                         "                            GROUP BY mt.id\n" +
                         "),\n" +
+//                        "FinalData AS (\n" +
+//                        "       SELECT\n" +
+//                        "                                CONCAT(?, ' 至 ', ?) AS 日期,\n" +
+//                        "                                cd.material_type_name AS 分类,\n" +
+//                        "                                cd.入库金额,\n" +
+//                        "                                cd.出库金额,\n" +
+//                        "                                COALESCE(s.在库金额, 0) AS 在库金额,\n" +
+//                        "                                cd.is_import,\n" +
+//                        "                                cd.type_id\n" +
+//                        "                            FROM CombinedData cd\n" +
+//                        "                           LEFT JOIN StockValue s ON cd.type_id = s.type_id\n" +
+//                        "),\n" +
                         "FinalData AS (\n" +
-                        "       SELECT\n" +
-                        "                                CONCAT(?, ' 至 ', ?) AS 日期,\n" +
-                        "                                cd.material_type_name AS 分类,\n" +
-                        "                                cd.入库金额,\n" +
-                        "                                cd.出库金额,\n" +
-                        "                                COALESCE(s.在库金额, 0) AS 在库金额,\n" +
-                        "                                cd.is_import,\n" +
-                        "                                cd.type_id\n" +
-                        "                            FROM CombinedData cd\n" +
-                        "                           LEFT JOIN StockValue s ON cd.type_id = s.type_id\n" +
-                        "),\n" +
+                        "    SELECT\n" +
+                        "        CONCAT(?, ' 至 ', ?) AS 日期,\n" +
+                        "        cd.material_type_name AS 分类,\n" +
+                        "        cd.入库金额,\n" +
+                        "        cd.出库金额,\n" +
+                        "        COALESCE(s.在库金额, 0) AS 在库金额,\n" +
+                        "        cd.is_import,\n" +
+                        "        cd.type_id\n" +
+                        "    FROM CombinedData cd\n" +
+                        "    LEFT JOIN StockValue s ON cd.type_id = s.type_id\n" +
+                        "    WHERE cd.raw_in_money > 0 OR cd.raw_out_money > 0 OR COALESCE(s.raw_stock_money, 0) > 0 -- 新增过滤条件\n" +
+                        "),"+
                         "Totals AS (\n" +
                         "        SELECT\n" +
                         "                               '总计' AS 日期,\n" +
@@ -110,7 +123,7 @@ public class ReportService {
 
     public List<Map<String, Object>> transferData(String startDate, String endDate) {
         String sql = "SELECT\n" +
-                "    DATE_FORMAT(o.apply_time, '%d/%m/%Y') AS 日期,\n" +
+                "    DATE_FORMAT(o.apply_time, '%Y/%m/%d') AS 日期,\n" +
                 "    o.mname AS 品名,\n" +
                 "    o.type_name AS 型号,\n" +
                 "    FORMAT(o.price, 2) AS 单价,\n" +

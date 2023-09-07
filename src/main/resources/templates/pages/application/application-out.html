@@ -51,18 +51,18 @@
                                         <label class="layui-form-label">出库类型:</label>
                                         <div class="layui-input-block">
                                             <select name="applyRemark" class="layui-select" lay-filter="applyRemarkFilter">
-                                                <option value="领用出库" selected>领用出库</option>
+                                                <option value="领用出库">领用出库</option>
                                                 <option value="销售出库">销售出库</option>
                                             </select>
                                         </div>
                                     </div>
+                                    <div class="layui-form-item" id="outLocationContainer"></div>
                                     <div class="layui-form-item">
                                         <label class="layui-form-label">出库日期:</label>
                                         <div class="layui-input-block">
                                             <input name="applyTime" type="text" id="storageDate" class="layui-input" placeholder="(此空不填，则提交当前时间)">
                                         </div>
                                     </div>
-                                    <div class="layui-form-item" id="outLocationContainer"></div>
                                     <div class="layui-form-item" style="display:none">
                                         <label class="layui-form-label">审核人:</label>
                                         <div class="layui-input-block" >
@@ -148,7 +148,10 @@
             data.state = 0;
             if (data.applyRemark === '领用出库') {
                 data.applyRemark += ': ' + data.outLocation;
+            } else if (data.applyRemark === '销售出库') {
+                data.applyRemark += ': ' + data.outLocation;
             }
+
             var url = '/OutdepositoryRecord'; // 统一URL
             $.ajax({
                 url: url,
@@ -259,14 +262,9 @@
             step.next('#stepForm');
             return false;
         });
-        function checkInitialOutType() {
-            var selectElem = document.querySelector('[name="applyRemark"]');
-            handleOutTypeChange(selectElem.value);
-        }
 
         function handleOutTypeChange(selectedValue) {
             if(selectedValue === '领用出库') {
-                // 插入出库地点的选择
                 var outLocationSelect = `
                 <label class="layui-form-label">领用地点:</label>
                 <div class="layui-input-block">
@@ -283,30 +281,28 @@
                 document.getElementById('outLocationContainer').innerHTML = outLocationSelect;
                 form.render('select'); // 重新渲染选择框
             } else if (selectedValue === '销售出库') {
-                var xiaoshouSelect = `
+                var outLocationSelect = `
                 <label class="layui-form-label">销售方:</label>
                 <div class="layui-input-block">
-                    <select name="xiaoshouParty" class="layui-select">
+                    <select name="outLocation" class="layui-select">
                         <option value="销售方1">销售方1</option>
                         <option value="销售方2">销售方2</option>
                         <option value="销售方3">销售方3</option>
                         <option value="销售方4">销售方4</option>
                     </select>
                 </div>`;
-                document.getElementById('outLocationContainer').innerHTML = xiaoshouSelect;
+                document.getElementById('outLocationContainer').innerHTML = outLocationSelect;
                 form.render('select'); // 重新渲染选择框
-            } else {
-                // 清空出库地点选择
-                document.getElementById('outLocationContainer').innerHTML = '';
             }
         }
-
         form.on('select(applyRemarkFilter)', function(data){
             handleOutTypeChange(data.value);
         });
-
         window.onload = checkInitialOutType;
-
+        function checkInitialOutType() {
+            var selectElem = document.querySelector('[name="applyRemark"]');
+            handleOutTypeChange(selectElem.value);
+        }
 
         $('.pre').click(function () {
             step.pre('#stepForm');
