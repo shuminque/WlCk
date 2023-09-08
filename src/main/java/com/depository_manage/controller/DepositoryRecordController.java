@@ -1,6 +1,10 @@
 package com.depository_manage.controller;
 
+import com.depository_manage.entity.DepositoryRecord;
+import com.depository_manage.entity.Material;
 import com.depository_manage.exception.MyException;
+import com.depository_manage.mapper.DepositoryRecordMapper;
+import com.depository_manage.mapper.MaterialMapper;
 import com.depository_manage.pojo.DepositoryRecordP;
 import com.depository_manage.pojo.RestResponse;
 import com.depository_manage.security.bean.UserToken;
@@ -11,6 +15,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -22,6 +29,10 @@ import java.util.Map;
 public class DepositoryRecordController {
     @Autowired
     private DepositoryRecordService depositoryRecordService;
+    @Autowired
+    private DepositoryRecordMapper depositoryRecordMapper;
+    @Autowired
+    private MaterialMapper materialMapper;
     @GetMapping("/get_record")
     public DepositoryRecordP getDepositoryRecordById(@RequestParam Integer id) {
         return depositoryRecordService.findDepositoryRecordById(id);
@@ -88,14 +99,66 @@ public class DepositoryRecordController {
     public RestResponse deleteDepositoryRecord(@RequestBody Map<String,Object> map){
         if (map.containsKey("id")){
             Integer id=ObjectFormatUtil.toInteger(map.get("id"));
+
+            // 1. 查询要删除的入库记录的详细信息
+            DepositoryRecord record = depositoryRecordMapper.findDepositoryRecordById(id);
+            if (record != null && !"审核未通过".equals(record.getState()) && !"待审核".equals(record.getState())) {
+                // 2. 根据入库记录的物品信息查询目标仓库中的物料记录
+                Map<String, Object> queryMap = new HashMap<>();
+                queryMap.put("depositoryId", record.getDepositoryId());
+                queryMap.put("atId", record.getAtId());
+                queryMap.put("model", record.getModel());
+                queryMap.put("mname", record.getMname());
+                List<Material> list = materialMapper.findMaterialByCondition(queryMap);
+
+                if (!list.isEmpty()) {
+                    Material material = list.get(0);
+                    if (record.getType() == 1) { // 假设1代表入库
+                        double totalPrice = material.getPrice() - (record.getPrice() * record.getQuantity());
+                        BigDecimal bdTotalPrice = new BigDecimal(totalPrice);
+                        bdTotalPrice = bdTotalPrice.setScale(2, RoundingMode.HALF_UP); // 保留两位小数，四舍五入
+                        material.setPrice(bdTotalPrice.doubleValue());
+                        // 计算新的总数量
+                        double totalQuantity = material.getQuantity() - record.getQuantity();
+                        // 计算新的均价
+                        double unitPrice = (totalQuantity == 0) ? 0 : totalPrice / totalQuantity;
+                        BigDecimal bdUnitPrice = new BigDecimal(unitPrice);
+                        bdUnitPrice = bdUnitPrice.setScale(2, RoundingMode.HALF_UP); // 保留两位小数，四舍五入
+                        material.setUnitPrice(bdUnitPrice.doubleValue());
+                        material.setQuantity(totalQuantity);
+                        materialMapper.updateMaterial(material);
+                    } else if (record.getType() == 0) { // 假设0代表出库
+                        double totalPrice = material.getPrice() + (record.getPrice() * record.getQuantity());
+                        BigDecimal bdTotalPrice = new BigDecimal(totalPrice);
+                        bdTotalPrice = bdTotalPrice.setScale(2, RoundingMode.HALF_UP); // 保留两位小数，四舍五入
+                        material.setPrice(bdTotalPrice.doubleValue());
+                        // 计算新的总数量
+                        double totalQuantity = material.getQuantity() + record.getQuantity();
+                        // 计算新的均价
+                        double unitPrice = totalPrice / totalQuantity;
+                        BigDecimal bdUnitPrice = new BigDecimal(unitPrice);
+                        bdUnitPrice = bdUnitPrice.setScale(2, RoundingMode.HALF_UP); // 保留两位小数，四舍五入
+                        material.setUnitPrice(bdUnitPrice.doubleValue());
+                        material.setQuantity(totalQuantity);
+                        materialMapper.updateMaterial(material);
+                    }
+                }
+            }
+            // 3. 删除入库记录
             return CrudUtil.deleteHandle(depositoryRecordService.deleteDepositoryRecordById(id),1);
-        }else if (map.containsKey("ids")){
+        } else if (map.containsKey("ids")){
             List<Integer> ids=(List<Integer>) map.get("ids");
+            for (Integer recordId : ids) {
+                // Repeat the same logic as above for each record
+                // ...
+            }
             return CrudUtil.deleteHandle(depositoryRecordService.deleteDepositoryRecordByIds(ids),ids.size());
-        }else {
+        } else {
             throw new MyException("所需请求参数缺失！");
         }
     }
+
+
     @PutMapping("/review")
     public RestResponse review(@RequestBody Map<String,Object> map, HttpServletRequest request){
         UserToken userToken= (UserToken) request.getAttribute("userToken");

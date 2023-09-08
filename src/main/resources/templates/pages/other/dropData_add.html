@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="/static/lib/layui-v2.6.3/css/layui.css" media="all">
+    <link rel="stylesheet" href="/static/css/public.css" media="all">
+    <link rel="stylesheet" href="/static/js/lay-module/step-lay/step.css" media="all">    <script src="/static/lib/layui-v2.6.3/layui.js" charset="utf-8"></script>
+    <script>
+        // 将Layui Tree数据转换回原始格式
+        function convertFromTreeData(data) {
+            return data.map(function (item) {
+                return {
+                    title: item.title,
+                    child: item.children ? convertFromTreeData(item.children) : undefined
+                };
+            });
+        }
+
+        function saveChanges() {
+            var treeData = layui.tree.getChecked('categoryTree'); // 使用Tree的ID获取数据
+            dropDataSAB = convertFromTreeData(treeData);
+            console.log(dropDataSAB); // 在控制台打印更改后的数据，您可以选择将其保存到服务器或其他位置
+        }
+
+    </script>
+</head>
+<body>
+<div class="layui-container">
+    <div class="layui-row">
+        <div class="layui-col-md6">
+            <!-- 左栏：展示数据 -->
+            <div id="categoryTree"></div>
+        </div>
+    </div>
+    <button class="layui-btn" onclick="saveChanges()">保存更改</button>
+</div>
+<script>
+    var dropDataSAB = [
+        {
+            title: 'SAB领用出库',
+            child: [
+                { title: '切断（圆锯机）' },
+                { title: '切断（冷锯机）' },
+                { title: '冲床' },
+                { title: '生研GA' },
+                { title: '生研CE' },
+                { title: '刻印' },
+                { title: 'N沟' },
+                {
+                    title: '单能线A-L',
+                    child: [
+                        { title: 'A线' },
+                        { title: 'B线' },
+                        { title: 'C线' },
+                        { title: 'D线' },
+                        { title: 'E线' },
+                        { title: 'G线' },
+                        { title: 'H线' },
+                        { title: 'I线' },
+                        { title: 'K线' },
+                        { title: 'L线' }
+                    ]
+                },
+                {
+                    title: '单能线M-V',
+                    child: [
+                        { title: 'M线' },
+                        { title: 'N线' },
+                        { title: 'O线' },
+                        { title: 'P线' },
+                        { title: 'Q线' },
+                        { title: 'R线' },
+                        { title: 'S线' },
+                        { title: 'T线' },
+                        { title: 'U线' },
+                        { title: 'V线' }
+                    ]
+                },
+                { title: '磨刀房' },
+                { title: '设备课' }
+            ]
+        },
+        {
+            title: '销售出库',
+            child: [
+                { title: '泰国旭' },
+                { title: '日本旭' },
+                { title: '合肥NSK' },
+                { title: 'SAB' },
+                { title: 'ZAB' }
+            ]
+        }
+    ];
+    layui.use(['tree'], function() {
+        var tree = layui.tree;
+        // 将dropDataSAB转换为Layui Tree需要的格式
+        function convertToTreeData(data) {
+            return data.map(function (category) {
+                return {
+                    title: category.title,
+                    children: category.child ? convertToTreeData(category.child) : []
+                };
+            });
+        }
+        // 渲染树形控件
+        tree.render({
+            elem: '#categoryTree',
+            data: convertToTreeData(dropDataSAB),
+            onlyIconControl: true, //是否仅允许节点左侧图标控制展开收缩
+            edit: ['add', 'update', 'del'], //开启操作
+            operate: function (obj) {
+                var type = obj.type;
+                var data = obj.data;
+                if (type === 'add') { //增加节点
+                    // 可以在这里添加子节点的逻辑
+                } else if (type === 'update') { //修改节点
+                    // 可以在这里修改节点的逻辑
+                } else if (type === 'del') { //删除节点
+                    // 可以在这里删除节点的逻辑
+                }
+            }
+        });
+    });
+</script>
+</body>
+</html>

@@ -118,7 +118,7 @@
             `;      globalToolbarTemplate = `
                 <div class="layui-btn-container">
                     <!-- 其他按钮可以放在这里 -->
-                    <button class="layui-btn layui-btn-sm layui-btn-danger data-delete-btn" lay-event="delete"> 删除</button>
+<!--                    <button class="layui-btn layui-btn-sm layui-btn-danger data-delete-btn" lay-event="delete"> 删除</button>-->
                 </div>
             `;
                 }
@@ -250,6 +250,8 @@
                 for (i=0,len=data.length;i<len;i++){
                     req.ids[i]=data[i].id;
                 }
+                console.log(data.type);
+                console.log(data.status);
                 $.ajax({
                     url: '/depositoryRecord',
                     type: 'delete',
