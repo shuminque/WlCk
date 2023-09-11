@@ -5,6 +5,13 @@
     <link rel="stylesheet" href="/static/lib/layui-v2.6.3/css/layui.css" media="all">
     <link rel="stylesheet" href="/static/css/public.css" media="all">
     <link rel="stylesheet" href="/static/js/lay-module/step-lay/step.css" media="all">    <script src="/static/lib/layui-v2.6.3/layui.js" charset="utf-8"></script>
+    <style>
+        .flex-center {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+    </style>
     <script>
         // 将Layui Tree数据转换回原始格式
         function convertFromTreeData(data) {
@@ -28,11 +35,19 @@
 <div class="layui-container">
     <div class="layui-row">
         <div class="layui-col-md6">
-            <!-- 左栏：展示数据 -->
-            <div id="categoryTree"></div>
+            <!-- SAB 数据展示 -->
+            <h3>SAB 数据</h3>
+            <div id="categoryTreeSAB"></div>
+        </div>
+        <div class="layui-col-md6">
+            <!-- ZAB 数据展示 -->
+            <h3>ZAB 数据</h3>
+            <div id="categoryTreeZAB"></div>
         </div>
     </div>
-    <button class="layui-btn" onclick="saveChanges()">保存更改</button>
+    <div class="layui-row flex-center">
+        <button class="layui-btn" onclick="saveChanges()">保存更改</button>
+    </div>
 </div>
 <script>
     var dropDataSAB = [
@@ -91,6 +106,95 @@
             ]
         }
     ];
+    var dropDataZAB = [
+        {
+            title: 'ZAB领用工程',
+            child: [
+                { title: '切断（圆锯机）' },
+                { title: '切断（冷锯机）' },
+                { title: '切管' },
+                { title: '冲床' },
+                { title: '生研GA' },
+                { title: '生研CE' },
+                { title: '刻印' },
+                { title: 'N沟' },
+                {
+                    title: '单能线A-E',
+                    child: [
+                        { title: 'A1线' },
+                        { title: 'A2前线' },
+                        { title: 'A2后线' },
+                        { title: 'B1线' },
+                        { title: 'B2线' },
+                        { title: 'C1线' },
+                        { title: 'C2线' },
+                        { title: 'D1线' },
+                        { title: 'D2线' },
+                        { title: 'E线' },
+                        { title: 'E1线' },
+                        { title: 'E2线' }
+                    ]
+                },
+                {
+                    title: '单能线F-I',
+                    child: [
+                        { title: 'F线' },
+                        { title: 'G线' },
+                        { title: 'J线' },
+                        { title: 'M线' },
+                        { title: 'N线' },
+                        { title: 'O线' },
+                        { title: 'P线' },
+                        { title: 'Q线' },
+                        { title: 'R线' },
+                        { title: 'I线' }
+                    ]
+                },
+                {
+                    title: '单能线T-W',
+                    child: [
+                        { title: 'TA线' },
+                        { title: 'TB线' },
+                        { title: 'UA线' },
+                        { title: 'UB线' },
+                        { title: 'VA线' },
+                        { title: 'VB线' },
+                        { title: 'WA线' },
+                        { title: 'WB线' }
+                    ]
+                },
+                {
+                    title: '数控NC',
+                    child: [
+                        { title: '4#机' },
+                        { title: '5#机' },
+                        { title: '6#机' },
+                        { title: '7#机' },
+                        { title: '8#机' },
+                        { title: '9#机' },
+                        { title: '10#机' },
+                        { title: '13#机' }
+                    ]
+                },
+                { title: '检测' },
+                { title: '磨刀房' },
+                { title: '设备课' },
+                { title: '金加工' },
+                { title: '大修组' }
+            ]
+        },
+        {
+            title: '销售出库',
+            child: [
+                { title: '泰国旭' },
+                { title: '日本旭' },
+                { title: '合肥NSK' },
+                { title: 'SAB' },
+                { title: 'ZAB' }
+            ]
+        }
+    ];
+
     layui.use(['tree'], function() {
         var tree = layui.tree;
         // 将dropDataSAB转换为Layui Tree需要的格式
@@ -104,8 +208,26 @@
         }
         // 渲染树形控件
         tree.render({
-            elem: '#categoryTree',
+            elem: '#categoryTreeSAB',
             data: convertToTreeData(dropDataSAB),
+            onlyIconControl: true, //是否仅允许节点左侧图标控制展开收缩
+            edit: ['add', 'update', 'del'], //开启操作
+            operate: function (obj) {
+                var type = obj.type;
+                var data = obj.data;
+                if (type === 'add') { //增加节点
+                    // 可以在这里添加子节点的
+                } else if (type === 'update') { //修改节点
+                    // 可以在这里修改节点的逻辑
+                } else if (type === 'del') { //删除节点
+                    // 可以在这里删除节点的逻辑
+                }
+            }
+        });
+
+        tree.render({
+            elem: '#categoryTreeZAB',
+            data: convertToTreeData(dropDataZAB),
             onlyIconControl: true, //是否仅允许节点左侧图标控制展开收缩
             edit: ['add', 'update', 'del'], //开启操作
             operate: function (obj) {
