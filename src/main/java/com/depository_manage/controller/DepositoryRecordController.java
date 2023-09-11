@@ -63,8 +63,6 @@ public class DepositoryRecordController {
 
         map.put("userId", userToken.getUser().getId());
         map.put("reviewGroup", reviewGroupId);
-        System.out.println(reviewGroupId);
-
         String dateRange = (String) map.get("applyTime");
         if (dateRange != null && dateRange.contains(" - ")) {
             String[] dates = dateRange.split(" - ");
