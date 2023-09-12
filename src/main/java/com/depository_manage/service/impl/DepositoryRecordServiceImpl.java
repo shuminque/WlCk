@@ -269,9 +269,14 @@ public class DepositoryRecordServiceImpl implements DepositoryRecordService {
         DepositoryRecord originalRecord = depositoryRecordMapper.findDepositoryRecordById(id);
 
         if (originalRecord != null && "已入库".equals(originalRecord.getState())) {
+            // 安全地获取quantity和price的值
+            double newQuantity = getDoubleFromMap(map, "quantity");
+            double newPrice = getDoubleFromMap(map, "price");
+
             // 计算数量和价格的差异
-            double quantityDiff =  ((Double) map.get("quantity") - originalRecord.getQuantity());
-            double priceDiff = (Double) map.get("price") - originalRecord.getPrice();
+            double quantityDiff = newQuantity - originalRecord.getQuantity();
+            double priceDiff = newPrice - originalRecord.getPrice();
+
             // 根据原始记录的物品信息查询目标仓库中的物料记录
             Map<String, Object> queryMap = new HashMap<>();
             queryMap.put("depositoryId", originalRecord.getDepositoryId());
@@ -282,26 +287,52 @@ public class DepositoryRecordServiceImpl implements DepositoryRecordService {
 
             if (!list.isEmpty()) {
                 Material material = list.get(0);
-                // 更新物料的总价
-                double totalPrice = material.getPrice() + (priceDiff * originalRecord.getQuantity());
-                BigDecimal bdTotalPrice = new BigDecimal(totalPrice);
-                bdTotalPrice = bdTotalPrice.setScale(2, RoundingMode.HALF_UP);
-                material.setPrice(bdTotalPrice.doubleValue());
+
+                if (priceDiff != 0) { // 如果单价发生了变化
+                    double totalPriceChange = priceDiff * originalRecord.getQuantity();
+                    double newTotalPrice = material.getPrice() + totalPriceChange;
+                    BigDecimal bdTotalPrice = new BigDecimal(newTotalPrice);
+                    bdTotalPrice = bdTotalPrice.setScale(2, RoundingMode.HALF_UP);
+                    material.setPrice(bdTotalPrice.doubleValue());
+                } else if (quantityDiff != 0) { // 如果数量发生了变化但单价没有变
+                    double totalPriceChange = originalRecord.getPrice() * quantityDiff;  // 使用原始记录的单价
+                    double newTotalPrice = material.getPrice() + totalPriceChange;
+                    BigDecimal bdTotalPrice = new BigDecimal(newTotalPrice);
+                    bdTotalPrice = bdTotalPrice.setScale(2, RoundingMode.HALF_UP);
+                    material.setPrice(bdTotalPrice.doubleValue());
+                }
+
                 // 更新物料的总数量
-                double totalQuantity = material.getQuantity() + quantityDiff;
-                material.setQuantity(totalQuantity);
+                double newTotalQuantity = material.getQuantity() + quantityDiff;
+                material.setQuantity(newTotalQuantity);
+
                 // 重新计算物料的均价
-                double unitPrice = (totalQuantity == 0) ? 0 : totalPrice / totalQuantity;
+                double unitPrice = (newTotalQuantity == 0) ? 0 : material.getPrice() / newTotalQuantity;
                 BigDecimal bdUnitPrice = new BigDecimal(unitPrice);
                 bdUnitPrice = bdUnitPrice.setScale(2, RoundingMode.HALF_UP);
                 material.setUnitPrice(bdUnitPrice.doubleValue());
+
                 materialMapper.updateMaterial(material);
             }
         }
         // 使用mapper更新DepositoryRecord的数据
         return depositoryRecordMapper.updateDepositoryRecord(map);
     }
-
+    private double getDoubleFromMap(Map<String, Object> map, String key) {
+        Object valueObj = map.get(key);
+        if (valueObj instanceof Double) {
+            return (Double) valueObj;
+        } else if (valueObj instanceof String) {
+            try {
+                return Double.parseDouble((String) valueObj);
+            } catch (NumberFormatException e) {
+                // 如果转换失败，则返回0.0
+                // 实际中，您可能需要处理此异常，例如记录错误日志
+                return 0.0;
+            }
+        }
+        return 0.0;
+    }
 
     @Override
     public DepositoryRecordP findDepositoryRecordById(Integer id) {
