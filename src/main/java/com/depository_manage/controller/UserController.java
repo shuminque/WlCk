@@ -51,9 +51,11 @@ public class UserController {
         if (userToken != null && userToken.getUser() != null) {
             Integer depositoryId = userToken.getUser().getDepositoryId();
             String authority = userToken.getUser().getAuthority();
+            Integer review_group_id = userToken.getUser().getReview_group_id();
             Map<String, Object> responseMap = new HashMap<>();
             responseMap.put("depositoryId", depositoryId);
             responseMap.put("authority", authority);
+            responseMap.put("review_group_id",review_group_id);
             return new ResponseEntity<>(responseMap, HttpStatus.OK);
         } else {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);

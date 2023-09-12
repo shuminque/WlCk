@@ -89,6 +89,7 @@
             elem: '#date',
             range: true
         });
+        var userReviewGroupId;
         //用户区分
         $.ajax({
             url: '/get_user_depository',
@@ -99,6 +100,7 @@
                 var userDepositoryId = data.depositoryId;
                 var toolbarTemplate;
                 var globalToolbarTemplate;
+                userReviewGroupId = data.review_group_id;
                 if (userDepositoryId === 1 || userDepositoryId === 2) {
                     // 不包含删除按钮的模板
                     toolbarTemplate = `
@@ -336,7 +338,7 @@
                 });
             } else if (obj.event === 'edit') {
                 // 检查流程状态是否为待审核
-                if (data.state === '待审核') {
+                if (userReviewGroupId === 3 || data.state === '待审核') {
                     var index = layer.open({
                         title: '入库信息编辑',
                         type: 2,
@@ -344,7 +346,7 @@
                         maxmin: true,
                         shadeClose: true,
                         area: ['100%', '100%'],
-                        content: '/application_in?id=' + data.id,
+                        content: '/application_in?id=' + data.id + '&action=edit', // 添加一个 action 参数，表示这是一个编辑操作
                         end: function() {
                             // 弹窗关闭后刷新当前页面
                             location.reload();
