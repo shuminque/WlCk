@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.depository_manage.mapper.CategoryMapper">
+
+    <resultMap id="BaseResultMap" type="com.depository_manage.entity.Category">
+        <id column="id" property="id" jdbcType="INTEGER"/>
+        <result column="depository_id" property="depositoryId" jdbcType="INTEGER"/>
+        <result column="parent_id" property="parentId" jdbcType="INTEGER"/>
+        <result column="title" property="title" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <!-- Insert operation -->
+    <insert id="insert" parameterType="com.depository_manage.entity.Category">
+        INSERT INTO categories (depository_id, parent_id, title)
+        VALUES (#{depositoryId}, #{parentId}, #{title})
+    </insert>
+
+    <!-- Select by ID operation -->
+    <select id="selectById" resultMap="BaseResultMap">
+        SELECT * FROM categories WHERE id = #{id}
+    </select>
+
+    <!-- Select all operation -->
+    <select id="selectAll" resultMap="BaseResultMap">
+        SELECT * FROM categories
+    </select>
+
+    <!-- Update operation -->
+    <update id="update" parameterType="com.depository_manage.entity.Category">
+        UPDATE categories
+        SET
+            depository_id = #{depositoryId},
+            parent_id = #{parentId},
+            title = #{title}
+        WHERE id = #{id}
+    </update>
+
+    <!-- Delete operation -->
+    <delete id="deleteCategory">
+        DELETE FROM categories WHERE id = #{id}
+    </delete>
+
+    <select id="findAllByDepositoryId" resultMap="BaseResultMap">
+        SELECT * FROM categories WHERE depository_id = #{depositoryId}
+    </select>
+
+
+</mapper>

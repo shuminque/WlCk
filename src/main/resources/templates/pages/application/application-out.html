@@ -16,44 +16,6 @@
         font-weight: bold;
     }
 </style>
-
-<!--<script>-->
-<!--    function handleSubLocationChange(selectedValue) {-->
-<!--        if (selectedValue === "单能线") {-->
-<!--            document.getElementById('subLocationContainer').innerHTML = `-->
-<!--            <label class="layui-form-label">产线:</label>-->
-<!--            <div class="layui-input-block">-->
-<!--                <select name="subLocation" class="layui-select">-->
-<!--                    <option value="A线">A线</option>-->
-<!--                    <option value="B线">B线</option>-->
-<!--                    <option value="C线">C线</option>-->
-<!--                    <option value="D线">D线</option>-->
-<!--                    <option value="E线">E线</option>-->
-<!--                    <option value="G线">G线</option>-->
-<!--                    <option value="H线">H线</option>-->
-<!--                    <option value="I线">I线</option>-->
-<!--                    <option value="K线">K线</option>-->
-<!--                    <option value="L线">L线</option>-->
-<!--                    <option value="M线">M线</option>-->
-<!--                    <option value="N线">N线</option>-->
-<!--                    <option value="O线">O线</option>-->
-<!--                    <option value="P线">P线</option>-->
-<!--                    <option value="Q线">Q线</option>-->
-<!--                    <option value="R线">R线</option>-->
-<!--                    <option value="S线">S线</option>-->
-<!--                    <option value="T线">T线</option>-->
-<!--                    <option value="U线">U线</option>-->
-<!--                    <option value="V线">V线</option>-->
-<!--                </select>-->
-<!--            </div>-->
-<!--        `;-->
-<!--            form.render('select'); // 重新渲染子选择框-->
-<!--        } else {-->
-<!--            // 如果选择的不是“单能线”，则清空子选择框-->
-<!--            document.getElementById('subLocationContainer').innerHTML = '';-->
-<!--        }-->
-<!--    }-->
-<!--</script>-->
 <body>
 <div class="layuimini-container">
     <div class="layuimini-main">
@@ -339,11 +301,6 @@
             data = data.field;
             data.type = 0;
             data.state = 0;
-            // if (data.applyRemark === '领用出库') {
-            //     data.applyRemark += ': ' + data.outLocation;
-            // } else if (data.applyRemark === '销售出库') {
-            //     data.applyRemark += ': ' + data.outLocation;
-            // }
             var url = '/OutdepositoryRecord'; // 统一URL
             $.ajax({
                 url: url,
@@ -498,51 +455,6 @@
                 }
             });
         }
-        // function handleOutTypeChange(selectedValue) {
-        //     if(selectedValue === '领用出库') {
-        //         var outLocationSelect = `
-        //         <label class="layui-form-label">领用地点:</label>
-        //         <div class="layui-input-block">
-        //             <select name="outLocation" class="layui-select" onchange="handleSubLocationChange(this.value)">
-        //                 <option value="切断（圆锯机）">切断（圆锯机）</option>
-        //                 <option value="切断（冷锯机）">切断（冷锯机）</option>
-        //                 <option value="冲床">冲床</option>
-        //                 <option value="生研GA">生研GA</option>
-        //                 <option value="生研CE">生研CE</option>
-        //                 <option value="刻印">刻印</option>
-        //                 <option value="N沟">N沟</option>
-        //                 <option value="单能线">单能线</option>
-        //                 <option value="磨刀房">磨刀房</option>
-        //                 <option value="设备课">设备课</option>
-        //             </select>
-        //         </div>`;
-        //         document.getElementById('outLocationContainer').innerHTML = outLocationSelect;
-        //         form.render('select'); // 重新渲染选择框
-        //     } else if (selectedValue === '销售出库') {
-        //         var outLocationSelect = `
-        //         <label class="layui-form-label">销售方:</label>
-        //         <div class="layui-input-block">
-        //             <select name="outLocation" class="layui-select">
-        //                 <option value="泰国旭">泰国旭</option>
-        //                 <option value="日本旭">日本旭</option>
-        //                 <option value="合肥NSK">合肥NSK</option>
-        //                 <option value="SAB">SAB</option>
-        //                 <option value="ZAB">ZAB</option>
-        //             </select>
-        //         </div>`;
-        //         document.getElementById('outLocationContainer').innerHTML = outLocationSelect;
-        //         form.render('select'); // 重新渲染选择框
-        //     }
-        // }
-        //
-        // form.on('select(applyRemarkFilter)', function(data){
-        //     handleOutTypeChange(data.value);
-        // });
-        // window.onload = checkInitialOutType;
-        // function checkInitialOutType() {
-        //     var selectElem = document.querySelector('[name="applyRemark"]');
-        //     handleOutTypeChange(selectElem.value);
-        // }
 
         $('.pre').click(function () {
             step.pre('#stepForm');

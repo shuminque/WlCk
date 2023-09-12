@@ -12,24 +12,24 @@
             align-items: center;
         }
     </style>
-    <script>
-        // 将Layui Tree数据转换回原始格式
-        function convertFromTreeData(data) {
-            return data.map(function (item) {
-                return {
-                    title: item.title,
-                    child: item.children ? convertFromTreeData(item.children) : undefined
-                };
-            });
-        }
+<!--    <script>-->
+<!--        // 将Layui Tree数据转换回原始格式-->
+<!--        function convertFromTreeData(data) {-->
+<!--            return data.map(function (item) {-->
+<!--                return {-->
+<!--                    title: item.title,-->
+<!--                    child: item.children ? convertFromTreeData(item.children) : undefined-->
+<!--                };-->
+<!--            });-->
+<!--        }-->
 
-        function saveChanges() {
-            var treeData = layui.tree.getChecked('categoryTree'); // 使用Tree的ID获取数据
-            dropDataSAB = convertFromTreeData(treeData);
-            console.log(dropDataSAB); // 在控制台打印更改后的数据，您可以选择将其保存到服务器或其他位置
-        }
+<!--        function saveChanges() {-->
+<!--            var treeData = layui.tree.getChecked('categoryTree'); // 使用Tree的ID获取数据-->
+<!--            dropDataSAB = convertFromTreeData(treeData);-->
+<!--            console.log(dropDataSAB); // 在控制台打印更改后的数据，您可以选择将其保存到服务器或其他位置-->
+<!--        }-->
 
-    </script>
+<!--    </script>-->
 </head>
 <body>
 <div class="layui-container">
@@ -49,199 +49,315 @@
         <button class="layui-btn" onclick="saveChanges()">保存更改</button>
     </div>
 </div>
-<script>
-    var dropDataSAB = [
-        {
-            title: 'SAB领用出库',
-            child: [
-                { title: '切断（圆锯机）' },
-                { title: '切断（冷锯机）' },
-                { title: '冲床' },
-                { title: '生研GA' },
-                { title: '生研CE' },
-                { title: '刻印' },
-                { title: 'N沟' },
-                {
-                    title: '单能线A-L',
-                    child: [
-                        { title: 'A线' },
-                        { title: 'B线' },
-                        { title: 'C线' },
-                        { title: 'D线' },
-                        { title: 'E线' },
-                        { title: 'G线' },
-                        { title: 'H线' },
-                        { title: 'I线' },
-                        { title: 'K线' },
-                        { title: 'L线' }
-                    ]
-                },
-                {
-                    title: '单能线M-V',
-                    child: [
-                        { title: 'M线' },
-                        { title: 'N线' },
-                        { title: 'O线' },
-                        { title: 'P线' },
-                        { title: 'Q线' },
-                        { title: 'R线' },
-                        { title: 'S线' },
-                        { title: 'T线' },
-                        { title: 'U线' },
-                        { title: 'V线' }
-                    ]
-                },
-                { title: '磨刀房' },
-                { title: '设备课' }
-            ]
-        },
-        {
-            title: '销售出库',
-            child: [
-                { title: '泰国旭' },
-                { title: '日本旭' },
-                { title: '合肥NSK' },
-                { title: 'SAB' },
-                { title: 'ZAB' }
-            ]
-        }
-    ];
-    var dropDataZAB = [
-        {
-            title: 'ZAB领用工程',
-            child: [
-                { title: '切断（圆锯机）' },
-                { title: '切断（冷锯机）' },
-                { title: '切管' },
-                { title: '冲床' },
-                { title: '生研GA' },
-                { title: '生研CE' },
-                { title: '刻印' },
-                { title: 'N沟' },
-                {
-                    title: '单能线A-E',
-                    child: [
-                        { title: 'A1线' },
-                        { title: 'A2前线' },
-                        { title: 'A2后线' },
-                        { title: 'B1线' },
-                        { title: 'B2线' },
-                        { title: 'C1线' },
-                        { title: 'C2线' },
-                        { title: 'D1线' },
-                        { title: 'D2线' },
-                        { title: 'E线' },
-                        { title: 'E1线' },
-                        { title: 'E2线' }
-                    ]
-                },
-                {
-                    title: '单能线F-I',
-                    child: [
-                        { title: 'F线' },
-                        { title: 'G线' },
-                        { title: 'J线' },
-                        { title: 'M线' },
-                        { title: 'N线' },
-                        { title: 'O线' },
-                        { title: 'P线' },
-                        { title: 'Q线' },
-                        { title: 'R线' },
-                        { title: 'I线' }
-                    ]
-                },
-                {
-                    title: '单能线T-W',
-                    child: [
-                        { title: 'TA线' },
-                        { title: 'TB线' },
-                        { title: 'UA线' },
-                        { title: 'UB线' },
-                        { title: 'VA线' },
-                        { title: 'VB线' },
-                        { title: 'WA线' },
-                        { title: 'WB线' }
-                    ]
-                },
-                {
-                    title: '数控NC',
-                    child: [
-                        { title: '4#机' },
-                        { title: '5#机' },
-                        { title: '6#机' },
-                        { title: '7#机' },
-                        { title: '8#机' },
-                        { title: '9#机' },
-                        { title: '10#机' },
-                        { title: '13#机' }
-                    ]
-                },
-                { title: '检测' },
-                { title: '磨刀房' },
-                { title: '设备课' },
-                { title: '金加工' },
-                { title: '大修组' }
-            ]
-        },
-        {
-            title: '销售出库',
-            child: [
-                { title: '泰国旭' },
-                { title: '日本旭' },
-                { title: '合肥NSK' },
-                { title: 'SAB' },
-                { title: 'ZAB' }
-            ]
-        }
-    ];
-    layui.use(['tree'], function() {
-        var tree = layui.tree;
-        // 将dropDataSAB转换为Layui Tree需要的格式
-        function convertToTreeData(data) {
-            return data.map(function (category) {
-                return {
-                    title: category.title,
-                    children: category.child ? convertToTreeData(category.child) : []
-                };
-            });
-        }
-        // 渲染树形控件
-        tree.render({
-            elem: '#categoryTreeSAB',
-            data: convertToTreeData(dropDataSAB),
-            onlyIconControl: true, //是否仅允许节点左侧图标控制展开收缩
-            edit: ['add', 'update', 'del'], //开启操作
-            operate: function (obj) {
-                var type = obj.type;
-                var data = obj.data;
-                if (type === 'add') { //增加节点
-                    // 可以在这里添加子节点的
-                } else if (type === 'update') { //修改节点
-                    // 可以在这里修改节点的逻辑
-                } else if (type === 'del') { //删除节点
-                    // 可以在这里删除节点的逻辑
-                }
-            }
-        });
 
-        tree.render({
-            elem: '#categoryTreeZAB',
-            data: convertToTreeData(dropDataZAB),
-            onlyIconControl: true, //是否仅允许节点左侧图标控制展开收缩
-            edit: ['add', 'update', 'del'], //开启操作
-            operate: function (obj) {
-                var type = obj.type;
-                var data = obj.data;
-                if (type === 'add') { //增加节点
-                    // 可以在这里添加子节点的逻辑
-                } else if (type === 'update') { //修改节点
-                    // 可以在这里修改节点的逻辑
-                } else if (type === 'del') { //删除节点
-                    // 可以在这里删除节点的逻辑
-                }
+<script>
+    function convertToTreeData(data) {
+        return data.map(function (category) {
+            return {
+                title: category.title,
+                id: category.id,  // Ensure the id is included
+                children: category.child ? convertToTreeData(category.child) : []
+            };
+        });
+    }
+
+    // 将Layui Tree数据转换回原始格式
+    function convertFromTreeData(data) {
+        return data.map(function (item) {
+            return {
+                title: item.title,
+                child: item.children ? convertFromTreeData(item.children) : undefined
+            };
+        });
+    }
+
+    function saveChanges() {
+        var treeData = layui.tree.getChecked('categoryTree'); // 使用Tree的ID获取数据
+        dropDataSAB = convertFromTreeData(treeData);
+        console.log(dropDataSAB); // 在控制台打印更改后的数据，您可以选择将其保存到服务器或其他位置
+    }
+
+    // 从服务器获取SAB和ZAB数据
+    function fetchData() {
+        layui.use(['tree', 'jquery'], function() {
+            var $ = layui.jquery;
+            var tree = layui.tree;
+
+            // 获取SAB数据
+            $.get("/api/categories/sab", function(data) {
+                var dropDataSAB = data;
+                renderTree('#categoryTreeSAB', dropDataSAB);
+            });
+
+            // 获取ZAB数据
+            $.get("/api/categories/zab", function(data) {
+                var dropDataZAB = data;
+                renderTree('#categoryTreeZAB', dropDataZAB);
+            });
+
+            function renderTree(elem, data) {
+                tree.render({
+                    elem: elem,
+                    data: convertToTreeData(data),
+                    onlyIconControl: true,
+                    edit: ['add', 'update', 'del'],
+                    operate: function(obj) {
+                        var type = obj.type;
+                        var data = obj.data;
+                        var $ = layui.jquery;
+
+                        if (type === 'add') {
+                            var newNodeTitle = prompt("请输入新节点的名称:");
+                            if (newNodeTitle) {
+                                var postData = {
+                                    title: newNodeTitle,
+                                    parentId: data.id
+                                };
+                                $.post("/api/categories/add", postData, function(response) {
+                                    if (response.success) {
+                                        fetchData();
+                                    } else {
+                                        alert("添加失败");
+                                    }
+                                });
+                            }
+                        } else if (type === 'update') {
+                            var newTitle = prompt("请输入新的节点名称:", data.title);
+                            if (newTitle && newTitle !== data.title) {
+                                var postData = {
+                                    id: data.id,
+                                    title: newTitle
+                                };
+                                $.post("/api/categories/update", postData, function(response) {
+                                    if (response.success) {
+                                        fetchData();
+                                    } else {
+                                        alert("更新失败");
+                                    }
+                                });
+                            }
+                        } else if(type === 'del') {
+                            if(data.id !== undefined) {
+                                $.ajax({
+                                    url: "/api/categories/delete/" + data.id,
+                                    type: 'DELETE',
+                                    success: function(response) {
+                                            fetchData();
+                                    },
+                                    error: function(error) {
+                                        console.error("Error during delete:", error);
+                                    }
+                                });
+                            } else {
+                                console.error("ID is undefined");
+                            }
+                        }
+                    }
+                });
             }
         });
+    }
+
+    // 当文档准备就绪时，获取数据
+    document.addEventListener("DOMContentLoaded", function() {
+        fetchData();
     });
 </script>
+
+<!--<script>-->
+<!--    var dropDataSAB = [-->
+<!--        {-->
+<!--            title: 'SAB领用出库',-->
+<!--            child: [-->
+<!--                { title: '切断（圆锯机）' },-->
+<!--                { title: '切断（冷锯机）' },-->
+<!--                { title: '冲床' },-->
+<!--                { title: '生研GA' },-->
+<!--                { title: '生研CE' },-->
+<!--                { title: '刻印' },-->
+<!--                { title: 'N沟' },-->
+<!--                {-->
+<!--                    title: '单能线A-L',-->
+<!--                    child: [-->
+<!--                        { title: 'A线' },-->
+<!--                        { title: 'B线' },-->
+<!--                        { title: 'C线' },-->
+<!--                        { title: 'D线' },-->
+<!--                        { title: 'E线' },-->
+<!--                        { title: 'G线' },-->
+<!--                        { title: 'H线' },-->
+<!--                        { title: 'I线' },-->
+<!--                        { title: 'K线' },-->
+<!--                        { title: 'L线' }-->
+<!--                    ]-->
+<!--                },-->
+<!--                {-->
+<!--                    title: '单能线M-V',-->
+<!--                    child: [-->
+<!--                        { title: 'M线' },-->
+<!--                        { title: 'N线' },-->
+<!--                        { title: 'O线' },-->
+<!--                        { title: 'P线' },-->
+<!--                        { title: 'Q线' },-->
+<!--                        { title: 'R线' },-->
+<!--                        { title: 'S线' },-->
+<!--                        { title: 'T线' },-->
+<!--                        { title: 'U线' },-->
+<!--                        { title: 'V线' }-->
+<!--                    ]-->
+<!--                },-->
+<!--                { title: '磨刀房' },-->
+<!--                { title: '设备课' }-->
+<!--            ]-->
+<!--        },-->
+<!--        {-->
+<!--            title: '销售出库',-->
+<!--            child: [-->
+<!--                { title: '泰国旭' },-->
+<!--                { title: '日本旭' },-->
+<!--                { title: '合肥NSK' },-->
+<!--                { title: 'SAB' },-->
+<!--                { title: 'ZAB' }-->
+<!--            ]-->
+<!--        }-->
+<!--    ];-->
+<!--    var dropDataZAB = [-->
+<!--        {-->
+<!--            title: 'ZAB领用工程',-->
+<!--            child: [-->
+<!--                { title: '切断（圆锯机）' },-->
+<!--                { title: '切断（冷锯机）' },-->
+<!--                { title: '切管' },-->
+<!--                { title: '冲床' },-->
+<!--                { title: '生研GA' },-->
+<!--                { title: '生研CE' },-->
+<!--                { title: '刻印' },-->
+<!--                { title: 'N沟' },-->
+<!--                {-->
+<!--                    title: '单能线A-E',-->
+<!--                    child: [-->
+<!--                        { title: 'A1线' },-->
+<!--                        { title: 'A2前线' },-->
+<!--                        { title: 'A2后线' },-->
+<!--                        { title: 'B1线' },-->
+<!--                        { title: 'B2线' },-->
+<!--                        { title: 'C1线' },-->
+<!--                        { title: 'C2线' },-->
+<!--                        { title: 'D1线' },-->
+<!--                        { title: 'D2线' },-->
+<!--                        { title: 'E线' },-->
+<!--                        { title: 'E1线' },-->
+<!--                        { title: 'E2线' }-->
+<!--                    ]-->
+<!--                },-->
+<!--                {-->
+<!--                    title: '单能线F-I',-->
+<!--                    child: [-->
+<!--                        { title: 'F线' },-->
+<!--                        { title: 'G线' },-->
+<!--                        { title: 'J线' },-->
+<!--                        { title: 'M线' },-->
+<!--                        { title: 'N线' },-->
+<!--                        { title: 'O线' },-->
+<!--                        { title: 'P线' },-->
+<!--                        { title: 'Q线' },-->
+<!--                        { title: 'R线' },-->
+<!--                        { title: 'I线' }-->
+<!--                    ]-->
+<!--                },-->
+<!--                {-->
+<!--                    title: '单能线T-W',-->
+<!--                    child: [-->
+<!--                        { title: 'TA线' },-->
+<!--                        { title: 'TB线' },-->
+<!--                        { title: 'UA线' },-->
+<!--                        { title: 'UB线' },-->
+<!--                        { title: 'VA线' },-->
+<!--                        { title: 'VB线' },-->
+<!--                        { title: 'WA线' },-->
+<!--                        { title: 'WB线' }-->
+<!--                    ]-->
+<!--                },-->
+<!--                {-->
+<!--                    title: '数控NC',-->
+<!--                    child: [-->
+<!--                        { title: '4#机' },-->
+<!--                        { title: '5#机' },-->
+<!--                        { title: '6#机' },-->
+<!--                        { title: '7#机' },-->
+<!--                        { title: '8#机' },-->
+<!--                        { title: '9#机' },-->
+<!--                        { title: '10#机' },-->
+<!--                        { title: '13#机' }-->
+<!--                    ]-->
+<!--                },-->
+<!--                { title: '检测' },-->
+<!--                { title: '磨刀房' },-->
+<!--                { title: '设备课' },-->
+<!--                { title: '金加工' },-->
+<!--                { title: '大修组' }-->
+<!--            ]-->
+<!--        },-->
+<!--        {-->
+<!--            title: '销售出库',-->
+<!--            child: [-->
+<!--                { title: '泰国旭' },-->
+<!--                { title: '日本旭' },-->
+<!--                { title: '合肥NSK' },-->
+<!--                { title: 'SAB' },-->
+<!--                { title: 'ZAB' }-->
+<!--            ]-->
+<!--        }-->
+<!--    ];-->
+<!--    layui.use(['tree'], function() {-->
+<!--        var tree = layui.tree;-->
+<!--        // 将dropDataSAB转换为Layui Tree需要的格式-->
+<!--        function convertToTreeData(data) {-->
+<!--            return data.map(function (category) {-->
+<!--                return {-->
+<!--                    title: category.title,-->
+<!--                    children: category.child ? convertToTreeData(category.child) : []-->
+<!--                };-->
+<!--            });-->
+<!--        }-->
+<!--        // 渲染树形控件-->
+<!--        tree.render({-->
+<!--            elem: '#categoryTreeSAB',-->
+<!--            data: convertToTreeData(dropDataSAB),-->
+<!--            onlyIconControl: true, //是否仅允许节点左侧图标控制展开收缩-->
+<!--            edit: ['add', 'update', 'del'], //开启操作-->
+<!--            operate: function (obj) {-->
+<!--                var type = obj.type;-->
+<!--                var data = obj.data;-->
+<!--                if (type === 'add') { //增加节点-->
+<!--                    // 可以在这里添加子节点的-->
+<!--                } else if (type === 'update') { //修改节点-->
+<!--                    // 可以在这里修改节点的逻辑-->
+<!--                } else if (type === 'del') { //删除节点-->
+<!--                    // 可以在这里删除节点的逻辑-->
+<!--                }-->
+<!--            }-->
+<!--        });-->
+
+<!--        tree.render({-->
+<!--            elem: '#categoryTreeZAB',-->
+<!--            data: convertToTreeData(dropDataZAB),-->
+<!--            onlyIconControl: true, //是否仅允许节点左侧图标控制展开收缩-->
+<!--            edit: ['add', 'update', 'del'], //开启操作-->
+<!--            operate: function (obj) {-->
+<!--                var type = obj.type;-->
+<!--                var data = obj.data;-->
+<!--                if (type === 'add') { //增加节点-->
+<!--                    // 可以在这里添加子节点的逻辑-->
+<!--                } else if (type === 'update') { //修改节点-->
+<!--                    // 可以在这里修改节点的逻辑-->
+<!--                } else if (type === 'del') { //删除节点-->
+<!--                    // 可以在这里删除节点的逻辑-->
+<!--                }-->
+<!--            }-->
+<!--        });-->
+
+<!--    });-->
+<!--</script>-->
 </body>
 </html>
