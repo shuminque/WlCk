@@ -102,6 +102,15 @@ public class PageController {
     public String dropData_add() {
         return "pages/other/dropData_add";
     }
+    @GetMapping("/once_add")
+    public String once_add() {
+        return "pages/other/once_add";
+    }
+    @GetMapping("/once_table")
+    public String once_table() {
+        return "pages/chart/once_table";
+    }
+
     @GetMapping("/material_add")
     public ModelAndView material_add() {
         ModelAndView mv = new ModelAndView();
