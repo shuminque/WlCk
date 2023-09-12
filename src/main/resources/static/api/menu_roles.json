@@ -276,7 +276,7 @@
                     ],
                     "child": [
                         {
-                            "title": "各类总表",
+                            "title": "成本分类报表",
                             "href": "/every_type",
                             "icon": "layui-icon layui-icon-list",
                             "target": "_self",
@@ -289,7 +289,7 @@
                             ]
                         },
                         {
-                            "title": "细化表",
+                            "title": "部品明细报表",
                             "href": "/total_table",
                             "icon": "layui-icon layui-icon-list",
                             "target": "_self",
@@ -302,7 +302,7 @@
                             ]
                         },
                         {
-                            "title": "转移表",
+                            "title": "互借明细",
                             "href": "/transfer_table",
                             "icon": "layui-icon layui-icon-list",
                             "target": "_self",
