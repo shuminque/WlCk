@@ -71,4 +71,6 @@ public interface OnceFillMapper {
      * @return 符合条件的记录行数
      */
     Integer findCountByCondition(Map<String, Object> map);
+
+    void insertBatch(List<OnceFill> records);
 }

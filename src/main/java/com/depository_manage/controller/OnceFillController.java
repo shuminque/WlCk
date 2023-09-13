@@ -3,6 +3,8 @@ package com.depository_manage.controller;
 import com.depository_manage.entity.OnceFill;
 import com.depository_manage.service.OnceFillService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -18,16 +20,16 @@ public class OnceFillController {
 
     // 添加一次性记录
     @PostMapping("/add")
-    public Map<String, Object> insertOnceFill(@RequestBody Map<String, Object> map) {
-        Map<String, Object> resultMap = new HashMap<>();
+    public ResponseEntity<Void> addRecords(@RequestBody List<OnceFill> records) {
         try {
-            onceFillService.insertOnceFill(map);
-            resultMap.put("status", "success");
-        } catch (Exception e) {
-            resultMap.put("status", "error");
-            resultMap.put("message", e.getMessage());
+            // 假设您有一个服务来处理数据的保存
+            onceFillService.saveAll(records);
+            // 返回成功响应，HTTP 204 No Content
+            return ResponseEntity.noContent().build();
+        } catch(Exception e) {
+            // 返回错误响应，HTTP 500 Internal Server Error
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
-        return resultMap;
     }
 
     // 更新一次性记录

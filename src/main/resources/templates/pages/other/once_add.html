@@ -12,97 +12,121 @@
 
 <div class="layui-container">
     <h2>添加一次性部品</h2>
-    <form class="layui-form" id="onceFillForm">
-        <div class="layui-form-item">
-            <label class="layui-form-label">品名</label>
-            <div class="layui-input-block">
-                <input type="text" name="name" required lay-verify="required" placeholder="Enter Name" autocomplete="off" class="layui-input">
-            </div>
-        </div>
-        <div class="layui-form-item">
-            <label class="layui-form-label">规格</label>
-            <div class="layui-input-block">
-                <input type="text" name="model" required lay-verify="required" placeholder="Enter model" autocomplete="off" class="layui-input">
-            </div>
-        </div>
-        <div class="layui-form-item">
-            <label class="layui-form-label">单价</label>
-            <div class="layui-input-block">
-                <input type="text" name="unitPrice" required lay-verify="required" placeholder="Enter unit_price" autocomplete="off" class="layui-input">
-            </div>
-        </div>
-        <div class="layui-form-item">
-            <label class="layui-form-label">数量</label>
-            <div class="layui-input-block">
-                <input type="text" name="quantity" required lay-verify="required" placeholder="Enter quantity" autocomplete="off" class="layui-input">
-            </div>
-        </div>
-        <div class="layui-form-item">
-            <label class="layui-form-label">时间</label>
-            <div class="layui-input-block">
-                <input name="time" type="text" id="storageDate" class="layui-input">
-            </div>
-        </div>
-        <div class="layui-form-item">
-            <label class="layui-form-label">备注</label>
-            <div class="layui-input-block">
-                <input type="text" name="applyRemark" required lay-verify="required" placeholder="Enter applyRemark" autocomplete="off" class="layui-input">
-            </div>
-        </div>
-        <input type="hidden" name="price" id="priceInput">
-        <div class="layui-form-item">
-            <div class="layui-input-block">
-                <button class="layui-btn" lay-submit lay-filter="formSubmit">添加</button>
-            </div>
-        </div>
-    </form>
+
+    <table class="layui-table" id="onceFillTable">
+        <thead>
+        <tr>
+            <th>品名</th>
+            <th>型号</th>
+            <th>单价</th>
+            <th>数量</th>
+            <th>总价</th>
+            <th>领用部门</th>
+            <th>日期</th>
+            <th>操作</th>
+        </tr>
+        </thead>
+        <tbody>
+        <!-- 初始的一行数据输入 -->
+        <tr>
+            <td><input type="text" class="layui-input" name="name"></td>
+            <td><input type="text" class="layui-input" name="model"></td>
+            <td><input type="text" class="layui-input" name="unitPrice"></td>
+            <td><input type="text" class="layui-input" name="quantity"></td>
+            <td><input type="text" class="layui-input" name="price" readonly></td>
+            <td><input type="text" class="layui-input" name="applyRemark"></td>
+            <td><input type="date" class="layui-input" name="time"></td>
+            <td><button class="layui-btn layui-btn-xs layui-btn-danger delete-row">删除</button></td>
+        </tr>
+        </tbody>
+    </table>
+
+    <button class="layui-btn" id="addRow">添加条目</button>
+    <button class="layui-btn" id="submitAll">提交所有</button>
 </div>
 <script src="/static/lib/layui-v2.6.3/layui.js" charset="utf-8"></script>
 <script type="text/javascript" src="/static/js/http_ajax.googleapis.com_ajax_libs_jquery_3.5.1_jquery.js" charset="utf-8"></script>
 <script>
-    layui.use(['form', 'layer', 'table', 'laydate'], function() {
+    layui.use(['form', 'layer', 'table', 'laydate','upload','jquery'], function() {
         var form = layui.form;
         var layer = layui.layer;
         var laydate = layui.laydate;
+        var $ = layui.jquery;
+        var upload = layui.upload;
+
         laydate.render({
             elem: '#storageDate',
-
         });
-        form.on('submit(formSubmit)', function(data) {
-            let formData = data.field;
-            if (parseFloat(formData.unitPrice) <= 0 || parseInt(formData.quantity) <= 0) {
+        $('#addRow').on('click', function() {
+            var newRow = `<tr>
+                <td><input type="text" class="layui-input" name="name"></td>
+                <td><input type="text" class="layui-input" name="model"></td>
+                <td><input type="text" class="layui-input" name="unitPrice"></td>
+                <td><input type="text" class="layui-input" name="quantity"></td>
+                <td><input type="text" class="layui-input" name="price" readonly></td>
+                <td><input type="text" class="layui-input" name="applyRemark"></td>
+                <td><input type="date" class="layui-input" name="time"></td>
+                <td><button class="layui-btn layui-btn-xs layui-btn-danger delete-row">删除</button></td>
+            </tr>`;
+            $('#onceFillTable tbody').append(newRow);
+        });
+
+        // 删除条目
+        $('#onceFillTable').on('click', '.delete-row', function() {
+            $(this).closest('tr').remove();
+        });
+
+        // 提交所有数据
+        $('#submitAll').on('click', function() {
+            var allData = [];
+
+            // 收集所有行数据
+            $('#onceFillTable tbody tr').each(function() {
+                var row = {
+                    name: $(this).find('input[name="name"]').val(),
+                    model: $(this).find('input[name="model"]').val(),
+                    unitPrice: $(this).find('input[name="unitPrice"]').val(),
+                    quantity: $(this).find('input[name="quantity"]').val(),
+                    price: $(this).find('input[name="price"]').val(),
+                    applyRemark: $(this).find('input[name="applyRemark"]').val(),
+                    time: $(this).find('input[name="time"]').val(),
+                };
+                allData.push(row);
+            });
+
+            // 为简单起见，我们只对第一行数据进行验证，您可以根据需要进行更复杂的验证
+            if (parseFloat(allData[0].unitPrice) <= 0 || parseInt(allData[0].quantity) <= 0) {
                 layer.msg('请输入正确的单价与数量');
-                return false;
+                return;
             }
-            let unitPrice = parseFloat(formData.unitPrice);
-            let quantity = parseInt(formData.quantity);
-            formData.price = unitPrice * quantity;
+
             var loadingIndex = layer.load(1);
+
+            // 发送所有数据到服务器
             fetch('/api/onceFill/add', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify(formData)
+                body: JSON.stringify(allData)
             })
-                .then(response => response.json())
-                .then(data => {
-                    // Close loading animation
+                .then(response => {
+                    // 关闭加载动画
                     layer.close(loadingIndex);
 
-                    if (data.status === "success") {
+                    if (response.ok) { // Check if status code is 200-299
                         layer.msg('添加成功！');
-                        $('#onceFillForm')[0].reset();  // 清除表单内容
                     } else {
-                        layer.msg('Error: ' + data.message);
+                        // 可以进一步检查特定的HTTP状态码，如果需要的话
+                        layer.msg('Error: ' + response.statusText);
                     }
                 })
                 .catch(error => {
-                    // Close loading animation
+                    // 关闭加载动画
                     layer.close(loadingIndex);
                     layer.msg('Error: ' + error.message);
                 });
-            return false;
+
         });
     });
 </script>

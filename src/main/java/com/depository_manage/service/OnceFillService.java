@@ -21,4 +21,7 @@ public interface OnceFillService {
 
     // 根据ID删除一次性记录
     void deleteOnceFillById(Integer id);
+
+    void saveAll(List<OnceFill> records);
+
 }

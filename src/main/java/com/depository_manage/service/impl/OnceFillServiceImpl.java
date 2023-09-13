@@ -39,4 +39,11 @@ public class OnceFillServiceImpl implements OnceFillService {
     public void deleteOnceFillById(Integer id) {
         onceFillMapper.deleteOnceFillById(id);
     }
+
+    public void saveAll(List<OnceFill> records) {
+        for (OnceFill record : records) {
+            record.setPrice(record.getUnitPrice() * record.getQuantity());
+        }
+        onceFillMapper.insertBatch(records);
+    }
 }

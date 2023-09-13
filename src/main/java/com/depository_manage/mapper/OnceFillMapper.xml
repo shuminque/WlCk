@@ -19,7 +19,13 @@
         INSERT INTO once_fill (depositoryId, name, model, unit_price, quantity, price, time, apply_remark)
         VALUES (#{depositoryId}, #{name}, #{model}, #{unitPrice}, #{quantity}, #{price}, #{time}, #{applyRemark})
     </insert>
-
+    <insert id="insertBatch" parameterType="java.util.List">
+        INSERT INTO once_fill (depositoryId, name, model, unit_price, quantity, price, time, apply_remark)
+        VALUES
+        <foreach collection="list" item="record" separator=",">
+            (#{record.depositoryId}, #{record.name}, #{record.model}, #{record.unitPrice}, #{record.quantity}, #{record.price}, #{record.time}, #{record.applyRemark})
+        </foreach>
+    </insert>
     <!-- Update operation -->
     <update id="updateOnceFill">
         UPDATE once_fill
