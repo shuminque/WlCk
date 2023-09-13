@@ -341,7 +341,7 @@
                     "child": [
                         {
                             "title": "一次性填写",
-                            "href": "/welcome",
+                            "href": "/once_add",
                             "icon": "layui-icon layui-icon-list",
                             "target": "_self",
                             "roles": [
@@ -354,7 +354,7 @@
                         },
                         {
                             "title": "一次性报表",
-                            "href": "/welcome",
+                            "href": "/once_table",
                             "icon": "layui-icon layui-icon-list",
                             "target": "_self",
                             "roles": [

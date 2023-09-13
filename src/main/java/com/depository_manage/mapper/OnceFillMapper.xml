@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.depository_manage.mapper.OnceFillMapper">
+
+    <resultMap id="BaseResultMap" type="com.depository_manage.entity.OnceFill">
+        <id column="id" property="id" jdbcType="INTEGER"/>
+        <result column="depositoryId" property="depositoryId" jdbcType="INTEGER"/>
+        <result column="name" property="name" jdbcType="VARCHAR"/>
+        <result column="model" property="model" jdbcType="VARCHAR"/>
+        <result column="unit_price" property="unitPrice" jdbcType="DOUBLE"/>
+        <result column="quantity" property="quantity" jdbcType="INTEGER"/>
+        <result column="price" property="price" jdbcType="DOUBLE"/>
+        <result column="time" property="time" jdbcType="TIMESTAMP"/>
+        <result column="apply_remark" property="applyRemark" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <!-- Insert operation -->
+    <insert id="insertOnceFill">
+        INSERT INTO once_fill (depositoryId, name, model, unit_price, quantity, price, time, apply_remark)
+        VALUES (#{depositoryId}, #{name}, #{model}, #{unitPrice}, #{quantity}, #{price}, #{time}, #{applyRemark})
+    </insert>
+
+    <!-- Update operation -->
+    <update id="updateOnceFill">
+        UPDATE once_fill
+        SET
+            depositoryId = #{depositoryId},
+            name = #{name},
+            model = #{model},
+            unit_price = #{unitPrice},
+            quantity = #{quantity},
+            price = #{price},
+            time = #{time},
+                apply_remark = #{applyRemark}
+        WHERE id = #{id}
+    </update>
+
+    <!-- Delete operation -->
+    <delete id="deleteOnceFillById">
+        DELETE FROM once_fill WHERE id = #{id}
+    </delete>
+
+    <!-- Select operations -->
+    <select id="findOnceFillByCondition" resultType="com.depository_manage.entity.OnceFill">
+        SELECT * FROM once_fill
+        WHERE 1=1
+        <!-- You can add more conditions based on the provided map -->
+        <if test="id != null">
+            AND id = #{id}
+        </if>
+        <!-- ... other conditions ... -->
+    </select>
+
+    <select id="findOnceFillAll" resultType="com.depository_manage.entity.OnceFill">
+        SELECT * FROM once_fill
+    </select>
+
+    <select id="findOnceFillById" resultType="com.depository_manage.entity.OnceFill">
+        SELECT * FROM once_fill WHERE id = #{id}
+    </select>
+
+    <select id="findOnceFillCount" resultType="int">
+        SELECT COUNT(*) FROM once_fill
+    </select>
+
+</mapper>
