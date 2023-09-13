@@ -32,7 +32,7 @@ public class ReportService {
                         "    AND (m.model IS NULL OR m.model = dr.model)\n" +
                         "    AND m.depository_id = dr.depository_id\n" +
                         "    AND dr.review_pass = 1\n" +
-                        "    AND dr.review_time >= ? AND dr.review_time < DATE_ADD(?, INTERVAL 1 DAY)\n" +
+                        "    AND dr.apply_time >= ? AND dr.apply_time < DATE_ADD(?, INTERVAL 1 DAY)\n" +
                         "WHERE m.depository_id = ?\n" +
                         "GROUP BY\n" +
                         "m.at_id, m.mname, m.model, m.quantity, m.price;";
@@ -54,7 +54,7 @@ public class ReportService {
                         "        FORMAT(COALESCE(SUM(CASE WHEN dr.type = 0 THEN dr.price * dr.quantity ELSE 0 END), 0), 2) AS 出库金额\n" +
                         "    FROM material_type mt\n" +
                         "    LEFT JOIN depository_record dr ON mt.tname = dr.type_name\n" +
-                        "                               AND dr.review_time >= ? AND dr.review_time < DATE_ADD(?, INTERVAL 1 DAY)\n" + // 修改时间
+                        "                               AND dr.apply_time >= ? AND dr.apply_time < DATE_ADD(?, INTERVAL 1 DAY)\n" + // 修改时间
                         "                               AND dr.review_pass = 1\n" +
                         "                               AND dr.depository_id = ?\n" +
                         "    GROUP BY mt.tname, mt.id\n" +
@@ -70,18 +70,6 @@ public class ReportService {
                         "                           WHERE m.depository_id = ?\n" +
                         "                            GROUP BY mt.id\n" +
                         "),\n" +
-//                        "FinalData AS (\n" +
-//                        "       SELECT\n" +
-//                        "                                CONCAT(?, ' 至 ', ?) AS 日期,\n" +
-//                        "                                cd.material_type_name AS 分类,\n" +
-//                        "                                cd.入库金额,\n" +
-//                        "                                cd.出库金额,\n" +
-//                        "                                COALESCE(s.在库金额, 0) AS 在库金额,\n" +
-//                        "                                cd.is_import,\n" +
-//                        "                                cd.type_id\n" +
-//                        "                            FROM CombinedData cd\n" +
-//                        "                           LEFT JOIN StockValue s ON cd.type_id = s.type_id\n" +
-//                        "),\n" +
                         "FinalData AS (\n" +
                         "    SELECT\n" +
                         "        CONCAT(?, ' 至 ', ?) AS 日期,\n" +

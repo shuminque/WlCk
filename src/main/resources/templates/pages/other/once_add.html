@@ -20,7 +20,7 @@
             <th>型号</th>
             <th>单价</th>
             <th>数量</th>
-            <th>总价</th>
+<!--            <th>总价</th>-->
             <th>领用部门</th>
             <th>日期</th>
             <th>操作</th>
@@ -33,7 +33,7 @@
             <td><input type="text" class="layui-input" name="model"></td>
             <td><input type="text" class="layui-input" name="unitPrice"></td>
             <td><input type="text" class="layui-input" name="quantity"></td>
-            <td><input type="text" class="layui-input" name="price" readonly></td>
+<!--            <td><input type="text" class="layui-input" name="price" readonly></td>-->
             <td><input type="text" class="layui-input" name="applyRemark"></td>
             <td><input type="date" class="layui-input" name="time"></td>
             <td><button class="layui-btn layui-btn-xs layui-btn-danger delete-row">删除</button></td>
@@ -114,10 +114,13 @@
                     // 关闭加载动画
                     layer.close(loadingIndex);
 
-                    if (response.ok) { // Check if status code is 200-299
+                    if (response.ok) {
                         layer.msg('添加成功！');
+                        // 清除所有输入框的内容
+                        $('#onceFillTable tbody tr').each(function() {
+                            $(this).find('input[type="text"], input[type="date"]').val('');
+                        });
                     } else {
-                        // 可以进一步检查特定的HTTP状态码，如果需要的话
                         layer.msg('Error: ' + response.statusText);
                     }
                 })
