@@ -1,6 +1,7 @@
 package com.depository_manage.service;
 
 import com.depository_manage.entity.OnceFill;
+import com.depository_manage.pojo.OnceFillP;
 
 import java.util.List;
 import java.util.Map;
@@ -17,11 +18,12 @@ public interface OnceFillService {
     OnceFill findOnceFillById(Integer id);
 
     // 根据条件查询一次性记录
-    List<OnceFill> findOnceFillByCondition(Map<String, Object> map);
+    public List<OnceFillP> findOnceFillPByCondition(Map<String, Object> map);
 
     // 根据ID删除一次性记录
     void deleteOnceFillById(Integer id);
 
-    void saveAll(List<OnceFill> records);
+    void saveAll(List<OnceFill> records, Integer depositoryId);
 
+    Integer findCountByCondition(Map<String,Object> map);
 }

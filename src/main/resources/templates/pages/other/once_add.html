@@ -35,7 +35,7 @@
             <td><input type="text" class="layui-input" name="quantity"></td>
 <!--            <td><input type="text" class="layui-input" name="price" readonly></td>-->
             <td><input type="text" class="layui-input" name="applyRemark"></td>
-            <td><input type="date" class="layui-input" name="time"></td>
+            <td><input type="text" id="storageDate" class="layui-input" name="time"></td>
             <td><button class="layui-btn layui-btn-xs layui-btn-danger delete-row">删除</button></td>
         </tr>
         </tbody>
@@ -63,9 +63,8 @@
                 <td><input type="text" class="layui-input" name="model"></td>
                 <td><input type="text" class="layui-input" name="unitPrice"></td>
                 <td><input type="text" class="layui-input" name="quantity"></td>
-                <td><input type="text" class="layui-input" name="price" readonly></td>
                 <td><input type="text" class="layui-input" name="applyRemark"></td>
-                <td><input type="date" class="layui-input" name="time"></td>
+                <td><input type="text" id="storageDate" class="layui-input" name="time"></td>
                 <td><button class="layui-btn layui-btn-xs layui-btn-danger delete-row">删除</button></td>
             </tr>`;
             $('#onceFillTable tbody').append(newRow);
@@ -79,7 +78,6 @@
         // 提交所有数据
         $('#submitAll').on('click', function() {
             var allData = [];
-
             // 收集所有行数据
             $('#onceFillTable tbody tr').each(function() {
                 var row = {

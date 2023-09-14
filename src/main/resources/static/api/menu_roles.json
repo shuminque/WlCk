@@ -210,7 +210,7 @@
                             ]
                         },
                         {
-                            "title": "型号信息",
+                            "title": "分类信息",
                             "href": "/materialType_add",
                             "icon": "layui-icon layui-icon-list",
                             "target": "_self",

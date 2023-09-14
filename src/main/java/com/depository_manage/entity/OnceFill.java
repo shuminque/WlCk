@@ -7,7 +7,6 @@ import java.util.Date;
 @Data
 public class OnceFill {
     private Integer id;
-
     private Integer depositoryId;
     private String name;
     private String model;
@@ -16,4 +15,6 @@ public class OnceFill {
     private Double price;
     private Date time;
     private String applyRemark;
+
+
 }

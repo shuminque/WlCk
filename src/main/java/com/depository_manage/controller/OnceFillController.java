@@ -1,12 +1,17 @@
 package com.depository_manage.controller;
 
 import com.depository_manage.entity.OnceFill;
+import com.depository_manage.pojo.DepositoryRecordP;
+import com.depository_manage.pojo.OnceFillP;
+import com.depository_manage.pojo.RestResponse;
+import com.depository_manage.security.bean.UserToken;
 import com.depository_manage.service.OnceFillService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -20,10 +25,13 @@ public class OnceFillController {
 
     // 添加一次性记录
     @PostMapping("/add")
-    public ResponseEntity<Void> addRecords(@RequestBody List<OnceFill> records) {
+    public ResponseEntity<Void> addRecords(@RequestBody List<OnceFill> records, HttpServletRequest request) {
         try {
-            // 假设您有一个服务来处理数据的保存
-            onceFillService.saveAll(records);
+            UserToken userToken = (UserToken) request.getAttribute("userToken");
+            Integer depositoryId = userToken.getUser().getDepositoryId();  // 假设您的User对象中有一个getDepositoryId()方法
+
+            // 传递depositoryId给您的服务方法
+            onceFillService.saveAll(records, depositoryId);
             // 返回成功响应，HTTP 204 No Content
             return ResponseEntity.noContent().build();
         } catch(Exception e) {
@@ -31,6 +39,7 @@ public class OnceFillController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
+
 
     // 更新一次性记录
     @PostMapping("/update")
@@ -53,9 +62,20 @@ public class OnceFillController {
     }
 
     // 根据条件查询一次性记录
-    @PostMapping("/list")
-    public List<OnceFill> findOnceFillByCondition(@RequestBody Map<String, Object> map) {
-        return onceFillService.findOnceFillByCondition(map);
+//    @GetMapping("/list")
+//    public List<OnceFill> findOnceFillByCondition(@RequestBody Map<String, Object> map) {
+//        return onceFillService.findOnceFillByCondition(map);
+//    }
+    @GetMapping("/list")
+    public RestResponse findOnceFillByCondition(@RequestParam Map<String,Object> map){
+        String dateRange = (String) map.get("time");
+        if (dateRange !=null && dateRange.contains(" - ")){
+            String[] dates = dateRange.split(" - ");
+            map.put("startDate", dates[0] + " 00:00:00");
+            map.put("endDate", dates[1] + " 23:59:59");
+        }
+        List<OnceFillP> list=onceFillService.findOnceFillPByCondition(map);
+        return new RestResponse(list,onceFillService.findCountByCondition(map),200);
     }
 
     // 根据ID删除一次性记录

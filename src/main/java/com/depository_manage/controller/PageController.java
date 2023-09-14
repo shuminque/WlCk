@@ -26,7 +26,10 @@ public class PageController {
     private DepositoryRecordService depositoryRecordService;
     @Autowired
     private NoticeService noticeService;
-
+    @Autowired
+    private MaterialEnginService materialEnginService;
+    @Autowired
+    private MaterialTypeService materialTypeService;
     @GetMapping("/login")
     public String login() {
         return "pages/user/login";
@@ -116,6 +119,8 @@ public class PageController {
         ModelAndView mv = new ModelAndView();
         mv.setViewName("pages/other/material_add");
         mv.addObject("depositories", depositoryService.findDepositoryAll());
+        mv.addObject("materialTypes", materialTypeService.findMaterialTypeAll());
+        mv.addObject("materialEngins", materialEnginService.findMaterialEnginAll());
 
         return mv;
     }

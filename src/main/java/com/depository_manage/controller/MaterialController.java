@@ -24,13 +24,22 @@ public class MaterialController {
     }
     @PostMapping("/instmaterial")
     public RestResponse addinsertMaterial(@RequestBody Map<String,Object> map) {
+        // 将所有空字符串转为null
         for(Map.Entry<String, Object> entry : map.entrySet()){
             if("".equals(entry.getValue())){
                 map.put(entry.getKey(), null);
             }
         }
+        // 检查必填字段是否为null或空字符串
+        if(map.get("atId") == null || "".equals(map.get("atId").toString().trim())
+                || map.get("mname") == null || "".equals(map.get("mname").toString().trim())) {
+            return new RestResponse("AT号和品名是必填的", 400, null); // 这里可以修改为您的错误响应格式
+        }
+
+        // 如果验证通过，执行插入操作
         return CrudUtil.postHandle(materialService.insertMaterial(map),1);
     }
+
 
     @DeleteMapping("/material/{id}")
     public RestResponse deleteMaterial(@PathVariable int id){

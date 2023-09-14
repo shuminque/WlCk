@@ -37,7 +37,7 @@
             quantity = #{quantity},
             price = #{price},
             time = #{time},
-                apply_remark = #{applyRemark}
+            apply_remark = #{applyRemark}
         WHERE id = #{id}
     </update>
 
@@ -46,15 +46,69 @@
         DELETE FROM once_fill WHERE id = #{id}
     </delete>
 
-    <!-- Select operations -->
-    <select id="findOnceFillByCondition" resultType="com.depository_manage.entity.OnceFill">
+    <select id="findOnceFillByCondition" resultMap="BaseResultMap">
         SELECT * FROM once_fill
         WHERE 1=1
-        <!-- You can add more conditions based on the provided map -->
         <if test="id != null">
             AND id = #{id}
         </if>
-        <!-- ... other conditions ... -->
+        <if test="depositoryId != null">
+            AND depositoryId = #{depositoryId}
+        </if>
+        <if test="unitPrice != null">
+            AND unit_price = #{unitPrice}
+        </if>
+        <if test="price != null">
+            AND price = #{price}
+        </if>
+        <if test="quantity != null">
+            AND quantity = #{quantity}
+        </if>
+        <if test="name != null and name != ''">
+            AND name LIKE CONCAT('%', #{name}, '%')
+        </if>
+        <if test="model != null and model != ''">
+            AND model LIKE CONCAT('%', #{model}, '%')
+        </if>
+        <if test="applyRemark != null and applyRemark != ''">
+            AND apply_remark LIKE CONCAT('%', #{applyRemark}, '%')
+        </if>
+        <if test="startDate != null and endDate != null">
+            AND DATE(time) BETWEEN #{startDate} AND #{endDate}
+        </if>
+    </select>
+
+    <select id="findCountByCondition" parameterType="map" resultType="integer">
+        SELECT
+        count(*)
+        FROM once_fill m WHERE 1 = 1
+        <if test="id != null">
+            AND m.id = #{id}
+        </if>
+        <if test="depositoryId != null">
+            AND m.depositoryId = #{depositoryId}
+        </if>
+        <if test="name != null and name != ''">
+            AND m.name LIKE CONCAT('%', #{name}, '%')
+        </if>
+        <if test="model != null and model != ''">
+            AND m.model LIKE CONCAT('%', #{model}, '%')
+        </if>
+        <if test="quantity != null">
+            AND m.quantity = #{quantity}
+        </if>
+        <if test="unitPrice != null">
+            AND m.unit_price = #{unitPrice}
+        </if>
+        <if test="price != null">
+            AND m.price = #{price}
+        </if>
+        <if test="applyRemark != null and applyRemark != ''">
+            AND apply_remark LIKE CONCAT('%', #{applyRemark}, '%')
+        </if>
+        <if test="startDate != null and endDate != null">
+            AND DATE(m.time) BETWEEN #{startDate} AND #{endDate}
+        </if>
     </select>
 
     <select id="findOnceFillAll" resultType="com.depository_manage.entity.OnceFill">
@@ -69,4 +123,9 @@
         SELECT COUNT(*) FROM once_fill
     </select>
 
+    <select id="findCount" resultType="integer">
+        SELECT
+            count(*)
+        FROM once_fill
+    </select>
 </mapper>

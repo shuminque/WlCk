@@ -18,22 +18,25 @@
                 <form class="layui-form layui-form-pane" action="">
                     <div class="layui-form-item">
                         <div class="layui-inline">
-                            <label class="layui-form-label">厂区</label>
                             <div class="layui-input-inline">
                                 <select name="depositoryId" >
                                     <option value="" selected>请选择厂区</option>
-                                    <option th:each="depository,iterStar:${depositories}" th:value="${depository?.getId()}" th:text="${depository?.getDname()}" >外芯仓库</option>
+                                    <option value="1">SAB</option>
+                                    <option value="2">ZAB</option>
                                 </select>
                             </div>
                         </div>
+
                         <div class="layui-inline">
-                            <div class="layui-input-inline">
-                                <input type="text" name="atId" autocomplete="off" class="layui-input" placeholder="搜索AT号">
+                            <label class="layui-form-label">日期</label>
+                            <div class="layui-input-block">
+                                <input type="text" name="time" id="date"  placeholder="请选择起止日期"
+                                       autocomplete="off" class="layui-input">
                             </div>
                         </div>
                         <div class="layui-inline">
                             <div class="layui-input-inline">
-                                <input type="text" name="mname" autocomplete="off" class="layui-input" placeholder="搜索品名">
+                                <input type="text" name="name" autocomplete="off" class="layui-input" placeholder="搜索品名">
                             </div>
                         </div>
                         <div class="layui-inline">
@@ -42,70 +45,20 @@
                             </div>
                         </div>
                         <div class="layui-inline">
+                            <div class="layui-input-inline">
+                                <input type="text" name="applyRemark" autocomplete="off" class="layui-input" placeholder="搜索领用部门">
+                            </div>
+                        </div>
+                        <div class="layui-inline">
                             <button type="submit" class="layui-btn layui-btn-primary" lay-submit
                                     lay-filter="data-search-btn"><i class="layui-icon"></i> 搜 索
                             </button>
                         </div>
                     </div>
-
                 </form>
             </div>
         </fieldset>
-        <button id="addEnginBtn" class="layui-btn">添加部品</button>
-
         <table class="layui-hide" id="currentTableId" lay-filter="currentTableFilter"></table>
-        <div id="enginAddForm" style="display: none;">
-            <fieldset class="table-search-fieldset">
-                <div class="layui-fluid">
-                    <div class="layui-card">
-                        <div class="layui-card-body">
-                            <form class="layui-form" lay-filter="form1" style="margin: 0 auto; max-width: 460px;">
-                                <div class="layui-form-item">
-                                    <label class="layui-form-label">工程at号:</label>
-                                    <div class="layui-input-block">
-                                        <input type="text" placeholder="请填写at号" class="layui-input" name="atId"/>
-                                    </div>
-                                    <label class="layui-form-label">部品名称:</label>
-                                    <div class="layui-input-block">
-                                        <input type="text" placeholder="请填写部品名称" name="mname" class="layui-input">
-                                    </div>
-                                    <label class="layui-form-label">规格:</label>
-                                    <div class="layui-input-block">
-                                        <input type="text" placeholder="请填写规格" name="model" class="layui-input">
-                                    </div>
-                                    <label class="layui-form-label">分类:</label>
-                                    <div class="layui-input-block">
-                                        <input type="text" placeholder="请填写分类" name="typeId" class="layui-input">
-                                    </div>
-                                    <label class="layui-form-label">图号:</label>
-                                    <div class="layui-input-block">
-                                        <input type="text" placeholder="请填写图号" name="picNum" class="layui-input">
-                                    </div>
-                                    <label class="layui-form-label">工程ID:</label>
-                                    <div class="layui-input-block">
-                                        <input type="text" placeholder="请填写工程id" name="enginId" class="layui-input">
-                                    </div>
-                                    <label class="layui-form-label">状态ID:</label>
-                                    <div class="layui-input-block">
-                                        <input type="text" placeholder="请填写状态id" name="stateId" class="layui-input">
-                                    </div>
-                                    <label class="layui-form-label">厂区ID:</label>
-                                    <div class="layui-input-block">
-                                        <input type="text" placeholder="请填写厂区id" name="depositoryId" class="layui-input">
-                                    </div>
-                                </div>
-                                <div class="layui-form-item" style="text-align: center;">
-                                    <button class="layui-btn" lay-submit lay-filter="formStep">
-                                        增添部品
-                                    </button>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-            </fieldset>
-        </div>
-
         <script type="text/html" id="operation-bar">
             <!--            <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>-->
             <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="delete">删除</a>
@@ -115,11 +68,16 @@
 <script src="/static/lib/layui-v2.6.3/layui.js" charset="utf-8"></script>
 <script>
     var data;
-    layui.use(['form', 'table','layer'], function () {
+    layui.use(['form', 'table','layer','laydate'], function () {
         var $ = layui.jquery,
             form = layui.form,
             table =  layui.table,
-            layer = layui.layer;
+            layer = layui.layer,
+            laydate=layui.laydate;
+        laydate.render({
+            elem: '#date',
+            range: true
+        });
         $.ajax({
             url: '/get_user_depository',
             type: 'GET',
@@ -129,25 +87,17 @@
                 var userDepositoryId = data.depositoryId;
                 // 如果depositoryId为0，则允许访问两个厂区
                 if (userDepositoryId === 0) {
-                    pp = '/material';
+                    pp = '/api/onceFill/list';
                 } else {
-                    pp = '/material?depositoryId=' + userDepositoryId;
+                    pp = '/api/onceFill/list?depositoryId='+userDepositoryId;
                 }
                 table.render({
                     elem: "#currentTableId",
                     url: pp,
-                    parseData: function (res) { //res 即为原始返回的数据
-                        return {
-                            "status": res.status, //解析接口状态
-                            "message": res.statusInfo.message, //解析提示文本
-                            "count": res.count, //解析数据长度
-                            "data": res.data //解析数据列表
-                        };
-                    },
-                    request: {
-                        pageName: 'page', //页码的参数名称，默认：page
-                        limitName: 'size' //每页数据量的参数名，默认：limit
-                    },
+                    // request: {
+                    //     pageName: 'page', //页码的参数名称，默认：page
+                    //     limitName: 'size' //每页数据量的参数名，默认：limit
+                    // },
                     response: {
                         statusName: 'status' //规定数据状态的字段名称，默认：code
                         ,statusCode: 200 //规定成功的状态码，默认：0
@@ -157,27 +107,38 @@
                     },
                     toolbar: ['filter', 'exports', 'print'],
                     cols: [ [
-                        // {field: 'id', width: '6%', title: '序号'},
-                        {field: 'depositoryName', width: '6%', title: '厂区', sort: true},
-                        {field: 'atId', width: '6%', title: 'AT号', sort: true},
-                        {field: 'mname', width: '10%', title: '品名'},
-                        {field: 'model', width: '7%', title: '规格'},
-                        {field: 'typeName', width: '18%', title: '型号'},
-                        {field: 'enginName',title: '工程', width:'12%', sort: true },
-                        {field: 'stateName',title: '状态', width:'16%', sort: true },
-                        {title: '操作', width: '15%', align: 'center', toolbar: '#operation-bar'}
+                        {field: 'id', width: '6%', title: '序号'},
+                        {field: 'name',  title: '品名'},
+                        {field: 'model', title: '规格'},
+                        {field: 'unitPrice',title: '单价'},
+                        {field: 'quantity',title: '数量'},
+                        {field: 'price',title: '总价',  sort: true },
+                        {field: 'time',title: '日期',  sort: true, templet: function(d){
+                                return formatDate(d.time);
+                            }},
+                        {field: 'applyRemark',title: '领用部门'},
+                            // {field: 'depositoryId', width: '6%', title: '厂区'}
                     ]],
-                    limits: [10, 15, 20, 25, 50],
-                    limit: 10,
-                    page: true,
-                    skin: 'line'
+                    // skin: 'line'
                 });
+                function formatDate(dateStr) {
+                    if (!dateStr) return '';
+                    let date = new Date(dateStr);
+                    let year = date.getFullYear();
+                    let month = (date.getMonth() + 1).toString().padStart(2, '0');
+                    let day = date.getDate().toString().padStart(2, '0');
+                    return `${year}-${month}-${day}`;
+                }
+
                 // 监听搜索操作
                 form.on('submit(data-search-btn)', function (data) {
                     var req={};
                     data=data.field;
-                    if (data.mname!==''){
-                        req.mname=data.mname;
+                    if (data.depositoryId!==''){
+                        req.depositoryId=data.depositoryId;
+                    }
+                    if (data.name!==''){
+                        req.name=data.name;
                     }
                     if (data.atId!==''){
                         req.atId = data.atId;
@@ -185,8 +146,13 @@
                     if (data.model!==''){
                         req.model=data.model;
                     }
-                    if (data.depositoryId!==''){
-                        req.depositoryId=data.depositoryId;
+                    if (data.applyRemark!==''){
+                        req.applyRemark=data.applyRemark;
+                    }
+                    if (data.time!==''){
+                        var dates = data.time.split(' - ');
+                        req.startDate = dates[0];
+                        req.endDate = dates[1];
                     }
                     //执行搜索重载
                     table.reload('currentTableId', {
@@ -196,56 +162,6 @@
                         }
                         , where: req
                     }, 'data');
-                    return false;
-                });
-                $('#addEnginBtn').on('click', function() {
-                    layer.open({
-                        type: 1,  // 页面层
-                        title: '部品增加',  // 标题
-                        area: ['500px', '500px'],  // 宽高
-                        content: $('#enginAddForm'),
-                        success: function(layero, index) {
-                            // 这里可以添加一些弹出层打开后的初始化代码，如果需要的话
-                        }
-                    });
-                });
-                form.on('submit(formStep)', function (data) {
-                    console.log(data.field);
-                    $.ajax({
-                        url:"/instmaterial",
-                        type:'post',
-                        dataType:'json',
-                        contentType: "application/json;charset=utf-8",
-                        data:JSON.stringify(data.field),
-                        beforeSend:function () {
-                            this.layerIndex = layer.load(0, { shade: [0.5, '#393D49'] });
-                        },
-                        success:function(data){
-                            layer.close(this.layerIndex);
-                            if(data.status >= 300){
-                                layer.msg(data.statusInfo.message);//失败的表情
-                                return;
-                            }else{
-                                layer.msg("添加成功！", {
-                                    icon: 6,//成功的表情
-                                    time: 1000 //1秒关闭（如果不配置，默认是3秒）
-                                });
-                                table.reload('currentTableId'); // 重新加载表格
-                            }
-                        },
-                        complete: function () {
-                            form.val("form1", { // "yourFormName"需要替换为您的实际表单名称或ID
-                                'atId': "",
-                                'mname': "",
-                                'model': "",
-                                'typeId': "",
-                                'picNum': "",
-                                'enginId': "",
-                                'stateId': "",
-                                'depositoryId': ""
-                            })
-                        }
-                    })
                     return false;
                 });
                 table.on('tool(currentTableFilter)', function(obj) {
