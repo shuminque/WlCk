@@ -127,7 +127,7 @@
             </fieldset>
         </div>
         <script type="text/html" id="operation-bar">
-            <!--            <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>-->
+                        <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
             <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="delete">删除</a>
         </script>
     </div>
@@ -147,6 +147,15 @@
             success: function(data) {
                 let pp;
                 var userDepositoryId = data.depositoryId;
+                var authority = data.authority;
+                if (userDepositoryId === 0 || authority === '审核人') {
+                    toolbarTemplate = `
+                <a class="layui-btn layui-btn-xs layui-btn-danger data-count-delete" lay-event="delete">删除</a>
+            `;
+                } else {
+                    toolbarTemplate = ` `;
+                }
+                $("#operation-bar").html(toolbarTemplate);
                 // 如果depositoryId为0，则允许访问两个厂区
                 if (userDepositoryId === 0) {
                     pp = '/material';
@@ -178,15 +187,15 @@
                     toolbar: ['filter', 'exports', 'print'],
                     cols: [ [
                         // {field: 'id', width: '6%', title: '序号'},
-                        {field: 'depositoryName', title: '厂区', sort: true},
+                        {field: 'depositoryName', title: '厂区'},
                         {field: 'atId',  title: 'AT号', sort: true},
                         {field: 'mname',  title: '品名'},
                         {field: 'model', title: '规格'},
                         {field: 'typeName', title: '分类'},
                         {field: 'enginName',title: '工程'},
-                        {field: 'picNum',title: '图号',  sort: true },
+                        {field: 'picNum',title: '图号'},
                         {field: 'stateName',title: '状态'},
-                        {title: '操作',  align: 'center', toolbar: '#operation-bar'}
+                        {title: ' ',  align: 'center', toolbar: '#operation-bar'}
                     ]],
                     limits: [10, 15, 20, 25, 50],
                     limit: 10,
@@ -240,9 +249,6 @@
                         layer.msg("请输入品名！");
                         return false;
                     }
-
-                    // 如果验证通过，继续执行后续操作
-                    console.log(data.field);
                     $.ajax({
                         url: "/instmaterial",
                         type: 'post',
