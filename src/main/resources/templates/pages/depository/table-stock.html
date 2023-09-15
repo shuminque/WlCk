@@ -21,7 +21,7 @@
                             <label class="layui-form-label">厂区</label>
                             <div class="layui-input-inline">
                                 <select name="depositoryId" >
-                                    <option value="" selected>请选择厂区</option>
+                                    <option value="" selected>全部</option>
                                     <option th:each="depository,iterStar:${depositories}" th:value="${depository?.getId()}" th:text="${depository?.getDname()}" >外芯仓库</option>
                                 </select>
                             </div>
@@ -69,8 +69,9 @@
             success: function(data) {
                 let pp;
                 var userDepositoryId = data.depositoryId;
+                var authority = data.authority; // 假设authority也在返回的数据中
                 // 如果depositoryId为0，则允许访问两个厂区
-                if (userDepositoryId === 0) {
+                if (userDepositoryId != null) {
                     pp = '/material';
                 } else {
                     pp = '/material?depositoryId=' + userDepositoryId;
@@ -105,17 +106,37 @@
                         {field: 'mname', width: '10%', title: '品名'},
                         {field: 'model', width: '7%', title: '规格'},
                         {field: 'typeName', width: '18%', title: '型号'},
-                        {field: 'picNum', width: '1%', title: '图号'},
+                        {field: 'picNum', width: '8%', title: '图号'},
                         {field: 'enginName',title: '工程', width:'12%', sort: true },
                         {field: 'stateName',title: '状态', width:'10%', sort: true },
-                        {field: 'price', title: '金额', width: '8%', sort: true},
-                        {field: 'unitPrice', title: '单价', width: '8%', sort: true},
                         {field: 'quantity', width: '10%', title: '数量(已审核)', sort: true},
+                        {field: 'unitPrice', title: '单价', width: '8%', sort: true},
+                        {field: 'price', title: '金额', width: '8%', sort: true}
                     ]],
                     limits: [10, 15, 20, 25, 50],
                     limit: 10,
                     page: true,
-                    skin: 'line'
+                    skin: 'line',
+                    done: function(res, curr, count) {
+                        if (userDepositoryId !==0) {
+                            // 遍历表格的每一行
+                            $(".layui-table-body tr").each(function() {
+                                // 获取当前行的depositoryName值
+                                var depositoryName = $(this).find("td[data-field='depositoryName']").text();
+                                // 当userDepositoryId为2且depositoryName为"SAB"时，隐藏该行的单价和金额列
+                                if (userDepositoryId === 2 && depositoryName === "SAB") {
+                                    $(this).find("td[data-field='unitPrice']").hide();
+                                    $(this).find("td[data-field='price']").hide();
+                                }
+                                // 当userDepositoryId为1且depositoryName为"ZAB"时，隐藏该行的单价和金额列
+                                if (userDepositoryId === 1 && depositoryName === "ZAB") {
+                                    $(this).find("td[data-field='unitPrice']").hide();
+                                    $(this).find("td[data-field='price']").hide();
+                                }
+                            });
+                        }
+                    }
+
                 });
 
                 // 监听搜索操作
