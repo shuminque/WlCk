@@ -108,10 +108,14 @@
                                     </div>
                                 </div>
                                 <!-- 厂区ID (如果不必要，可以隐藏) -->
-                                <div class="layui-form-item">
+                                <div class="layui-form-item" style="" id="depositorySelectDiv">
                                     <label class="layui-form-label">厂区</label>
                                     <div class="layui-input-block">
-                                        <input type="text" name="depositoryId" class="layui-input">
+                                        <select name="depositoryId" id="depositorySelect">
+                                            <option value="" selected>请选择厂区</option>
+                                            <option value="1">SAB</option>
+                                            <option value="2">ZAB</option>
+                                        </select>
                                     </div>
                                 </div>
                                 <!-- 提交按钮 -->
@@ -127,12 +131,13 @@
             </fieldset>
         </div>
         <script type="text/html" id="operation-bar">
-                        <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
-            <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="delete">删除</a>
+<!--            <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>-->
+<!--            <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="delete">删除</a>-->
         </script>
     </div>
 </div>
 <script src="/static/lib/layui-v2.6.3/layui.js" charset="utf-8"></script>
+<script type="text/javascript" src="/static/js/http_ajax.googleapis.com_ajax_libs_jquery_3.5.1_jquery.js" charset="utf-8"></script>
 <script>
     var data;
     layui.use(['form', 'table','layer'], function () {
@@ -156,6 +161,14 @@
                     toolbarTemplate = ` `;
                 }
                 $("#operation-bar").html(toolbarTemplate);
+
+                $(document).ready(function(){
+                    if (userDepositoryId === 1 || userDepositoryId === 2) {
+                        // 隐藏厂区选择框
+                        $('#depositorySelectDiv').hide();
+                    }
+                });
+
                 // 如果depositoryId为0，则允许访问两个厂区
                 if (userDepositoryId === 0) {
                     pp = '/material';
