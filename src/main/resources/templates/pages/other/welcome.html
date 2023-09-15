@@ -42,7 +42,7 @@
                 <div class="layui-row layui-col-space15">
                     <div class="layui-col-md6">
                         <div class="layui-card">
-                            <div class="layui-card-header"><i class="fa fa-signal icon"></i>数据统计</div>
+                            <div class="layui-card-header"><i class="fa fa-signal icon"></i>SAB数据统计</div>
                             <div class="layui-card-body">
                                 <div class="welcome-module">
                                     <div class="layui-row layui-col-space10">
@@ -50,12 +50,12 @@
                                             <div class="panel layui-bg-number">
                                                 <div class="panel-body">
                                                     <div class="panel-title">
-                                                        <span class="label pull-right layui-bg-blue">D</span>
-                                                        <h5>厂区数量</h5>
+                                                        <span class="label pull-right layui-bg-blue">A</span>
+                                                        <h5>SAB在库金额</h5>
                                                     </div>
                                                     <div class="panel-content">
-                                                        <h1 th:text="${depositories.size()}"></h1>
-                                                        <small>当前分类总记录数</small>
+                                                        <h1 th:text="${SABpriceSum}"></h1>
+                                                        <small>SAB在库金额  CNY</small>
                                                     </div>
                                                 </div>
                                             </div>
@@ -64,12 +64,12 @@
                                             <div class="panel layui-bg-number">
                                                 <div class="panel-body">
                                                     <div class="panel-title">
-                                                        <span class="label pull-right layui-bg-cyan">A</span>
-                                                        <h5>库存金额统计</h5>
+                                                        <span class="label pull-right layui-bg-cyan">B</span>
+                                                        <h5>ZAB在库金额</h5>
                                                     </div>
                                                     <div class="panel-content">
-                                                        <h1 class="no-margins">12032</h1>
-                                                        <small>当前分类总记录数</small>
+                                                        <h1 th:text="${ZABpriceSum}"></h1>
+                                                        <small>ZAB在库金额  CNY</small>
                                                     </div>
                                                 </div>
                                             </div>
@@ -78,7 +78,7 @@
                                             <div class="panel layui-bg-number">
                                                 <div class="panel-body">
                                                     <div class="panel-title">
-                                                        <span class="label pull-right layui-bg-orange">B</span>
+                                                        <span class="label pull-right layui-bg-orange">C</span>
                                                         <h5>记录数</h5>
                                                     </div>
                                                     <div class="panel-content">
@@ -92,7 +92,7 @@
                                             <div class="panel layui-bg-number">
                                                 <div class="panel-body">
                                                     <div class="panel-title">
-                                                        <span class="label pull-right layui-bg-green">C</span>
+                                                        <span class="label pull-right layui-bg-green">D</span>
                                                         <h5>仓库流水</h5>
                                                     </div>
                                                     <div class="panel-content">
@@ -152,7 +152,7 @@
                                         <div class="layui-col-xs3 layuimini-qiuck-module">
                                             <a href="javascript:;" layuimini-content-href="/my_task" data-title="我的任务" data-icon="fa fa-snowflake-o">
                                                 <i class="fa fa-tasks"></i>
-                                                <cite>我的任务</cite>
+                                                <cite>任务审批</cite>
                                             </a>
                                         </div>
                                         <div class="layui-col-xs3 layuimini-qiuck-module">

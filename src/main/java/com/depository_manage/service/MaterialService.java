@@ -3,6 +3,7 @@ package com.depository_manage.service;
 import com.depository_manage.entity.Material;
 import com.depository_manage.pojo.MaterialP;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
@@ -69,4 +70,8 @@ public interface MaterialService {
      * @return 符合条件的记录行数
      */
     Integer findCountByCondition(Map<String,Object> map);
+
+    BigDecimal findSABpriceSum();
+    BigDecimal findZABpriceSum();
+
 }

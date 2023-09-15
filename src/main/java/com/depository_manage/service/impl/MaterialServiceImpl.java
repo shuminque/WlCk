@@ -9,6 +9,7 @@ import com.depository_manage.utils.ObjectFormatUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -82,6 +83,8 @@ public class MaterialServiceImpl implements MaterialService {
     }
 
 
+
+
     /**
      * 对查出来的记录进行包装，包装成前端需要的数据
      * @param list DepositoryRecord集合
@@ -98,5 +101,13 @@ public class MaterialServiceImpl implements MaterialService {
             result.add(m);
         }
         return result;
+    }
+    @Override
+    public BigDecimal findSABpriceSum() {
+        return materialMapper.findSABpriceSum();
+    }
+    @Override
+    public BigDecimal findZABpriceSum() {
+        return materialMapper.findZABpriceSum();
     }
 }

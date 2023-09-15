@@ -4,6 +4,7 @@ import com.depository_manage.entity.Material;
 import org.apache.ibatis.annotations.Mapper;
 import org.springframework.stereotype.Repository;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
@@ -92,4 +93,6 @@ public interface MaterialMapper {
     Integer findEnginIdByEnginName(String enginName);
 
     Integer findStateIdByStateName(String stateName);
+    BigDecimal findSABpriceSum();
+    BigDecimal findZABpriceSum();
 }

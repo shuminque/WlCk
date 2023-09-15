@@ -62,11 +62,11 @@ public class PageController {
         mv.addObject("notices", noticeService.findNoticeByCondition(map));
         mv.addObject("depositories", depositoryService.findDepositoryAll());
         mv.addObject("materials", materialService.findMaterialAll());
-
+        mv.addObject("SABpriceSum", materialService.findSABpriceSum());
+        mv.addObject("ZABpriceSum", materialService.findZABpriceSum());
         // 添加 materials 的总数
         int count = materialService.findCount();
         mv.addObject("count", count);
-
         return mv;
     }
 
