@@ -340,4 +340,14 @@
         FROM material
         WHERE depository_id = 2
     </select>
+    <select id="findSABcountSum" resultType="java.lang.Integer">
+        SELECT SUM(quantity)
+        FROM material
+        WHERE depository_id = 1
+    </select>
+    <select id="findZABcountSum" resultType="java.lang.Integer">
+        SELECT SUM(quantity)
+        FROM material
+        WHERE depository_id = 2
+    </select>
 </mapper>

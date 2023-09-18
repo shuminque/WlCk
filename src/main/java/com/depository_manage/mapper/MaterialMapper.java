@@ -95,4 +95,8 @@ public interface MaterialMapper {
     Integer findStateIdByStateName(String stateName);
     BigDecimal findSABpriceSum();
     BigDecimal findZABpriceSum();
+
+    Integer findSABcountSum();
+
+    Integer findZABcountSum();
 }

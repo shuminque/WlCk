@@ -42,7 +42,7 @@
                 <div class="layui-row layui-col-space15">
                     <div class="layui-col-md6">
                         <div class="layui-card">
-                            <div class="layui-card-header"><i class="fa fa-signal icon"></i>SAB数据统计</div>
+                            <div class="layui-card-header"><i class="fa fa-signal icon"></i>数据统计</div>
                             <div class="layui-card-body">
                                 <div class="welcome-module">
                                     <div class="layui-row layui-col-space10">
@@ -74,25 +74,16 @@
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="layui-card">
-                            <div class="layui-card-header"><i class="fa fa-signal icon"></i>ZAB数据统计</div>
-                            <div class="layui-card-body">
-                                <div class="welcome-module">
-                                    <div class="layui-row layui-col-space10">
                                         <div class="layui-col-xs6">
                                             <div class="panel layui-bg-number">
                                                 <div class="panel-body">
                                                     <div class="panel-title">
                                                         <span class="label pull-right layui-bg-orange">C</span>
-                                                        <h5>记录数</h5>
+                                                        <h5>SAB在库数</h5>
                                                     </div>
                                                     <div class="panel-content">
-                                                        <h1 th:text="${count}"></h1>
-                                                        <small>当前分类总记录数</small>
+                                                        <h1 th:text="${SABcountSum}"></h1>
+                                                        <small>SAB在库数</small>
                                                     </div>
                                                 </div>
                                             </div>
@@ -102,11 +93,11 @@
                                                 <div class="panel-body">
                                                     <div class="panel-title">
                                                         <span class="label pull-right layui-bg-green">D</span>
-                                                        <h5>仓库流水</h5>
+                                                        <h5>ZAB在库数</h5>
                                                     </div>
                                                     <div class="panel-content">
-                                                        <h1 class="no-margins">12</h1>
-                                                        <small>当前分类总记录数</small>
+                                                        <h1 th:text="${ZABcountSum}"></h1>
+                                                        <small>ZAB在库数</small>
                                                     </div>
                                                 </div>
                                             </div>
@@ -115,7 +106,18 @@
                                 </div>
                             </div>
                         </div>
+                        <div class="layui-card">
+                            <div class="layui-card-header"><i class="fa fa-signal icon"></i>数据统计</div>
+                            <div class="layui-card-body">
+                                <div class="welcome-module">
+                                    <div class="layui-row layui-col-space10">
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
+
                     <div class="layui-col-md6">
                         <div class="layui-card">
                             <div class="layui-card-header"><i class="fa fa-credit-card icon icon-blue"></i>快捷入口</div>
@@ -153,21 +155,21 @@
                                         <!-- 入库查询 -->
                                         <div class="layui-col-xs3 layuimini-qiuck-module">
                                             <a href="javascript:;" layuimini-content-href="/table_in" data-title="入库查询" data-icon="fa fa-search">
-                                                <i class="fa fa-search"></i>
+                                                <i class="fa fa-search-plus"></i>
                                                 <cite>入库查询</cite>
                                             </a>
                                         </div>
                                         <!-- 出库查询 -->
                                         <div class="layui-col-xs3 layuimini-qiuck-module">
                                             <a href="javascript:;" layuimini-content-href="/table_out" data-title="出库查询" data-icon="fa fa-search">
-                                                <i class="fa fa-search"></i>
+                                                <i class="fa fa-search-minus"></i>
                                                 <cite>出库查询</cite>
                                             </a>
                                         </div>
                                         <!-- 库存查询 -->
                                         <div class="layui-col-xs3 layuimini-qiuck-module">
                                             <a href="javascript:;" layuimini-content-href="/table_stock" data-title="库存查询" data-icon="fa fa-search">
-                                                <i class="fa fa-search"></i>
+                                                <i class="fa fa-list-alt"></i>
                                                 <cite>库存查询</cite>
                                             </a>
                                         </div>
@@ -183,7 +185,16 @@
                                 </div>
                             </div>
                         </div>
+                        <div class="layui-card">
+                            <div class="layui-card-header"><i class="fa fa-signal icon"></i>数据统计</div>
+                            <div class="layui-card-body">
+                                <div class="welcome-module">
+                                    <div class="layui-row layui-col-space10">
 
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                     <div class="layui-col-md12">
                         <div class="layui-card">
@@ -197,7 +208,6 @@
             </div>
 
             <div class="layui-col-md4">
-
                 <div class="layui-card">
                     <div class="layui-card-header"><i class="fa fa-bullhorn icon icon-tip"></i>系统公告</div>
                     <div class="layui-card-body layui-text">
@@ -266,7 +276,7 @@
                 trigger: 'axis'
             },
             legend: {
-                data:['邮件营销','联盟广告','视频广告','直接访问','搜索引擎']
+                data:['SAB','ZAB']
             },
             grid: {
                 left: '3%',
@@ -289,29 +299,14 @@
             },
             series: [
                 {
-                    name:'邮件营销',
+                    name:'SAB',
                     type:'line',
-                    data:[120, 132, 101, 134, 90, 230, 210]
+                    data:[120, 132, 101, 134, 90, 230, 690]
                 },
                 {
-                    name:'联盟广告',
+                    name:'ZAB',
                     type:'line',
-                    data:[220, 182, 191, 234, 290, 330, 310]
-                },
-                {
-                    name:'视频广告',
-                    type:'line',
-                    data:[150, 232, 201, 154, 190, 330, 410]
-                },
-                {
-                    name:'直接访问',
-                    type:'line',
-                    data:[320, 332, 301, 334, 390, 330, 320]
-                },
-                {
-                    name:'搜索引擎',
-                    type:'line',
-                    data:[820, 932, 901, 934, 1290, 1330, 1320]
+                    data:[220, 182, 191, 234, 290, 330, 3110]
                 }
             ]
         };

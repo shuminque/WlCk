@@ -110,4 +110,12 @@ public class MaterialServiceImpl implements MaterialService {
     public BigDecimal findZABpriceSum() {
         return materialMapper.findZABpriceSum();
     }
+    @Override
+    public Integer findSABcountSum() {
+        return materialMapper.findSABcountSum();
+    }
+    @Override
+    public Integer findZABcountSum() {
+        return materialMapper.findZABcountSum();
+    }
 }

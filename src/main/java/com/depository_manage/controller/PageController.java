@@ -64,6 +64,8 @@ public class PageController {
         mv.addObject("materials", materialService.findMaterialAll());
         mv.addObject("SABpriceSum", materialService.findSABpriceSum());
         mv.addObject("ZABpriceSum", materialService.findZABpriceSum());
+        mv.addObject("SABcountSum", materialService.findSABcountSum());
+        mv.addObject("ZABcountSum", materialService.findZABcountSum());
         // 添加 materials 的总数
         int count = materialService.findCount();
         mv.addObject("count", count);

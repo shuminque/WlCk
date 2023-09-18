@@ -74,4 +74,6 @@ public interface MaterialService {
     BigDecimal findSABpriceSum();
     BigDecimal findZABpriceSum();
 
+    Integer findSABcountSum();
+    Integer findZABcountSum();
 }
