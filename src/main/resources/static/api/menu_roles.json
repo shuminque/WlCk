@@ -15,11 +15,7 @@
             "icon": "fa fa-tachometer",
             "target": "_self",
             "roles": [
-                "SAB_cg",
-                "SAB_sh",
-                "ZAB_cg",
-                "ZAB_sh",
-                "ALL"
+                "SAB_cg", "SAB_sh", "ZAB_cg", "ZAB_sh", "ALL"
             ],
             "child": [
                 {
@@ -28,11 +24,7 @@
                     "icon": "fa fa-home",
                     "target": "_self",
                     "roles": [
-                        "SAB_cg",
-                        "SAB_sh",
-                        "ZAB_cg",
-                        "ZAB_sh",
-                        "ALL"
+                        "SAB_cg", "SAB_sh", "ZAB_cg", "ZAB_sh", "ALL"
                     ]
                 }
             ]
@@ -43,11 +35,7 @@
             "href": "",
             "target": "_self",
             "roles": [
-                "SAB_cg",
-                "SAB_sh",
-                "ZAB_cg",
-                "ZAB_sh",
-                "ALL"
+                "SAB_cg", "SAB_sh", "ZAB_cg", "ZAB_sh", "ALL"
             ],
             "child": [
                 {
@@ -55,37 +43,25 @@
                     "icon": "fa fa-book",
                     "target": "_self",
                     "roles": [
-                        "SAB_cg",
-                        "SAB_sh",
-                        "ZAB_cg",
-                        "ZAB_sh",
-                        "ALL"
+                        "SAB_cg", "SAB_sh", "ZAB_cg", "ZAB_sh", "ALL"
                     ],
                     "child": [
                         {
                             "title": "入库申请",
                             "href": "/application_in",
-                            "icon": "layui-icon layui-icon-file-b",
+                            "icon": "fa fa-arrow-down",
                             "target": "_self",
                             "roles": [
-                                "SAB_cg",
-                                "SAB_sh",
-                                "ZAB_cg",
-                                "ZAB_sh",
-                                "ALL"
+                                "SAB_cg", "SAB_sh", "ZAB_cg", "ZAB_sh", "ALL"
                             ]
                         },
                         {
                             "title": "出库申请",
                             "href": "/application_out",
-                            "icon": "fa fa-file-text",
+                            "icon": "fa fa-arrow-up",
                             "target": "_self",
                             "roles": [
-                                "SAB_cg",
-                                "SAB_sh",
-                                "ZAB_cg",
-                                "ZAB_sh",
-                                "ALL"
+                                "SAB_cg", "SAB_sh", "ZAB_cg", "ZAB_sh", "ALL"
                             ]
                         },
                         {
@@ -94,11 +70,7 @@
                             "icon": "fa fa-exchange",
                             "target": "_self",
                             "roles": [
-                                "SAB_cg",
-                                "SAB_sh",
-                                "ZAB_cg",
-                                "ZAB_sh",
-                                "ALL"
+                                "SAB_cg", "SAB_sh", "ZAB_cg", "ZAB_sh", "ALL"
                             ]
                         }
                     ]
@@ -108,11 +80,7 @@
                     "icon": "fa fa-mail-forward",
                     "target": "_self",
                     "roles": [
-                        "SAB_cg",
-                        "SAB_sh",
-                        "ZAB_cg",
-                        "ZAB_sh",
-                        "ALL"
+                        "SAB_cg", "SAB_sh", "ZAB_cg", "ZAB_sh", "ALL"
                     ],
                     "child": [
                         {
@@ -121,11 +89,7 @@
                             "icon": "fa fa-th-list",
                             "target": "_self",
                             "roles": [
-                                "SAB_cg",
-                                "SAB_sh",
-                                "ZAB_cg",
-                                "ZAB_sh",
-                                "ALL"
+                                "SAB_cg", "SAB_sh", "ZAB_cg", "ZAB_sh", "ALL"
                             ]
                         }
                     ]
@@ -135,11 +99,7 @@
                     "icon": "fa fa-mail-reply",
                     "target": "_self",
                     "roles": [
-                        "SAB_cg",
-                        "SAB_sh",
-                        "ZAB_cg",
-                        "ZAB_sh",
-                        "ALL"
+                        "SAB_cg", "SAB_sh", "ZAB_cg", "ZAB_sh", "ALL"
                     ],
                     "child": [
                         {
@@ -148,11 +108,7 @@
                             "icon": "fa fa-th-list",
                             "target": "_self",
                             "roles": [
-                                "SAB_cg",
-                                "SAB_sh",
-                                "ZAB_cg",
-                                "ZAB_sh",
-                                "ALL"
+                                "SAB_cg", "SAB_sh", "ZAB_cg", "ZAB_sh", "ALL"
                             ]
                         }
                     ]
@@ -162,11 +118,7 @@
                     "icon": "fa fa-server",
                     "target": "_self",
                     "roles": [
-                        "SAB_cg",
-                        "SAB_sh",
-                        "ZAB_cg",
-                        "ZAB_sh",
-                        "ALL"
+                        "SAB_cg", "SAB_sh", "ZAB_cg", "ZAB_sh", "ALL"
                     ],
                     "child": [
                         {
@@ -175,11 +127,7 @@
                             "icon": "fa fa-th-list",
                             "target": "_self",
                             "roles": [
-                                "SAB_cg",
-                                "SAB_sh",
-                                "ZAB_cg",
-                                "ZAB_sh",
-                                "ALL"
+                                "SAB_cg", "SAB_sh", "ZAB_cg", "ZAB_sh", "ALL"
                             ]
                         }
                     ]
@@ -189,77 +137,43 @@
                     "icon": "fa fa-wrench",
                     "target": "_self",
                     "roles": [
-                        "SAB_cg",
-                        "SAB_sh",
-                        "ZAB_cg",
-                        "ZAB_sh",
-                        "ALL"
+                        "SAB_cg", "SAB_sh", "ZAB_cg", "ZAB_sh", "ALL"
                     ],
                     "child": [
                         {
                             "title": "物品信息",
                             "href": "/material_add",
-                            "icon": "layui-icon layui-icon-list",
+                            "icon": "layui-icon layui-icon-file",
                             "target": "_self",
-                            "roles": [
-                                "SAB_cg",
-                                "SAB_sh",
-                                "ZAB_cg",
-                                "ZAB_sh",
-                                "ALL"
-                            ]
+                            "roles": ["SAB_cg","SAB_sh","ZAB_cg","ZAB_sh","ALL"]
                         },
                         {
                             "title": "分类信息",
                             "href": "/materialType_add",
-                            "icon": "layui-icon layui-icon-list",
+                            "icon": "layui-icon layui-icon-tabs",
                             "target": "_self",
-                            "roles": [
-                                "SAB_cg",
-                                "SAB_sh",
-                                "ZAB_cg",
-                                "ZAB_sh",
-                                "ALL"
-                            ]
+                            "roles": ["SAB_cg","SAB_sh","ZAB_cg","ZAB_sh","ALL"]
                         },
                         {
                             "title": "工程信息",
                             "href": "/materialEngin_add",
-                            "icon": "layui-icon layui-icon-list",
+                            "icon": "layui-icon layui-icon-util",
                             "target": "_self",
-                            "roles": [
-                                "SAB_cg",
-                                "SAB_sh",
-                                "ZAB_cg",
-                                "ZAB_sh",
-                                "ALL"
-                            ]
+                            "roles": ["SAB_cg","SAB_sh","ZAB_cg","ZAB_sh","ALL"]
                         },
                         {
                             "title": "厂区信息",
                             "href": "/depository_add",
-                            "icon": "layui-icon layui-icon-template-1",
+                            "icon": "layui-icon layui-icon-template",
                             "target": "_self",
-                            "roles": [
-                                "SAB_cg",
-                                "SAB_sh",
-                                "ZAB_cg",
-                                "ZAB_sh",
-                                "ALL"
-                            ]
+                            "roles": ["SAB_cg","SAB_sh","ZAB_cg","ZAB_sh","ALL"]
                         },
                         {
                             "title": "汇率信息",
                             "href": "/rate_add",
-                            "icon": "layui-icon layui-icon-template-1",
+                            "icon": "layui-icon layui-icon-dollar",
                             "target": "_self",
-                            "roles": [
-                                "SAB_cg",
-                                "SAB_sh",
-                                "ZAB_cg",
-                                "ZAB_sh",
-                                "ALL"
-                            ]
+                            "roles": ["SAB_cg","SAB_sh","ZAB_cg","ZAB_sh","ALL"]
                         }
                     ]
                 },
@@ -268,11 +182,7 @@
                     "icon": "fa fa-map",
                     "target": "_self",
                     "roles": [
-                        "SAB_cg",
-                        "SAB_sh",
-                        "ZAB_cg",
-                        "ZAB_sh",
-                        "ALL"
+                        "SAB_cg", "SAB_sh", "ZAB_cg", "ZAB_sh", "ALL"
                     ],
                     "child": [
                         {
@@ -281,11 +191,7 @@
                             "icon": "layui-icon layui-icon-list",
                             "target": "_self",
                             "roles": [
-                                "SAB_cg",
-                                "SAB_sh",
-                                "ZAB_cg",
-                                "ZAB_sh",
-                                "ALL"
+                                "SAB_cg", "SAB_sh", "ZAB_cg", "ZAB_sh", "ALL"
                             ]
                         },
                         {
@@ -294,11 +200,7 @@
                             "icon": "layui-icon layui-icon-list",
                             "target": "_self",
                             "roles": [
-                                "SAB_cg",
-                                "SAB_sh",
-                                "ZAB_cg",
-                                "ZAB_sh",
-                                "ALL"
+                                "SAB_cg", "SAB_sh", "ZAB_cg", "ZAB_sh", "ALL"
                             ]
                         },
                         {
@@ -307,11 +209,7 @@
                             "icon": "layui-icon layui-icon-list",
                             "target": "_self",
                             "roles": [
-                                "SAB_cg",
-                                "SAB_sh",
-                                "ZAB_cg",
-                                "ZAB_sh",
-                                "ALL"
+                                "SAB_cg", "SAB_sh", "ZAB_cg", "ZAB_sh", "ALL"
                             ]
                         }
                     ]
@@ -322,9 +220,7 @@
                     "target": "_self",
                     "href": "/my_task",
                     "roles": [
-                        "SAB_sh",
-                        "ZAB_sh",
-                        "ALL"
+                        "SAB_sh", "ZAB_sh", "ALL"
                     ]
                 },
                 {
@@ -332,24 +228,16 @@
                     "icon": "fa fa-tasks",
                     "target": "_self",
                     "roles": [
-                        "SAB_cg",
-                        "SAB_sh",
-                        "ZAB_cg",
-                        "ZAB_sh",
-                        "ALL"
+                        "SAB_cg", "SAB_sh", "ZAB_cg", "ZAB_sh", "ALL"
                     ],
                     "child": [
                         {
                             "title": "一次性填写",
                             "href": "/once_add",
-                            "icon": "layui-icon layui-icon-list",
+                            "icon": "fa fa-pencil",
                             "target": "_self",
                             "roles": [
-                                "SAB_cg",
-                                "SAB_sh",
-                                "ZAB_cg",
-                                "ZAB_sh",
-                                "ALL"
+                                "SAB_cg", "SAB_sh", "ZAB_cg", "ZAB_sh", "ALL"
                             ]
                         },
                         {
@@ -358,11 +246,7 @@
                             "icon": "layui-icon layui-icon-list",
                             "target": "_self",
                             "roles": [
-                                "SAB_cg",
-                                "SAB_sh",
-                                "ZAB_cg",
-                                "ZAB_sh",
-                                "ALL"
+                                "SAB_cg", "SAB_sh", "ZAB_cg", "ZAB_sh", "ALL"
                             ]
                         }
                     ]

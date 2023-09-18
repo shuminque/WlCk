@@ -74,6 +74,15 @@
                                                 </div>
                                             </div>
                                         </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="layui-card">
+                            <div class="layui-card-header"><i class="fa fa-signal icon"></i>ZAB数据统计</div>
+                            <div class="layui-card-body">
+                                <div class="welcome-module">
+                                    <div class="layui-row layui-col-space10">
                                         <div class="layui-col-xs6">
                                             <div class="panel layui-bg-number">
                                                 <div class="panel-body">
@@ -113,55 +122,64 @@
                             <div class="layui-card-body">
                                 <div class="welcome-module">
                                     <div class="layui-row layui-col-space10 layuimini-qiuck">
+                                        <!-- 入库申请 -->
                                         <div class="layui-col-xs3 layuimini-qiuck-module">
-                                            <a href="javascript:;" layuimini-content-href="/application_in" data-title="入库申请" data-icon="fa fa-window-maximize">
-                                                <i class="layui-icon layui-icon-file-b"></i>
+                                            <a href="javascript:;" layuimini-content-href="/application_in" data-title="入库申请" data-icon="fa fa-arrow-down">
+                                                <i class="fa fa-arrow-down"></i>
                                                 <cite>入库申请</cite>
                                             </a>
                                         </div>
+                                        <!-- 出库申请 -->
                                         <div class="layui-col-xs3 layuimini-qiuck-module">
-                                            <a href="javascript:;" layuimini-content-href="/application_out" data-title="出库申请" data-icon="fa fa-gears">
-                                                <i class="fa fa-file-text"></i>
+                                            <a href="javascript:;" layuimini-content-href="/application_out" data-title="出库申请" data-icon="fa fa-arrow-up">
+                                                <i class="fa fa-arrow-up"></i>
                                                 <cite>出库申请</cite>
                                             </a>
                                         </div>
+                                        <!-- 转移申请 -->
                                         <div class="layui-col-xs3 layuimini-qiuck-module">
-                                            <a href="javascript:;" layuimini-content-href="/application_transfer" data-title="转移申请" data-icon="fa fa-file-text">
+                                            <a href="javascript:;" layuimini-content-href="/application_transfer" data-title="转移申请" data-icon="fa fa-exchange">
                                                 <i class="fa fa-exchange"></i>
                                                 <cite>转移申请</cite>
                                             </a>
                                         </div>
+                                        <!-- 一次性填写 -->
                                         <div class="layui-col-xs3 layuimini-qiuck-module">
-                                            <a href="javascript:;" layuimini-content-href="/chart_in" data-title="入库可视化" data-icon="fa fa-dot-circle-o">
-                                                <i class="fa fa-bar-chart"></i>
-                                                <cite>入库可视化</cite>
+                                            <a href="javascript:;" layuimini-content-href="/once_add" data-title="一次性填写" data-icon="fa fa-pencil-alt">
+                                                <i class="fa fa-pencil"></i>
+                                                <cite>一次性填写</cite>
                                             </a>
                                         </div>
+                                        <!-- 入库查询 -->
                                         <div class="layui-col-xs3 layuimini-qiuck-module">
-                                            <a href="javascript:;" layuimini-content-href="/chart_out" data-title="出库可视化" data-icon="fa fa-calendar">
+                                            <a href="javascript:;" layuimini-content-href="/table_in" data-title="入库查询" data-icon="fa fa-search">
+                                                <i class="fa fa-search"></i>
+                                                <cite>入库查询</cite>
+                                            </a>
+                                        </div>
+                                        <!-- 出库查询 -->
+                                        <div class="layui-col-xs3 layuimini-qiuck-module">
+                                            <a href="javascript:;" layuimini-content-href="/table_out" data-title="出库查询" data-icon="fa fa-search">
+                                                <i class="fa fa-search"></i>
+                                                <cite>出库查询</cite>
+                                            </a>
+                                        </div>
+                                        <!-- 库存查询 -->
+                                        <div class="layui-col-xs3 layuimini-qiuck-module">
+                                            <a href="javascript:;" layuimini-content-href="/table_stock" data-title="库存查询" data-icon="fa fa-search">
+                                                <i class="fa fa-search"></i>
+                                                <cite>库存查询</cite>
+                                            </a>
+                                        </div>
+                                        <!-- 一次性报表 -->
+                                        <div class="layui-col-xs3 layuimini-qiuck-module">
+                                            <a href="javascript:;" layuimini-content-href="/once_table" data-title="一次性报表" data-icon="fa fa-pie-chart">
                                                 <i class="fa fa-pie-chart"></i>
-                                                <cite>出库可视化</cite>
-                                            </a>
-                                        </div>
-                                        <div class="layui-col-xs3 layuimini-qiuck-module">
-                                            <a href="javascript:;" layuimini-content-href="/chart_stock" data-title="库存可视化" data-icon="fa fa-hourglass-end">
-                                                <i class="fa fa-area-chart"></i>
-                                                <cite>库存可视化</cite>
-                                            </a>
-                                        </div>
-                                        <div class="layui-col-xs3 layuimini-qiuck-module">
-                                            <a href="javascript:;" layuimini-content-href="/my_task" data-title="我的任务" data-icon="fa fa-snowflake-o">
-                                                <i class="fa fa-tasks"></i>
-                                                <cite>任务审批</cite>
-                                            </a>
-                                        </div>
-                                        <div class="layui-col-xs3 layuimini-qiuck-module">
-                                            <a href="javascript:;" layuimini-content-href="/my_apply" data-title="我的申请" data-icon="fa fa-search">
-                                                <i class="fa fa-paper-plane"></i>
-                                                <cite>我的申请</cite>
+                                                <cite>一次性报表</cite>
                                             </a>
                                         </div>
                                     </div>
+
                                 </div>
                             </div>
                         </div>
