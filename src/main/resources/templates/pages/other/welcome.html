@@ -196,6 +196,7 @@
                             </div>
                         </div>
                     </div>
+
                     <div class="layui-col-md12">
                         <div class="layui-card">
                             <div class="layui-card-header"><i class="fa fa-line-chart icon"></i>报表统计</div>
@@ -204,6 +205,7 @@
                             </div>
                         </div>
                     </div>
+
                 </div>
             </div>
 
@@ -213,7 +215,7 @@
                     <div class="layui-card-body layui-text">
                         <div class="layuimini-notice" th:each="notice,iterStat:${notices}">
                             <div class="layuimini-notice-title" th:text="${notice.getTitle()}">修改选项卡样式</div>
-                            <div class="layuimini-notice-extra" th:text="${#dates.format(notice.getTime(), 'yyyy-MM-dd HH:mm:ss')}">2019-07-11 23:06</div>
+                            <div class="layuimini-notice-extra" th:text="${#dates.format(notice.getTime(), 'yyyy-MM-dd')}">2019-07-11 23:06</div>
                             <div class="layuimini-notice-content layui-hide" th:text="${notice.getContent()}">
                                 界<br>
                                 一<br>

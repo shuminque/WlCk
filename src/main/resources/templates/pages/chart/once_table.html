@@ -109,9 +109,9 @@
                         {field: 'id', width: '6%', title: '序号'},
                         {field: 'name',  title: '品名'},
                         {field: 'model', title: '规格'},
-                        {field: 'unitPrice',title: '单价'},
+                        {field: 'unitPrice',title: '单价',templet: function(d) {return parseFloat(d.unitPrice).toFixed(2);}},
                         {field: 'quantity',title: '数量'},
-                        {field: 'price',title: '总价',  sort: true },
+                        {field: 'price',title: '金额',  sort: true, templet: function(d) {return parseFloat(d.unitPrice).toFixed(2);}},
                         {field: 'time',title: '日期',  sort: true, templet: function(d){
                                 return formatDate(d.time);
                             }},

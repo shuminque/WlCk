@@ -10,7 +10,7 @@
     },
     "menuInfo": [
         {
-            "title": "仓库信息概览",
+            "title": "仓库信息",
             "href": "/welcome",
             "icon": "fa fa-tachometer",
             "target": "_self",

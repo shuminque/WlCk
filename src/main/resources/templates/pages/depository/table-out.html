@@ -172,7 +172,10 @@
                         {field: 'price', title: '单价', minWidth: 70, sort: true},
                         {field: 'applyRemark', title: '领用部门', minWidth: 120},
                         // {field: 'applyTime', width: 170, title: '申请时间', sort: true},
-                        {field: 'reviewTime', width: 150, title: '出库时间'},
+                        // {field: 'reviewTime', width: 150, title: '出库时间'},
+                        {field: 'reviewTime',title: '出库时间',  sort: true, templet: function(d){
+                                return formatDate(d.reviewTime);
+                            }},
                         {title: '操作 ', minWidth: 200, toolbar: '#currentTableId', align: "center"}
                     ]],
                     limits: [10, 15, 20, 25, 50],
@@ -182,6 +185,14 @@
                     // id:'idTest',
                 });
                 // table.resize('idTest');
+                function formatDate(dateStr) {
+                    if (!dateStr) return '';
+                    let date = new Date(dateStr);
+                    let year = date.getFullYear();
+                    let month = (date.getMonth() + 1).toString().padStart(2, '0');
+                    let day = date.getDate().toString().padStart(2, '0');
+                    return `${year}-${month}-${day}`;
+                }
                 // 监听搜索操作
                 form.on('submit(data-search-btn)', function (data) {
                     var req={};

@@ -2,7 +2,7 @@
 <html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>后台管理-登陆</title>
+    <title>登陆</title>
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
     <meta http-equiv="Access-Control-Allow-Origin" content="*">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
@@ -38,7 +38,7 @@
         <div class="layui-form login-form">
             <form class="layui-form" action="">
                 <div class="layui-form-item logo-title">
-                    <h1>仓库管理系统</h1>
+                    <h1>综合仓库管理系统</h1>
                 </div>
                 <div class="layui-form-item">
                     <label class="layui-icon layui-icon-username" ></label>
@@ -48,7 +48,7 @@
                     <label class="layui-icon layui-icon-password" ></label>
                     <input type="password" name="credentials" lay-verify="required|password" placeholder="密码" autocomplete="off" class="layui-input">
                 </div>
-                <!-- 徒有其表的验证码，主要是不想另外弄了 -->
+                <!-- 徒有其表的验证码 -->
                 <div class="layui-form-item">
                     <button class="layui-btn layui-btn layui-btn-normal layui-btn-fluid" lay-submit="" lay-filter="login">登 入</button>
                 </div>
@@ -56,18 +56,14 @@
         </div>
     </div>
 </div>
-<script  src="static/lib/jquery-3.4.1/jquery-3.4.1.min.js" charset="utf-8"></script>
-<script  src="static/lib/layui-v2.6.3/layui.js" charset="utf-8"></script>
-<script  src="static/lib/jq-module/jquery.particleground.min.js" charset="utf-8"></script>
-<script  src="static/js/cookie.js" charset="utf-8"></script>
+<script  src="/static/lib/jquery-3.4.1/jquery-3.4.1.min.js" charset="utf-8"></script>
+<script  src="/static/lib/layui-v2.6.3/layui.js" charset="utf-8"></script>
+<script  src="/static/lib/jq-module/jquery.particleground.min.js" charset="utf-8"></script>
+<script  src="/static/js/cookie.js" charset="utf-8"></script>
 <script>
     layui.use(['layer','form'], function () {
         var form = layui.form,
             layer = layui.layer;
-
-        // 登录过期的时候，跳出ifram框架
-        if (top.location != self.location) top.location = self.location;
-
         // 粒子线条背景
         $(document).ready(function(){
             $('.layui-container').particleground({
@@ -101,17 +97,18 @@
                 success:function(data){
                     layer.close(this.layerIndex);
                     if(data.status !== 200){
-                        layer.msg(data.statusInfo.message);//失败的表情
-                        return;
-                    }else{
+                        layer.msg(data.statusInfo.message, {
+                            icon: 5, //失败的表情
+                            time: 2000
+                        });
+                    } else {
                         layer.msg("登录成功", {
-                            icon: 6,//成功的表情
-                            time: 1000 //1秒关闭（如果不配置，默认是3秒）
+                            icon: 6,
+                            time: 1000
                         }, function(){
                             cookieUtil.createCookie("token",data.data)
                             window.location = '/index';
                         });
-
                     }
                 },
                 complete: function () {

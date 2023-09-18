@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>型号</title>
+    <title>分类</title>
     <meta name="renderer" content="webkit">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
@@ -12,11 +12,11 @@
 <body>
 <div class="layuimini-container">
     <div class="layuimini-main">
-        <button id="addTypeBtn" class="layui-btn">添加型号</button>
+        <button id="addTypeBtn" class="layui-btn">添加分类</button>
         <table class="layui-hide" id="currentTableId" lay-filter="currentTableFilter"></table>
         <div id="typeAddForm" style="display: none;">
             <fieldset class="table-search-fieldset">
-            <legend>型号增加</legend>
+            <legend>分类增加</legend>
             <div class="layui-fluid">
                 <div class="layui-card">
                     <div class="layui-card-body" style="padding-top: 40px;">
@@ -32,7 +32,7 @@
                                 <div class="layui-form-item">
                                     <label class="layui-form-label">型号:</label>
                                     <div class="layui-input-block">
-                                        <input type="text" placeholder="请填写型号" name="tname" class="layui-input"
+                                        <input type="text" placeholder="请填写分类" name="tname" class="layui-input"
                                                lay-verify="required" required>
                                     </div>
                                 </div>
@@ -40,7 +40,7 @@
                                 <div class="layui-form-item">
                                     <div class="layui-input-block">
                                         <button class="layui-btn" lay-submit lay-filter="formStep">
-                                            &emsp;增加型号&emsp;
+                                            &emsp;增加分类&emsp;
                                         </button>
                                     </div>
                                 </div>
@@ -106,7 +106,7 @@
                         toolbar: ['filter', 'exports', 'print'],
                         cols: [ [
                             {field: 'id',  title: '编号'},
-                            {field: 'tname',  title: '型号', sort: true},
+                            {field: 'tname',  title: '分类', sort: true},
                             {title: ' ',  align: 'center', toolbar: '#operation-bar'}
                         ]],
 

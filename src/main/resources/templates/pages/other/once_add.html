@@ -12,7 +12,6 @@
 
 <div class="layui-container">
     <h2>添加一次性部品</h2>
-
     <table class="layui-table" id="onceFillTable">
         <thead>
         <tr>
@@ -35,7 +34,7 @@
             <td><input type="text" class="layui-input" name="quantity"></td>
 <!--            <td><input type="text" class="layui-input" name="price" readonly></td>-->
             <td><input type="text" class="layui-input" name="applyRemark"></td>
-            <td><input type="text" id="storageDate" class="layui-input" name="time"></td>
+            <td><input type="text" class="layui-input storageDate" name="time"></td>
             <td><button class="layui-btn layui-btn-xs layui-btn-danger delete-row">删除</button></td>
         </tr>
         </tbody>
@@ -55,7 +54,7 @@
         var upload = layui.upload;
 
         laydate.render({
-            elem: '#storageDate',
+            elem: '.storageDate',
         });
         $('#addRow').on('click', function() {
             var newRow = `<tr>
@@ -64,10 +63,13 @@
                 <td><input type="text" class="layui-input" name="unitPrice"></td>
                 <td><input type="text" class="layui-input" name="quantity"></td>
                 <td><input type="text" class="layui-input" name="applyRemark"></td>
-                <td><input type="text" id="storageDate" class="layui-input" name="time"></td>
+                <td><input type="text" class="layui-input storageDate" name="time"></td>
                 <td><button class="layui-btn layui-btn-xs layui-btn-danger delete-row">删除</button></td>
             </tr>`;
             $('#onceFillTable tbody').append(newRow);
+            laydate.render({
+                elem: $('#onceFillTable tbody tr:last .storageDate')[0], // 选择最后一个.storageDate元素
+            });
         });
 
         // 删除条目

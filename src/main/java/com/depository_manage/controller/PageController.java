@@ -11,6 +11,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
+import java.math.BigDecimal;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.util.HashMap;
 import java.util.Map;
 @Controller
@@ -48,7 +51,10 @@ public class PageController {
     public String register() {
         return "pages/user/register";
     }
-
+    public String formatWithCommas(BigDecimal number) {
+        NumberFormat numberFormat = NumberFormat.getInstance();
+        return numberFormat.format(number);
+    }
     @GetMapping("/welcome")
     public ModelAndView welcome() {
         ModelAndView mv = new ModelAndView();
@@ -62,8 +68,13 @@ public class PageController {
         mv.addObject("notices", noticeService.findNoticeByCondition(map));
         mv.addObject("depositories", depositoryService.findDepositoryAll());
         mv.addObject("materials", materialService.findMaterialAll());
-        mv.addObject("SABpriceSum", materialService.findSABpriceSum());
-        mv.addObject("ZABpriceSum", materialService.findZABpriceSum());
+//        mv.addObject("SABpriceSum", materialService.findSABpriceSum());
+//        mv.addObject("ZABpriceSum", materialService.findZABpriceSum());
+        DecimalFormat df = new DecimalFormat("#,##0"); // 这会格式化数字为千分位格式，并且始终有两位小数
+        BigDecimal sabPriceSum = materialService.findSABpriceSum();
+        BigDecimal zabPriceSum = materialService.findZABpriceSum();
+        mv.addObject("SABpriceSum", df.format(sabPriceSum));
+        mv.addObject("ZABpriceSum", df.format(zabPriceSum));
         mv.addObject("SABcountSum", materialService.findSABcountSum());
         mv.addObject("ZABcountSum", materialService.findZABcountSum());
         // 添加 materials 的总数

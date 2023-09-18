@@ -331,12 +331,12 @@
     </delete>
 
     <select id="findSABpriceSum" resultType="java.math.BigDecimal">
-        SELECT ROUND(SUM(price), 2)
+        SELECT ROUND(SUM(price), 0)
         FROM material
         WHERE depository_id = 1
     </select>
     <select id="findZABpriceSum" resultType="java.math.BigDecimal">
-        SELECT ROUND(SUM(price), 2)
+        SELECT ROUND(SUM(price), 0)
         FROM material
         WHERE depository_id = 2
     </select>
