@@ -32,4 +32,5 @@ public class SimpleDepositoryRecord {
 
     /** 数量 */
     private Double quantity;
+    private Double price;
 }

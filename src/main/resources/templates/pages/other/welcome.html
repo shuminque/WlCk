@@ -106,16 +106,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="layui-card">
-                            <div class="layui-card-header"><i class="fa fa-signal icon"></i>数据统计</div>
-                            <div class="layui-card-body">
-                                <div class="welcome-module">
-                                    <div class="layui-row layui-col-space10">
 
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
                     </div>
 
                     <div class="layui-col-md6">
@@ -185,30 +176,9 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="layui-card">
-                            <div class="layui-card-header"><i class="fa fa-signal icon"></i>数据统计</div>
-                            <div class="layui-card-body">
-                                <div class="welcome-module">
-                                    <div class="layui-row layui-col-space10">
-
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
                     </div>
-
-                    <div class="layui-col-md12">
-                        <div class="layui-card">
-                            <div class="layui-card-header"><i class="fa fa-line-chart icon"></i>报表统计</div>
-                            <div class="layui-card-body">
-                                <div id="echarts-records" style="width: 100%;min-height:500px"></div>
-                            </div>
-                        </div>
-                    </div>
-
                 </div>
             </div>
-
             <div class="layui-col-md4">
                 <div class="layui-card">
                     <div class="layui-card-header"><i class="fa fa-bullhorn icon icon-tip"></i>系统公告</div>
@@ -231,10 +201,45 @@
                 </div>
             </div>
         </div>
+
+        <div class="layui-row">
+            <!-- 入库金额折线图 -->
+            <div class="layui-col-md6">
+                <div class="layui-card">
+                    <div class="layui-card-header"><i class="fa fa-signal icon"></i>入库折线图</div>
+                    <div class="layui-card-body">
+                        <div id="inbound-chart" style="width: 100%; height: 500px;"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 出库金额折线图 -->
+            <div class="layui-col-md6">
+                <div class="layui-card">
+                    <div class="layui-card-header"><i class="fa fa-signal icon"></i>出库折线图</div>
+                    <div class="layui-card-body">
+                        <div id="outbound-chart" style="width: 100%; height: 500px;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="layui-row">
+            <!-- 在库金额折线图 -->
+            <div class="layui-col-md12">
+                <div class="layui-card">
+                    <div class="layui-card-header"><i class="fa fa-signal icon"></i>在库金额折线图</div>
+                    <div class="layui-card-body">
+                        <div id="stock-chart" style="width: 100%; height: 500px;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 <script src="/static/lib/layui-v2.6.3/layui.js" charset="utf-8"></script>
 <script src="/static/js/lay-config.js?v=1.0.4" charset="utf-8"></script>
+<script type="text/javascript" src="/static/js/http_ajax.googleapis.com_ajax_libs_jquery_3.5.1_jquery.js" charset="utf-8"></script>
+<script type="text/javascript" src="/static/js/http_cdn.bootcdn.net_ajax_libs_echarts_5.2.0_echarts.js" charset="utf-8"></script>
 <script>
     layui.use(['layer', 'miniTab','echarts'], function () {
         var $ = layui.jquery,
@@ -272,53 +277,174 @@
         /**
          * 报表功能
          */
-        var echartsRecords = echarts.init(document.getElementById('echarts-records'), 'walden');
-        var optionRecords = {
-            tooltip: {
-                trigger: 'axis'
-            },
-            legend: {
-                data:['SAB','ZAB']
-            },
-            grid: {
-                left: '3%',
-                right: '4%',
-                bottom: '3%',
-                containLabel: true
-            },
-            toolbox: {
-                feature: {
-                    saveAsImage: {}
-                }
-            },
-            xAxis: {
-                type: 'category',
-                boundaryGap: false,
-                data: ['周一','周二','周三','周四','周五','周六','周日']
-            },
-            yAxis: {
-                type: 'value'
-            },
-            series: [
-                {
-                    name:'SAB',
-                    type:'line',
-                    data:[120, 132, 101, 134, 90, 230, 690]
-                },
-                {
-                    name:'ZAB',
-                    type:'line',
-                    data:[220, 182, 191, 234, 290, 330, 3110]
-                }
-            ]
-        };
-        echartsRecords.setOption(optionRecords);
+        $(document).ready(function () {
+            // 获取当前年份
+            var year = new Date().getFullYear();
 
-        // echarts 窗口缩放自适应
-        window.onresize = function(){
-            echartsRecords.resize();
+            // 使用jQuery的AJAX功能从服务器获取数据
+            $.ajax({
+                url: '/monthly-amounts/' + year,
+                type: 'GET',
+                dataType: 'json',
+                success: function (data) {
+                    // 当成功获取数据时，初始化并设置ECharts图表
+                    initECharts(data);
+                },
+                error: function (error) {
+                    console.log("Error fetching data", error);
+                }
+            });
+        });
+        var echartsInstances = [];
+        function initECharts(data) {
+            var months = data.map(item => {
+                var dateParts = item.month.split("-");
+                return dateParts[1] + '月';  // 返回“月份 + '月'”格式
+            });
+
+            // 入库金额图
+            var sabInbound = data.map(item => item.sabInboundAmount);
+            var zabInbound = data.map(item => item.zabInboundAmount);
+
+            // 出库金额图
+            var sabOutbound = data.map(item => item.sabOutboundAmount);
+            var zabOutbound = data.map(item => item.zabOutboundAmount);
+
+            // 在库金额图
+            var sabStock = data.map(item => item.sabStockAmount);
+            var zabStock = data.map(item => item.zabStockAmount);
+
+            echartsInstances.push(initChart('inbound-chart', months, sabInbound, zabInbound, '入库金额'));
+            echartsInstances.push(initChart('outbound-chart', months, sabOutbound, zabOutbound, '出库金额'));
+            echartsInstances.push(initBarChart('stock-chart', months, sabStock, zabStock, '在库金额'));
         }
 
+        function initChart(chartId, months, sabData, zabData, title) {
+            var echartsInstance = echarts.init(document.getElementById(chartId), 'walden');
+            var option = {
+                tooltip: {
+                    trigger: 'axis',
+                    axisPointer: {
+                        type: "cross",
+                        label: {
+                            backgroundColor: "#6e7985"
+                        }
+                    }
+                },
+                legend: {
+                    data: ['SAB', 'ZAB']
+                },
+                title: {
+                    text: title,
+                    left: 'left'
+                },
+                grid: {
+                    left: '3%',
+                    right: '4%',
+                    bottom: '3%',
+                    containLabel: true
+                },
+                toolbox: {
+                    feature: {
+                        saveAsImage: {}
+                    }
+                },
+                xAxis: {
+                    type: 'category',
+                    boundaryGap: false,
+                    data: months
+                },
+                yAxis: {
+                    type: 'value'
+                },
+                series: [
+                    {
+                        name: 'SAB',
+                        type: 'line',
+                        stack: '金额',
+                        smooth: true,
+                        label: {
+                            normal: {
+                                show: true,
+                                position: 'left'
+                            }
+                        },
+                        areaStyle: {},
+                        data: sabData
+                    },
+                    {
+                        name: 'ZAB',
+                        type: 'line',
+                        stack: '金额',
+                        smooth: true,
+                        label: {
+                            normal: {
+                                show: true,
+                                position: 'right'
+                            }
+                        },
+                        areaStyle: {},
+                        data: zabData
+                    }
+                ]
+            };
+            echartsInstance.setOption(option);
+            return echartsInstance;
+        }
+        function initBarChart(chartId, months, sabData, zabData, title) {
+            var echartsInstance = echarts.init(document.getElementById(chartId), 'walden');
+            var option = {
+                tooltip: {
+                    trigger: 'axis'
+                },
+                legend: {
+                    data: ['SAB', 'ZAB']
+                },
+                title: {
+                    text: title,
+                    left: 'left'
+                },
+                grid: {
+                    left: '3%',
+                    right: '4%',
+                    bottom: '3%',
+                    containLabel: true
+                },
+                toolbox: {
+                    feature: {
+                        saveAsImage: {}
+                    }
+                },
+                xAxis: {
+                    type: 'category',
+                    data: months
+                },
+                yAxis: {
+                    type: 'value'
+                },
+                series: [
+                    {
+                        name: 'SAB',
+                        type: 'bar',
+                        barGap: '1%',
+                        data: sabData
+                    },
+                    {
+                        name: 'ZAB',
+                        type: 'bar',
+                        barGap: '1%',
+                        data: zabData,
+                    }
+                ]
+            };
+            echartsInstance.setOption(option);
+            return echartsInstance;
+        }
+        window.onresize = function(){
+            for (var i = 0; i < echartsInstances.length; i++) {
+                echartsInstances[i].resize();
+            }
+        }
     });
 </script>
 </body>

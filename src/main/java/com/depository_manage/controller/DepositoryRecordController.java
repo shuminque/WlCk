@@ -6,12 +6,14 @@ import com.depository_manage.exception.MyException;
 import com.depository_manage.mapper.DepositoryRecordMapper;
 import com.depository_manage.mapper.MaterialMapper;
 import com.depository_manage.pojo.DepositoryRecordP;
+import com.depository_manage.pojo.MonthlyAmountDTO;
 import com.depository_manage.pojo.RestResponse;
 import com.depository_manage.security.bean.UserToken;
 import com.depository_manage.service.DepositoryRecordService;
 import com.depository_manage.utils.CrudUtil;
 import com.depository_manage.utils.ObjectFormatUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -168,4 +170,10 @@ public class DepositoryRecordController {
         map.put("applicantId",userToken.getUser().getId());
         return CrudUtil.postHandle(depositoryRecordService.transferApply(map),1);
     }
+    @GetMapping("/monthly-amounts/{year}")
+    public ResponseEntity<List<MonthlyAmountDTO>> getMonthlyAmounts(@PathVariable String year) {
+        List<MonthlyAmountDTO> monthlyAmounts = depositoryRecordService.fetchMonthlyAmountsForYear(year);
+        return ResponseEntity.ok(monthlyAmounts);
+    }
+
 }

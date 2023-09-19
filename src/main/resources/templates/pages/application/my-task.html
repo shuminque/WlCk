@@ -86,7 +86,14 @@
                 {field: 'atId', title: 'AT号'},
                 {field: 'mname', title: '品名'},
                 {field: 'model', title: '规格'},
+                {field: 'price', title: '单价'},
                 {field: 'quantity', title: '数量'},
+                {
+                    title: '金额',
+                    templet: function(d) {
+                        return (d.price * d.quantity).toFixed(2);  // 计算总价并保留两位小数
+                    }
+                },
                 {field: 'applyTime', title: '申请时间'},
                 {title: '操作 ', minWidth: 200, toolbar: '#currentTableBar', align: "center"}
                 // 添加更多的列来匹配你的任务数据...

@@ -14,6 +14,7 @@
         <result column="at_id" property="atId" jdbcType="INTEGER" />
         <result column="mname" property="mname" jdbcType="VARCHAR" />
         <result column="model" property="model" jdbcType="VARCHAR" />
+        <result column="price" property="price" jdbcType="VARCHAR" />
         <result column="quantity" property="quantity" jdbcType="VARCHAR" />
         <result column="review_group_id" property="review_group_id" jdbcType="INTEGER" />
     </resultMap>
@@ -48,7 +49,7 @@
 
     <!-- 表查询字段 -->
     <sql id="simpleColumns">
-        dr.id, dr.type, dr.applicant_id, dr.apply_remark, dr.apply_time, dr.review_group_id, dr.at_id, dr.mname, dr.model, dr.quantity
+        dr.id, dr.type, dr.applicant_id, dr.apply_remark, dr.apply_time, dr.review_group_id, dr.at_id, dr.mname, dr.model, dr.quantity, dr.price
     </sql>
     <!-- 表查询字段 -->
     <sql id="allColumns">
@@ -514,4 +515,23 @@
             #{id}
         </foreach>
     </delete>
+
+    <select id="getMonthlyAmountsForYear" resultType="com.depository_manage.pojo.MonthlyAmountDTO" parameterType="string">
+    SELECT
+        DATE_FORMAT(apply_time, '%Y-%m') as month,
+    ROUND(SUM(CASE WHEN depository_id = 1 AND type = 1 THEN price * quantity ELSE 0 END), 2) as sabInboundAmount,
+    ROUND(SUM(CASE WHEN depository_id = 1 AND type = 0 THEN price * quantity ELSE 0 END), 2) as sabOutboundAmount,
+    /* 在库金额的计算可能需要更复杂的逻辑 */
+    ROUND(SUM(CASE WHEN depository_id = 1 THEN price * quantity ELSE 0 END), 2) as sabStockAmount,
+    ROUND(SUM(CASE WHEN depository_id = 2 AND type = 1 THEN price * quantity ELSE 0 END), 2) as zabInboundAmount,
+    ROUND(SUM(CASE WHEN depository_id = 2 AND type = 0 THEN price * quantity ELSE 0 END), 2) as zabOutboundAmount,
+    /* 在库金额的计算可能需要更复杂的逻辑 */
+    ROUND(SUM(CASE WHEN depository_id = 2 THEN price * quantity ELSE 0 END), 2) as zabStockAmount
+        FROM depository_record
+        WHERE DATE_FORMAT(apply_time, '%Y') = #{year}
+        AND review_pass = 1
+        GROUP BY DATE_FORMAT(apply_time, '%Y-%m')
+        ORDER BY DATE_FORMAT(apply_time, '%Y-%m')
+    </select>
+
 </mapper>

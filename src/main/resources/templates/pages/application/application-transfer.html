@@ -55,7 +55,9 @@
                                         <label class="layui-form-label">原仓库：</label>
                                         <div class="layui-input-block">
                                             <select name="fromId" lay-verify="required" id="OldCk">
-                                                <option th:each="depository,iterStar:${depositories}" th:value="${depository?.getId()}" th:text="${depository?.getDname()}" disabled selected>外芯仓库</option>
+                                                <option th:each="depository,iterStar:${depositories}"
+                                                        th:value="${depository?.getId()}"
+                                                        th:text="${depository?.getDname()}" disabled selected>外芯仓库</option>
                                             </select>
                                         </div>
                                     </div>
@@ -63,10 +65,11 @@
                                         <label class="layui-form-label">转入仓库：</label>
                                         <div class="layui-input-block">
                                             <select name="toId" lay-verify="required" id="NewCk">
-                                                <option th:each="depository,iterStar:${depositories}" th:value="${depository?.getId()}" th:text="${depository?.getDname()}" disabled selected>外芯仓库</option>
+                                                <option th:each="depository,iterStar:${depositories}"
+                                                        th:value="${depository?.getId()}"
+                                                        th:text="${depository?.getDname()}" disabled selected>外芯仓库</option>
                                             </select>
                                             <input name="reviewerId" type="hidden" value="21" />
-
                                         </div>
                                     </div>
 <!--                                    <div class="layui-form-item">-->
@@ -212,6 +215,18 @@
                 } else {
                     pp = '/material?depositoryId=' + userDepositoryId;
                 }
+                if (userDepositoryId === 1) {  // SAB仓库员登录
+                    $('#OldCk').val(1);
+                    $('#NewCk').val(2);
+                    $('#groupSelect').val(1);
+                    $('#applyRemarkSelect').val("SAB转入ZAB");
+                } else if (userDepositoryId === 2) {  // ZAB仓库员登录
+                    $('#OldCk').val(2);
+                    $('#NewCk').val(1);
+                    $('#groupSelect').val(2);
+                    $('#applyRemarkSelect').val("ZAB转入SAB");
+                }
+                layui.form.render('select');  // 重新渲染选择框
                 tableSelect.render({
                     elem: '#materialSelect', // 定义输入框input对象
                     checkedKey: 'id', // 表格的唯一建值

@@ -28,7 +28,7 @@ public class SimpleDepositoryRecordP {
     private String mname;
     /**型号/规格*/
     private String model;
-
+    private Double price;
     /** 数量 */
     private Double quantity;
 
@@ -41,6 +41,7 @@ public class SimpleDepositoryRecordP {
         this.atId = d.getAtId();
         this.mname = d.getMname();
         this.model = d.getModel();
+        this.price = d.getPrice();
         this.quantity = d.getQuantity();
     }
 }

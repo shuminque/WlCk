@@ -3,6 +3,7 @@ package com.depository_manage.service.impl;
 import com.depository_manage.entity.SimpleDepositoryRecord;
 import com.depository_manage.exception.MyException;
 import com.depository_manage.mapper.*;
+import com.depository_manage.pojo.MonthlyAmountDTO;
 import com.depository_manage.service.DepositoryRecordService;
 import com.depository_manage.service.NotificationService;
 import com.depository_manage.entity.DepositoryRecord;
@@ -440,6 +441,10 @@ public class DepositoryRecordServiceImpl implements DepositoryRecordService {
             d.setCheckerName(userMapper.findUserNameById(record.getCheckerId()));
         }
         return d;
+    }
+
+    public List<MonthlyAmountDTO> fetchMonthlyAmountsForYear(String year) {
+        return depositoryRecordMapper.getMonthlyAmountsForYear(year);
     }
 
 }

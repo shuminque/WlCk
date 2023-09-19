@@ -2,6 +2,7 @@ package com.depository_manage.service;
 
 import com.depository_manage.entity.DepositoryRecord;
 import com.depository_manage.pojo.DepositoryRecordP;
+import com.depository_manage.pojo.MonthlyAmountDTO;
 import com.depository_manage.pojo.SimpleDepositoryRecordP;
 
 import java.util.List;
@@ -103,4 +104,7 @@ public interface DepositoryRecordService {
 
 
 //    Integer applyAndReview(Map<String, Object> map, Integer userId, Integer did);
+
+    List<MonthlyAmountDTO> fetchMonthlyAmountsForYear(String year);
+
 }
