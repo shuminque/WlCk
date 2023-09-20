@@ -316,7 +316,7 @@
 
             echartsInstances.push(initChart('inbound-chart', months, sabInbound, zabInbound, '入库金额'));
             echartsInstances.push(initChart('outbound-chart', months, sabOutbound, zabOutbound, '出库金额'));
-            echartsInstances.push(initBarChart('stock-chart', months, sabStock, zabStock, '在库金额'));
+            echartsInstances.push(initBarChart('stock-chart', months, sabStock, zabStock, '库存流水'));
         }
 
         function initChart(chartId, months, sabData, zabData, title) {
@@ -362,7 +362,7 @@
                         name: 'SAB',
                         type: 'line',
                         // stack: '金额',
-                        smooth: true,
+                        smooth: false,
                         label: {
                             normal: {
                                 show: true,
@@ -376,7 +376,7 @@
                         name: 'ZAB',
                         type: 'line',
                         // stack: '金额',
-                        smooth: true,
+                        smooth: false,
                         label: {
                             normal: {
                                 show: true,

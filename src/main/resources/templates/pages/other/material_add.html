@@ -257,7 +257,7 @@
                     },
                     toolbar: ['filter', 'exports', 'print'],
                     cols: [ [
-                        {field: 'id', width: '6%', title: '序号'},
+                        // {field: 'id', width: '6%', title: '序号'},
                         {field: 'depositoryName', title: '厂区'},
                         {field: 'atId',  title: 'AT号', sort: true},
                         {field: 'mname',  title: '品名'},
@@ -381,12 +381,14 @@
                             var form = layui.form;
                             form.val("editFormFilter", data);
                             // 监听提交按钮
-                            form.on('submit(editSubmitBtnFilter)', function(data) {
+                            form.on('submit(editSubmitBtnFilter)', function(formData) {
                                 // 获取表单数据，发送到服务器更新
                                 $.ajax({
-                                    url: "/material/" + data.field.id,
+                                    url: "/material/" + data.id,  // 使用外部data参数
                                     type: 'PUT',
-                                    data: data.field,
+                                    dataType: 'json',
+                                    contentType: "application/json;charset=utf-8",
+                                    data: JSON.stringify(data.field),
                                     success: function(response) {
                                         layer.msg('更新成功！');
                                         layer.close(index); // 关闭弹出层
@@ -401,7 +403,6 @@
                         }
                     });
                 }
-
                 function deleteModel(id) {
                     layer.confirm('确定要删除吗？', function(index) {
                         $.ajax({

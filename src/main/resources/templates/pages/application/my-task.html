@@ -94,7 +94,9 @@
                         return (d.price * d.quantity).toFixed(2);  // 计算总价并保留两位小数
                     }
                 },
-                {field: 'applyTime', title: '申请时间'},
+                {field: 'applyTime',title: '出库时间', templet: function(d){
+                        return formatDate(d.applyTime);
+                    }},
                 {title: '操作 ', minWidth: 200, toolbar: '#currentTableBar', align: "center"}
                 // 添加更多的列来匹配你的任务数据...
             ]],
@@ -106,7 +108,14 @@
             page: true,
             skin: 'line'
         });
-
+        function formatDate(dateStr) {
+            if (!dateStr) return '';
+            let date = new Date(dateStr);
+            let year = date.getFullYear();
+            let month = (date.getMonth() + 1).toString().padStart(2, '0');
+            let day = date.getDate().toString().padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
         form.on('submit(data-search-btn)', function (data) {
             var req={};
             data=data.field;

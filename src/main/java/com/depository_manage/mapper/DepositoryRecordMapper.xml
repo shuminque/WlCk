@@ -521,12 +521,25 @@
             SELECT
                 DATE_FORMAT(time, '%Y-%m') as month,  -- Using 'time' column from once_fill
             depositoryId as depository_id,        -- Using 'depositoryId' column from once_fill
-            0 as type, -- Outbound for once_fill records
-            SUM(price * quantity) as amount
+            1 as type, -- Inbound for once_fill records
+            SUM(unit_price * quantity) as amount
         FROM once_fill
         WHERE DATE_FORMAT(time, '%Y') = #{year}
         GROUP BY DATE_FORMAT(time, '%Y-%m'), depositoryId
+
         UNION ALL
+
+        SELECT
+            DATE_FORMAT(time, '%Y-%m') as month,  -- Using 'time' column from once_fill
+        depositoryId as depository_id,        -- Using 'depositoryId' column from once_fill
+        0 as type, -- Outbound for once_fill records
+        SUM(unit_price * quantity) as amount
+        FROM once_fill
+        WHERE DATE_FORMAT(time, '%Y') = #{year}
+        GROUP BY DATE_FORMAT(time, '%Y-%m'), depositoryId
+
+        UNION ALL
+
         SELECT
             DATE_FORMAT(apply_time, '%Y-%m') as month,
         depository_id,                        -- Using 'depository_id' column from depository_record
@@ -541,10 +554,10 @@
             month,
             ROUND(SUM(CASE WHEN depository_id = 1 AND type = 1 THEN amount ELSE 0 END), 2) as sabInboundAmount,
             ROUND(SUM(CASE WHEN depository_id = 1 AND type = 0 THEN amount ELSE 0 END), 2) as sabOutboundAmount,
-            ROUND(SUM(CASE WHEN depository_id = 1 THEN amount ELSE 0 END), 2) as sabStockAmount,
+            ROUND(SUM(CASE WHEN depository_id = 1 AND type = 1 THEN amount ELSE 0 END) - SUM(CASE WHEN depository_id = 1 AND type = 0 THEN amount ELSE 0 END), 2) as sabStockAmount,
             ROUND(SUM(CASE WHEN depository_id = 2 AND type = 1 THEN amount ELSE 0 END), 2) as zabInboundAmount,
             ROUND(SUM(CASE WHEN depository_id = 2 AND type = 0 THEN amount ELSE 0 END), 2) as zabOutboundAmount,
-            ROUND(SUM(CASE WHEN depository_id = 2 THEN amount ELSE 0 END), 2) as zabStockAmount
+            ROUND(SUM(CASE WHEN depository_id = 2 AND type = 1 THEN amount ELSE 0 END) - SUM(CASE WHEN depository_id = 2 AND type = 0 THEN amount ELSE 0 END), 2) as zabStockAmount
         FROM MonthlyAmounts
         GROUP BY month
         ORDER BY month;

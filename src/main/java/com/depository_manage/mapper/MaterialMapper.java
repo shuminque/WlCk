@@ -2,6 +2,7 @@ package com.depository_manage.mapper;
 
 import com.depository_manage.entity.Material;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
 import java.math.BigDecimal;
@@ -26,7 +27,7 @@ public interface MaterialMapper {
      * @param map 参数列表
      * @return 受影响的行数
      */
-    Integer updateMaterial(Map<String, Object> map);
+    Integer updateMaterial(@Param("id") int id, @Param("map") Map<String, Object> map);
 
     /**
      * 更新一条库存记录
