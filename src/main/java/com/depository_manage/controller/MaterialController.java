@@ -56,6 +56,9 @@ public class MaterialController {
 
     @PutMapping("/material/{id}")
     public RestResponse updateMaterial(@PathVariable int id, @RequestBody Map<String, Object> map) {
+        // 将 id 也放入 map 中，以便在 MyBatis 映射中使用
+        map.put("id", id);
+
         // 对传入的数据进行一些处理或验证，比如空值检查等
         for(Map.Entry<String, Object> entry : map.entrySet()){
             if("".equals(entry.getValue())){
@@ -69,12 +72,10 @@ public class MaterialController {
             return new RestResponse("AT号和品名是必填的", 400, null);
         }
 
-        int result = materialService.updateMaterial(id, map);
-        if(result > 0) {
-            return new RestResponse("更新成功！", 200, null);
-        } else {
-            return new RestResponse("更新失败！", 500, null);
-        }
+        int result = materialService.updateMaterial(map);
+        return CrudUtil.putHandle(result,1);  // 假设CrudUtil.updateHandle是一个静态方法，用于处理更新操作的结果
     }
+
+
 
 }

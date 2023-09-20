@@ -33,8 +33,8 @@ public class MaterialServiceImpl implements MaterialService {
     }
 
     @Override
-    public Integer updateMaterial(int id, Map<String, Object> map) {
-        return materialMapper.updateMaterial(id, map);
+    public Integer updateMaterial(Map<String, Object> map) {
+        return materialMapper.updateMaterial(map);
     }
 
 

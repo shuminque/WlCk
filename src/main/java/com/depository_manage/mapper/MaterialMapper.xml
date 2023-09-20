@@ -208,7 +208,7 @@
         SELECT id FROM material_state WHERE sname = #{stateName}
     </select>
     <!-- 修改数据 -->
-    <update id="updateMaterial">
+    <update id="updateMaterial" parameterType="map">
         UPDATE material
         <set>
             <if test="atId != null">

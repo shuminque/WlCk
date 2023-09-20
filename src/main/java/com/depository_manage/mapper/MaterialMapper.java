@@ -27,7 +27,7 @@ public interface MaterialMapper {
      * @param map 参数列表
      * @return 受影响的行数
      */
-    Integer updateMaterial(@Param("id") int id, @Param("map") Map<String, Object> map);
+    Integer updateMaterial(Map<String, Object> map);
 
     /**
      * 更新一条库存记录
