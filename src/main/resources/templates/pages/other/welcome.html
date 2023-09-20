@@ -361,7 +361,7 @@
                     {
                         name: 'SAB',
                         type: 'line',
-                        stack: '金额',
+                        // stack: '金额',
                         smooth: true,
                         label: {
                             normal: {
@@ -375,7 +375,7 @@
                     {
                         name: 'ZAB',
                         type: 'line',
-                        stack: '金额',
+                        // stack: '金额',
                         smooth: true,
                         label: {
                             normal: {
@@ -427,12 +427,24 @@
                         name: 'SAB',
                         type: 'bar',
                         barGap: '1%',
+                        label: {
+                            normal: {
+                                show: true,
+                                position: 'top'
+                            }
+                        },
                         data: sabData
                     },
                     {
                         name: 'ZAB',
                         type: 'bar',
                         barGap: '1%',
+                        label: {
+                            normal: {
+                                show: true,
+                                position: 'top'
+                            }
+                        },
                         data: zabData,
                     }
                 ]
