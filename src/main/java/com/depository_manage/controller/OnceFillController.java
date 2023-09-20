@@ -28,9 +28,7 @@ public class OnceFillController {
     public ResponseEntity<Void> addRecords(@RequestBody List<OnceFill> records, HttpServletRequest request) {
         try {
             UserToken userToken = (UserToken) request.getAttribute("userToken");
-            Integer depositoryId = userToken.getUser().getDepositoryId();  // 假设您的User对象中有一个getDepositoryId()方法
-
-            // 传递depositoryId给您的服务方法
+            Integer depositoryId = userToken.getUser().getDepositoryId();
             onceFillService.saveAll(records, depositoryId);
             // 返回成功响应，HTTP 204 No Content
             return ResponseEntity.noContent().build();

@@ -53,4 +53,28 @@ public class MaterialController {
         int result = materialService.deleteMaterialById(id);
         return CrudUtil.deleteHandle(result,1);
     }
+
+    @PutMapping("/material/{id}")
+    public RestResponse updateMaterial(@PathVariable int id, @RequestBody Map<String, Object> map) {
+        // 对传入的数据进行一些处理或验证，比如空值检查等
+        for(Map.Entry<String, Object> entry : map.entrySet()){
+            if("".equals(entry.getValue())){
+                map.put(entry.getKey(), null);
+            }
+        }
+
+        // 检查必填字段是否为null或空字符串，此处仅为示例，你可以根据你的实际需求来决定哪些字段是必填的
+        if(map.get("atId") == null || "".equals(map.get("atId").toString().trim())
+                || map.get("mname") == null || "".equals(map.get("mname").toString().trim())) {
+            return new RestResponse("AT号和品名是必填的", 400, null);
+        }
+
+        int result = materialService.updateMaterial(id, map);
+        if(result > 0) {
+            return new RestResponse("更新成功！", 200, null);
+        } else {
+            return new RestResponse("更新失败！", 500, null);
+        }
+    }
+
 }

@@ -23,7 +23,7 @@ public interface MaterialService {
      * @param map 参数列表
      * @return 受影响的行数
      */
-    Integer updateMaterial(Map<String, Object> map);
+    Integer updateMaterial(int id,Map<String, Object> map);
 
     /**
      * 根据id删除一条库存记录

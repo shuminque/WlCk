@@ -56,10 +56,6 @@
                                     <div class="layui-form-item">
                                         <label class="layui-form-label">出库类型:</label>
                                         <div class="layui-input-block">
-<!--                                            <select name="applyRemark" class="layui-select" lay-filter="applyRemarkFilter">-->
-<!--                                                <option value="领用出库">领用出库</option>-->
-<!--                                                <option value="销售出库">销售出库</option>-->
-<!--                                            </select>-->
                                             <button name="applyRemark" class="layui-input custom-input" id="ID-dropdown-demo-complex">
                                                 选择出库类型
                                             </button>
@@ -345,7 +341,6 @@
                     // 清除旧的出库类型下拉列表
                     document.getElementById('ID-dropdown-demo-complex').innerHTML = '';
                 }
-
                 function loadOutTypeDropdown(depositoryId) {
                     if (depositoryId === '1') {
                         setParentForChild(dropDataSAB);
@@ -364,7 +359,7 @@
                     {searchKey: 'mname', searchPlaceholder: "搜索品名"},
                 ],
                 table: { // 定义表格参数
-                    url: pp, // 你的数据源URL
+                    url: pp,
                     parseData: function (res) { //res 即为原始返回的数据
                         return {
                             "status": res.status, //解析接口状态
@@ -395,7 +390,6 @@
                         {field: 'unitPrice',title: '单价'},
                     ]]
                 },
-
                 done: function (elem, data) {
                     // 获取选中的数据
                     var selectedData = data.data[0];
@@ -417,8 +411,7 @@
             });
         },
         error: function() {
-        // 处理错误，例如显示一个消息
-        layer.msg('无法获取用户的厂区信息');
+            layer.msg('无法获取用户的厂区信息');
         }
     });
         form.on('submit(formStep2)', function (data) {

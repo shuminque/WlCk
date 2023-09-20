@@ -53,6 +53,7 @@ public class OnceFillServiceImpl implements OnceFillService {
     public Integer findCountByCondition(Map<String,Object> map) {
         return onceFillMapper.findCountByCondition(map);
     }
+    @Override
     public void saveAll(List<OnceFill> records, Integer depositoryId) {
         for (OnceFill record : records) {
             record.setDepositoryId(depositoryId);

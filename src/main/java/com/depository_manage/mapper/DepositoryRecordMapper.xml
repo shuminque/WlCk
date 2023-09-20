@@ -517,21 +517,37 @@
     </delete>
 
     <select id="getMonthlyAmountsForYear" resultType="com.depository_manage.pojo.MonthlyAmountDTO" parameterType="string">
-    SELECT
-        DATE_FORMAT(apply_time, '%Y-%m') as month,
-    ROUND(SUM(CASE WHEN depository_id = 1 AND type = 1 THEN price * quantity ELSE 0 END), 2) as sabInboundAmount,
-    ROUND(SUM(CASE WHEN depository_id = 1 AND type = 0 THEN price * quantity ELSE 0 END), 2) as sabOutboundAmount,
-    /* 在库金额的计算可能需要更复杂的逻辑 */
-    ROUND(SUM(CASE WHEN depository_id = 1 THEN price * quantity ELSE 0 END), 2) as sabStockAmount,
-    ROUND(SUM(CASE WHEN depository_id = 2 AND type = 1 THEN price * quantity ELSE 0 END), 2) as zabInboundAmount,
-    ROUND(SUM(CASE WHEN depository_id = 2 AND type = 0 THEN price * quantity ELSE 0 END), 2) as zabOutboundAmount,
-    /* 在库金额的计算可能需要更复杂的逻辑 */
-    ROUND(SUM(CASE WHEN depository_id = 2 THEN price * quantity ELSE 0 END), 2) as zabStockAmount
+        WITH MonthlyAmounts AS (
+            SELECT
+                DATE_FORMAT(time, '%Y-%m') as month,  -- Using 'time' column from once_fill
+            depositoryId as depository_id,        -- Using 'depositoryId' column from once_fill
+            0 as type, -- Outbound for once_fill records
+            SUM(price * quantity) as amount
+        FROM once_fill
+        WHERE DATE_FORMAT(time, '%Y') = #{year}
+        GROUP BY DATE_FORMAT(time, '%Y-%m'), depositoryId
+        UNION ALL
+        SELECT
+            DATE_FORMAT(apply_time, '%Y-%m') as month,
+        depository_id,                        -- Using 'depository_id' column from depository_record
+        type,
+        SUM(price * quantity) as amount
         FROM depository_record
         WHERE DATE_FORMAT(apply_time, '%Y') = #{year}
-        AND review_pass = 1
-        GROUP BY DATE_FORMAT(apply_time, '%Y-%m')
-        ORDER BY DATE_FORMAT(apply_time, '%Y-%m')
+          AND review_pass = 1
+        GROUP BY DATE_FORMAT(apply_time, '%Y-%m'), depository_id, type
+            )
+        SELECT
+            month,
+            ROUND(SUM(CASE WHEN depository_id = 1 AND type = 1 THEN amount ELSE 0 END), 2) as sabInboundAmount,
+            ROUND(SUM(CASE WHEN depository_id = 1 AND type = 0 THEN amount ELSE 0 END), 2) as sabOutboundAmount,
+            ROUND(SUM(CASE WHEN depository_id = 1 THEN amount ELSE 0 END), 2) as sabStockAmount,
+            ROUND(SUM(CASE WHEN depository_id = 2 AND type = 1 THEN amount ELSE 0 END), 2) as zabInboundAmount,
+            ROUND(SUM(CASE WHEN depository_id = 2 AND type = 0 THEN amount ELSE 0 END), 2) as zabOutboundAmount,
+            ROUND(SUM(CASE WHEN depository_id = 2 THEN amount ELSE 0 END), 2) as zabStockAmount
+        FROM MonthlyAmounts
+        GROUP BY month
+        ORDER BY month;
     </select>
 
 </mapper>
