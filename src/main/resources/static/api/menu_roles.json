@@ -6,7 +6,7 @@
     "logoInfo": {
         "title": "综合仓库",
         "image": "static/images/xuri-logo.jpeg",
-        "href": "/welcome"
+        "href": "/index#//welcome"
     },
     "menuInfo": [
         {

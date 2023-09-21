@@ -17,14 +17,32 @@
     <![endif]-->
     <style>
         html, body {width: 100%;height: 100%;overflow: hidden}
-        body {background: #1E9FFF;}
+        body {
+            background: linear-gradient(to right, #1E9FFF, #36D1DC); /* 背景渐变 */
+        }
         body:after {content:'';background-repeat:no-repeat;background-size:cover;-webkit-filter:blur(3px);-moz-filter:blur(3px);-o-filter:blur(3px);-ms-filter:blur(3px);filter:blur(3px);position:absolute;top:0;left:0;right:0;bottom:0;z-index:-1;}
         .layui-container {width: 100%;height: 100%;overflow: hidden}
         .admin-login-background {width:360px;height:300px;position:absolute;left:50%;top:40%;margin-left:-180px;margin-top:-100px;}
         .logo-title {text-align:center;letter-spacing:2px;padding:14px 0;}
-        .logo-title h1 {color:#1E9FFF;font-size:25px;font-weight:bold;}
-        .login-form {background-color:#fff;border:1px solid #fff;border-radius:3px;padding:14px 20px;box-shadow:0 0 8px #eeeeee;}
+        .logo-title h1 {color: #0a6ab6;font-size: 25px;text-shadow: 2px 2px 4px rgba(0,0,0,0.1); /* 添加文字阴影 */}
+        .login-form {background-color:#fff;border:1px solid #fff;border-radius:3px;padding:14px 20px;box-shadow:0 0 8px #eeeeee;border-radius: 20px;}
         .login-form .layui-form-item {position:relative;}
+        .layui-btn-normal {
+            background-color: #1E9FFF;
+            border: none;
+            transition: transform 0.2s; /* 添加过渡效果 */
+        }
+        .layui-btn-normal:hover {
+            transform: translateY(-2px); /* 悬停时上移按钮 */
+        }
+        .layui-form-item input {
+            background-color: #FFFFFF;
+            border-radius: 20px; /* 输入框圆角 */
+            transition: box-shadow 0.3s; /* 添加过渡效果 */
+        }
+        .layui-form-item input:focus {
+            box-shadow: 0 0 5px #ffffff; /* 输入框聚焦时的阴影效果 */
+        }
         .login-form .layui-form-item label {position:absolute;left:1px;top:1px;width:38px;line-height:36px;text-align:center;color:#d2d2d2;}
         .login-form .layui-form-item input {padding-left:36px;}
         .captcha {width:60%;display:inline-block;}
@@ -42,11 +60,11 @@
                 </div>
                 <div class="layui-form-item">
                     <label class="layui-icon layui-icon-username" ></label>
-                    <input type="text" name="principal" lay-verify="required|account" placeholder="请输入邮箱" autocomplete="off" class="layui-input" >
+                    <input type="text" name="principal" lay-verify="required|account" placeholder="请输入账号" autocomplete="off" class="layui-input" >
                 </div>
                 <div class="layui-form-item">
                     <label class="layui-icon layui-icon-password" ></label>
-                    <input type="password" name="credentials" lay-verify="required|password" placeholder="密码" autocomplete="off" class="layui-input">
+                    <input type="password" name="credentials" lay-verify="required|password" placeholder="请输入密码" autocomplete="off" class="layui-input">
                 </div>
                 <!-- 徒有其表的验证码 -->
                 <div class="layui-form-item">
