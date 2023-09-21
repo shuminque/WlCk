@@ -149,6 +149,12 @@
                                 table.reload('currentTableId'); // 重新加载表格
                             }
                         },
+                        error: function (jqXHR, textStatus, errorThrown) {
+                            layer.close(this.layerIndex);
+                            layer.msg("添加失败，请检查后重新添加！: " + textStatus, {
+                                time: 2000
+                            }); //可以根据需要更改错误消息
+                        },
                         complete: function () {
                             form.val("form1", {
                                 'id':"",

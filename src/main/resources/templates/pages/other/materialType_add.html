@@ -124,35 +124,39 @@
                     });
                     form.on('submit(formStep)', function (data) {
                         $.ajax({
-                            url:"/materialType",
-                            type:'post',
-                            dataType:'json',
+                            url: "/materialType",
+                            type: 'post',
+                            dataType: 'json',
                             contentType: "application/json;charset=utf-8",
-                            data:JSON.stringify(data.field),
-                            beforeSend:function () {
+                            data: JSON.stringify(data.field),
+                            beforeSend: function () {
                                 this.layerIndex = layer.load(0, { shade: [0.5, '#393D49'] });
                             },
-                            success:function(data){
+                            success: function (data) {
                                 layer.close(this.layerIndex);
-                                if(data.status >= 300){
-                                    layer.msg(data.statusInfo.message);//失败的表情
+                                if (data.status >= 300) {
+                                    layer.msg(data.statusInfo.message); //失败的表情
                                     return;
-                                }else{
+                                } else {
                                     layer.msg("添加成功！", {
-                                        icon: 6,//成功的表情
+                                        icon: 6, //成功的表情
                                         time: 1000 //1秒关闭（如果不配置，默认是3秒）
                                     });
                                     table.reload('currentTableId'); // 重新加载表格
                                 }
                             },
+                            error: function (jqXHR, textStatus, errorThrown) {
+                                layer.close(this.layerIndex);
+                                layer.msg("添加失败，请检查后重新添加！: " + textStatus); //可以根据需要更改错误消息
+                            },
                             complete: function () {
                                 form.val("form1", {
-                                    'id': ""
-                                    ,"tname": ""
-                                    ,"introduce": ""
+                                    'id': "",
+                                    "tname": "",
+                                    "introduce": ""
                                 })
                             }
-                        })
+                        });
                         return false;
                     });
                     table.on('tool(currentTableFilter)', function(obj) {
