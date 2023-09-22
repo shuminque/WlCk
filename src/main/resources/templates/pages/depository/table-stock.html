@@ -79,6 +79,7 @@
                 table.render({
                     elem: "#currentTableId",
                     url: pp,
+                    height: "full-50", // 设置表格高度并固定表头
                     parseData: function (res) { //res 即为原始返回的数据
                         return {
                             "status": res.status, //解析接口状态
@@ -117,7 +118,7 @@
                                 return parseFloat(d.price).toFixed(2);  // 格式化为两位小数
                             }},
                     ]],
-                    limits: [10, 50, 100, 10000],
+                    limits: [10, 50, 100, 100000],
                     limit: 10,
                     page: true,
                     skin: 'line',

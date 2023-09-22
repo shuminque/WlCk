@@ -22,6 +22,28 @@
     layui.use(['treeTable', 'jquery'], function() {
         var $ = layui.jquery;
         var treeTable = layui.treeTable;
+        $.ajax({
+            url: '/get_user_depository',
+            type: 'GET',
+            dataType: 'json',
+            success: function(data) {
+                var userDepositoryId = data.depositoryId;
+                // 根据userDepositoryId显示/隐藏表格
+                if (userDepositoryId === 1) {
+                    // 如果userDepositoryId为1，显示SAB表格并隐藏ZAB表格的容器
+                    $('#categoryTreeSAB').parent().show();
+                    $('#categoryTreeZAB').parent().hide();
+                } else if (userDepositoryId === 2) {
+                    // 如果userDepositoryId为2，显示ZAB表格并隐藏SAB表格的容器
+                    $('#categoryTreeZAB').parent().show();
+                    $('#categoryTreeSAB').parent().hide();
+                } else {
+                    // 如果userDepositoryId为其他值，显示两个表格的容器
+                    $('#categoryTreeSAB').parent().show();
+                    $('#categoryTreeZAB').parent().show();
+                }
+            },
+        });
 
         function renderTreeTable(elem, url) {
             $.get(url, function(response) {
