@@ -51,8 +51,7 @@ public class CategoryService {
     }
 
     public int addCategory(Category category) {
-        categoryMapper.insert(category);
-        return 0;
+        return categoryMapper.insert(category);
     }
 
 

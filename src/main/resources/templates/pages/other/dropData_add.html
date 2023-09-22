@@ -42,8 +42,6 @@
                 });
             });
         }
-
-
         renderTreeTable('#categoryTreeSAB', "/api/categories/sab");
         renderTreeTable('#categoryTreeZAB', "/api/categories/zab");
         // 绑定 categoryTreeSAB 表格的工具按钮事件
@@ -66,15 +64,20 @@
         function handleToolEvent(layEvent, data, tableType) {
             var urlPrefix = '/api/categories/' + tableType.toLowerCase();
             if (layEvent === 'add') {
-                // 处理添加事件
                 layer.prompt({title: '请输入新分类名称', formType: 0}, function(value, index){
-                    // 调用添加 API
-                    $.post(urlPrefix + '/add', { title: value, parentId: data.id }, function(response) {
-                        if(response.success) {
-                            layer.msg('添加成功!');
-                            treeTable.reload('categoryTree' + tableType);
-                        } else {
-                            layer.msg('添加失败: ' + response.message);
+                    $.ajax({
+                        url: '/api/categories/add',
+                        type: 'POST',
+                        contentType: 'application/json',
+                        data: JSON.stringify({ title: value, parentId: data.id ,depositoryId: data.depositoryId}), // 将对象转换为JSON字符串
+                        success: function(response) {
+                            if(response.success) {
+                                layer.msg('添加成功!');
+                                renderTreeTable('#categoryTree' + tableType, "/api/categories/" + tableType.toLowerCase());
+                            } else {
+                                layer.msg('添加失败: ' + response.message);
+                                renderTreeTable('#categoryTree' + tableType, "/api/categories/" + tableType.toLowerCase());
+                            }
                         }
                     });
                     layer.close(index);
@@ -84,14 +87,14 @@
                 layer.prompt({title: '修改分类名称', formType: 0, value: data.title}, function(value, index){
                     // 调用更新 API
                     $.ajax({
-                        url: urlPrefix + '/update',
+                        url: '/api/categories/update',
                         type: 'PUT',
                         contentType: 'application/json',
-                        data: JSON.stringify({ id: data.id, title: value }),
+                        data: JSON.stringify({ id: data.id,title: value }),
                         success: function(response) {
                             if(response.success) {
                                 layer.msg('修改成功!');
-                                treeTable.reload('categoryTree' + tableType);
+                                renderTreeTable('#categoryTree' + tableType, "/api/categories/" + tableType.toLowerCase());
                             } else {
                                 layer.msg('修改失败: ' + response.message);
                             }
@@ -109,8 +112,9 @@
                         success: function(response) {
                             if(response.success) {
                                 layer.msg('删除成功!');
-                                treeTable.reload('categoryTree' + tableType);
-                            } else {
+                                renderTreeTable('#categoryTree' + tableType, "/api/categories/" + tableType.toLowerCase());
+                            }
+                            else {
                                 layer.msg('删除失败: ' + response.message);
                             }
                         }

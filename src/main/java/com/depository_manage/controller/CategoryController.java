@@ -5,6 +5,7 @@ import com.depository_manage.pojo.RestResponse;
 import com.depository_manage.service.CategoryService;
 import com.depository_manage.utils.CrudUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,16 +20,12 @@ public class CategoryController {
     @Autowired
     private CategoryService categoryService;
 
-//    @GetMapping("/sab")
-//    public List<Category> getSABCategories() {
-//        return categoryService.getAllSABCategories();
-//    }
     @GetMapping("/sab")
     public ResponseEntity<Map<String, Object>> getSABCategories() {
         List<Category> categories = categoryService.getAllSABCategories();
         Map<String, Object> response = new HashMap<>();
         response.put("code", 0);
-        response.put("msg", "");
+        response.put("count",2);
         response.put("data", categories);
         return ResponseEntity.ok(response);
     }
@@ -41,23 +38,37 @@ public class CategoryController {
         response.put("data", categories);
         return ResponseEntity.ok(response);
     }
-
     @PostMapping("/add")
-    public RestResponse addCategory(@RequestBody Category category) {
+    public ResponseEntity<RestResponse> addCategory(@RequestBody Category category) {
         int result = categoryService.addCategory(category);
-        return CrudUtil.postHandle(result, 1);  // 假设 CrudUtil 有一个名为 addHandle 的方法
+        if (result > 0) {
+            return ResponseEntity.ok(new RestResponse(true, "添加成功"));
+        } else {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new RestResponse(false, "添加错误"));
+        }
     }
-
     @PutMapping("/update")
-    public RestResponse updateMaterial(@RequestBody Map<String, Object> map) {
+    public ResponseEntity<RestResponse> updateMaterial(@RequestBody Map<String, Object> map) {
         int result = categoryService.update(map);
-        return CrudUtil.putHandle(result, 1);  // 假设 CrudUtil 有一个名为 updateHandle 的方法
+        if (result > 0) {
+            return ResponseEntity.ok(new RestResponse(true, "Update Successful"));
+        } else {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new RestResponse(false, "Update Failed"));
+        }
     }
-
-
     @DeleteMapping("/delete/{id}")
-    public RestResponse deleteCategory(@PathVariable int id){
-        int result = categoryService.deleteCategory(id);
-        return CrudUtil.deleteHandle(result,1);
+    public ResponseEntity<Map<String, Object>> deleteCategory(@PathVariable Integer id) {
+        Map<String, Object> response = new HashMap<>();
+        try {
+            // 执行删除操作
+            categoryService.deleteCategory(id);
+            response.put("success", true);
+            response.put("message", "删除成功");
+        } catch (Exception e) {
+            response.put("success", false);
+            response.put("message", e.getMessage());
+        }
+        return ResponseEntity.ok(response);
     }
+
 }

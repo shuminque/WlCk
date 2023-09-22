@@ -24,6 +24,8 @@ public class RestResponse implements Serializable {
      * 状态码
      */
     private int status=200;
+    private boolean success; // 新增字段
+    private String message;  // 新增字段
     /**
      * 状态信息
      */
@@ -47,5 +49,10 @@ public class RestResponse implements Serializable {
         this.status = status;
         this.statusInfo = statusInfo;
     }
+    public RestResponse(boolean success, String message) {
+        this.success = success;
+        this.message = message;
+    }
+
 }
 

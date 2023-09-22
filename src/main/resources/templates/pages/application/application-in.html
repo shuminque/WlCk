@@ -232,12 +232,7 @@
                             icon: 6,//成功的表情
                             time: 500 //1秒关闭（如果不配置，默认是3秒）
                         }, function(){
-                            if (method === 'PUT') {
-                                // window.location.href = '/table_in' ; // 返回编辑页面
-                                parent.layer.closeAll(); // 关闭所有父页面的弹窗
-                            } else if (method === 'POST') {
-                                step.next('#stepForm'); // 进入下一步
-                            }
+                            window.location.href = '/'; // 导航到首页
                         });
                     }
                 },

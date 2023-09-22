@@ -50,146 +50,8 @@
 <script type="text/javascript" src="/static/js/http_ajax.googleapis.com_ajax_libs_jquery_3.5.1_jquery.js" charset="utf-8"></script>
 <script>
     let dropdownCount = 2;
-    var dropDataSAB = [
-        {
-            title: 'SAB领用出库',
-            child: [
-                { title: '切断（圆锯机）' },
-                { title: '切断（冷锯机）' },
-                { title: '冲床' },
-                { title: '生研GA' },
-                { title: '生研CE' },
-                { title: '刻印' },
-                { title: 'N沟' },
-                {
-                    title: '单能线A-L',
-                    child: [
-                        { title: 'A线' },
-                        { title: 'B线' },
-                        { title: 'C线' },
-                        { title: 'D线' },
-                        { title: 'E线' },
-                        { title: 'G线' },
-                        { title: 'H线' },
-                        { title: 'I线' },
-                        { title: 'K线' },
-                        { title: 'L线' }
-                    ]
-                },
-                {
-                    title: '单能线M-V',
-                    child: [
-                        { title: 'M线' },
-                        { title: 'N线' },
-                        { title: 'O线' },
-                        { title: 'P线' },
-                        { title: 'Q线' },
-                        { title: 'R线' },
-                        { title: 'S线' },
-                        { title: 'T线' },
-                        { title: 'U线' },
-                        { title: 'V线' }
-                    ]
-                },
-                { title: '磨刀房' },
-                { title: '设备课' }
-            ]
-        },
-        {
-            title: '销售出库',
-            child: [
-                { title: '泰国旭' },
-                { title: '日本旭' },
-                { title: '合肥NSK' }
-            ]
-        }
-    ];
-    var dropDataZAB = [
-        {
-            title: 'ZAB领用工程',
-            child: [
-                { title: '切断（圆锯机）' },
-                { title: '切断（冷锯机）' },
-                { title: '切管' },
-                { title: '冲床' },
-                { title: '生研GA' },
-                { title: '生研CE' },
-                { title: '刻印' },
-                { title: 'N沟' },
-                {
-                    title: '单能线A-E',
-                    child: [
-                        { title: 'A1线' },
-                        { title: 'A2前线' },
-                        { title: 'A2后线' },
-                        { title: 'B1线' },
-                        { title: 'B2线' },
-                        { title: 'C1线' },
-                        { title: 'C2线' },
-                        { title: 'D1线' },
-                        { title: 'D2线' },
-                        { title: 'E线' },
-                        { title: 'E1线' },
-                        { title: 'E2线' }
-                    ]
-                },
-                {
-                    title: '单能线F-I',
-                    child: [
-                        { title: 'F线' },
-                        { title: 'G线' },
-                        { title: 'J线' },
-                        { title: 'M线' },
-                        { title: 'N线' },
-                        { title: 'O线' },
-                        { title: 'P线' },
-                        { title: 'Q线' },
-                        { title: 'R线' },
-                        { title: 'I线' }
-                    ]
-                },
-                {
-                    title: '单能线T-W',
-                    child: [
-                        { title: 'TA线' },
-                        { title: 'TB线' },
-                        { title: 'UA线' },
-                        { title: 'UB线' },
-                        { title: 'VA线' },
-                        { title: 'VB线' },
-                        { title: 'WA线' },
-                        { title: 'WB线' }
-                    ]
-                },
-                {
-                    title: '数控NC',
-                    child: [
-                        { title: '4#机' },
-                        { title: '5#机' },
-                        { title: '6#机' },
-                        { title: '7#机' },
-                        { title: '8#机' },
-                        { title: '9#机' },
-                        { title: '10#机' },
-                        { title: '13#机' }
-                    ]
-                },
-                { title: '检测' },
-                { title: '磨刀房' },
-                { title: '设备课' },
-                { title: '金加工' },
-                { title: '大修组' }
-            ]
-        },
-        {
-            title: '销售出库',
-            child: [
-                { title: '泰国旭' },
-                { title: '日本旭' },
-                { title: '合肥NSK' }
-            ]
-        }
-    ];
+    let dropDataSAB = [];
+    let dropDataZAB = [];
     layui.use(['form', 'layer', 'table', 'laydate','upload','jquery'], function() {
         var form = layui.form;
         var layer = layui.layer;
@@ -197,7 +59,16 @@
         var $ = layui.jquery;
         var dropdown = layui.dropdown;
         var upload = layui.upload;
-
+        function formatData(apiData) {
+            let formattedData = apiData.map(item => {
+                let formattedItem = { title: item.title };
+                if (item.children && item.children.length > 0) {
+                    formattedItem.child = formatData(item.children); // 递归处理子项目
+                }
+                return formattedItem;
+            });
+            return formattedData;
+        }
         function setParentForChild(data) {
             for (let i = 0; i < data.length; i++) {
                 if (data[i].child) {
@@ -208,40 +79,62 @@
                 }
             }
         }
-        function loadDepositoryDataForElem(elemSelector) {
+        var userDepositoryId;
+        function loadDepositoryDataForElem(elemSelector, dropdownData) {
+            // 使用存储的 userDepositoryId 而不是重新获取
+            setParentForChild(dropdownData);
+            dropdown.render({
+                elem: elemSelector,
+                data: dropdownData,
+                click: function(item) {
+                    let path = item.title;
+                    let currentItem = item;
+                    while (currentItem.parent) {
+                        path = currentItem.parent.title + "-" + path;
+                        currentItem = currentItem.parent;
+                    }
+                    $(elemSelector).text(path);
+                    const remarkInputSelector = elemSelector.replace(/ID-dropdown-demo-complex(-\d+)?$/, "applyRemarkInput$1");
+                    $(remarkInputSelector).val(path);
+                }
+            });
+        }
+        $(document).ready(function() {
             $.ajax({
                 url: '/get_user_depository',
                 type: 'GET',
                 dataType: 'json',
                 success: function(data) {
-                    var userDepositoryId = data.depositoryId;
-                    var dropdownData = userDepositoryId === 1 ? dropDataSAB : dropDataZAB;
-                    // 为传递的元素选择器设置父子关系
-                    setParentForChild(dropdownData);
-                    // 渲染下拉数据
-                    dropdown.render({
-                        elem: elemSelector,
-                        data: dropdownData,
-                        click: function(item) {
-                            let path = item.title;
-                            let currentItem = item;
-                            while (currentItem.parent) {
-                                path = currentItem.parent.title + "-" + path;
-                                currentItem = currentItem.parent;
+                    userDepositoryId = data.depositoryId;
+
+                    function loadCategoryData(category, callback) {
+                        $.get('/api/categories/' + category, function(response) {
+                            if (response.code === 0) {
+                                callback(formatData(response.data));
+                            } else {
+                                layer.msg(`无法加载${category.toUpperCase()}的分类数据`);
                             }
-                            $(elemSelector).text(path);
-                            const remarkInputSelector = elemSelector.replace(/ID-dropdown-demo-complex(-\d+)?$/, "applyRemarkInput$1");
-                            $(remarkInputSelector).val(path);
-                        }
-                    });
+                        }).fail(function() {
+                            layer.msg(`无法加载${category.toUpperCase()}的分类数据`);
+                        });
+                    }
+
+                    if (userDepositoryId === 1) {
+                        loadCategoryData('sab', function(data) {
+                            dropDataSAB = data;
+                            loadDepositoryDataForElem('#ID-dropdown-demo-complex-1', dropDataSAB);
+                        });
+                    } else {
+                        loadCategoryData('zab', function(data) {
+                            dropDataZAB = data;
+                            loadDepositoryDataForElem('#ID-dropdown-demo-complex-1', dropDataZAB);
+                        });
+                    }
                 },
                 error: function() {
                     layer.msg('无法获取用户的厂区信息');
                 }
             });
-        }
-        $(document).ready(function() {
-            loadDepositoryDataForElem('#ID-dropdown-demo-complex-1');
         });
 
         laydate.render({
@@ -265,7 +158,8 @@
             laydate.render({
                 elem: $('#onceFillTable tbody tr:last .storageDate')[0], // 选择最后一个.storageDate元素
             });
-            loadDepositoryDataForElem(`#ID-dropdown-demo-complex-${dropdownCount}`);
+            var dropdownData = userDepositoryId === 1 ? dropDataSAB : dropDataZAB;
+            loadDepositoryDataForElem(`#ID-dropdown-demo-complex-${dropdownCount}`, dropdownData);
         });
 
         // 删除条目
