@@ -5,7 +5,10 @@ import com.depository_manage.mapper.CategoryMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 public class CategoryService {
@@ -18,20 +21,45 @@ public class CategoryService {
     }
 
     public List<Category> getAllSABCategories() {
-        return categoryMapper.findAllByDepositoryId(1); // 1 represents SAB
+        List<Category> flatCategories = categoryMapper.findAllByDepositoryId(1); // 1 represents SAB
+        return buildHierarchy(flatCategories);
     }
 
     public List<Category> getAllZABCategories() {
-        return categoryMapper.findAllByDepositoryId(2); // 2 represents ZAB
+        List<Category> flatCategories = categoryMapper.findAllByDepositoryId(2); // 2 represents ZAB
+        return buildHierarchy(flatCategories);
     }
 
-    public void addCategory(Category category) {
+    private List<Category> buildHierarchy(List<Category> flatCategories) {
+        List<Category> topLevelCategories = flatCategories.stream()
+                .filter(c -> c.getParentId() == null)
+                .collect(Collectors.toList());
+
+        topLevelCategories.forEach(topLevelCategory -> addChildren(topLevelCategory, flatCategories));
+
+        return topLevelCategories;
+    }
+
+    private void addChildren(Category parent, List<Category> flatCategories) {
+        List<Category> children = flatCategories.stream()
+                .filter(c -> c.getParentId() != null && c.getParentId().equals(parent.getId()))
+                .collect(Collectors.toList());
+
+        parent.setChildren(new ArrayList<>(children));
+
+        children.forEach(child -> addChildren(child, flatCategories));
+    }
+
+    public int addCategory(Category category) {
         categoryMapper.insert(category);
+        return 0;
     }
 
-    public void updateCategory(Category category) {
-        categoryMapper.update(category);
+
+    public Integer update(Map<String, Object> map) {
+        return categoryMapper.update(map);
     }
+
 
     public Integer deleteCategory(Integer id) {
         return categoryMapper.deleteCategory(id);

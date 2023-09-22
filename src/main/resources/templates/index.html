@@ -249,29 +249,45 @@
                 });
             }
             loadNotifications();
+            // $("#notification-list").on("click", "dd", function() {
+            //     var notificationId = $(this).data("id");
+            //     var content = $(this).text();
+            //     var applicationIdMatch = content.match(/ID: (\d+)/);
+            //     var applicationId = applicationIdMatch ? applicationIdMatch[1] : null;
+            //
+            //     $.ajax({
+            //         url: '/notifications/mark-as-read/' + notificationId,
+            //         type: 'PUT',
+            //         success: function() {
+            //             loadNotifications();
+            //             if (content.includes("[出库]")) {
+            //                 window.location.href = "index#//application_out?id=" + applicationId+ "&refill=true";
+            //             } else if (content.includes("[入库]")) {
+            //                 window.location.href = "index#//application_in?id=" + applicationId + "&notificationId=" + notificationId + "&refill=true";
+            //             }
+            //             window.location.reload();
+            //         },
+            //         error: function() {
+            //             layer.msg('标记为已读失败');
+            //         }
+            //     });
+            // });
             $("#notification-list").on("click", "dd", function() {
                 var notificationId = $(this).data("id");
                 var content = $(this).text();
                 var applicationIdMatch = content.match(/ID: (\d+)/);
                 var applicationId = applicationIdMatch ? applicationIdMatch[1] : null;
 
-                $.ajax({
-                    url: '/notifications/mark-as-read/' + notificationId,
-                    type: 'PUT',
-                    success: function() {
-                        loadNotifications();
-                        if (content.includes("[出库]")) {
-                            window.location.href = "index#//application_out?id=" + applicationId+ "&refill=true";
-                        } else if (content.includes("[入库]")) {
-                            window.location.href = "index#//application_in?id=" + applicationId+ "&refill=true";
-                        }
-                        window.location.reload();
-                    },
-                    error: function() {
-                        layer.msg('标记为已读失败');
-                    }
-                });
+                // 保留页面跳转逻辑，但移除标记为已读的AJAX请求和页面重新加载
+                if (content.includes("[出库]")) {
+                    window.location.href = "index#//application_out?id=" + applicationId+ "&refill=true";
+                } else if (content.includes("[入库]")) {
+                    window.location.href = "index#//application_in?id=" + applicationId + "&notificationId=" + notificationId + "&refill=true";
+                }
+                window.location.reload();
             });
+
+
         });
         // 百度统计代码，只统计指定域名
         miniTongji.render({

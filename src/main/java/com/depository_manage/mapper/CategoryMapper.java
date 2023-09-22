@@ -4,6 +4,7 @@ import com.depository_manage.entity.Category;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
+import java.util.Map;
 
 @Mapper
 public interface CategoryMapper {
@@ -12,9 +13,9 @@ public interface CategoryMapper {
 
     List<Category> findAllByDepositoryId(Integer depositoryId);
 
-    void insert(Category category);
+    int insert(Category category);
 
-    void update(Category category);
+    Integer update(Map<String, Object> map);
 
     Integer deleteCategory(Integer id);
 }

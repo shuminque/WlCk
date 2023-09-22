@@ -192,6 +192,7 @@
                 }
             }
             var urlParams = new URLSearchParams(window.location.search);
+            var notificationId = urlParams.get('notificationId'); // 获取notificationId参数
             var id = urlParams.get('id');
             var refill = urlParams.get('refill') === 'true'; // 检查是否为填充模式
             var currentPage = sessionStorage.getItem('currentPage');
@@ -212,7 +213,21 @@
                     if(data.status >= 300){
                         layer.msg(data.statusInfo.message);//失败的表情
                         return;
-                    }else{
+                    } else {
+                        // 如果存在notificationId，发送AJAX请求来标记通知为已读
+                        if (notificationId) {
+                            $.ajax({
+                                url: '/notifications/mark-as-read/' + notificationId,
+                                type: 'PUT',
+                                success: function() {
+                                    console.log('Notification marked as read successfully.');
+                                },
+                                error: function() {
+                                    console.error('Failed to mark notification as read.');
+                                }
+                            });
+                        }
+
                         layer.msg("申请提交成功", {
                             icon: 6,//成功的表情
                             time: 500 //1秒关闭（如果不配置，默认是3秒）
@@ -229,7 +244,7 @@
                 complete: function () {
                     layer.close(this.layerIndex);
                 }
-            })
+            });
             return false;
         });
 

@@ -27,12 +27,19 @@
     </select>
 
     <!-- Update operation -->
-    <update id="update" parameterType="com.depository_manage.entity.Category">
+    <update id="update" parameterType="map">
         UPDATE categories
-        SET
-            depository_id = #{depositoryId},
-            parent_id = #{parentId},
-            title = #{title}
+        <set>
+            <if test="depositoryId != null">
+                depository_id = #{depositoryId},
+            </if>
+            <if test="parentId != null">
+                parent_id = #{parentId},
+            </if>
+            <if test="title != null">
+                title = #{title},
+            </if>
+        </set>
         WHERE id = #{id}
     </update>
 
@@ -44,6 +51,5 @@
     <select id="findAllByDepositoryId" resultMap="BaseResultMap">
         SELECT * FROM categories WHERE depository_id = #{depositoryId}
     </select>
-
 
 </mapper>
