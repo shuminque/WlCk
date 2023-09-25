@@ -90,6 +90,8 @@
             elem: '#date'
             ,range:true,
         });
+        var userReviewGroupId;
+        var userAuthority;
         //用户区分
         $.ajax({
             url: '/get_user_depository',
@@ -100,31 +102,33 @@
                 var userDepositoryId = data.depositoryId;
                 var toolbarTemplate;
                 var globalToolbarTemplate;
-                if (userDepositoryId === 1 || userDepositoryId === 2) {
-                    // 不包含删除按钮的模板
-                    toolbarTemplate = `
-                <a class="layui-btn layui-btn-normal layui-btn-xs data-count-edit" lay-event="detail">详情</a>
-<!--                <a class="layui-btn layui-btn-xs" lay-event="edit">修改</a>-->
-            `;      globalToolbarTemplate = `
-                <div class="layui-btn-container">
-                    <!-- 其他按钮可以放在这里 -->
-                </div>
-            `;
-                } else {
-                    // 包含删除按钮的模板
-                    toolbarTemplate = `
-                <a class="layui-btn layui-btn-normal layui-btn-xs data-count-edit" lay-event="detail">详情</a>
-<!--                <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>-->
-<!--                <a class="layui-btn layui-btn-xs layui-btn-danger data-count-delete" lay-event="delete">删除</a>-->
-            `;      globalToolbarTemplate = `
-                <div class="layui-btn-container">
-                    <!-- 其他按钮可以放在这里 -->
-<!--                    <button class="layui-btn layui-btn-sm layui-btn-danger data-delete-btn" lay-event="delete"> 删除</button>-->
-                </div>
-            `;
-                }
-                $("#currentTableId").html(toolbarTemplate);
-                $("#toolbarDemo").html(globalToolbarTemplate);
+                userAuthority = data.authority;
+                userReviewGroupId = data.review_group_id;
+//                 if (userDepositoryId === 1 || userDepositoryId === 2) {
+//                     // 不包含删除按钮的模板
+//                     toolbarTemplate = `
+//                 <a class="layui-btn layui-btn-normal layui-btn-xs data-count-edit" lay-event="detail">详情</a>
+// <!--                <a class="layui-btn layui-btn-xs" lay-event="edit">修改</a>-->
+//             `;      globalToolbarTemplate = `
+//                 <div class="layui-btn-container">
+//                     <!-- 其他按钮可以放在这里 -->
+//                 </div>
+//             `;
+//                 } else {
+//                     // 包含删除按钮的模板
+//                     toolbarTemplate = `
+//                 <a class="layui-btn layui-btn-normal layui-btn-xs data-count-edit" lay-event="detail">详情</a>
+//                 <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
+//                 <a class="layui-btn layui-btn-xs layui-btn-danger data-count-delete" lay-event="delete">删除</a>
+//             `;      globalToolbarTemplate = `
+//                 <div class="layui-btn-container">
+//                     <!-- 其他按钮可以放在这里 -->
+// <!--                    <button class="layui-btn layui-btn-sm layui-btn-danger data-delete-btn" lay-event="delete"> 删除</button>-->
+//                 </div>
+//             `;
+//                 }
+//                 $("#currentTableId").html(toolbarTemplate);
+//                 $("#toolbarDemo").html(globalToolbarTemplate);
                 // 如果depositoryId为0，则允许访问两个厂区
                 if (userDepositoryId === 0) {
                     pp = '/depositoryRecord';
@@ -176,7 +180,38 @@
                         {field: 'reviewTime',title: '出库时间',  sort: true, templet: function(d){
                                 return formatDate(d.reviewTime);
                             }},
-                        {title: '操作 ', minWidth: 200, toolbar: '#currentTableId', align: "center"}
+                        // {title: '操作 ', minWidth: 200, toolbar: '#currentTableId', align: "center"}
+                        {
+                            title: '操作',
+                            minWidth: 200,
+                            align: "center",
+                            templet: function (row) {
+                                // 初始化按钮字符串
+                                let buttons = '<a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="detail">详情</a>';
+
+                                // 获取当前日期
+                                const today = new Date();
+                                const currentMonth = today.getMonth() + 1; // JavaScript中，月份是从0开始的
+                                const currentYear = today.getFullYear();
+
+                                // 获取数据的日期
+                                const [year, month] = (typeof row.applyTime === 'string' && row.applyTime.includes('-')) ?
+                                    row.applyTime.split('-').map(Number) : [null, null];
+
+                                // 根据userAuthority和其他条件判断是否添加修改和删除按钮
+                                if (userAuthority === '仓管员' && year === currentYear && month === currentMonth ) {
+                                    buttons += '<a class="layui-btn layui-btn-xs" lay-event="edit">修改</a>';
+                                    buttons += '<a class="layui-btn layui-btn-xs layui-btn-danger" lay-event="delete">删除</a>';
+                                } else if (userAuthority === '审核人' && year === currentYear && month === currentMonth) {
+                                    buttons += '<a class="layui-btn layui-btn-xs" lay-event="edit">修改</a>';
+                                    buttons += '<a class="layui-btn layui-btn-xs layui-btn-danger" lay-event="delete">删除</a>';
+                                } else if (userAuthority === '系统管理员'){
+                                    buttons += '<a class="layui-btn layui-btn-xs" lay-event="edit">修改</a>';
+                                    buttons += '<a class="layui-btn layui-btn-xs layui-btn-danger" lay-event="delete">删除</a>';
+                                }
+                                return buttons;
+                            }
+                        }
                     ]],
                     limits: [10, 15, 20, 25, 50],
                     limit: 10,
@@ -345,7 +380,7 @@
                 });
             } else if (obj.event === 'edit') {
                 // 检查流程状态是否为待审核
-                if (data.state === '待审核') {
+                if (userReviewGroupId !== '') {
                     var index = layer.open({
                         title: '出库信息编辑',
                         type: 2,
@@ -353,7 +388,7 @@
                         maxmin: true,
                         shadeClose: true,
                         area: ['100%', '100%'],
-                        content: '/application_out?id=' + data.id,
+                        content: '/application_out?id=' + data.id + '&action=edit',
                         end: function() {
                             // 弹窗关闭后刷新当前页面
                             location.reload();

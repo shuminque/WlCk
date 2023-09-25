@@ -341,6 +341,30 @@
         $('.next').click(function () {
             step.next('#stepForm');
         });
+        $(document).ready(function() {
+            // 获取URL中的查询参数
+            var urlParams = new URLSearchParams(window.location.search);
+            var id = urlParams.get('id');
+            if (id) {
+                $.get('/get_record?id=' + id, function(data) {
+                    // 填充表单
+                    $('input[name="depositoryId"]').val(data.depositoryId);
+                    $('input[name="atId"]').val(data.atId);
+                    $('input[name="mname"]').val(data.mname);
+                    $('input[name="quantity"]').val(data.quantity);
+                    $('select[name="currency"]').val(data.currency);
+                    $('input[name="price"]').val(data.price);
+                    $('select[name="applyRemark"]').val(data.applyRemark);
+                    $('select[name="reviewerId"]').val(data.reviewerId);
+                    $('input[name="model"]').val(data.model);
+                    $('input[name="enginName"]').val(data.enginName);
+                    $('input[name="typeName"]').val(data.typeName);
+                    $('input[name="applyTime"]').val(data.applyTime);
+                    // 重新渲染表单
+                    layui.form.render();
+                });
+            }
+        });
     })
 </script>
 </body>
