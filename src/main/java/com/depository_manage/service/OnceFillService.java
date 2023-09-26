@@ -12,7 +12,7 @@ public interface OnceFillService {
     void insertOnceFill(Map<String, Object> map);
 
     // 更新一次性记录
-    void updateOnceFill(Map<String, Object> map);
+    Integer updateOnceFill(Map<String, Object> map);
 
     // 根据ID查询一次性记录
     OnceFill findOnceFillById(Integer id);

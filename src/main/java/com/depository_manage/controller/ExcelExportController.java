@@ -1,9 +1,8 @@
 package com.depository_manage.controller;
 
 import com.depository_manage.service.ReportService;
-import org.apache.poi.xssf.usermodel.XSSFSheet;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.apache.poi.xssf.usermodel.XSSFRow;
+import org.apache.poi.ss.usermodel.BorderStyle;
+import org.apache.poi.xssf.usermodel.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -33,32 +32,43 @@ public class ExcelExportController {
         List<Map<String, Object>> data = reportService.fetchReportData(startDate, endDate, depositoryId);
         XSSFWorkbook workbook = new XSSFWorkbook();
         XSSFSheet sheet = workbook.createSheet("Report");
-        // Create header row
+
+// 创建单元格样式并设置边框
+        XSSFCellStyle style = workbook.createCellStyle();
+        style.setBorderTop(BorderStyle.THIN);
+        style.setBorderBottom(BorderStyle.THIN);
+        style.setBorderLeft(BorderStyle.THIN);
+        style.setBorderRight(BorderStyle.THIN);
+
+// 创建表头行并设置样式
         XSSFRow headerRow = sheet.createRow(0);
-        headerRow.createCell(0).setCellValue("AT号");
-        headerRow.createCell(1).setCellValue("品名");
-        headerRow.createCell(2).setCellValue("规格");
-        headerRow.createCell(3).setCellValue("入库数量");
-        headerRow.createCell(4).setCellValue("入库金额");
-        headerRow.createCell(5).setCellValue("出库数量");
-        headerRow.createCell(6).setCellValue("出库金额");
-        headerRow.createCell(7).setCellValue("库存数量");
-        headerRow.createCell(8).setCellValue("在库金额");
+        createCellWithStyle(headerRow, 0, "AT号", style);
+        createCellWithStyle(headerRow, 1, "品名", style);
+        createCellWithStyle(headerRow, 2, "规格", style);
+        createCellWithStyle(headerRow, 3, "入库数量", style);
+        createCellWithStyle(headerRow, 4, "入库金额", style);
+        createCellWithStyle(headerRow, 5, "出库数量", style);
+        createCellWithStyle(headerRow, 6, "出库金额", style);
+        createCellWithStyle(headerRow, 7, "库存数量", style);
+        createCellWithStyle(headerRow, 8, "在库金额", style);
 
         for (int i = 0; i < data.size(); i++) {
             Map<String, Object> record = data.get(i);
             XSSFRow row = sheet.createRow(i + 1);
-            row.createCell(0).setCellValue(((Integer) getOrDefault(record, "AT号", 0)).intValue());
-            row.createCell(1).setCellValue((String) getOrDefault(record, "品名", "aaa"));
-            row.createCell(2).setCellValue((String) getOrDefault(record, "规格", ""));
-            row.createCell(3).setCellValue(((Double) getOrDefault(record, "入库数量", 0.0)).doubleValue());
-            row.createCell(4).setCellValue((String) getOrDefault(record, "入库金额", "0.00"));
-            row.createCell(5).setCellValue(((Double) getOrDefault(record, "出库数量", 0.0)).doubleValue());
-            row.createCell(6).setCellValue((String) getOrDefault(record, "出库金额", "0.00"));
-            row.createCell(7).setCellValue(((Double) getOrDefault(record, "库存数量", 0.0)).doubleValue());
-            row.createCell(8).setCellValue((String) getOrDefault(record, "在库金额", "0.00"));
 
+            createCellWithStyle(row, 0, ((Integer) getOrDefault(record, "AT号", 0)).intValue(), style);
+            createCellWithStyle(row, 1, (String) getOrDefault(record, "品名", "aaa"), style);
+            createCellWithStyle(row, 2, (String) getOrDefault(record, "规格", ""), style);
+            createCellWithStyle(row, 3, ((Double) getOrDefault(record, "入库数量", 0.0)).doubleValue(), style);
+            createCellWithStyle(row, 4, (String) getOrDefault(record, "入库金额", "0.00"), style);
+            createCellWithStyle(row, 5, ((Double) getOrDefault(record, "出库数量", 0.0)).doubleValue(), style);
+            createCellWithStyle(row, 6, (String) getOrDefault(record, "出库金额", "0.00"), style);
+            createCellWithStyle(row, 7, ((Double) getOrDefault(record, "库存数量", 0.0)).doubleValue(), style);
+            createCellWithStyle(row, 8, (String) getOrDefault(record, "在库金额", "0.00"), style);
         }
+
+
+
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         workbook.write(outputStream);
         workbook.close();
@@ -70,7 +80,23 @@ public class ExcelExportController {
                 .header("Content-Disposition", "attachment; filename*=UTF-8''" + encodedFilename)
                 .body(resource);
     }
+    private void createCellWithStyle(XSSFRow row, int column, String value, XSSFCellStyle style) {
+        XSSFCell cell = row.createCell(column);
+        cell.setCellValue(value);
+        cell.setCellStyle(style);
+    }
 
+    private void createCellWithStyle(XSSFRow row, int column, double value, XSSFCellStyle style) {
+        XSSFCell cell = row.createCell(column);
+        cell.setCellValue(value);
+        cell.setCellStyle(style);
+    }
+
+    private void createCellWithStyle(XSSFRow row, int column, int value, XSSFCellStyle style) {
+        XSSFCell cell = row.createCell(column);
+        cell.setCellValue(value);
+        cell.setCellStyle(style);
+    }
 
     @GetMapping("/every")
     public ResponseEntity<ByteArrayResource> everyTypeToExcel(

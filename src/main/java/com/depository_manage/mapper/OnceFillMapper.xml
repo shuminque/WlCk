@@ -27,19 +27,37 @@
         </foreach>
     </insert>
     <!-- Update operation -->
-    <update id="updateOnceFill">
+    <update id="updateOnceFill" parameterType="map">
         UPDATE once_fill
-        SET
-            depositoryId = #{depositoryId},
-            name = #{name},
-            model = #{model},
-            unit_price = #{unitPrice},
-            quantity = #{quantity},
-            price = #{price},
-            time = #{time},
-            apply_remark = #{applyRemark}
+        <set>
+            <if test="depositoryId != null">
+                depository_id = #{depositoryId},
+            </if>
+            <if test="name != null">
+                name = #{name},
+            </if>
+            <if test="model != null">
+                model = #{model},
+            </if>
+            <if test="unitPrice != null">
+                unit_price = #{unitPrice},
+            </if>
+            <if test="quantity != null">
+                quantity = #{quantity},
+            </if>
+            <if test="price != null">
+                price = #{price},
+            </if>
+            <if test="time != null">
+                time = #{time},
+            </if>
+            <if test="applyRemark != null">
+                apply_remark = #{applyRemark},
+            </if>
+        </set>
         WHERE id = #{id}
     </update>
+
 
     <!-- Delete operation -->
     <delete id="deleteOnceFillById">

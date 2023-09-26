@@ -48,6 +48,11 @@
         .captcha {width:60%;display:inline-block;}
         .captcha-img {display:inline-block;width:34%;float:right;}
         .captcha-img img {height:34px;border:1px solid #e6e6e6;height:36px;width:100%;}
+        .department-title {
+            font-size: 18px; /* 或者其他您需要的大小 */
+            color: #333; /* 或者其他您喜欢的颜色 */
+            text-align: center; /* 如果您希望文字居中 */
+        }
     </style>
 </head>
 <body>
@@ -56,8 +61,12 @@
         <div class="layui-form login-form">
             <form class="layui-form" action="">
                 <div class="layui-form-item logo-title">
-                    <h1>综合仓库管理系统</h1>
+                    <h1>生产管理部</h1>
+                    <div class="department-title">
+                        综合仓库系统
+                    </div>
                 </div>
+
                 <div class="layui-form-item">
                     <label class="layui-icon layui-icon-username" ></label>
                     <input type="text" name="principal" lay-verify="required|account" placeholder="请输入账号" autocomplete="off" class="layui-input" >

@@ -81,6 +81,11 @@ public class DepositoryRecordController {
         map.put("applicantId",userToken.getUser().getId());
         return CrudUtil.postHandle(depositoryRecordService.apply(map),1);
     }
+    @PutMapping("/depositoryRecord/{id}")
+    public RestResponse updateDepositoryRecord(@PathVariable Integer id, @RequestBody Map<String,Object> map, HttpServletRequest request){
+        map.put("id", id);
+        return CrudUtil.postHandle(depositoryRecordService.updateDepositoryRecord(map),1);
+    }
     @PostMapping("/OutdepositoryRecord")
     public RestResponse insertDepositoryRecord2(@RequestBody Map<String, Object> map, HttpServletRequest request) {
         UserToken userToken = (UserToken) request.getAttribute("userToken");
@@ -89,10 +94,13 @@ public class DepositoryRecordController {
         Integer result = depositoryRecordService.applyDirectOutbound(map);
         return CrudUtil.postHandle(result, 1);
     }
-    @PutMapping("/depositoryRecord/{id}")
-    public RestResponse updateDepositoryRecord(@PathVariable Integer id, @RequestBody Map<String,Object> map, HttpServletRequest request){
+    @PutMapping("/OutdepositoryRecord/{id}")
+    public RestResponse updateOutdepositoryRecord(@PathVariable Integer id, @RequestBody Map<String,Object> map, HttpServletRequest request){
         map.put("id", id);
-        return CrudUtil.postHandle(depositoryRecordService.updateDepositoryRecord(map),1);
+        UserToken userToken = (UserToken) request.getAttribute("userToken");
+        map.put("reviewerId", userToken.getUser().getId()); // 设置reviewerId
+        map.put("state", "已出库");
+        return CrudUtil.postHandle(depositoryRecordService.updateOutdepositoryRecord(map),1);
     }
 
     @DeleteMapping("/depositoryRecord")

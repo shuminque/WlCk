@@ -30,8 +30,8 @@ public class OnceFillServiceImpl implements OnceFillService {
     }
 
     @Override
-    public void updateOnceFill(Map<String, Object> map) {
-        onceFillMapper.updateOnceFill(map);
+    public Integer updateOnceFill(Map<String, Object> map) {
+        return onceFillMapper.updateOnceFill(map);
     }
 
     @Override

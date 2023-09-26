@@ -6,6 +6,7 @@ import com.depository_manage.pojo.OnceFillP;
 import com.depository_manage.pojo.RestResponse;
 import com.depository_manage.security.bean.UserToken;
 import com.depository_manage.service.OnceFillService;
+import com.depository_manage.utils.CrudUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -40,17 +41,12 @@ public class OnceFillController {
 
 
     // 更新一次性记录
-    @PostMapping("/update")
-    public Map<String, Object> updateOnceFill(@RequestBody Map<String, Object> map) {
-        Map<String, Object> resultMap = new HashMap<>();
-        try {
-            onceFillService.updateOnceFill(map);
-            resultMap.put("status", "success");
-        } catch (Exception e) {
-            resultMap.put("status", "error");
-            resultMap.put("message", e.getMessage());
-        }
-        return resultMap;
+    @PutMapping("/update/{id}")
+    public RestResponse updateOnceFill(@PathVariable int id, @RequestBody Map<String, Object> map) {
+        // 将 id 也放入 map 中，以便在 MyBatis 映射中使用
+        map.put("id", id);
+        int result = onceFillService.updateOnceFill(map);
+        return CrudUtil.putHandle(result,1);  // 假设CrudUtil.updateHandle是一个静态方法，用于处理更新操作的结果
     }
 
     // 根据ID查询一次性记录

@@ -9,7 +9,6 @@ import com.depository_manage.service.NotificationService;
 import com.depository_manage.entity.DepositoryRecord;
 import com.depository_manage.entity.Material;
 import com.depository_manage.entity.Notification;
-import com.depository_manage.mapper.*;
 import com.depository_manage.pojo.DepositoryRecordP;
 import com.depository_manage.pojo.SimpleDepositoryRecordP;
 import com.depository_manage.utils.ObjectFormatUtil;
@@ -100,6 +99,51 @@ public class DepositoryRecordServiceImpl implements DepositoryRecordService {
         }
 
         return result;
+    }
+    @Override
+    public Integer updateOutdepositoryRecord(Map<String, Object> map) {
+        Integer id = (Integer) map.get("id");
+        DepositoryRecord originalRecord = depositoryRecordMapper.findDepositoryRecordById(id);
+
+        if (originalRecord != null && "已出库".equals(originalRecord.getState())) {
+            double originalQuantity = originalRecord.getQuantity();
+            double originalPrice = originalRecord.getPrice();
+            double newQuantity = Double.parseDouble(String.valueOf(map.get("quantity")));
+            double newPrice = Double.parseDouble(String.valueOf(map.get("price")));
+
+            List<Material> list = materialMapper.findMaterialForOutbound(map);
+            if (list.isEmpty()) {
+                throw new MyException("未找到匹配的物料");
+            }
+            Material material = list.get(0);
+
+            // 计算数量和价格的差异
+            double quantityDiff = originalQuantity - newQuantity;
+            double priceDiff = originalPrice * originalQuantity - newPrice * newQuantity;
+
+            // 计算新的物料数量和价格
+            double materialNewQuantity = material.getQuantity() + quantityDiff; // 出库所以加回差额
+            double materialNewPrice = material.getPrice() + priceDiff; // 出库所以加回差额
+
+            // 检查新的物料数量是否有效
+            if (materialNewQuantity < 0) {
+                throw new MyException("库存不足以调整该出库请求");
+            }
+
+            // 计算新的均价
+            double materialNewUnitPrice = (materialNewQuantity == 0) ? 0 : materialNewPrice / materialNewQuantity;
+            BigDecimal bdNewUnitPrice = new BigDecimal(materialNewUnitPrice).setScale(2, RoundingMode.HALF_UP);
+
+            // 更新物料
+            material.setQuantity(materialNewQuantity);
+            material.setPrice(materialNewPrice);
+            material.setUnitPrice(bdNewUnitPrice.doubleValue());
+            materialMapper.updateMaterial(material);
+
+            // 更新出库记录
+            return depositoryRecordMapper.updateDepositoryRecord(map);
+        }
+        throw new MyException("无法更新未出库的记录或记录不存在");
     }
 
     /**

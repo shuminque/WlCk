@@ -17,6 +17,8 @@ public interface DepositoryRecordService {
      */
     Integer apply(Map<String,Object> map );
 
+    Integer updateOutdepositoryRecord(Map<String, Object> map);
+
     /**
      * 转移申请
      * @param map 仓库调度信息
