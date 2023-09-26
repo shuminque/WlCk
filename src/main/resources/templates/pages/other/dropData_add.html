@@ -22,12 +22,14 @@
     layui.use(['treeTable', 'jquery'], function() {
         var $ = layui.jquery;
         var treeTable = layui.treeTable;
+        var authority;
         $.ajax({
             url: '/get_user_depository',
             type: 'GET',
             dataType: 'json',
             success: function(data) {
                 var userDepositoryId = data.depositoryId;
+                authority = data.authority;
                 // 根据userDepositoryId显示/隐藏表格
                 if (userDepositoryId === 1) {
                     // 如果userDepositoryId为1，显示SAB表格并隐藏ZAB表格的容器
@@ -48,6 +50,12 @@
         function renderTreeTable(elem, url) {
             $.get(url, function(response) {
                 var originalData = response.data; // 提取 data 字段
+                var colsArray = [
+                    {field: 'title', title: '分类名称'}
+                ];
+                if (authority === "系统管理员") {
+                    colsArray.push({fixed: 'right', title: '操作', toolbar: '#barDemo'});
+                }
                 treeTable.render({
                     elem: elem,
                     data: originalData,
@@ -57,10 +65,7 @@
                         idName: 'id',
                         pidName: 'parentId'
                     },
-                    cols: [ [
-                        {field: 'title', title: '分类名称'},
-                        {fixed: 'right', title: '操作', toolbar: '#barDemo'}
-                    ]]
+                    cols: [colsArray]
                 });
             });
         }

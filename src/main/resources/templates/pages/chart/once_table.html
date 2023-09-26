@@ -171,26 +171,25 @@
                             }},
                         {field: 'applyRemark',title: '领用部门'},
                             // {field: 'depositoryId', width: '6%', title: '厂区'}
-                        {
-                            title: '操作',
-                            minWidth: 200,
-                            align: "center",
-                            templet: function (row) {
-                                // 初始化按钮字符串
-                                let buttons =
-                                    '<a class="layui-btn layui-btn-xs" lay-event="edit">修改</a>' +
-                                    '<a class="layui-btn layui-btn-xs layui-btn-danger" lay-event="delete">删除</a>';
-
-                                // 获取当前日期
-                                const today = new Date();
-                                const currentMonth = today.getMonth() + 1; // JavaScript中，月份是从0开始的
-                                const currentYear = today.getFullYear();
-                                // 获取数据的日期
-                                const [year, month] = (typeof row.applyTime === 'string' && row.applyTime.includes('-')) ?
-                                    row.applyTime.split('-').map(Number) : [null, null];
-                                return buttons;
-                            }
-                        }
+                        // {
+                        //     title: '操作',
+                        //     minWidth: 200,
+                        //     align: "center",
+                        //     templet: function (row) {
+                        //         // 初始化按钮字符串
+                        //         let buttons =
+                        //             '<a class="layui-btn layui-btn-xs" lay-event="edit">修改</a>' +
+                        //             '<a class="layui-btn layui-btn-xs layui-btn-danger" lay-event="delete">删除</a>';
+                        //         // 获取当前日期
+                        //         const today = new Date();
+                        //         const currentMonth = today.getMonth() + 1; // JavaScript中，月份是从0开始的
+                        //         const currentYear = today.getFullYear();
+                        //         // 获取数据的日期
+                        //         const [year, month] = (typeof row.applyTime === 'string' && row.applyTime.includes('-')) ?
+                        //             row.applyTime.split('-').map(Number) : [null, null];
+                        //         return buttons;
+                        //     }
+                        // }
                     ]],
                     // skin: 'line'
                 });
@@ -249,19 +248,23 @@
                         deleteModel(data.id);
                     }
                 });
+
                 function editModel(data) {
                     var index = layer.open({
                         type: 1, // 页面层
                         title: '编辑部品',
-                        area: ['600px', '400px'], // 设置弹出层的宽高
+                        area: ['600px', '500px'], // 设置弹出层的宽高
                         content: $('#editModelTemplate').html(), // 获取编辑模板的HTML
                         success: function(layero, index) {
                             // 填充数据到表单中
                             var form = layui.form;
                             form.val("editFormFilter", data);
-                            layui.laydate.render({ // 初始化日期选择器
-                                elem: '#editDate'
+                            laydate.render({
+                                elem: '#editDate',
+                                type: 'date', // 日期类型，无时间
+                                value: formatDate(data.time) // 使用格式化后的日期字符串初始化日期选择器
                             });
+                            data.time = formatDate(data.time);
                             form.val("editFormFilter", data);
                             // 监听提交按钮
                             form.on('submit(editSubmitBtnFilter)', function(formData) {
@@ -273,12 +276,12 @@
                                     contentType: "application/json;charset=utf-8",
                                     data: JSON.stringify(formData.field),
                                     success: function(response) {
-                                        layer.msg('更新成功！');
+                                        layer.msg('修改完成！');
                                         layer.close(index); // 关闭弹出层
                                         table.reload('currentTableId'); // 重新加载表格
                                     },
                                     error: function() {
-                                        layer.msg('更新失败！');
+                                        layer.msg('修改失败！');
                                     }
                                 });
                                 return false; // 阻止表单跳转
@@ -308,6 +311,7 @@
                 layer.msg('无法获取用户的厂区信息');
             }
         });
+
     });
 </script>
 </body>
