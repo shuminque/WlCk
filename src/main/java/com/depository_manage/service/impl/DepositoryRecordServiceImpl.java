@@ -52,37 +52,44 @@ public class DepositoryRecordServiceImpl implements DepositoryRecordService {
         return depositoryRecordMapper.insertDepositoryRecord(map);
     }
 
-    public Integer applyDirectOutbound(Map<String, Object> map  ) {
+    public Integer applyDirectOutbound(Map<String, Object> map) {
         // 设置为已审核状态
         map.put("state", "已出库");
-        // 设置其他需要的默认值，如申请时间等
-        if (map.get("applyTime") == null || ((String)map.get("applyTime")).trim().isEmpty()) {
+        if (map.get("applyTime") == null || ((String) map.get("applyTime")).trim().isEmpty()) {
             map.put("applyTime", new Date());
         }
         map.put("reviewTime", map.get("applyTime"));
         map.put("reviewPass", "1");
+        List<Material> list = materialMapper.findMaterialForOutbound(map);
+        if (list.isEmpty()) {
+            throw new MyException("未找到匹配的物料");
+        }
+        Material material = list.get(0);
+        double recordQuantity = Double.parseDouble(String.valueOf(map.get("quantity")));
+        double recordPrice = Double.parseDouble(String.valueOf(map.get("price")));
+        if (material.getQuantity() < recordQuantity) {
+            throw new MyException("库存不足于该出库请求");
+        }
         // 插入数据
         Integer result = depositoryRecordMapper.insertDepositoryRecord(map);
-
         // 如果插入成功，执行出库操作
         if (result == 1) {
-            List<Material> list = materialMapper.findMaterialForOutbound(map);
-            if (list.isEmpty()) {
-                throw new MyException("未找到匹配的物料");
-            }
-            Material material = list.get(0);
-            // 此处应该获取新插入的记录，但我假设您的map中已经有了需要的数据
-            double recordQuantity = Double.parseDouble(String.valueOf(map.get("quantity")));
-            double recordPrice = Double.parseDouble(String.valueOf(map.get("price")));
-            if (material.getQuantity() > recordQuantity) {
-                // 计算新的总数量
-                double newQuantity = material.getQuantity() - recordQuantity;
-                // 计算出库的总价
-                double outPrice = recordPrice * recordQuantity;
-                // 计算新的总价
-                double newPrice = material.getPrice() - outPrice;
+            // 计算新的总数量
+            double newQuantity = material.getQuantity() - recordQuantity;
+            // 计算出库的总价
+            double outPrice = recordPrice * recordQuantity;
+            // 计算新的总价
+            double newPrice = material.getPrice() - outPrice;
+
+            // 如果新数量为0，就不计算新的均价
+            if (newQuantity == 0) {
+                material.setPrice(0.00);
+                material.setQuantity(0.00);
+                material.setUnitPrice(0.00);
+            } else {
                 BigDecimal bdNewPrice = new BigDecimal(newPrice);
                 bdNewPrice = bdNewPrice.setScale(2, RoundingMode.HALF_UP);
+
                 // 计算新的均价
                 double newUnitPrice = newPrice / newQuantity;
                 BigDecimal bdNewUnitPrice = new BigDecimal(newUnitPrice);
@@ -92,14 +99,12 @@ public class DepositoryRecordServiceImpl implements DepositoryRecordService {
                 material.setPrice(bdNewPrice.doubleValue());
                 material.setQuantity(newQuantity);
                 material.setUnitPrice(bdNewUnitPrice.doubleValue());
-                materialMapper.updateMaterial(material);
-            } else {
-                throw new MyException("库存不足于该出库请求");
             }
+            materialMapper.updateMaterial(material);
         }
-
         return result;
     }
+
     @Override
     public Integer updateOutdepositoryRecord(Map<String, Object> map) {
         Integer id = (Integer) map.get("id");

@@ -1,9 +1,12 @@
 package com.depository_manage.exception;
 
 
+import lombok.Getter;
+
 /**
  * 自定义异常类
  */
+@Getter
 public class MyException extends RuntimeException {
     /**
      * 异常码
@@ -25,16 +28,8 @@ public class MyException extends RuntimeException {
         this.msg = msg;
     }
 
-    public int getCode() {
-        return code;
-    }
-
     public void setCode(int code) {
         this.code = code;
-    }
-
-    public String getMsg() {
-        return msg;
     }
 
     public void setMsg(String msg) {

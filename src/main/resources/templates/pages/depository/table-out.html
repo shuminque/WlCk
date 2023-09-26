@@ -20,8 +20,7 @@
                         <div class="layui-inline">
                             <label class="layui-form-label">日期</label>
                             <div class="layui-input-block">
-                                <input type="text" name="applyTime" id="date"  placeholder="请选择起止日期"
-                                       autocomplete="off" class="layui-input">
+                                <input type="text" name="applyTime" id="date" placeholder="请选择起止日期" autocomplete="off" class="layui-input">
                             </div>
                         </div>
                         <div class="layui-inline">
@@ -29,8 +28,6 @@
                                 <select id="state" name="state">
                                     <option value="" selected>请选择状态</option>
                                     <option value="已出库">已出库</option>
-<!--                                    <option value="审核未通过">审核未通过</option>-->
-<!--                                    <option value="待审核">待审核</option>-->
                                 </select>
                             </div>
                         </div>
@@ -49,9 +46,19 @@
                                 <input type="text" name="atId" autocomplete="off" class="layui-input" placeholder="搜索AT号">
                             </div>
                         </div>
+<!--                        <div class="layui-inline">-->
+<!--                            <div class="layui-input-inline">-->
+<!--                                <select name="depositoryId">-->
+<!--                                    <option value="" selected>请选择厂区</option>-->
+<!--                                    <option value="1">SAB</option>-->
+<!--                                    <option value="2">ZAB</option>-->
+<!--                                </select>-->
+<!--                            </div>-->
+<!--                        </div>-->
                         <div class="layui-inline">
-                            <div class="layui-input-inline">
-                                <select name="depositoryId" >
+                            <label class="layui-form-label">厂区</label>
+                            <div class="layui-input-block">
+                                <select name="depositoryId">
                                     <option value="" selected>请选择厂区</option>
                                     <option value="1">SAB</option>
                                     <option value="2">ZAB</option>
@@ -59,12 +66,18 @@
                             </div>
                         </div>
                         <div class="layui-inline">
-                            <button type="submit" class="layui-btn layui-btn-primary" lay-submit
-                                    lay-filter="data-search-btn"><i class="layui-icon"></i> 搜 索
+                            <div class="layui-input-inline">
+                                <input type="text" name="applyRemark" autocomplete="off" class="layui-input" placeholder="搜索领用地点">
+                            </div>
+                        </div>
+                        <div class="layui-inline">
+                            <button type="submit" class="layui-btn layui-btn-primary" lay-submit lay-filter="data-search-btn">
+                                <i class="layui-icon">   </i> 搜 索
                             </button>
                         </div>
                     </div>
                 </form>
+
             </div>
         </fieldset>
         <script type="text/html" id="toolbarDemo">
@@ -247,6 +260,9 @@
                     }
                     if (data.model!==''){
                         req.model=data.model;
+                    }
+                    if(data.applyRemark !==''){
+                        req.applyRemark=data.applyRemark;
                     }
                     if (data.applyTime!==''){
                         var dates = data.applyTime.split(' - ');

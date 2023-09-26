@@ -56,10 +56,10 @@
                                     <div class="layui-form-item">
                                         <label class="layui-form-label">出库类型:</label>
                                         <div class="layui-input-block">
-                                            <button name="applyRemark" class="layui-input custom-input" id="ID-dropdown-demo-complex">
+                                            <button name="applyRemark" class="layui-input custom-input" id="ID-dropdown-demo-complex" >
                                                 选择出库类型
                                             </button>
-                                            <input type="hidden" name="applyRemark" id="applyRemarkInput" value="">
+                                            <input type="hidden" name="applyRemark" id="applyRemarkInput" value="" lay-verify="required">
                                         </div>
                                     </div>
                                     <div class="layui-form-item" id="outLocationContainer"></div>
@@ -168,7 +168,6 @@
             var isEditing = id != null;
             var url = isEditing ? '/OutdepositoryRecord/' + id : '/OutdepositoryRecord'; // 判断是编辑还是新建
             var method = isEditing ? 'PUT' : 'POST'; // 判断是PUT还是POST
-
             $.ajax({
                 url: url,
                 type: method,
@@ -179,6 +178,7 @@
                     this.layerIndex = layer.load(0, {shade: [0.5, '#393D49']});
                 },
                 success: function (data) {
+                    console.log(data.status); // 在这里添加console.log来打印data.status的值
                     layer.close(this.layerIndex);
                     if (data.status >= 300) {
                         layer.msg(data.statusInfo.message); //失败的表情
@@ -195,6 +195,11 @@
                             }  // 刷新当前页面
                         });
                     }
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    layer.close(this.layerIndex);
+                    var errorMessage = jqXHR.responseJSON ? jqXHR.responseJSON.message : '未知错误';
+                    layer.msg(errorMessage); //显示错误信息
                 },
                 complete: function () {
                     layer.close(this.layerIndex);
