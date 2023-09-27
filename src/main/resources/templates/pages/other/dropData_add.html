@@ -2,7 +2,9 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
+    <title>领用信息</title>
     <link rel="stylesheet" href="/static/lib/layui-v2.8.17/css/layui.css" media="all">
+    <link rel="preload" href="/static/lib/layui-v2.8.17/font/iconfont.woff2?v=282" as="font" type="font/woff2" crossorigin>
 </head>
 <body>
 <div class="layui-container">
@@ -46,12 +48,20 @@
                 }
             },
         });
-
         function renderTreeTable(elem, url) {
             $.get(url, function(response) {
-                var originalData = response.data; // 提取 data 字段
+                var originalData = response.data;
+                function markParentNodes(data) {
+                    data.forEach(function (item) {
+                        if (item.children && item.children.length > 0) {
+                            item.title = '<strong>' + '► ' + item.title + '</strong>'; // 如果节点有子节点，则加粗标题
+                            markParentNodes(item.children); // 递归处理子节点
+                        }
+                    });
+                }
+                markParentNodes(originalData); // 调用函数来修改具有子节点的节点的标题
                 var colsArray = [
-                    {field: 'title', title: '分类名称'}
+                    {field: 'title', title: '分类名称', minWidth: 200, templet: function(d) { return d.title; } } // 使用templet来渲染HTML
                 ];
                 if (authority === "系统管理员") {
                     colsArray.push({fixed: 'right', title: '操作', toolbar: '#barDemo'});
@@ -59,12 +69,6 @@
                 treeTable.render({
                     elem: elem,
                     data: originalData,
-                    tree: {
-                        iconIndex: 2,
-                        isPidData: true,
-                        idName: 'id',
-                        pidName: 'parentId'
-                    },
                     cols: [colsArray]
                 });
             });
@@ -150,8 +154,6 @@
                 });
             }
         }
-
-
     });
 </script>
 <script type="text/html" id="barDemo">

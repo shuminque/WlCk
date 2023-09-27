@@ -88,6 +88,7 @@
                     table.render({
                         elem: "#currentTableId",
                         url: '/rate',
+                        initSort: {field: 'date', type: 'desc'},
                         parseData: function (res) { //res 即为原始返回的数据
                             return {
                                 "status": res.status, //解析接口状态
