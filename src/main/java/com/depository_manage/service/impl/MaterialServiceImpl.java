@@ -29,8 +29,14 @@ public class MaterialServiceImpl implements MaterialService {
 
     @Override
     public Integer insertMaterial(Map<String, Object> map) {
-        return materialMapper.insertMaterial(map);
+        Integer id = materialMapper.insertMaterial(map);
+        if(id == null || id == 0) {
+            // 可以抛出一个自定义的异常，或者一个通用的 RuntimeException，包含一个错误消息。
+            throw new RuntimeException("Failed to insert material.");
+        }
+        return id;
     }
+
 
     @Override
     public Integer updateMaterial(Map<String, Object> map) {

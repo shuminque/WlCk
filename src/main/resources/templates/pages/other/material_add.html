@@ -268,25 +268,29 @@
                     }
                     $.ajax({
                         url: "/instmaterial",
-                        type: 'post',
+                        type: 'POST',
                         dataType: 'json',
                         contentType: "application/json;charset=utf-8",
                         data: JSON.stringify(data.field),
                         beforeSend: function () {
                             this.layerIndex = layer.load(0, {shade: [0.5, '#393D49']});
                         },
-                        success: function (data) {
+                        success: function (data, textStatus, xhr) {
                             layer.close(this.layerIndex);
-                            if (data.status >= 300) {
-                                layer.msg(data.statusInfo.message);//失败的表情
-                                return;
-                            } else {
-                                layer.msg("添加成功！", {
-                                    icon: 6,//成功的表情
-                                    time: 1000 //1秒关闭（如果不配置，默认是3秒）
-                                });
+                            if (data.status === 201) {
+                                layer.msg("添加成功！", { icon: 6, time: 1000 });
                                 table.reload('currentTableId'); // 重新加载表格
+                            } else if(data.status === 409) { // 检查409状态码
+                                layer.msg('添加失败：' + data.data, { icon: 5, time: 3000 }); // 使用data.data来获取错误消息
+                            } else {
+                                // 当状态码不是200和409时，显示一个通用错误消息
+                                layer.msg('未知错误：' + xhr.status, { icon: 5, time: 3000 });
                             }
+                        },
+                        error: function (xhr, textStatus, errorThrown) {
+                            layer.close(this.layerIndex);
+                            // 当请求失败时，显示一个通用错误消息
+                            layer.msg('请求失败：' + errorThrown, { icon: 5, time: 3000 }); // 5是失败的表情
                         },
                         complete: function () {
                             form.val("form1", { // "yourFormName"需要替换为您的实际表单名称或ID

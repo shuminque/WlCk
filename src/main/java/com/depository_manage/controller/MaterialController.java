@@ -5,6 +5,7 @@ import com.depository_manage.security.bean.UserToken;
 import com.depository_manage.service.MaterialService;
 import com.depository_manage.utils.CrudUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -26,26 +27,37 @@ public class MaterialController {
     }
     @PostMapping("/instmaterial")
     public RestResponse addinsertMaterial(@RequestBody Map<String,Object> map, HttpServletRequest request) {
-        UserToken userToken = (UserToken) request.getAttribute("userToken");
-        Integer depositoryId = userToken.getUser().getDepositoryId();
-        // 将所有空字符串转为null
-        for(Map.Entry<String, Object> entry : map.entrySet()){
-            if("".equals(entry.getValue())){
-                map.put(entry.getKey(), null);
+        try {
+            UserToken userToken = (UserToken) request.getAttribute("userToken");
+            Integer depositoryId = userToken.getUser().getDepositoryId();
+            // 将所有空字符串转为null
+            for(Map.Entry<String, Object> entry : map.entrySet()){
+                if("".equals(entry.getValue())){
+                    map.put(entry.getKey(), null);
+                }
             }
+            // 检查必填字段是否为null或空字符串
+            if(map.get("atId") == null || "".equals(map.get("atId").toString().trim())
+                    || map.get("mname") == null || "".equals(map.get("mname").toString().trim())) {
+                return new RestResponse("AT号和品名是必填的", 400, null);
+            }
+            if (depositoryId != 0) {
+                map.put("depositoryId", depositoryId);
+            }
+            map.put("stateId",1);
+            // 如果验证通过，执行插入操作
+            return CrudUtil.postHandle(materialService.insertMaterial(map),1);
+        } catch (DataIntegrityViolationException e) {
+            // 当唯一性约束违反时，捕获异常并返回错误消息。
+            return new RestResponse("AT号和仓库组合必须是唯一的", 409, null);
+        } catch (RuntimeException e) {
+            // 当插入操作失败时，捕获异常并返回错误消息。
+            return new RestResponse("Insertion failed: " + e.getMessage(), 500, null);
         }
-        // 检查必填字段是否为null或空字符串
-        if(map.get("atId") == null || "".equals(map.get("atId").toString().trim())
-                || map.get("mname") == null || "".equals(map.get("mname").toString().trim())) {
-            return new RestResponse("AT号和品名是必填的", 400, null); // 这里可以修改为您的错误响应格式
-        }
-        if (depositoryId != 0) {
-            map.put("depositoryId", depositoryId);
-        }
-        map.put("stateId",1);
-        // 如果验证通过，执行插入操作
-        return CrudUtil.postHandle(materialService.insertMaterial(map),1);
+
+
     }
+
 
 
     @DeleteMapping("/material/{id}")
