@@ -68,26 +68,25 @@ public class MaterialController {
 
     @PutMapping("/material/{id}")
     public RestResponse updateMaterial(@PathVariable int id, @RequestBody Map<String, Object> map) {
-        // 将 id 也放入 map 中，以便在 MyBatis 映射中使用
-        map.put("id", id);
-
-        // 对传入的数据进行一些处理或验证，比如空值检查等
-        for(Map.Entry<String, Object> entry : map.entrySet()){
-            if("".equals(entry.getValue())){
-                map.put(entry.getKey(), null);
+        try {
+            map.put("id", id);
+            for(Map.Entry<String, Object> entry : map.entrySet()){
+                if("".equals(entry.getValue())){
+                    map.put(entry.getKey(), null);
+                }
             }
+            if(map.get("atId") == null || "".equals(map.get("atId").toString().trim())
+                    || map.get("mname") == null || "".equals(map.get("mname").toString().trim())) {
+                return new RestResponse("AT号和品名是必填的", 400, null);
+            }
+            int result = materialService.updateMaterial(map);
+            return CrudUtil.putHandle(result,1);
+        } catch (DataIntegrityViolationException e) {
+            return new RestResponse("AT号和仓库组合必须是唯一的", 409, null);
+        } catch (Exception e) {
+            return new RestResponse("服务器错误：" + e.getMessage(), 500, null);
         }
-
-        // 检查必填字段是否为null或空字符串，此处仅为示例，你可以根据你的实际需求来决定哪些字段是必填的
-        if(map.get("atId") == null || "".equals(map.get("atId").toString().trim())
-                || map.get("mname") == null || "".equals(map.get("mname").toString().trim())) {
-            return new RestResponse("AT号和品名是必填的", 400, null);
-        }
-
-        int result = materialService.updateMaterial(map);
-        return CrudUtil.putHandle(result,1);  // 假设CrudUtil.updateHandle是一个静态方法，用于处理更新操作的结果
     }
-
 
 
 }
