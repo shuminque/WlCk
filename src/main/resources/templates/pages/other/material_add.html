@@ -62,14 +62,14 @@
                                 <div class="layui-form-item">
                                     <label class="layui-form-label">AT号</label>
                                     <div class="layui-input-block">
-                                        <input type="text" placeholder="请填入 AT号" name="atId" required class="layui-input">
+                                        <input type="text" placeholder="请填入 AT号" name="atId" required class="layui-input" lay-verify="required">
                                     </div>
                                 </div>
                                 <!-- 品名 -->
                                 <div class="layui-form-item">
                                     <label class="layui-form-label">品名</label>
                                     <div class="layui-input-block">
-                                        <input type="text" placeholder="请填入 品名" name="mname" required class="layui-input">
+                                        <input type="text" placeholder="请填入 品名" name="mname" required class="layui-input" lay-verify="required">
                                     </div>
                                 </div>
                                 <!-- 规格 -->
@@ -83,7 +83,7 @@
                                 <div class="layui-form-item">
                                     <label class="layui-form-label">分类</label>
                                     <div class="layui-input-block">
-                                        <select name="typeId">
+                                        <select name="typeId" lay-verify="required">
                                             <option value="">请选择分类</option>
                                             <option th:each="type : ${materialTypes}" th:value="${type.id}" th:text="${type.id}+' '+${type.tname}"></option>
                                         </select>
@@ -100,7 +100,7 @@
                                 <div class="layui-form-item">
                                     <label class="layui-form-label">工程</label>
                                     <div class="layui-input-block">
-                                        <select name="enginId">
+                                        <select name="enginId" lay-verify="required">
                                             <option value="">请选择工程</option>
                                             <option th:each="engin : ${materialEngins}" th:value="${engin.id}" th:text="${engin.id}+' '+${engin.ename}"></option>
                                         </select>
@@ -132,64 +132,6 @@
         <script type="text/html" id="operation-bar">
 <!--            <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>-->
 <!--            <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="delete">删除</a>-->
-        </script>
-        <script type="text/template" id="editModelTemplate">
-            <form class="layui-form" lay-filter="editFormFilter">
-                <!-- AT号 -->
-                <div class="layui-form-item">
-                    <label class="layui-form-label">AT号</label>
-                    <div class="layui-input-block">
-                        <input type="text" placeholder="请填入 AT号" name="atId" required class="layui-input">
-                    </div>
-                </div>
-                <!-- 品名 -->
-                <div class="layui-form-item">
-                    <label class="layui-form-label">品名</label>
-                    <div class="layui-input-block">
-                        <input type="text" placeholder="请填入 品名" name="mname" required class="layui-input">
-                    </div>
-                </div>
-                <!-- 规格 -->
-                <div class="layui-form-item">
-                    <label class="layui-form-label">规格</label>
-                    <div class="layui-input-block">
-                        <input type="text" placeholder="请填入 规格" name="model" class="layui-input">
-                    </div>
-                </div>
-                <!-- 分类 -->
-                <div class="layui-form-item">
-                    <label class="layui-form-label">分类</label>
-                    <div class="layui-input-block">
-                        <select name="typeId">
-                            <option value="">请选择分类</option>
-                            <option th:each="type : ${materialTypes}" th:value="${type.id}" th:text="${type.id}+' '+${type.tname}"></option>
-                        </select>
-                    </div>
-                </div>
-                <!-- 图号 -->
-                <div class="layui-form-item">
-                    <label class="layui-form-label">图号</label>
-                    <div class="layui-input-block">
-                        <input type="text" placeholder="请填入 图号" name="picNum" class="layui-input">
-                    </div>
-                </div>
-                <!-- 工程 -->
-                <div class="layui-form-item">
-                    <label class="layui-form-label">工程</label>
-                    <div class="layui-input-block">
-                        <select name="enginId">
-                            <option value="">请选择工程</option>
-                            <option th:each="engin : ${materialEngins}" th:value="${engin.id}" th:text="${engin.id}+' '+${engin.ename}"></option>
-                        </select>
-                    </div>
-                </div>
-                <!-- 提交按钮 -->
-                <div class="layui-form-item" style="text-align: center;">
-                    <button class="layui-btn layui-btn-normal" lay-submit="editSubmitBtnFilter" lay-filter="editSubmitBtnFilter">
-                        更新部品
-                    </button>
-                </div>
-            </form>
         </script>
     </div>
 </div>
@@ -318,6 +260,10 @@
                     }
                     if (!data.field.mname || data.field.mname.trim() === "") {
                         layer.msg("请输入品名！");
+                        return false;
+                    }
+                    if (!data.field.model || data.field.model.trim() === "") {
+                        layer.msg("请输入规格！");
                         return false;
                     }
                     $.ajax({

@@ -169,12 +169,36 @@
 
         // 提交所有数据
         $('#submitAll').on('click', function() {
+            var isAllFilled = true;
+            var errorMessage = "请输入以下字段: \n";
+
+            // 检查每一行的每个输入字段
+            $('#onceFillTable tbody tr').each(function() {
+                // 检查类型为 text 的输入字段
+                $(this).find('input[type="text"]').each(function() {
+                    var inputName = $(this).attr('name');
+                    if ($(this).val().trim() === "") {
+                        isAllFilled = false;
+                        errorMessage += inputName + "\n";
+                    }
+                });
+
+                // 检查领用部门的隐藏输入字段
+                var applyRemarkInput = $(this).find('input[name="applyRemark"]');
+                if (applyRemarkInput.val().trim() === "") {
+                    isAllFilled = false;
+                    errorMessage += "领用部门\n";
+                }
+            });
+
+            if (!isAllFilled) {
+                layer.msg(errorMessage); // 如果有未填写的字段，显示错误消息
+                return; // 并且返回，不进行后续的提交操作
+            }
             var allData = [];
-            console.log("All applyRemarkInput values before collecting data:");
             $('[id^="applyRemarkInput"]').each(function() {
                 console.log($(this).attr('id') + ": " + $(this).val());
             });
-
             // 收集所有行数据
             $('#onceFillTable tbody tr').each(function() {
                 var currentDropdownCount = $(this).data('dropdown-id');

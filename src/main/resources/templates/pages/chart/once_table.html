@@ -130,6 +130,7 @@
             elem: '#date',
             range: true
         });
+        var userAuthority;
         $.ajax({
             url: '/get_user_depository',
             type: 'GET',
@@ -137,6 +138,8 @@
             success: function(data) {
                 let pp;
                 var userDepositoryId = data.depositoryId;
+                userAuthority = data.authority;
+
                 // 如果depositoryId为0，则允许访问两个厂区
                 if (userDepositoryId === 0) {
                     pp = '/api/onceFill/list';
@@ -147,10 +150,18 @@
                     elem: "#currentTableId",
                     url: pp,
                     height: "full-50", // 设置表格高度并固定表头
-                    // request: {
-                    //     pageName: 'page', //页码的参数名称，默认：page
-                    //     limitName: 'size' //每页数据量的参数名，默认：limit
-                    // },
+                    parseData: function (res) { //res 即为原始返回的数据
+                        return {
+                            "status": res.status, //解析接口状态
+                            "message": res.statusInfo.message, //解析提示文本
+                            "count": res.count, //解析数据长度
+                            "data": res.data //解析数据列表
+                        };
+                    },
+                    request: {
+                        pageName: 'page', //页码的参数名称，默认：page
+                        limitName: 'size' //每页数据量的参数名，默认：limit
+                    },
                     response: {
                         statusName: 'status' //规定数据状态的字段名称，默认：code
                         ,statusCode: 200 //规定成功的状态码，默认：0
@@ -171,26 +182,37 @@
                             }},
                         {field: 'applyRemark',title: '领用部门'},
                             // {field: 'depositoryId', width: '6%', title: '厂区'}
-                        // {
-                        //     title: '操作',
-                        //     minWidth: 200,
-                        //     align: "center",
-                        //     templet: function (row) {
-                        //         // 初始化按钮字符串
-                        //         let buttons =
-                        //             '<a class="layui-btn layui-btn-xs" lay-event="edit">修改</a>' +
-                        //             '<a class="layui-btn layui-btn-xs layui-btn-danger" lay-event="delete">删除</a>';
-                        //         // 获取当前日期
-                        //         const today = new Date();
-                        //         const currentMonth = today.getMonth() + 1; // JavaScript中，月份是从0开始的
-                        //         const currentYear = today.getFullYear();
-                        //         // 获取数据的日期
-                        //         const [year, month] = (typeof row.applyTime === 'string' && row.applyTime.includes('-')) ?
-                        //             row.applyTime.split('-').map(Number) : [null, null];
-                        //         return buttons;
-                        //     }
-                        // }
+                        {
+                            title: '操作',
+                            minWidth: 200,
+                            align: "center",
+                            templet: function (row) {
+                                // 初始化按钮字符串
+                                let buttons =
+                                    ' ';
+
+                                const today = new Date();
+                                const currentMonth = today.getMonth() + 1; // JavaScript中，月份是从0开始的
+                                const currentYear = today.getFullYear();
+
+                                // 获取数据的日期
+                                const [year, month] = (typeof row.time === 'string' && row.time.includes('-')) ?
+                                    row.time.split('-').map(Number) : [null, null];
+                                if ( year === currentYear && month === currentMonth ) {
+                                    buttons += '<a class="layui-btn layui-btn-xs" lay-event="edit">修改</a>';
+                                    buttons += '<a class="layui-btn layui-btn-xs layui-btn-danger" lay-event="delete">删除</a>';
+                                } else if (userAuthority === '系统管理员'){
+                                    buttons += '<a class="layui-btn layui-btn-xs" lay-event="edit">修改</a>';
+                                    buttons += '<a class="layui-btn layui-btn-xs layui-btn-danger" lay-event="delete">删除</a>';
+                                }
+                                return buttons;
+                            }
+                        }
                     ]],
+                    limits: [10, 50, 100, 100000],
+                    limit: 100,
+                    page: true,
+                    skin: 'line',
                     // skin: 'line'
                 });
                 function formatDate(dateStr) {

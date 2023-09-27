@@ -21,8 +21,9 @@
 </div>
 <script src="/static/lib/layui-v2.8.17/layui.js" charset="utf-8"></script>
 <script>
-    layui.use(['treeTable', 'jquery'], function() {
+    layui.use(['treeTable', 'jquery','tree'], function() {
         var $ = layui.jquery;
+        var tree = layui.tree;
         var treeTable = layui.treeTable;
         var authority;
         $.ajax({
@@ -71,6 +72,9 @@
                     data: originalData,
                     cols: [colsArray]
                 });
+                tree.renderer({
+
+                })
             });
         }
         renderTreeTable('#categoryTreeSAB', "/api/categories/sab");

@@ -64,7 +64,7 @@
         DELETE FROM once_fill WHERE id = #{id}
     </delete>
 
-    <select id="findOnceFillByCondition" resultMap="BaseResultMap">
+    <select id="findOnceFillByCondition" resultMap="BaseResultMap" parameterType="map">
         SELECT * FROM once_fill
         WHERE 1=1
         <if test="id != null">
@@ -93,6 +93,10 @@
         </if>
         <if test="startDate != null and endDate != null">
             AND DATE(time) BETWEEN #{startDate} AND #{endDate}
+        </if>
+        ORDER BY id DESC
+        <if test="begin != null and size != null">
+            LIMIT #{begin},#{size}
         </if>
     </select>
 

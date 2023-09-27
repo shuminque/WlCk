@@ -42,8 +42,16 @@ public class OnceFillServiceImpl implements OnceFillService {
 
     @Override
     public List<OnceFillP> findOnceFillPByCondition(Map<String, Object> map) {
-        List<OnceFill> list=onceFillMapper.findOnceFillByCondition(map);
-        return pack(list);
+        Integer size = 10,page=1;
+        if (map.containsKey("size")){
+            size=ObjectFormatUtil.toInteger(map.get("size"));
+            map.put("size", size);
+        }
+        if (map.containsKey("page")){
+            page=ObjectFormatUtil.toInteger(map.get("page"));
+            map.put("begin",(page-1)*size);
+        }
+        return pack(onceFillMapper.findOnceFillByCondition(map));
     }
     @Override
     public void deleteOnceFillById(Integer id) {
