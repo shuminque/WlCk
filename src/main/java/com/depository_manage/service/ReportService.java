@@ -14,7 +14,7 @@ public class ReportService {
 
     public List<Map<String, Object>> fetchReportData(String startDate, String endDate, int depositoryId) {
         String sql =
-                "SELECT\n" +
+                        "SELECT\n" +
                         "    m.at_id as AT号,\n" +
                         "    m.mname as 品名,\n" +
                         "    COALESCE(LEFT(m.model, 30), 'N/A')  AS 规格,\n" +
