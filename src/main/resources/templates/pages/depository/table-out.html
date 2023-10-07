@@ -186,8 +186,10 @@
                         {field: 'typeName', width: 240, title: '分类'},
                         {field: 'enginName', width: 120, title: '工程'},
                         {field: 'quantity', width: 80, title: '数量'},
-                        {field: 'price', title: '单价', minWidth: 70},
-                        {field: 'applyRemark', title: '领用部门', width: 120},
+                        {field: 'price', title: '单价', minWidth: 80},
+                        {field: 'applyRemark', title: '领用部门', width: 200, templet: function(d){
+                                return d.applyRemark ? d.applyRemark.replace(/[A-Z]-[A-Z]/g, '') : '';
+                            }},
                         // {field: 'applyTime', width: 170, title: '申请时间', sort: true},
                         // {field: 'reviewTime', width: 150, title: '出库时间'},
                         {field: 'reviewTime',title: '出库时间',  width: 120,sort: true, templet: function(d){
@@ -201,7 +203,6 @@
                             templet: function (row) {
                                 // 初始化按钮字符串
                                 let buttons = '<a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="detail">详情</a>';
-
                                 // 获取当前日期
                                 const today = new Date();
                                 const currentMonth = today.getMonth() + 1; // JavaScript中，月份是从0开始的

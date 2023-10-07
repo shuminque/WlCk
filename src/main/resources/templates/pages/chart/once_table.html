@@ -180,8 +180,10 @@
                         {field: 'time',title: '日期',  sort: true, templet: function(d){
                                 return formatDate(d.time);
                             }},
-                        {field: 'applyRemark',title: '领用部门'},
-                            // {field: 'depositoryId', width: '6%', title: '厂区'}
+                        {field: 'applyRemark', title: '领用部门', width: 120, templet: function(d){
+                                return d.applyRemark ? d.applyRemark.replace(/[A-Z]-[A-Z](-\d)?/g, '') : '';
+                            }},
+                        // {field: 'depositoryId', width: '6%', title: '厂区'}
                         {
                             title: '操作',
                             minWidth: 200,
