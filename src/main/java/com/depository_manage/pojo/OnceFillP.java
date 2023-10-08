@@ -10,12 +10,14 @@ public class OnceFillP {
     private Integer depositoryId;
     private String name;
     private String model;
+    /** 材料种类名称 */
+    private String typeName;
     private Double unitPrice;
     private Integer quantity;
     private Double price;
     private Date time;
     private String applyRemark;
-    public OnceFillP(Integer id,  String name, String model, Integer quantity, Double price, Double unitPrice,
+    public OnceFillP(Integer id,  String name, String model, Integer quantity, Double price, Double unitPrice,String typeName,
                      Integer depositoryId, String applyRemark, Date time) {
         this.id = id;
         this.name = name;
@@ -23,6 +25,7 @@ public class OnceFillP {
         this.quantity = quantity;
         this.price = price;
         this.unitPrice=unitPrice;
+        this.typeName = typeName;
         this.depositoryId = depositoryId;
         this.applyRemark = applyRemark;
         this.time =time;

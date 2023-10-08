@@ -2,6 +2,7 @@ package com.depository_manage.service.impl;
 
 import com.depository_manage.entity.Material;
 import com.depository_manage.entity.OnceFill;
+import com.depository_manage.mapper.MaterialTypeMapper;
 import com.depository_manage.mapper.OnceFillMapper;
 import com.depository_manage.mapper.UserMapper;
 import com.depository_manage.pojo.MaterialP;
@@ -22,10 +23,11 @@ public class OnceFillServiceImpl implements OnceFillService {
     private OnceFillMapper onceFillMapper;
     @Autowired
     private UserMapper userMapper;
+    @Autowired
+    MaterialTypeMapper materialTypeMapper;
 
     @Override
     public void insertOnceFill(Map<String, Object> map) {
-
         onceFillMapper.insertOnceFill(map);
     }
 
@@ -64,6 +66,9 @@ public class OnceFillServiceImpl implements OnceFillService {
     @Override
     public void saveAll(List<OnceFill> records, Integer depositoryId) {
         for (OnceFill record : records) {
+            if(record.getUnitPrice() == null || record.getQuantity() == null) {
+                throw new IllegalArgumentException("Unit price and quantity must not be null");
+            }
             record.setDepositoryId(depositoryId);
             record.setPrice(record.getUnitPrice() * record.getQuantity());
         }
@@ -74,6 +79,7 @@ public class OnceFillServiceImpl implements OnceFillService {
         List<OnceFillP> result=new ArrayList<>(list.size());
         for (OnceFill onceFill: list){
             OnceFillP m=new OnceFillP(onceFill);
+            m.setTypeName(materialTypeMapper.findMaterialTypeNameById(onceFill.getTypeId()));
             result.add(m);
         }
         return result;

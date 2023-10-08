@@ -10,6 +10,8 @@ public class OnceFill {
     private Integer depositoryId;
     private String name;
     private String model;
+    /** 材料种类id */
+    private Integer typeId;
     private Double unitPrice;
     private Integer quantity;
     private Double price;

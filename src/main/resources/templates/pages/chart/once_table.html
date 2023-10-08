@@ -45,6 +45,11 @@
                         </div>
                         <div class="layui-inline">
                             <div class="layui-input-inline">
+                                <input type="text" name="typeName" autocomplete="off" class="layui-input" placeholder="搜索分类">
+                            </div>
+                        </div>
+                        <div class="layui-inline">
+                            <div class="layui-input-inline">
                                 <input type="text" name="applyRemark" autocomplete="off" class="layui-input" placeholder="搜索领用部门">
                             </div>
                         </div>
@@ -174,6 +179,7 @@
                         {field: 'id', width: '6%', title: '序号'},
                         {field: 'name',  title: '品名'},
                         {field: 'model', title: '规格'},
+                        {field: 'typeName', width: '15%',title: '分类'},
                         {field: 'unitPrice',title: '单价'},
                         {field: 'quantity',title: '数量'},
                         {field: 'price',title: '金额'},
@@ -241,6 +247,9 @@
                     }
                     if (data.model!==''){
                         req.model=data.model;
+                    }
+                    if (data.typeName!==''){
+                        req.typeName=data.typeName;
                     }
                     if (data.applyRemark!==''){
                         req.applyRemark=data.applyRemark;

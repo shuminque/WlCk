@@ -119,12 +119,22 @@ public class PageController {
         return "pages/other/dropData_add";
     }
     @GetMapping("/once_add")
-    public String once_add() {
-        return "pages/other/once_add";
+    public ModelAndView once_add() {
+        ModelAndView mv = new ModelAndView();
+        mv.setViewName("pages/other/once_add");
+        mv.addObject("depositories", depositoryService.findDepositoryAll());
+        mv.addObject("materialTypes", materialTypeService.findMaterialTypeAll());
+        mv.addObject("materialEngins", materialEnginService.findMaterialEnginAll());
+        return mv;
     }
     @GetMapping("/once_table")
-    public String once_table() {
-        return "pages/chart/once_table";
+    public ModelAndView once_table() {
+        ModelAndView mv = new ModelAndView();
+        mv.setViewName("pages/chart/once_table");
+        mv.addObject("depositories", depositoryService.findDepositoryAll());
+        mv.addObject("materialTypes", materialTypeService.findMaterialTypeAll());
+        mv.addObject("materialEngins", materialEnginService.findMaterialEnginAll());
+        return mv;
     }
 
     @GetMapping("/material_add")
@@ -134,7 +144,6 @@ public class PageController {
         mv.addObject("depositories", depositoryService.findDepositoryAll());
         mv.addObject("materialTypes", materialTypeService.findMaterialTypeAll());
         mv.addObject("materialEngins", materialEnginService.findMaterialEnginAll());
-
         return mv;
     }
 

@@ -7,6 +7,7 @@
         <result column="depositoryId" property="depositoryId" jdbcType="INTEGER"/>
         <result column="name" property="name" jdbcType="VARCHAR"/>
         <result column="model" property="model" jdbcType="VARCHAR"/>
+        <result column="type_id" property="typeId" jdbcType="INTEGER" />
         <result column="unit_price" property="unitPrice" jdbcType="DOUBLE"/>
         <result column="quantity" property="quantity" jdbcType="INTEGER"/>
         <result column="price" property="price" jdbcType="DOUBLE"/>
@@ -16,14 +17,14 @@
 
     <!-- Insert operation -->
     <insert id="insertOnceFill">
-        INSERT INTO once_fill (depositoryId, name, model, unit_price, quantity, price, time, apply_remark)
-        VALUES (#{depositoryId}, #{name}, #{model}, #{unitPrice}, #{quantity}, #{price}, #{time}, #{applyRemark})
+        INSERT INTO once_fill (depositoryId, name, model, unit_price, quantity, price, time, apply_remark, type_id)
+        VALUES (#{depositoryId}, #{name}, #{model}, #{unitPrice}, #{quantity}, #{price}, #{time}, #{applyRemark}, #{typeId})
     </insert>
     <insert id="insertBatch" parameterType="java.util.List">
-        INSERT INTO once_fill (depositoryId, name, model, unit_price, quantity, price, time, apply_remark)
+        INSERT INTO once_fill (depositoryId, name, model, type_id, unit_price, quantity, price, time, apply_remark)
         VALUES
         <foreach collection="list" item="record" separator=",">
-            (#{record.depositoryId}, #{record.name}, #{record.model}, #{record.unitPrice}, #{record.quantity}, #{record.price}, #{record.time}, #{record.applyRemark})
+            (#{record.depositoryId}, #{record.name}, #{record.model}, #{record.typeId}, #{record.unitPrice}, #{record.quantity}, #{record.price}, #{record.time}, #{record.applyRemark})
         </foreach>
     </insert>
     <!-- Update operation -->
@@ -38,6 +39,9 @@
             </if>
             <if test="model != null">
                 model = #{model},
+            </if>
+            <if test="typeId != null">
+                type_id = #{typeId},
             </if>
             <if test="unitPrice != null">
                 unit_price = #{unitPrice},
@@ -88,6 +92,9 @@
         <if test="model != null and model != ''">
             AND model LIKE CONCAT('%', #{model}, '%')
         </if>
+        <if test="typeId != null">
+            AND type_id = #{typeId}
+        </if>
         <if test="applyRemark != null and applyRemark != ''">
             AND apply_remark LIKE CONCAT('%', #{applyRemark}, '%')
         </if>
@@ -115,6 +122,9 @@
         </if>
         <if test="model != null and model != ''">
             AND m.model LIKE CONCAT('%', #{model}, '%')
+        </if>
+        <if test="typeId != null">
+            AND m.type_id = #{typeId}
         </if>
         <if test="quantity != null">
             AND m.quantity = #{quantity}
