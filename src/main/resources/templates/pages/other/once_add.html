@@ -177,12 +177,15 @@
                 // 检查类型为 text 的输入字段
                 $(this).find('input[type="text"]').each(function() {
                     var inputName = $(this).attr('name');
+                    // 如果 inputName 是 "model"，跳过检查
+                    if(inputName === "model") {
+                        return true; // 继续下一个迭代
+                    }
                     if ($(this).val().trim() === "") {
                         isAllFilled = false;
                         errorMessage += inputName + "\n";
                     }
                 });
-
                 // 检查领用部门的隐藏输入字段
                 var applyRemarkInput = $(this).find('input[name="applyRemark"]');
                 if (applyRemarkInput.val().trim() === "") {
@@ -190,6 +193,7 @@
                     errorMessage += "领用部门\n";
                 }
             });
+
 
             if (!isAllFilled) {
                 layer.msg(errorMessage); // 如果有未填写的字段，显示错误消息
