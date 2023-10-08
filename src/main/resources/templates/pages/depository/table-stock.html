@@ -48,6 +48,14 @@
                             </div>
                         </div>
                         <div class="layui-inline">
+                            <div class="layui-input-inline">
+                                <select name="typeId" >
+                                    <option value="" selected>全部</option>
+                                    <option th:each="material_type,iterStar:${materialTypes}" th:value="${material_type?.getId()}" th:text="${material_type?.getTname()}" >外芯仓库</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="layui-inline">
                             <button type="submit" class="layui-btn layui-btn-primary" lay-submit
                                     lay-filter="data-search-btn"><i class="layui-icon"></i> 搜 索
                             </button>
@@ -167,7 +175,9 @@
                     if (data.depositoryId!==''){
                         req.depositoryId=data.depositoryId;
                     }
-
+                    if (data.typeId!==''){
+                        req.typeId = data.typeId;
+                    }
                     //执行搜索重载
                     table.reload('currentTableId', {
                         url: pp,
