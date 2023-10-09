@@ -33,6 +33,8 @@ public class PageController {
     private MaterialEnginService materialEnginService;
     @Autowired
     private MaterialTypeService materialTypeService;
+    @Autowired
+    private CategoryService categoryService;
     @GetMapping("/login")
     public String login() {
         return "pages/user/login";
@@ -187,6 +189,7 @@ public class PageController {
         ModelAndView mv = new ModelAndView();
         mv.setViewName("pages/depository/table-out");
         mv.addObject("depositories", depositoryService.findDepositoryAll());
+        mv.addObject("cas",categoryService.getAllCategories());
         return mv;
     }
 

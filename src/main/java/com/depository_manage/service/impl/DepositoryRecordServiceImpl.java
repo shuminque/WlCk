@@ -400,14 +400,20 @@ public class DepositoryRecordServiceImpl implements DepositoryRecordService {
 
     @Override
     public List<DepositoryRecordP> findDepositoryRecordPByCondition(Map<String,Object> map) {
-        Integer size = 8,page=1;
-        if (map.containsKey("size")){
-            size=ObjectFormatUtil.toInteger(map.get("size"));
+        Integer size = 8, page = 1;
+        if (map.containsKey("size")) {
+            size = ObjectFormatUtil.toInteger(map.get("size"));
             map.put("size", size);
         }
-        if (map.containsKey("page")){
-            page=ObjectFormatUtil.toInteger(map.get("page"));
-            map.put("begin",(page-1)*size);
+        if (map.containsKey("page")) {
+            page = ObjectFormatUtil.toInteger(map.get("page"));
+            map.put("begin", (page - 1) * size);
+        }
+        if (map.containsKey("applyRemark")) {
+            Object applyRemark = map.get("applyRemark");
+            if (!(applyRemark instanceof Collection)) {
+                map.put("applyRemark", Collections.singletonList(applyRemark));
+            }
         }
         return pack(depositoryRecordMapper.findDepositoryRecordByCondition(map));
     }

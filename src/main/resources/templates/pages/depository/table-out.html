@@ -8,7 +8,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
     <link rel="stylesheet" href="/static/lib/layui-v2.6.3/css/layui.css" media="all">
     <link rel="stylesheet" href="/static/css/public.css" media="all">
-</head>
+</head><link rel="stylesheet" type="text/css" href="/static/css/formSelects-v4.css"/>
 <body>
 <div class="layuimini-container">
     <div class="layuimini-main">
@@ -23,12 +23,17 @@
                                 <input type="text" name="applyTime" id="date" placeholder="请选择起止日期" autocomplete="off" class="layui-input">
                             </div>
                         </div>
+<!--                        <div class="layui-inline">-->
+<!--                            <div class="layui-input-inline">-->
+<!--                                <select id="state" name="state">-->
+<!--                                    <option value="" selected>请选择状态</option>-->
+<!--                                    <option value="已出库">已出库</option>-->
+<!--                                </select>-->
+<!--                            </div>-->
+<!--                        </div>-->
                         <div class="layui-inline">
                             <div class="layui-input-inline">
-                                <select id="state" name="state">
-                                    <option value="" selected>请选择状态</option>
-                                    <option value="已出库">已出库</option>
-                                </select>
+                                <input type="text" name="atId" autocomplete="off" class="layui-input" placeholder="搜索AT号">
                             </div>
                         </div>
                         <div class="layui-inline">
@@ -39,11 +44,6 @@
                         <div class="layui-inline">
                             <div class="layui-input-inline">
                                 <input type="text" name="model" autocomplete="off" class="layui-input" placeholder="搜索规格">
-                            </div>
-                        </div>
-                        <div class="layui-inline">
-                            <div class="layui-input-inline">
-                                <input type="text" name="atId" autocomplete="off" class="layui-input" placeholder="搜索AT号">
                             </div>
                         </div>
 <!--                        <div class="layui-inline">-->
@@ -65,10 +65,10 @@
                                 </select>
                             </div>
                         </div>
-                        <div class="layui-inline">
-                            <div class="layui-input-inline">
-                                <input type="text" name="applyRemark" autocomplete="off" class="layui-input" placeholder="搜索领用地点">
-                            </div>
+                        <div>
+                            <select name="applyRemark" xm-select="selectId" >
+                                <option th:each="categories : ${cas}" th:value="${categories.title}" th:text="${categories.title}" ></option>
+                            </select>
                         </div>
                         <div class="layui-inline">
                             <button type="submit" class="layui-btn layui-btn-primary" lay-submit lay-filter="data-search-btn">
@@ -90,6 +90,7 @@
     </div>
 </div>
 <script src="/static/lib/layui-v2.6.3/layui.js" charset="utf-8"></script>
+<script type="text/javascript" src="/static/js/formSelects-v4.js" charset="utf-8"></script>
 <script>
     var data;
     layui.use(['form', 'table','laydate'], function () {
@@ -244,6 +245,7 @@
                 }
                 // 监听搜索操作
                 form.on('submit(data-search-btn)', function (data) {
+                    console.log(data);
                     var req={};
                     data=data.field;
                     req.type=0;
@@ -262,8 +264,8 @@
                     if (data.model!==''){
                         req.model=data.model;
                     }
-                    if(data.applyRemark !==''){
-                        req.applyRemark=data.applyRemark;
+                    if (data.applyRemark && data.applyRemark !== ''){
+                        req.applyRemark = data.applyRemark.split(',');
                     }
                     if (data.applyTime!==''){
                         var dates = data.applyTime.split(' - ');
@@ -423,6 +425,8 @@
             }
         });
     });
+    formSelects.render('selectId');
+
 </script>
 
 </body>

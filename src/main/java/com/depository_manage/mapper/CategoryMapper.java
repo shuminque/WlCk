@@ -12,7 +12,7 @@ public interface CategoryMapper {
     Category selectById(Integer id);
 
     List<Category> findAllByDepositoryId(Integer depositoryId);
-
+    List<Category> selectAll();
     int insert(Category category);
 
     Integer update(Map<String, Object> map);

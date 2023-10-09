@@ -24,7 +24,10 @@ public class CategoryService {
         List<Category> flatCategories = categoryMapper.findAllByDepositoryId(1); // 1 represents SAB
         return buildHierarchy(flatCategories);
     }
+    public List<Category> getAllCategories() {
+        return categoryMapper.selectAll(); // 1 represents SAB
 
+    }
     public List<Category> getAllZABCategories() {
         List<Category> flatCategories = categoryMapper.findAllByDepositoryId(2); // 2 represents ZAB
         return buildHierarchy(flatCategories);

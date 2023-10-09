@@ -40,7 +40,12 @@ public class DepositoryRecordController {
         return depositoryRecordService.findDepositoryRecordById(id);
     }
     @GetMapping("/depositoryRecord")
-    public RestResponse findDepositoryRecordByCondition(@RequestParam Map<String,Object> map){
+    public RestResponse findDepositoryRecordByCondition(@RequestParam Map<String,Object> map,
+                                                        @RequestParam(name = "applyRemark[]", required = false) List<String> applyRemarks){
+        System.out.println(map);
+        if (applyRemarks != null && !applyRemarks.isEmpty()) {
+            map.put("applyRemark", applyRemarks);
+        }
         String dateRange = (String) map.get("applyTime");
         if (dateRange !=null && dateRange.contains(" - ")){
             String[] dates = dateRange.split(" - ");

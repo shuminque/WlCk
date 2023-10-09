@@ -49,7 +49,6 @@ public class MaterialServiceImpl implements MaterialService {
 
     @Override
     public List<MaterialP> findMaterialPByCondition(Map<String, Object> map) {
-        System.out.println("Query parameters: " + map);
         Integer size = 10, page = 1;
         if (map.containsKey("size")) {
             size = ObjectFormatUtil.toInteger(map.get("size"));

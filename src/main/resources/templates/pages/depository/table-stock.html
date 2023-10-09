@@ -9,13 +9,6 @@
     <link rel="stylesheet" href="/static/lib/layui-v2.6.3/css/layui.css" media="all">
     <link rel="stylesheet" href="/static/css/public.css" media="all">
     <link rel="stylesheet" type="text/css" href="/static/css/formSelects-v4.css"/>
-
-    <!--    <style>-->
-<!--        .layui-table-cell {-->
-<!--            font-size: 18px !important;-->
-<!--            text-align: center !important;-->
-<!--        }-->
-<!--    </style>-->
 </head>
 <body>
 <div class="layuimini-container">
@@ -49,11 +42,11 @@
                                 <input type="text" name="model" autocomplete="off" class="layui-input" placeholder="搜索规格">
                             </div>
                         </div>
-                            <div>
-                                <select name="typeId" xm-select="selectId" >
-                                    <option th:each="material_type : ${materialTypes}" th:value="${material_type.id}" th:text="${material_type.tname}"></option>
-                                </select>
-                            </div>
+                        <div>
+                            <select name="typeId" xm-select="selectId" >
+                                <option th:each="material_type : ${materialTypes}" th:value="${material_type.id}" th:text="${material_type.tname}" ></option>
+                            </select>
+                        </div>
                         <div class="layui-inline">
                             <button type="submit" class="layui-btn layui-btn-primary" lay-submit
                                     lay-filter="data-search-btn"><i class="layui-icon"></i> 搜 索
@@ -159,8 +152,6 @@
                 });
                 // 监听搜索操作
                 form.on('submit(data-search-btn)', function (data) {
-                    console.log(data.field);  // 在控制台打印提交的表单数据
-
                     var req={};
                     data=data.field;
                     if (data.mname!==''){
