@@ -55,8 +55,11 @@
         <if test="price != null">
             AND m.price = #{price}
         </if>
-        <if test="typeId != null">
-            AND m.type_id = #{typeId}
+        <if test="typeId != null and typeId.size > 0">
+            AND m.type_id IN
+            <foreach item="item" index="index" collection="typeId" open="(" separator="," close=")">
+                #{item}
+            </foreach>
         </if>
         <if test="picNum != null and picNum != ''">
             AND m.picNum LIKE CONCAT('%', #{picNum}, '%')
@@ -71,6 +74,7 @@
             AND m.at_id = #{atId}
         </if>
     </select>
+
 
     <!-- 查询所有数据 -->
     <select id="findMaterialAll" resultMap="materialMap">
@@ -122,9 +126,14 @@
         <if test="unitPrice != null">
             AND m.unit_price = #{unitPrice}
         </if>
-        <if test="typeId != null">
-            AND m.type_id = #{typeId}
+        <!-- 修改此处开始 -->
+        <if test="typeId != null and typeId.size > 0">
+            AND m.type_id IN
+            <foreach item="item" index="index" collection="typeId" open="(" separator="," close=")">
+                #{item}
+            </foreach>
         </if>
+        <!-- 修改此处结束 -->
         <if test="picNum != null and picNum != ''">
             AND m.picNum LIKE CONCAT('%', #{picNum}, '%')
         </if>
@@ -138,6 +147,7 @@
             LIMIT #{begin},#{size}
         </if>
     </select>
+
 
     <!-- 根据主键查询数据 -->
     <select id="findMaterialById" resultMap="materialMap" parameterType="integer">

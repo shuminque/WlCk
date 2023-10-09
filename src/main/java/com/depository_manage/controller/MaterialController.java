@@ -9,6 +9,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -18,9 +19,15 @@ public class MaterialController {
     @Autowired
     MaterialService materialService;
     @GetMapping("/material")
-    public RestResponse findMaterial(@RequestParam Map<String,Object> map){
-        return new RestResponse(materialService.findMaterialPByCondition(map),materialService.findCountByCondition(map),200);
+    public RestResponse findMaterial(@RequestParam Map<String,Object> map,
+                                     @RequestParam(name = "typeId[]", required = false) List<Integer> typeIds){
+        if (typeIds != null && !typeIds.isEmpty()) {
+            map.put("typeId", typeIds);
+        }
+        return new RestResponse(materialService.findMaterialPByCondition(map),
+                materialService.findCountByCondition(map), 200);
     }
+
     @PostMapping("/material")
     public RestResponse insertMaterial(@RequestParam Map<String,Object> map){
         return CrudUtil.postHandle(materialService.insertMaterial(map),1);

@@ -8,7 +8,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
     <link rel="stylesheet" href="/static/lib/layui-v2.6.3/css/layui.css" media="all">
     <link rel="stylesheet" href="/static/css/public.css" media="all">
-<!--    <style>-->
+    <link rel="stylesheet" type="text/css" href="/static/css/formSelects-v4.css"/>
+
+    <!--    <style>-->
 <!--        .layui-table-cell {-->
 <!--            font-size: 18px !important;-->
 <!--            text-align: center !important;-->
@@ -47,14 +49,11 @@
                                 <input type="text" name="model" autocomplete="off" class="layui-input" placeholder="搜索规格">
                             </div>
                         </div>
-                        <div class="layui-inline">
-                            <div class="layui-input-inline">
-                                <select name="typeId" >
-                                    <option value="" selected>搜索分类</option>
-                                    <option th:each="material_type,iterStar:${materialTypes}" th:value="${material_type?.getId()}" th:text="${material_type?.getTname()}" >外芯仓库</option>
+                            <div>
+                                <select name="typeId" xm-select="selectId" >
+                                    <option th:each="material_type : ${materialTypes}" th:value="${material_type.id}" th:text="${material_type.tname}"></option>
                                 </select>
                             </div>
-                        </div>
                         <div class="layui-inline">
                             <button type="submit" class="layui-btn layui-btn-primary" lay-submit
                                     lay-filter="data-search-btn"><i class="layui-icon"></i> 搜 索
@@ -68,8 +67,9 @@
         <table class="layui-hide" id="currentTableId" lay-filter="currentTableFilter"></table>
     </div>
 </div>
+<script type="text/javascript" src="/static/js/http_ajax.googleapis.com_ajax_libs_jquery_3.5.1_jquery.js" charset="utf-8"></script>
 <script src="/static/lib/layui-v2.6.3/layui-by.js" charset="utf-8"></script>
-
+<script type="text/javascript" src="/static/js/formSelects-v4.js" charset="utf-8"></script>
 <script>
     var data;
     layui.use(['form', 'table'], function () {
@@ -156,11 +156,11 @@
                             });
                         }
                     }
-
                 });
-
                 // 监听搜索操作
                 form.on('submit(data-search-btn)', function (data) {
+                    console.log(data.field);  // 在控制台打印提交的表单数据
+
                     var req={};
                     data=data.field;
                     if (data.mname!==''){
@@ -175,8 +175,8 @@
                     if (data.depositoryId!==''){
                         req.depositoryId=data.depositoryId;
                     }
-                    if (data.typeId!==''){
-                        req.typeId = data.typeId;
+                    if (data.typeId && data.typeId !== ''){
+                        req.typeId = data.typeId.split(',').map(Number);
                     }
                     //执行搜索重载
                     table.reload('currentTableId', {
@@ -184,7 +184,7 @@
                         page: {
                             curr: 1
                         }
-                        , where: req
+                         , where: req
                     }, 'data');
                     return false;
                 });
@@ -195,8 +195,7 @@
             }
         });
     });
-
-
+    formSelects.render('selectId');
 </script>
 
 </body>

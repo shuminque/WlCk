@@ -10,9 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 public class MaterialServiceImpl implements MaterialService {
@@ -51,18 +49,29 @@ public class MaterialServiceImpl implements MaterialService {
 
     @Override
     public List<MaterialP> findMaterialPByCondition(Map<String, Object> map) {
-        Integer size = 10,page=1;
-        if (map.containsKey("size")){
-            size= ObjectFormatUtil.toInteger(map.get("size"));
+        System.out.println("Query parameters: " + map);
+        Integer size = 10, page = 1;
+        if (map.containsKey("size")) {
+            size = ObjectFormatUtil.toInteger(map.get("size"));
             map.put("size", size);
         }
-        if (map.containsKey("page")){
-            page=ObjectFormatUtil.toInteger(map.get("page"));
-            map.put("begin",(page-1)*size);
+        if (map.containsKey("page")) {
+            page = ObjectFormatUtil.toInteger(map.get("page"));
+            map.put("begin", (page - 1) * size);
         }
-        List<Material> list=materialMapper.findMaterialByCondition(map);
+        // 如果map中包含typeId，并且它是一个数组或列表，直接传给MyBatis
+        // 如果它是一个单一的值，可能需要将它转换成一个只有一个元素的列表
+        if (map.containsKey("typeId")) {
+            Object typeId = map.get("typeId");
+            if (!(typeId instanceof Collection)) {
+                // 如果typeId不是一个列表或集合，将它转换成一个列表
+                map.put("typeId", Collections.singletonList(typeId));
+            }
+        }
+        List<Material> list = materialMapper.findMaterialByCondition(map);
         return pack(list);
     }
+
 
     @Override
     public List<Material> findMaterialAll() {
