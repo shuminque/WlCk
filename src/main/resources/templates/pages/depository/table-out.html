@@ -46,6 +46,11 @@
                                 <input type="text" name="model" autocomplete="off" class="layui-input" placeholder="搜索规格">
                             </div>
                         </div>
+<!--                        <div>-->
+<!--                            <select name="typeName" xm-select="selecttypeId" >-->
+<!--                                <option th:each="material_type : ${materialTypes}" th:value="${material_type.getTname()}" th:text="${material_type.tname}" ></option>-->
+<!--                            </select>-->
+<!--                        </div>-->
 <!--                        <div class="layui-inline">-->
 <!--                            <div class="layui-input-inline">-->
 <!--                                <select name="depositoryId">-->
@@ -264,6 +269,9 @@
                     if (data.model!==''){
                         req.model=data.model;
                     }
+                    if (data.typeName && data.typeName !== ''){
+                        req.typeName = data.typeName.split(',');
+                    }
                     if (data.applyRemark && data.applyRemark !== ''){
                         req.applyRemark = data.applyRemark.split(',');
                     }
@@ -425,6 +433,7 @@
             }
         });
     });
+    formSelects.render('selecttypeId');
     formSelects.render('selectId');
 
 </script>

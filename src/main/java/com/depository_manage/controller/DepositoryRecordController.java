@@ -41,8 +41,11 @@ public class DepositoryRecordController {
     }
     @GetMapping("/depositoryRecord")
     public RestResponse findDepositoryRecordByCondition(@RequestParam Map<String,Object> map,
+                                                        @RequestParam(name = "typeName[]", required = false) List<String> typeNames,
                                                         @RequestParam(name = "applyRemark[]", required = false) List<String> applyRemarks){
-        System.out.println(map);
+        if (typeNames != null && !typeNames.isEmpty()) {
+            map.put("typeName", typeNames);
+        }
         if (applyRemarks != null && !applyRemarks.isEmpty()) {
             map.put("applyRemark", applyRemarks);
         }

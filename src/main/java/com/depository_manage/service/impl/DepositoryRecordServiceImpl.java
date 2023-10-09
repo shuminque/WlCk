@@ -415,6 +415,12 @@ public class DepositoryRecordServiceImpl implements DepositoryRecordService {
                 map.put("applyRemark", Collections.singletonList(applyRemark));
             }
         }
+        if (map.containsKey("typeName")) {
+            Object typeName = map.get("typeName");
+            if (!(typeName instanceof Collection)) {
+                map.put("typeName", Collections.singletonList(typeName));
+            }
+        }
         return pack(depositoryRecordMapper.findDepositoryRecordByCondition(map));
     }
 

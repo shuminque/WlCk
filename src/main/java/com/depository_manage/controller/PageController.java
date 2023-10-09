@@ -189,6 +189,7 @@ public class PageController {
         ModelAndView mv = new ModelAndView();
         mv.setViewName("pages/depository/table-out");
         mv.addObject("depositories", depositoryService.findDepositoryAll());
+        mv.addObject("materialTypes",materialTypeService.findMaterialTypeAll());
         mv.addObject("cas",categoryService.getAllCategories());
         return mv;
     }

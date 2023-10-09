@@ -52,6 +52,9 @@ public class MaterialController {
                 map.put("depositoryId", depositoryId);
             }
             map.put("stateId",1);
+            map.put("quantity",0);
+            map.put("price",0);
+            map.put("unitPrice",0);
             // 如果验证通过，执行插入操作
             return CrudUtil.postHandle(materialService.insertMaterial(map),1);
         } catch (DataIntegrityViolationException e) {
@@ -61,7 +64,6 @@ public class MaterialController {
             // 当插入操作失败时，捕获异常并返回错误消息。
             return new RestResponse("Insertion failed: " + e.getMessage(), 500, null);
         }
-
 
     }
 

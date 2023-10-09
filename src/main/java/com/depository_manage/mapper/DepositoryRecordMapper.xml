@@ -100,8 +100,11 @@
         <if test="model != null and model != ''">
             AND dr.model LIKE CONCAT('%', #{model}, '%')
         </if>
-        <if test="typeName != null and typeName != ''">
-            AND dr.type_name LIKE CONCAT('%', #{typeName}, '%')
+        <if test="typeName != null and typeName.size > 0">
+            AND dr.type_name IN
+            <foreach item="item" index="index" collection="typeName" open="(" separator="," close=")">
+                #{item}
+            </foreach>
         </if>
         <if test="enginName != null and enginName != ''">
             AND dr.engin_name LIKE CONCAT('%', #{enginName}, '%')
@@ -221,8 +224,11 @@
         <if test="model != null and model != ''">
             AND dr.model LIKE CONCAT('%', #{model}, '%')
         </if>
-        <if test="typeName != null and typeName != ''">
-            AND dr.type_name LIKE CONCAT('%', #{typeName}, '%')
+        <if test="typeName != null and typeName.size > 0">
+            AND dr.type_name IN
+            <foreach item="item" index="index" collection="typeName" open="(" separator="," close=")">
+                #{item}
+            </foreach>
         </if>
         <if test="enginName != null and enginName != ''">
             AND dr.engin_name LIKE CONCAT('%', #{enginName}, '%')
