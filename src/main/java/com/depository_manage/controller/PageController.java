@@ -1,5 +1,6 @@
 package com.depository_manage.controller;
 
+import com.depository_manage.entity.Category;
 import com.depository_manage.exception.MyException;
 import com.depository_manage.service.*;
 import com.depository_manage.pojo.DepositoryRecordP;
@@ -15,6 +16,7 @@ import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 @Controller
 public class PageController {
@@ -185,14 +187,34 @@ public class PageController {
     }
 
     @GetMapping("/table_out")
-    public ModelAndView table_out() {
+    public ModelAndView table_out(HttpServletRequest request) {
         ModelAndView mv = new ModelAndView();
         mv.setViewName("pages/depository/table-out");
+
         mv.addObject("depositories", depositoryService.findDepositoryAll());
-        mv.addObject("materialTypes",materialTypeService.findMaterialTypeAll());
-        mv.addObject("cas",categoryService.getAllCategories());
+        mv.addObject("materialTypes", materialTypeService.findMaterialTypeAll());
+
+        // 获取用户信息
+        UserToken userToken = (UserToken) request.getAttribute("userToken");
+        // 确保userToken和user对象不为null
+        if (userToken != null && userToken.getUser() != null) {
+            int userDepositoryId = userToken.getUser().getDepositoryId();
+            // 根据 userDepositoryId 决定使用哪个 categories 列表
+            List<Category> categories;
+            if (userDepositoryId == 1) {
+                categories = categoryService.getSABCategories();
+            } else if (userDepositoryId == 2) {
+                categories = categoryService.getZABCategories();
+            } else {
+                categories = categoryService.getAllCategories();
+            }
+            mv.addObject("cas", categories);
+        } else {
+            // 处理 userToken 或 user 对象为 null 的情况，你可能需要重定向到登录页面或显示错误消息
+        }
         return mv;
     }
+
 
     @GetMapping("/table_user")
     public ModelAndView table_user() {

@@ -38,6 +38,18 @@ public class CategoryController {
         response.put("data", categories);
         return ResponseEntity.ok(response);
     }
+//    @GetMapping("/get_SAB_categories")//
+//    public List<Category> getSABCategoriess() {
+//        return categoryService.getAllSABCategories();
+//    }
+//    @GetMapping("/get_ZAB_categories")//
+//    public List<Category> getZABCategoriess() {
+//        return categoryService.getAllZABCategories();
+//    }
+    @GetMapping("/get_all_categories")//
+    public List<Category> getAllCategories() {
+        return categoryService.getAllCategories();
+    }
     @PostMapping("/add")
     public ResponseEntity<RestResponse> addCategory(@RequestBody Category category) {
         int result = categoryService.addCategory(category);
