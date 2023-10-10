@@ -390,6 +390,7 @@
                             form.val("editFormFilter", data);
                             // 监听提交按钮
                             form.on('submit(editSubmitBtnFilter)', function(formData) {
+                                console.log(formData);
                                 // 获取表单数据，发送到服务器更新
                                 $.ajax({
                                     url: "/material/" + data.id,  // 使用外部data参数

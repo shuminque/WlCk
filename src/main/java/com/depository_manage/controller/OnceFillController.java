@@ -43,11 +43,23 @@ public class OnceFillController {
     // 更新一次性记录
     @PutMapping("/update/{id}")
     public RestResponse updateOnceFill(@PathVariable int id, @RequestBody Map<String, Object> map) {
-        // 将 id 也放入 map 中，以便在 MyBatis 映射中使用
         map.put("id", id);
+        // 空字符串检查
+        for(Map.Entry<String, Object> entry : map.entrySet()){
+            if("".equals(entry.getValue())){
+                map.put(entry.getKey(), null);
+            }
+        }
+        // 必填字段验证：根据您的业务规则添加
+        // if (map.get("someField") == null || "".equals(map.get("someField").toString().trim())) {
+        //     return new RestResponse("Some field is required", 400, null);
+        // }
+        // 数据更新
         int result = onceFillService.updateOnceFill(map);
-        return CrudUtil.putHandle(result,1);  // 假设CrudUtil.updateHandle是一个静态方法，用于处理更新操作的结果
+        // 处理和返回更新结果
+        return CrudUtil.putHandle(result,1);
     }
+
 
     // 根据ID查询一次性记录
     @GetMapping("/get/{id}")
