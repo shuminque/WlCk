@@ -156,6 +156,13 @@
                         <input type="text" placeholder="请填入 规格" name="model" class="layui-input">
                     </div>
                 </div>
+                <!-- 图号 -->
+                <div class="layui-form-item">
+                    <label class="layui-form-label">图号</label>
+                    <div class="layui-input-block">
+                        <input type="text" placeholder="请填入 图号" name="picNum" class="layui-input">
+                    </div>
+                </div>
                 <!-- 分类 -->
                 <div class="layui-form-item">
                     <label class="layui-form-label">分类</label>
@@ -164,13 +171,6 @@
                             <option value="">请选择分类</option>
                             <option th:each="type : ${materialTypes}" th:value="${type.id}" th:text="${type.id}+' '+${type.tname}"></option>
                         </select>
-                    </div>
-                </div>
-                <!-- 图号 -->
-                <div class="layui-form-item">
-                    <label class="layui-form-label">图号</label>
-                    <div class="layui-input-block">
-                        <input type="text" placeholder="请填入 图号" name="picNum" class="layui-input">
                     </div>
                 </div>
                 <!-- 工程 -->
@@ -382,7 +382,7 @@
                     var index = layer.open({
                         type: 1, // 页面层
                         title: '编辑部品',
-                        area: ['600px', '400px'], // 设置弹出层的宽高
+                        area: ['40%', '80%'], // 设置弹出层的宽高
                         content: $('#editModelTemplate').html(), // 获取编辑模板的HTML
                         success: function(layero, index) {
                             // 填充数据到表单中

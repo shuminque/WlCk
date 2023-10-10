@@ -77,6 +77,15 @@
                     </div>
                 </div>
                 <div class="layui-form-item">
+                    <label class="layui-form-label">分类</label>
+                    <div class="layui-input-block">
+                        <select name="typeId">
+                            <option value="">请选择分类</option>
+                            <option th:each="type : ${materialTypes}" th:value="${type.id}" th:text="${type.id}+' '+${type.tname}"></option>
+                        </select>
+                    </div>
+                </div>
+                <div class="layui-form-item">
                     <label class="layui-form-label">单价</label>
                     <div class="layui-input-block">
                         <input type="number" name="unitPrice" placeholder="请输入单价" autocomplete="off" class="layui-input">
@@ -286,7 +295,7 @@
                     var index = layer.open({
                         type: 1, // 页面层
                         title: '编辑部品',
-                        area: ['600px', '500px'], // 设置弹出层的宽高
+                        area: ['40%', '90%'], // 设置弹出层的宽高
                         content: $('#editModelTemplate').html(), // 获取编辑模板的HTML
                         success: function(layero, index) {
                             // 填充数据到表单中

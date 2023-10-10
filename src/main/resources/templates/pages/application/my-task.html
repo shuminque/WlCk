@@ -60,6 +60,7 @@
         table.render({
             elem: "#taskTableId",
             url: "/myTask?isDone=0",
+            height: "full-50",
             parseData: function (res) { //res 即为原始返回的数据
                 return {
                     "status": res.status, //解析接口状态
@@ -68,10 +69,7 @@
                     "data": res.data //解析数据列表
                 };
             },
-            request: {
-                pageName: 'page', //页码的参数名称，默认：page
-                limitName: 'size' //每页数据量的参数名，默认：limit
-            },
+
             response: {
                 statusName: 'status' //规定数据状态的字段名称，默认：code
                 ,statusCode: 200 //规定成功的状态码，默认：0
@@ -98,7 +96,7 @@
                         return formatDate(d.applyTime);
                     }},
                 {title: '操作 ', minWidth: 200, toolbar: '#currentTableBar', align: "center"}
-                // 添加更多的列来匹配你的任务数据...
+                //
             ]],
             where: {
                 type: "1"
