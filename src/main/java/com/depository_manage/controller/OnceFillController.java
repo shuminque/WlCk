@@ -73,7 +73,11 @@ public class OnceFillController {
 //        return onceFillService.findOnceFillByCondition(map);
 //    }
     @GetMapping("/list")
-    public RestResponse findOnceFillByCondition(@RequestParam Map<String,Object> map){
+    public RestResponse findOnceFillByCondition(@RequestParam Map<String,Object> map,
+                                                @RequestParam(name = "typeId[]", required = false) List<Integer> typeIds){
+        if (typeIds != null && !typeIds.isEmpty()) {
+            map.put("typeId", typeIds);
+        }
         String dateRange = (String) map.get("time");
         if (dateRange !=null && dateRange.contains(" - ")){
             String[] dates = dateRange.split(" - ");

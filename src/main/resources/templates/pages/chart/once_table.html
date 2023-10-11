@@ -8,6 +8,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
     <link rel="stylesheet" href="/static/lib/layui-v2.6.3/css/layui.css" media="all">
     <link rel="stylesheet" href="/static/css/public.css" media="all">
+    <link rel="stylesheet" type="text/css" href="/static/css/formSelects-v4.css"/>
 </head>
 <body>
 <div class="layuimini-container">
@@ -51,6 +52,12 @@
                                 </select>
                             </div>
                         </div>
+<!--                        <div class="layui-inline" style="width: 57%;">-->
+<!--                                <select name="typeId" xm-select="selectId" >-->
+<!--                                    <option value="">请选择分类</option>-->
+<!--                                    <option th:each="material_type : ${materialTypes}" th:value="${material_type.id}" th:text="${material_type.tname}" ></option>-->
+<!--                                </select>-->
+<!--                        </div>-->
                         <div class="layui-inline">
                             <div class="layui-input-inline">
                                 <input type="text" name="applyRemark" autocomplete="off" class="layui-input" placeholder="搜索领用部门">
@@ -82,9 +89,8 @@
                 <div class="layui-form-item">
                     <label class="layui-form-label">分类</label>
                     <div class="layui-input-block">
-                        <select name="typeId">
-                            <option value="">请选择分类</option>
-                            <option th:each="type : ${materialTypes}" th:value="${type.id}" th:text="${type.id}+' '+${type.tname}"></option>
+                        <select name="typeId" xm-select="selectId" >
+                            <option th:each="material_type : ${materialTypes}" th:value="${material_type.id}" th:text="${material_type.tname}" ></option>
                         </select>
                     </div>
                 </div>
@@ -136,6 +142,7 @@
     </div>
 </div>
 <script src="/static/lib/layui-v2.6.3/layui.js" charset="utf-8"></script>
+<script type="text/javascript" src="/static/js/formSelects-v4.js" charset="utf-8"></script>
 <script>
     var data;
     layui.use(['form', 'table','layer','laydate'], function () {
@@ -202,6 +209,7 @@
                         {field: 'applyRemark', title: '领用部门', width: 210, templet: function(d){
                                 return d.applyRemark ? d.applyRemark.replace(/[A-Z]-[A-Z](-\d)?/g, '') : '';
                             }},
+                        {field: 'introduce', title: '备注'},
                         // {field: 'depositoryId', width: '6%', title: '厂区'}
                         {
                             title: '操作',
@@ -260,8 +268,8 @@
                     if (data.model!==''){
                         req.model=data.model;
                     }
-                    if (data.typeId!==''){
-                        req.typeId=data.typeId;
+                    if (data.typeId && data.typeId !== ''){
+                        req.typeId = data.typeId.split(',').map(Number);
                     }
                     if (data.applyRemark!==''){
                         req.applyRemark=data.applyRemark;
@@ -358,8 +366,8 @@
                 layer.msg('无法获取用户的厂区信息');
             }
         });
-
     });
+    formSelects.render('selectId');
 </script>
 </body>
 </html>

@@ -183,6 +183,20 @@
                         </select>
                     </div>
                 </div>
+                <!-- 状态 -->
+                <div class="layui-form-item">
+                    <label class="layui-form-label">状态</label>
+                    <div class="layui-input-block">
+                        <select name="stateId">
+                            <option value="">请选择工程</option>
+                            <option value="1">使用中</option>
+                            <option value="2">2年以上不流动、待确认</option>
+                            <option value="3">4年以上不流动、死库存</option>
+                            <option value="4">AT号资源空、无实物</option>
+                            <option value="5">曾经使用过，现已不再使用</option>
+                        </select>
+                    </div>
+                </div>
                 <!-- 提交按钮 -->
                 <div class="layui-form-item" style="text-align: center;">
                     <button class="layui-btn layui-btn-normal" lay-submit="editSubmitBtnFilter" lay-filter="editSubmitBtnFilter">

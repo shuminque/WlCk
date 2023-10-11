@@ -17,6 +17,6 @@ public class OnceFill {
     private Double price;
     private Date time;
     private String applyRemark;
-
+    private String introduce;
 
 }

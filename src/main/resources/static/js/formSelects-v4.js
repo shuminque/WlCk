@@ -55,7 +55,7 @@
 		FORM_TEAM_PID = 'XM_PID_VALUE',
 		CZ = 'xm-cz',
 		CZ_GROUP = 'xm-cz-group',
-		TIPS = '请选择',
+		TIPS = '',
 		data = {},
 		events = {
 			on: {},

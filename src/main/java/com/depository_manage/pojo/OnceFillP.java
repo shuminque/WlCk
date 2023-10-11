@@ -17,8 +17,10 @@ public class OnceFillP {
     private Double price;
     private Date time;
     private String applyRemark;
+    private String introduce;
+
     public OnceFillP(Integer id,  String name, String model, Integer quantity, Double price, Double unitPrice,String typeName,
-                     Integer depositoryId, String applyRemark, Date time) {
+                     Integer depositoryId, String applyRemark, Date time, String introduce) {
         this.id = id;
         this.name = name;
         this.model =model;
@@ -29,6 +31,7 @@ public class OnceFillP {
         this.depositoryId = depositoryId;
         this.applyRemark = applyRemark;
         this.time =time;
+        this.introduce = introduce;
     }
     public OnceFillP(OnceFill onceFill) {
         this.id = onceFill.getId();
@@ -40,5 +43,6 @@ public class OnceFillP {
         this.depositoryId = onceFill.getDepositoryId();
         this.applyRemark = onceFill.getApplyRemark();
         this.time =onceFill.getTime();
+        this.introduce = onceFill.getIntroduce();
     }
 }

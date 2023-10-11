@@ -13,18 +13,19 @@
         <result column="price" property="price" jdbcType="DOUBLE"/>
         <result column="time" property="time" jdbcType="TIMESTAMP"/>
         <result column="apply_remark" property="applyRemark" jdbcType="VARCHAR"/>
+        <result column="introduce" property="introduce" jdbcType="VARCHAR"/>
     </resultMap>
 
     <!-- Insert operation -->
     <insert id="insertOnceFill">
-        INSERT INTO once_fill (depositoryId, name, model, unit_price, quantity, price, time, apply_remark, type_id)
-        VALUES (#{depositoryId}, #{name}, #{model}, #{unitPrice}, #{quantity}, #{price}, #{time}, #{applyRemark}, #{typeId})
+        INSERT INTO once_fill (depositoryId, name, model, unit_price, quantity, price, time, apply_remark, type_id, introduce)
+        VALUES (#{depositoryId}, #{name}, #{model}, #{unitPrice}, #{quantity}, #{price}, #{time}, #{applyRemark}, #{typeId}, #{introduce})
     </insert>
     <insert id="insertBatch" parameterType="java.util.List">
-        INSERT INTO once_fill (depositoryId, name, model, type_id, unit_price, quantity, price, time, apply_remark)
+        INSERT INTO once_fill (depositoryId, name, model, type_id, unit_price, quantity, price, time, apply_remark, introduce)
         VALUES
         <foreach collection="list" item="record" separator=",">
-            (#{record.depositoryId}, #{record.name}, #{record.model}, #{record.typeId}, #{record.unitPrice}, #{record.quantity}, #{record.price}, #{record.time}, #{record.applyRemark})
+            (#{record.depositoryId}, #{record.name}, #{record.model}, #{record.typeId}, #{record.unitPrice}, #{record.quantity}, #{record.price}, #{record.time}, #{record.applyRemark}, #{record.introduce})
         </foreach>
     </insert>
     <!-- Update operation -->
@@ -57,6 +58,9 @@
             </if>
             <if test="applyRemark != null">
                 apply_remark = #{applyRemark},
+            </if>
+            <if test="introduce != null">
+                introduce = #{introduce},
             </if>
         </set>
         WHERE id = #{id}
@@ -92,11 +96,17 @@
         <if test="model != null and model != ''">
             AND model LIKE CONCAT('%', #{model}, '%')
         </if>
-        <if test="typeId != null">
-            AND type_id = #{typeId}
+        <if test="typeId != null and typeId.size > 0">
+            AND type_id IN
+            <foreach item="item" index="index" collection="typeId" open="(" separator="," close=")">
+                #{item}
+            </foreach>
         </if>
         <if test="applyRemark != null and applyRemark != ''">
             AND apply_remark LIKE CONCAT('%', #{applyRemark}, '%')
+        </if>
+        <if test="introduce != null and introduce != ''">
+            AND introduce LIKE CONCAT('%', #{introduce}, '%')
         </if>
         <if test="startDate != null and endDate != null">
             AND DATE(time) BETWEEN #{startDate} AND #{endDate}
@@ -123,8 +133,11 @@
         <if test="model != null and model != ''">
             AND m.model LIKE CONCAT('%', #{model}, '%')
         </if>
-        <if test="typeId != null">
-            AND m.type_id = #{typeId}
+        <if test="typeId != null and typeId.size > 0">
+            AND m.type_id IN
+            <foreach item="item" index="index" collection="typeId" open="(" separator="," close=")">
+                #{item}
+            </foreach>
         </if>
         <if test="quantity != null">
             AND m.quantity = #{quantity}
@@ -137,6 +150,9 @@
         </if>
         <if test="applyRemark != null and applyRemark != ''">
             AND apply_remark LIKE CONCAT('%', #{applyRemark}, '%')
+        </if>
+        <if test="introduce != null and introduce != ''">
+            AND introduce LIKE CONCAT('%', #{introduce}, '%')
         </if>
         <if test="startDate != null and endDate != null">
             AND DATE(m.time) BETWEEN #{startDate} AND #{endDate}

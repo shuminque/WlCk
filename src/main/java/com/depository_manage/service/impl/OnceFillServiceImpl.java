@@ -12,9 +12,7 @@ import com.depository_manage.utils.ObjectFormatUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 public class OnceFillServiceImpl implements OnceFillService {
@@ -41,7 +39,6 @@ public class OnceFillServiceImpl implements OnceFillService {
         return onceFillMapper.findOnceFillById(id);
     }
 
-
     @Override
     public List<OnceFillP> findOnceFillPByCondition(Map<String, Object> map) {
         Integer size = 10,page=1;
@@ -52,6 +49,13 @@ public class OnceFillServiceImpl implements OnceFillService {
         if (map.containsKey("page")){
             page=ObjectFormatUtil.toInteger(map.get("page"));
             map.put("begin",(page-1)*size);
+        }
+        if (map.containsKey("typeId")) {
+            Object typeId = map.get("typeId");
+            if (!(typeId instanceof Collection)) {
+                // 如果typeId不是一个列表或集合，将它转换成一个列表
+                map.put("typeId", Collections.singletonList(typeId));
+            }
         }
         return pack(onceFillMapper.findOnceFillByCondition(map));
     }
