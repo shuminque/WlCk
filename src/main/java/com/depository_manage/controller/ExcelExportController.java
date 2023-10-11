@@ -32,42 +32,52 @@ public class ExcelExportController {
         List<Map<String, Object>> data = reportService.fetchReportData(startDate, endDate, depositoryId);
         XSSFWorkbook workbook = new XSSFWorkbook();
         XSSFSheet sheet = workbook.createSheet("Report");
-
 // 创建单元格样式并设置边框
         XSSFCellStyle style = workbook.createCellStyle();
         style.setBorderTop(BorderStyle.THIN);
         style.setBorderBottom(BorderStyle.THIN);
         style.setBorderLeft(BorderStyle.THIN);
         style.setBorderRight(BorderStyle.THIN);
-
 // 创建表头行并设置样式
         XSSFRow headerRow = sheet.createRow(0);
-        createCellWithStyle(headerRow, 0, "AT号", style);
-        createCellWithStyle(headerRow, 1, "品名", style);
-        createCellWithStyle(headerRow, 2, "规格", style);
-        createCellWithStyle(headerRow, 3, "入库数量", style);
-        createCellWithStyle(headerRow, 4, "入库金额", style);
-        createCellWithStyle(headerRow, 5, "出库数量", style);
-        createCellWithStyle(headerRow, 6, "出库金额", style);
-        createCellWithStyle(headerRow, 7, "库存数量", style);
-        createCellWithStyle(headerRow, 8, "在库金额", style);
+        createCellWithStyle(headerRow, 0, "分类", style);
+        createCellWithStyle(headerRow, 1, "AT号", style);
+        createCellWithStyle(headerRow, 2, "品名", style);
+        createCellWithStyle(headerRow, 3, "规格", style);
+        createCellWithStyle(headerRow, 4, "入库数量", style);
+        createCellWithStyle(headerRow, 5, "入库金额", style);
+        createCellWithStyle(headerRow, 6, "出库数量", style);
+        createCellWithStyle(headerRow, 7, "出库金额", style);
+        createCellWithStyle(headerRow, 8, "库存数量", style);
+        createCellWithStyle(headerRow, 9, "在库金额", style);
 
+        String previousCategory = "";  // 这个变量用于存储前一行的分类
         for (int i = 0; i < data.size(); i++) {
             Map<String, Object> record = data.get(i);
             XSSFRow row = sheet.createRow(i + 1);
+            // 获取当前行的分类
+            String currentCategory = (String) getOrDefault(record, "分类", "");
 
-            createCellWithStyle(row, 0, ((Integer) getOrDefault(record, "AT号", 0)).intValue(), style);
-            createCellWithStyle(row, 1, (String) getOrDefault(record, "品名", "aaa"), style);
-            createCellWithStyle(row, 2, (String) getOrDefault(record, "规格", ""), style);
-            createCellWithStyle(row, 3, ((Double) getOrDefault(record, "入库数量", 0.0)).doubleValue(), style);
-            createCellWithStyle(row, 4, (String) getOrDefault(record, "入库金额", "0.00"), style);
-            createCellWithStyle(row, 5, ((Double) getOrDefault(record, "出库数量", 0.0)).doubleValue(), style);
-            createCellWithStyle(row, 6, (String) getOrDefault(record, "出库金额", "0.00"), style);
-            createCellWithStyle(row, 7, ((Double) getOrDefault(record, "库存数量", 0.0)).doubleValue(), style);
-            createCellWithStyle(row, 8, (String) getOrDefault(record, "在库金额", "0.00"), style);
+            // 检查当前行的分类是否与上一行的分类相同
+            if(currentCategory.equals(previousCategory)) {
+                // 如果相同，则在这一行的分类列中设置为空字符串
+                createCellWithStyle(row, 0, "", style);
+            } else {
+                // 如果不同，则使用分类的名称，并更新previousCategory变量
+                createCellWithStyle(row, 0, currentCategory, style);
+                previousCategory = currentCategory;
+            }
+            // 其他列的处理保持不变
+            createCellWithStyle(row, 1, ((Integer) getOrDefault(record, "AT号", 0)).intValue(), style);
+            createCellWithStyle(row, 2, (String) getOrDefault(record, "品名", ""), style);
+            createCellWithStyle(row, 3, (String) getOrDefault(record, "规格", ""), style);
+            createCellWithStyle(row, 4, ((Double) getOrDefault(record, "入库数量", 0.0)).doubleValue(), style);
+            createCellWithStyle(row, 5, (String) getOrDefault(record, "入库金额", "0.00"), style);
+            createCellWithStyle(row, 6 , ((Double) getOrDefault(record, "出库数量", 0.0)).doubleValue(), style);
+            createCellWithStyle(row, 7, (String) getOrDefault(record, "出库金额", "0.00"), style);
+            createCellWithStyle(row, 8, ((Double) getOrDefault(record, "库存数量", 0.0)).doubleValue(), style);
+            createCellWithStyle(row, 9, (String) getOrDefault(record, "在库金额", "0.00"), style);
         }
-
-
 
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         workbook.write(outputStream);

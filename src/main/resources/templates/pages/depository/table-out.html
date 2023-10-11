@@ -62,11 +62,9 @@
 <!--                        </div>-->
                         <div class="layui-inline">
                             <label class="layui-form-label">厂区</label>
-                            <div class="layui-input-block">
-                                <select name="depositoryId">
-                                    <option value="" selected>请选择厂区</option>
-                                    <option value="1">SAB</option>
-                                    <option value="2">ZAB</option>
+                            <div class="layui-input-inline">
+                                <select name="depositoryId" id="depositorySelect" lay-search>
+                                    <!-- 初始值，稍后会根据用户信息进行更新 -->
                                 </select>
                             </div>
                         </div>
@@ -123,6 +121,19 @@
                 var globalToolbarTemplate;
                 userAuthority = data.authority;
                 userReviewGroupId = data.review_group_id;
+                let selectElem = document.getElementById('depositorySelect');
+
+                if (userDepositoryId === 1) {
+                    selectElem.innerHTML = '<option value="1">SAB</option>';
+                } else if (userDepositoryId === 2) {
+                    selectElem.innerHTML = '<option value="2">ZAB</option>';
+                } else if (userDepositoryId ===0){
+                    selectElem.innerHTML =
+                        '<option value="" selected>请选择厂区</option>'+
+                        '<option value="1">SAB</option>' +
+                        '<option value="2">ZAB</option>'
+                }
+                layui.form.render('select');
 //                 if (userDepositoryId === 1 || userDepositoryId === 2) {
 //                     // 不包含删除按钮的模板
 //                     toolbarTemplate = `

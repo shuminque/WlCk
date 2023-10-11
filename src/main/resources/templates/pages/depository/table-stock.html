@@ -23,7 +23,10 @@
                             <div class="layui-input-inline">
                                 <select name="depositoryId" >
                                     <option value="" selected>全部</option>
-                                    <option th:each="depository,iterStar:${depositories}" th:value="${depository?.getId()}" th:text="${depository?.getDname()}" >外芯仓库</option>
+                                    <option th:each="depository,iterStat:${depositories}"
+                                            th:if="${iterStat.index > 0}"
+                                            th:value="${depository?.getId()}"
+                                            th:text="${depository?.getDname()}">外芯仓库</option>
                                 </select>
                             </div>
                         </div>

@@ -189,10 +189,10 @@
                     },
                     toolbar: ['filter', 'exports', 'print'],
                     cols: [ [
+                        {field: 'typeName', width: '15%',title: '分类' , sort: true},
                         {field: 'id', width: '6%', title: '序号'},
                         {field: 'name',  title: '品名'},
                         {field: 'model', title: '规格'},
-                        {field: 'typeName', width: '15%',title: '分类'},
                         {field: 'unitPrice',title: '单价'},
                         {field: 'quantity',title: '数量'},
                         {field: 'price',title: '金额'},
@@ -211,7 +211,6 @@
                                 // 初始化按钮字符串
                                 let buttons =
                                     ' ';
-
                                 const today = new Date();
                                 const currentMonth = today.getMonth() + 1; // JavaScript中，月份是从0开始的
                                 const currentYear = today.getFullYear();
