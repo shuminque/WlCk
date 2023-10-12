@@ -76,7 +76,7 @@
         <div class="layui-hide" id="currentTableId" style="display: none;" lay-filter="currentTableFilter"></div>
     </div>
 </div>
-<script src="/static/lib/layui-v2.6.3/layui.js" charset="utf-8"></script>
+<script src="/static/lib/layui-v2.6.3/layui-by.js" charset="utf-8"></script>
 <script>
     var data;
     layui.use(['form', 'table','laydate'], function () {
@@ -225,9 +225,8 @@
                                 return buttons;
                             }
                         }
-
                     ]],
-                    limits: [10, 15, 20, 25, 50],
+                    limits: [10, 54, 100, 500, 100000],
                     limit: 10,
                     page: true,
                     skin: 'line'

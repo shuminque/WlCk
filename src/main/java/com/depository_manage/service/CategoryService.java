@@ -29,11 +29,12 @@ public class CategoryService {
         return buildHierarchy(flatCategories);
     }
     public List<Category> getSABCategories() {
-        return categoryMapper.findAllByDepositoryId(1);
+        List<Category> flatCategories = categoryMapper.findAllByDepositoryId(1); // 1 represents SAB
+        return childrenHierarchy(flatCategories);
     }
     public List<Category> getZABCategories() {
-        return categoryMapper.findAllByDepositoryId(2);
-    }
+        List<Category> flatCategories = categoryMapper.findAllByDepositoryId(2); // 1 represents SAB
+        return childrenHierarchy(flatCategories);    }
     public List<Category> getAllCategories() {
         return categoryMapper.selectAll();
     }
@@ -45,6 +46,13 @@ public class CategoryService {
         topLevelCategories.forEach(topLevelCategory -> addChildren(topLevelCategory, flatCategories));
 
         return topLevelCategories;
+    }
+
+    private List<Category> childrenHierarchy(List<Category> flatCategories) {
+
+        return flatCategories.stream()
+                .filter(c -> c.getParentId() != null)
+                .collect(Collectors.toList());
     }
 
     private void addChildren(Category parent, List<Category> flatCategories) {
