@@ -12,6 +12,7 @@ import com.depository_manage.utils.ObjectFormatUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.text.DecimalFormat;
 import java.util.*;
 
 @Service
@@ -74,7 +75,10 @@ public class OnceFillServiceImpl implements OnceFillService {
                 throw new IllegalArgumentException("Unit price and quantity must not be null");
             }
             record.setDepositoryId(depositoryId);
-            record.setPrice(record.getUnitPrice() * record.getQuantity());
+            DecimalFormat decimalFormat = new DecimalFormat("#.000");
+            double price = record.getUnitPrice() * record.getQuantity();
+            String formattedPrice = decimalFormat.format(price);
+            record.setPrice(Double.parseDouble(formattedPrice));
         }
         onceFillMapper.insertBatch(records);
     }
