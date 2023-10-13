@@ -49,9 +49,8 @@ public class CategoryService {
     }
 
     private List<Category> childrenHierarchy(List<Category> flatCategories) {
-
         return flatCategories.stream()
-                .filter(c -> c.getParentId() != null)
+                .filter(c -> c.getParentId() != null || c.getChildren() ==null)
                 .collect(Collectors.toList());
     }
 
