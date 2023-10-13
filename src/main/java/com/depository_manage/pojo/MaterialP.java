@@ -62,6 +62,8 @@ public class MaterialP {
         this.quantity = material.getQuantity();
         this.picNum = material.getPicNum();
         this.price = material.getPrice();
+        this.enginId = material.getEnginId();
         this.unitPrice=material.getUnitPrice();
+        this.stateId = material.getStateId();
     }
 }
