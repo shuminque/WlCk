@@ -89,7 +89,8 @@
                 <div class="layui-form-item">
                     <label class="layui-form-label">分类</label>
                     <div class="layui-input-block">
-                        <select name="typeId" xm-select="selectId" >
+                        <select name="typeId">
+                            <option value="">请选择分类</option>
                             <option th:each="material_type : ${materialTypes}" th:value="${material_type.id}" th:text="${material_type.tname}" ></option>
                         </select>
                     </div>
@@ -196,6 +197,7 @@
                     },
                     toolbar: ['filter', 'exports', 'print'],
                     cols: [ [
+                        { field: 'typeId', width: '6%', title: '分类id', hide: true },
                         {field: 'typeName', width: '15%',title: '分类' , sort: true},
                         {field: 'id', width: '6%', title: '序号'},
                         {field: 'name',  title: '品名'},
@@ -313,6 +315,7 @@
                             var form = layui.form;
                             data.time = formatDate(data.time);
                             form.val("editFormFilter", data);
+                            console.log(data);
                             laydate.render({
                                 elem: '#editDate',
                                 type: 'date',
