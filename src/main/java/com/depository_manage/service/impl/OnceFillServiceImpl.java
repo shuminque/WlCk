@@ -75,7 +75,7 @@ public class OnceFillServiceImpl implements OnceFillService {
                 throw new IllegalArgumentException("Unit price and quantity must not be null");
             }
             record.setDepositoryId(depositoryId);
-            DecimalFormat decimalFormat = new DecimalFormat("#.000");
+            DecimalFormat decimalFormat = new DecimalFormat("#.00");
             double price = record.getUnitPrice() * record.getQuantity();
             String formattedPrice = decimalFormat.format(price);
             record.setPrice(Double.parseDouble(formattedPrice));

@@ -6,7 +6,7 @@
     <meta name="renderer" content="webkit">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-    <link rel="stylesheet" href="/static/lib/layui-v2.6.3/css/layui.css" media="all">
+    <link rel="stylesheet" href="/static/lib/layui-v2.8.17/css/layui.css" media="all">
     <link rel="stylesheet" href="/static/css/public.css" media="all">
 </head><link rel="stylesheet" type="text/css" href="/static/css/formSelects-v4.css"/>
 <body>
@@ -96,7 +96,7 @@
         <div class="layui-hide" id="currentTableId" style="display: none;" lay-filter="currentTableFilter"></div>
     </div>
 </div>
-<script src="/static/lib/layui-v2.6.3/layui.js" charset="utf-8"></script>
+<script src="/static/lib/layui-v2.8.17/layui.js" charset="utf-8"></script>
 <script type="text/javascript" src="/static/js/formSelects-v4.js" charset="utf-8"></script>
 <script>
     var data;
@@ -110,6 +110,62 @@
         laydate.render({
             elem: '#date'
             ,range:true,
+            rangeLinked: true,
+            shortcuts: [
+                {
+                    text: "上个月",
+                    value: function(){
+                        var value = [];
+                        var date1 = new Date();
+                        date1.setMonth(date1.getMonth() - 1);
+                        date1.setDate(1);
+                        date1.setHours(0, 0, 0, 0);
+                        value.push(date1);
+                        var date2 = new Date();
+                        date2.setDate(1);
+                        date2.setHours(0, 0, 0, 0);
+                        date2 = date2.getTime() - 1;
+                        value.push(new Date(date2));
+                        return value;
+                    }
+                },
+                {
+                    text: "这个月",
+                    value: function(){
+                        var value = [];
+                        var date1 = new Date();
+                        date1.setHours(0, 0, 0, 0);
+                        value.push(date1);
+
+                        var date2 = new Date();
+                        date2.setMonth(date2.getMonth() + 1);
+                        date2.setDate(0); // 设置为当前月的最后一天
+                        date2.setHours(23, 59, 59, 999); // 设置为当天的最后一刻
+                        value.push(date2);
+
+                        return value;
+                    }
+
+                },
+                {
+                    text: "下个月",
+                    value: function(){
+                        var value = [];
+                        var date1 = new Date();
+                        date1.setMonth(date1.getMonth() + 1);
+                        date1.setDate(1);
+                        date1.setHours(0, 0, 0, 0);
+                        value.push(date1);
+                        var date2 = new Date();
+                        date2.setMonth(date2.getMonth() + 2);
+                        date2.setDate(1);
+                        date2.setHours(0, 0, 0, 0);
+                        date2 = date2.getTime() - 1;
+                        value.push(new Date(date2));
+                        return value;
+                    }
+                }
+            ]
         });
         var userReviewGroupId;
         var userAuthority;
