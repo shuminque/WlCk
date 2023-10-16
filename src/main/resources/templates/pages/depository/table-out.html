@@ -75,7 +75,6 @@
                                     <option th:each="categories : ${cas}" th:value="${categories.title}" th:text="${categories.title}" ></option>
                                 </select>
                             </div>
-
                         </div>
                         <div class="layui-inline">
                             <button type="submit" class="layui-btn layui-btn-primary" lay-submit lay-filter="data-search-btn">
@@ -269,8 +268,8 @@
                             }},
                         // {field: 'applyTime', width: 170, title: '申请时间', sort: true},
                         // {field: 'reviewTime', width: 150, title: '出库时间'},
-                        {field: 'reviewTime',title: '出库时间',  width: 120,sort: true, templet: function(d){
-                                return formatDate(d.reviewTime);
+                        {field: 'applyTime',title: '出库时间',  width: 120,sort: true, templet: function(d){
+                                return formatDate(d.applyTime);
                             }},
                         // {title: '操作 ', minWidth: 200, toolbar: '#currentTableId', align: "center"}
                         {

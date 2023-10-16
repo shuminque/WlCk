@@ -246,10 +246,11 @@
             AND dr.applicant_id = #{applicantId}
         </if>
         <if test="applyRemark != null and applyRemark.size > 0">
-            AND dr.apply_remark IN
-            <foreach item="item" index="index" collection="applyRemark" open="(" separator="," close=")">
-                #{item}
+            AND (
+            <foreach item="item" index="index" collection="applyRemark" open="" separator=" OR " close="">
+                dr.apply_remark LIKE CONCAT('%', #{item}, '%')
             </foreach>
+            )
         </if>
         <if test="startDate != null and endDate != null">
             AND DATE(dr.apply_time) BETWEEN #{startDate} AND #{endDate}
