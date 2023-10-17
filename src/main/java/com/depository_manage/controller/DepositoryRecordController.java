@@ -192,11 +192,12 @@ public class DepositoryRecordController {
         List<MonthlyAmountDTO> monthlyAmounts = depositoryRecordService.fetchMonthlyAmountsForYear(year);
         return ResponseEntity.ok(monthlyAmounts);
     }
-    @GetMapping("/category-outbounds/{year}/{month}")
-    public ResponseEntity<List<CategoryOutboundDTO>> getCategoryOutbounds(@PathVariable String year, @PathVariable String month) {
-        List<CategoryOutboundDTO> categoryOutbounds = depositoryRecordService.fetchCategoryOutboundsForYearMonth(year, month);
+    @GetMapping("/category-outbounds/{year}/{month}/{depositoryId}")
+    public ResponseEntity<List<CategoryOutboundDTO>> getCategoryOutbounds(@PathVariable String year, @PathVariable String month, @PathVariable Integer depositoryId) {
+        List<CategoryOutboundDTO> categoryOutbounds = depositoryRecordService.fetchCategoryOutboundsForYearMonth(year, month, depositoryId);
         return ResponseEntity.ok(categoryOutbounds);
     }
+
 
 
 }

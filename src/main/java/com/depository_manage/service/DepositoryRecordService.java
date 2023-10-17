@@ -109,7 +109,7 @@ public interface DepositoryRecordService {
 //    Integer applyAndReview(Map<String, Object> map, Integer userId, Integer did);
 
     List<MonthlyAmountDTO> fetchMonthlyAmountsForYear(String year);
-    public List<CategoryOutboundDTO> fetchCategoryOutboundsForYearMonth(String year, String month);
+    public List<CategoryOutboundDTO> fetchCategoryOutboundsForYearMonth(String year, String month, Integer depositoryId);
 
 
 }

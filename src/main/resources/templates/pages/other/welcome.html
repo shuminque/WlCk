@@ -238,6 +238,11 @@
                 </div>
             </div>
         </div>
+        <select id="depository-selector">
+            <option value="">选择厂区</option>
+            <option value="1">SAB</option>
+            <option value="2">ZAB</option>
+        </select>
         <input type="text" id="month-selector" placeholder="请选择年月">
         <div class="layui-row">
             <!-- 分类金额柱形图 -->
@@ -264,32 +269,49 @@
             miniTab = layui.miniTab,
             echarts = layui.echarts,
             laydate = layui.laydate;
+        // 初始化日期选择器
         laydate.render({
             elem: '#month-selector',
             type: 'month',
             done: function(value, date, endDate) {
-                // value 是格式化后的日期字符串，例如 "2023-01"
-                fetchDataForMonth(value);
+                // 检查是否已选择厂区
+                if (document.getElementById('depository-selector').value) {
+                    fetchDataForMonth(value);
+                } else {
+                    alert("请先选择一个厂区！");
+                }
+            }
+        });
+// 为厂区选择器添加事件监听器
+        document.getElementById('depository-selector').addEventListener('change', function() {
+            var selectedMonth = document.getElementById('month-selector').value;
+            if (selectedMonth) {
+                fetchDataForMonth(selectedMonth);
             }
         });
         function fetchDataForMonth(yearMonth) {
             var parts = yearMonth.split('-');  // 拆分为 ["2023", "01"]
             var year = parts[0];
             var month = parts[1];
-
-            $.ajax({
-                url: '/category-outbounds/' + year + '/' + month,  // 修改URL格式
-                type: 'GET',
-                dataType: 'json',
-                success: function (data) {
-                    // 当成功获取数据时，初始化并设置分类柱形图
-                    initCategoryBarChart(data);
-                },
-                error: function (error) {
-                    console.log("Error fetching category outbounds", error);
-                }
-            });
+            var selectedDepositoryId = document.getElementById('depository-selector').value;
+            if (selectedDepositoryId) {
+                $.ajax({
+                    url: '/category-outbounds/' + year + '/' + month + '/' + selectedDepositoryId,
+                    type: 'GET',
+                    dataType: 'json',
+                    success: function(data) {
+                        // 当成功获取数据时，初始化并设置分类柱形图
+                        initCategoryBarChart(data);
+                    },
+                    error: function(error) {
+                        console.log("Error fetching category outbounds", error);
+                    }
+                });
+            } else {
+                alert("请先选择一个厂区！");
+            }
         }
+
         miniTab.listen();
 
         /**
@@ -380,9 +402,6 @@
                     axisPointer: {
                         type: 'shadow'
                     }
-                },
-                legend: {  // 添加这个部分
-                    data: uniqueCategories
                 },
                 xAxis: {
                     type: 'category',
