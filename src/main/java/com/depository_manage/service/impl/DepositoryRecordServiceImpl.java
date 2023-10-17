@@ -181,6 +181,7 @@ public class DepositoryRecordServiceImpl implements DepositoryRecordService {
         if (material.getQuantity() >= recordQuantity) {
             // 计算新的总数量
             double newQuantity = material.getQuantity() - recordQuantity;
+
             // 计算出库的总价
             double outPrice = recordPrice * recordQuantity;
             // 计算新的总价
@@ -190,10 +191,21 @@ public class DepositoryRecordServiceImpl implements DepositoryRecordService {
             // 更新物料
             material.setPrice(bdNewPrice.doubleValue());
             material.setQuantity(newQuantity);
+
+            // 重新设置单位价格
+            if (newQuantity != 0) {
+                material.setUnitPrice(bdNewPrice.doubleValue() / newQuantity);
+            } else {
+                // 如果物料数量为0，你可能需要设置unitPrice为0或保持其当前值
+                // 这取决于你的业务逻辑
+                material.setUnitPrice(0.00); // 或者保持当前值，这取决于你的选择
+            }
+
             materialMapper.updateMaterial(material);
         } else {
             throw new MyException("库存不足于该出库请求");
         }
+
         // 清除主键
         map.remove("id");
         map.put("state", "待审核");
