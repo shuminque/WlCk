@@ -2,8 +2,10 @@ package com.depository_manage.mapper;
 
 import com.depository_manage.entity.DepositoryRecord;
 import com.depository_manage.entity.SimpleDepositoryRecord;
+import com.depository_manage.pojo.CategoryOutboundDTO;
 import com.depository_manage.pojo.MonthlyAmountDTO;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -95,5 +97,7 @@ public interface DepositoryRecordMapper {
      */
     Integer findCountByCondition(Map<String,Object> map);
     List<MonthlyAmountDTO> getMonthlyAmountsForYear(String year);
+    List<CategoryOutboundDTO> getCategoryOutboundsForYearMonth(@Param("year") String year, @Param("month") String month);
+
 
 }

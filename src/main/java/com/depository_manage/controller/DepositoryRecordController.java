@@ -5,6 +5,7 @@ import com.depository_manage.entity.Material;
 import com.depository_manage.exception.MyException;
 import com.depository_manage.mapper.DepositoryRecordMapper;
 import com.depository_manage.mapper.MaterialMapper;
+import com.depository_manage.pojo.CategoryOutboundDTO;
 import com.depository_manage.pojo.DepositoryRecordP;
 import com.depository_manage.pojo.MonthlyAmountDTO;
 import com.depository_manage.pojo.RestResponse;
@@ -191,5 +192,11 @@ public class DepositoryRecordController {
         List<MonthlyAmountDTO> monthlyAmounts = depositoryRecordService.fetchMonthlyAmountsForYear(year);
         return ResponseEntity.ok(monthlyAmounts);
     }
+    @GetMapping("/category-outbounds/{year}/{month}")
+    public ResponseEntity<List<CategoryOutboundDTO>> getCategoryOutbounds(@PathVariable String year, @PathVariable String month) {
+        List<CategoryOutboundDTO> categoryOutbounds = depositoryRecordService.fetchCategoryOutboundsForYearMonth(year, month);
+        return ResponseEntity.ok(categoryOutbounds);
+    }
+
 
 }

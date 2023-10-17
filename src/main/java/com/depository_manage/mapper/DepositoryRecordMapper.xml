@@ -540,9 +540,7 @@
         FROM once_fill
         WHERE DATE_FORMAT(time, '%Y') = #{year}
         GROUP BY DATE_FORMAT(time, '%Y-%m'), depositoryId
-
         UNION ALL
-
         SELECT
             DATE_FORMAT(time, '%Y-%m') as month,  -- Using 'time' column from once_fill
         depositoryId as depository_id,        -- Using 'depositoryId' column from once_fill
@@ -576,5 +574,52 @@
         GROUP BY month
         ORDER BY month;
     </select>
+    <select id="getCategoryOutboundsForYearMonth" resultType="com.depository_manage.pojo.CategoryOutboundDTO" parameterType="java.util.Map">
+        WITH CategoryOutbounds AS (
+            -- 从 once_fill 表查询
+            SELECT
+                DATE_FORMAT(time, '%Y-%m') as month,
+            c.title AS category,
+            ROUND(SUM(o.unit_price * o.quantity)) AS amount
+        FROM
+            once_fill o
+            JOIN
+            categories c ON o.apply_remark LIKE CONCAT('%', c.title, '%')
+            AND c.id NOT IN (SELECT parent_id FROM categories WHERE parent_id IS NOT NULL)
+        WHERE
+            DATE_FORMAT(time, '%Y') = #{year} AND DATE_FORMAT(time, '%m') = #{month}
+        GROUP BY
+            DATE_FORMAT(time, '%Y-%m'), c.title
 
+        UNION ALL
+
+        -- 从 depository_record 表查询
+        SELECT
+            DATE_FORMAT(apply_time, '%Y-%m') as month,
+        c.title AS category,
+        ROUND(SUM(d.price * d.quantity)) AS amount
+        FROM
+            depository_record d
+            JOIN
+            categories c ON d.apply_remark LIKE CONCAT('%', c.title, '%')
+            AND c.id NOT IN (SELECT parent_id FROM categories WHERE parent_id IS NOT NULL)
+        WHERE
+            d.type = 0
+          AND d.review_pass = 1
+          AND DATE_FORMAT(apply_time, '%Y') = #{year} AND DATE_FORMAT(apply_time, '%m') = #{month}
+        GROUP BY
+            DATE_FORMAT(apply_time, '%Y-%m'), c.title
+            )
+        SELECT
+            month,
+            category,
+            ROUND(SUM(amount)) AS amount
+        FROM
+            CategoryOutbounds
+        GROUP BY
+            month, category
+        ORDER BY
+            month, category DESC;
+
+    </select>
 </mapper>

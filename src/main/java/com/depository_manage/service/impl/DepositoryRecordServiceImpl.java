@@ -3,6 +3,7 @@ package com.depository_manage.service.impl;
 import com.depository_manage.entity.SimpleDepositoryRecord;
 import com.depository_manage.exception.MyException;
 import com.depository_manage.mapper.*;
+import com.depository_manage.pojo.CategoryOutboundDTO;
 import com.depository_manage.pojo.MonthlyAmountDTO;
 import com.depository_manage.service.DepositoryRecordService;
 import com.depository_manage.service.NotificationService;
@@ -507,5 +508,10 @@ public class DepositoryRecordServiceImpl implements DepositoryRecordService {
     public List<MonthlyAmountDTO> fetchMonthlyAmountsForYear(String year) {
         return depositoryRecordMapper.getMonthlyAmountsForYear(year);
     }
+    public List<CategoryOutboundDTO> fetchCategoryOutboundsForYearMonth(String year, String month) {
+        // 逻辑调用mapper
+        return depositoryRecordMapper.getCategoryOutboundsForYearMonth(year, month);
+    }
+
 
 }
