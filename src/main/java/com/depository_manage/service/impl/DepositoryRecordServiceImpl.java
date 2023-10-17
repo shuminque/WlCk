@@ -182,23 +182,25 @@ public class DepositoryRecordServiceImpl implements DepositoryRecordService {
             // 计算新的总数量
             double newQuantity = material.getQuantity() - recordQuantity;
 
-            // 计算出库的总价
-            double outPrice = recordPrice * recordQuantity;
-            // 计算新的总价
-            double newPrice = material.getPrice() - outPrice;
-            BigDecimal bdNewPrice = new BigDecimal(newPrice);
-            bdNewPrice = bdNewPrice.setScale(2, RoundingMode.HALF_UP);
-            // 更新物料
-            material.setPrice(bdNewPrice.doubleValue());
-            material.setQuantity(newQuantity);
-
-            // 重新设置单位价格
-            if (newQuantity != 0) {
-                material.setUnitPrice(bdNewPrice.doubleValue() / newQuantity);
+            // 如果新数量为0，那么将金额、数量和单价都设置为0
+            if (newQuantity == 0) {
+                material.setPrice(0.00);
+                material.setQuantity(0.00);
+                material.setUnitPrice(0.00);
             } else {
-                // 如果物料数量为0，你可能需要设置unitPrice为0或保持其当前值
-                // 这取决于你的业务逻辑
-                material.setUnitPrice(0.00); // 或者保持当前值，这取决于你的选择
+                // 计算出库的总价
+                double outPrice = recordPrice * recordQuantity;
+                // 计算新的总价
+                double newPrice = material.getPrice() - outPrice;
+                BigDecimal bdNewPrice = new BigDecimal(newPrice);
+                bdNewPrice = bdNewPrice.setScale(2, RoundingMode.HALF_UP);
+
+                // 更新物料
+                material.setPrice(bdNewPrice.doubleValue());
+                material.setQuantity(newQuantity);
+
+                // 重新设置单位价格
+                material.setUnitPrice(bdNewPrice.doubleValue() / newQuantity);
             }
 
             materialMapper.updateMaterial(material);
