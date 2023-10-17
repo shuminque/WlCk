@@ -178,7 +178,7 @@ public class DepositoryRecordServiceImpl implements DepositoryRecordService {
         Material material = list.get(0);
         double recordQuantity = Double.parseDouble(String.valueOf(map.get("quantity")));
         double recordPrice = Double.parseDouble(String.valueOf(map.get("price")));
-        if (material.getQuantity() > recordQuantity) {
+        if (material.getQuantity() >= recordQuantity) {
             // 计算新的总数量
             double newQuantity = material.getQuantity() - recordQuantity;
             // 计算出库的总价
