@@ -1,6 +1,7 @@
 package com.depository_manage.controller;
 
 import com.depository_manage.entity.Category;
+import com.depository_manage.pojo.RecordDTO;
 import com.depository_manage.pojo.RestResponse;
 import com.depository_manage.service.CategoryService;
 import com.depository_manage.utils.CrudUtil;
@@ -82,5 +83,17 @@ public class CategoryController {
         }
         return ResponseEntity.ok(response);
     }
+
+    @GetMapping("/category-records/{categoryName}/{year}/{month}/{depositoryId}")
+    public ResponseEntity<List<RecordDTO>> getCategoryRecords(
+            @PathVariable String categoryName,
+            @PathVariable String year,
+            @PathVariable String month,
+            @PathVariable Integer depositoryId) {
+        List<RecordDTO> records = categoryService.getRecordsForCategory(categoryName, depositoryId, year, month);
+        return ResponseEntity.ok(records);
+    }
+
+
 
 }

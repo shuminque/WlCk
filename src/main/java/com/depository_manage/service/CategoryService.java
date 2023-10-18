@@ -2,6 +2,8 @@ package com.depository_manage.service;
 
 import com.depository_manage.entity.Category;
 import com.depository_manage.mapper.CategoryMapper;
+import com.depository_manage.pojo.CategoryOutboundDTO;
+import com.depository_manage.pojo.RecordDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -78,4 +80,9 @@ public class CategoryService {
     public Integer deleteCategory(Integer id) {
         return categoryMapper.deleteCategory(id);
     }
+
+    public List<RecordDTO> getRecordsForCategory(String categoryName, Integer depositoryId, String year, String month) {
+        return categoryMapper.getRecordsForCategory(categoryName, depositoryId, year, month);
+    }
+
 }

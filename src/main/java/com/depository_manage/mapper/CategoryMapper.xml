@@ -52,4 +52,54 @@
         SELECT * FROM categories WHERE depository_id = #{depositoryId}
     </select>
 
+    <select id="getRecordsForCategory" resultType="com.depository_manage.pojo.RecordDTO" parameterType="java.util.Map">
+        -- 从 once_fill 表中获取记录
+        SELECT
+            'once_fill' AS source_table,
+            o.id,
+            o.name as name,
+            o.model ,
+            o.quantity ,
+            o.unit_price as '单价',
+                o.quantity * o.unit_price as '总金额',
+                o.time AS record_date,
+            o.apply_remark,
+            c.title AS category_title
+        FROM
+            once_fill AS o
+                JOIN
+            categories AS c ON o.apply_remark LIKE CONCAT('%', c.title, '%')
+        WHERE
+                    c.title = #{categoryName}  -- 分类名称
+                AND c.depository_id = #{depositoryId}
+                AND o.depositoryId = #{depositoryId} -- 仓库ID
+                AND YEAR(o.time) = #{year}  -- 年份
+          AND MONTH(o.time) = #{month} -- 月份
+
+        UNION ALL
+
+-- 从 depository_record 表中获取记录
+        SELECT
+            'depository_record' AS source_table,
+            d.id,
+            d.mname AS name,
+            d.model,
+            d.quantity,
+            d.price as  '单价',
+                d.quantity * d.price as '总金额',
+                d.apply_time AS record_date,
+            d.apply_remark,
+            c.title AS category_title
+        FROM
+            depository_record AS d
+                JOIN
+            categories AS c ON d.apply_remark LIKE CONCAT('%', c.title, '%')
+        WHERE
+                    c.title = #{categoryName}  -- 分类名称
+                AND c.depository_id = #{depositoryId}
+                AND d.depository_id = #{depositoryId} -- 仓库ID
+                AND YEAR(d.apply_time) = #{year}  -- 年份
+          AND MONTH(d.apply_time) = #{month} -- 月份
+    </select>
+
 </mapper>

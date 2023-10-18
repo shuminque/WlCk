@@ -1,7 +1,9 @@
 package com.depository_manage.mapper;
 
 import com.depository_manage.entity.Category;
+import com.depository_manage.pojo.RecordDTO;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 import java.util.Map;
@@ -18,4 +20,6 @@ public interface CategoryMapper {
     Integer update(Map<String, Object> map);
 
     Integer deleteCategory(Integer id);
+    List<RecordDTO> getRecordsForCategory(@Param("categoryName") String categoryName, @Param("depositoryId") Integer depositoryId, @Param("year") String year, @Param("month") String month);
+
 }
