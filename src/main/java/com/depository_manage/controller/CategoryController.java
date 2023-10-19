@@ -84,12 +84,12 @@ public class CategoryController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/category-records/{categoryName}/{year}/{month}/{depositoryId}")
+    @GetMapping("/category-records/{categoryName}/{depositoryId}/{year}/{month}")
     public ResponseEntity<List<RecordDTO>> getCategoryRecords(
             @PathVariable String categoryName,
+            @PathVariable Integer depositoryId,
             @PathVariable String year,
-            @PathVariable String month,
-            @PathVariable Integer depositoryId) {
+            @PathVariable String month) {
         List<RecordDTO> records = categoryService.getRecordsForCategory(categoryName, depositoryId, year, month);
         return ResponseEntity.ok(records);
     }

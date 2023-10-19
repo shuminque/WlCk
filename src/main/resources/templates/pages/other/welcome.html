@@ -255,17 +255,9 @@
                 </div>
             </div>
         </div>
-        <script type="text/html" id="popup-form-template">
-            <form id="category-form" class="layui-form" style="margin: 15px;">
-                <div class="layui-form-item">
-                    <label class="layui-form-label">分类</label>
-                    <div class="layui-input-block">
-                        <input type="text" id="selected-category" readonly class="layui-input">
-                    </div>
-                </div>
-
-            </form>
-        </script>
+        <div id="recordTableContainer" style="display: none">
+            <table id="recordTable"></table>
+        </div>
     </div>
 </div>
 <script src="/static/lib/layui-v2.6.3/layui.js" charset="utf-8"></script>
@@ -273,12 +265,13 @@
 <script type="text/javascript" src="/static/js/http_ajax.googleapis.com_ajax_libs_jquery_3.5.1_jquery.js" charset="utf-8"></script>
 <script type="text/javascript" src="/static/js/http_cdn.bootcdn.net_ajax_libs_echarts_5.2.0_echarts.js" charset="utf-8"></script>
 <script>
-    layui.use(['layer', 'miniTab','echarts','laydate'], function () {
+    layui.use(['layer', 'miniTab','echarts','laydate','table'], function () {
         var $ = layui.jquery,
             layer = layui.layer,
             miniTab = layui.miniTab,
             echarts = layui.echarts,
-            laydate = layui.laydate;
+            laydate = layui.laydate,
+            table = layui.table;
         // 初始化日期选择器
         laydate.render({
             elem: '#month-selector',
@@ -450,19 +443,96 @@
             var chart = echarts.init(document.getElementById('category-bar-chart'));
             chart.setOption(option);
             chart.on('click', function (params) {
-                // 使用layui的layer组件显示弹出层
-                layer.open({
-                    type: 1,
-                    title: params.name, // 使用分类名称作为标题
-                    content: document.getElementById('popup-form-template').innerHTML,
-                    success: function(layero, index) {
-                        // 添加弹出层显示后的逻辑，填充数据
-                        var categoryInput = layero.find('#selected-category')[0];
-                        categoryInput.value = params.name;
+                var selectedDepositoryId = document.getElementById('depository-selector').value;
+                var selectedMonth = document.getElementById('month-selector').value;
+                var parts = selectedMonth.split('-');  // 拆分为 ["2023", "01"]
+                var year = parts[0];
+                var month = parts[1];
+                console.log(params.name);
+                var encodedCategoryName = encodeURIComponent(params.name);
+                // 发送AJAX请求获取该分类的记录
+                $.ajax({
+                    url: '/api/categories/category-records/' + encodedCategoryName + '/' + selectedDepositoryId + '/' + year + '/' + month,
+                    type: 'GET',
+                    dataType: 'json',
+                    success: function(records) {
+                        var tableHtml = generateTableHtml(records);
+                        layer.open({
+                            type: 1,
+                            title: params.name,
+                            content: tableHtml
+                        });
+                        // renderTable(records);
+                        // // 使用layui的layer组件显示弹出层
+                        // layer.open({
+                        //     type: 1,
+                        //     title: params.name, // 使用分类名称作为标题
+                        //     content: $('#recordTableContainer'),  // 注意这里我们使用了上面定义的容器
+                        //     area: ['80%', '60%']  // 这里你可以设置弹出窗口的大小
+                        // });
+                    },
+                    error: function(error) {
+                        console.log("Error fetching records for category", error);
                     }
                 });
             });
 
+            function renderTable(records) {
+                table.render({
+                    elem: '#recordTable',
+                    cols: [ [
+                        { field: 'sourceTable', title: '来源表' },
+                        { field: 'id', title: 'ID' },
+                        { field: 'name', title: '名称' },
+                        { field: 'model', title: '型号' },
+                        { field: 'quantity', title: '数量' },
+                        { field: 'unitPrice', title: '单价' },
+                        { field: 'totalAmount', title: '总金额' },
+                        { field: 'recordDate', title: '记录日期' },
+                        { field: 'applyRemark', title: '备注' },
+                        { field: 'categoryTitle', title: '分类标题' }
+                    ]],
+                    data: records
+                });
+            }
+
+            function generateTableHtml(records) {
+                // 根据传入的记录生成HTML表格
+                var html = '<table class="table-class-name">';
+                html += '<thead>';
+                html += '<tr>';
+                html += '<th>来源表</th>';
+                html += '<th>ID</th>';
+                html += '<th>名称</th>';
+                html += '<th>型号</th>';
+                html += '<th>数量</th>';
+                html += '<th>单价</th>';
+                html += '<th>总金额</th>';
+                html += '<th>记录日期</th>';
+                html += '<th>备注</th>';
+                html += '<th>分类标题</th>';
+                html += '</tr>';
+                html += '</thead>';
+                html += '<tbody>';
+
+                records.forEach(function(record) {
+                    html += '<tr>';
+                    html += '<td>' + record.sourceTable + '</td>';
+                    html += '<td>' + record.id + '</td>';
+                    html += '<td>' + record.name + '</td>';
+                    html += '<td>' + record.model + '</td>';
+                    html += '<td>' + record.quantity + '</td>';
+                    html += '<td>' + record.unitPrice + '</td>';  // 请注意这里使用的属性名
+                    html += '<td>' + record.totalAmount + '</td>'; // 同上
+                    html += '<td>' + record.recordDate + '</td>';
+                    html += '<td>' + record.applyRemark + '</td>';
+                    html += '<td>' + record.categoryTitle + '</td>';
+                    html += '</tr>';
+                });
+
+                html += '</tbody></table>';
+                return html;
+            }
         }
 
         function initChart(chartId, months, sabData, zabData, title) {

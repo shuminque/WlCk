@@ -60,8 +60,8 @@
             o.name as name,
             o.model ,
             o.quantity ,
-            o.unit_price as '单价',
-                o.quantity * o.unit_price as '总金额',
+            o.unit_price as unitPrice,
+                o.quantity * o.unit_price as totalAmount,
                 o.time AS record_date,
             o.apply_remark,
             c.title AS category_title
@@ -85,8 +85,8 @@
             d.mname AS name,
             d.model,
             d.quantity,
-            d.price as  '单价',
-                d.quantity * d.price as '总金额',
+            d.price as  unitPrice,
+                d.quantity * d.price as totalAmount,
                 d.apply_time AS record_date,
             d.apply_remark,
             c.title AS category_title
