@@ -53,6 +53,24 @@
             color: #333; /* 或者其他您喜欢的颜色 */
             text-align: center; /* 如果您希望文字居中 */
         }
+        .department-logo {
+            width: 80px; /* 您可以根据需要调整尺寸 */
+            height: 80px;
+            background: url('/static/images/xuri-logo.ico') no-repeat center center; /* 替换为您的图片路径 */
+            background-size: cover;
+            border-radius: 50%; /* 使其成为圆形 */
+            margin: -70px auto -40px auto; /* 使用负的 margin-top 将其向上移动 */
+            position: relative; /* 使用 relative 定位 */
+            z-index: 1; /* 确保其在其他元素之上 */
+            padding: -10px ;  /* 调整 padding 来缩小白色背景 */
+        }
+        .logo-title {
+            text-align: center;
+            letter-spacing: 5px;
+        }
+        .logo-title h1 {
+            margin-top: 40px; /* 根据需要调整 */
+        }
     </style>
 </head>
 <body>
@@ -61,6 +79,7 @@
         <div class="layui-form login-form">
             <form class="layui-form" action="">
                 <div class="layui-form-item logo-title">
+                    <div class="department-logo"></div>
                     <h1>生产管理部</h1>
                     <div class="department-title">
                         综合仓库系统
