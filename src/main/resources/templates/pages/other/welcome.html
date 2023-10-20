@@ -484,6 +484,7 @@
 
                 table.render({
                     elem: '#recordTable',
+                    height: "full-50", // 设置表格高度并固定表头
                     cols: [ [
                         { field: 'sourceTable', title: '来源表', flex:1, hide: true},
                         { field: 'id', title: 'ID', flex:1 },
@@ -505,8 +506,9 @@
                         { field: 'applyRemark', title: '备注', flex:1 ,hide: true},
                         { field: 'categoryTitle', title: '分类标题', flex:1 ,hide: true}
                     ]],
+                    limit: records.length,
+                    height: 280,
                     data: records,
-                    skin: 'line',
                 });
             }
         }
