@@ -118,6 +118,11 @@ public class PageController {
     public String rate_add() {
         return "pages/other/rate_add";
     }
+    @GetMapping("/productInfo_add")
+    public String productInfo_add() {
+        return "pages/other/productInfo_add";
+    }
+
     @GetMapping("/dropData_add")
     public String dropData_add() {
         return "pages/other/dropData_add";

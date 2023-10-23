@@ -64,10 +64,7 @@ public class MaterialController {
             // 当插入操作失败时，捕获异常并返回错误消息。
             return new RestResponse("Insertion failed: " + e.getMessage(), 500, null);
         }
-
     }
-
-
 
     @DeleteMapping("/material/{id}")
     public RestResponse deleteMaterial(@PathVariable int id){
