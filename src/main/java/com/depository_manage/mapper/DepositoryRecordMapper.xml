@@ -625,5 +625,74 @@
         ORDER BY
             month, category_id;
     </select>
+    <select id="fetchMonthlyAmountByTypeAndYear" resultType="com.depository_manage.pojo.MonthlyAmountDTO" parameterType="map">
+        WITH MonthlyAmount AS (
+            SELECT
+            MONTH(combined.date) AS month,
+            ROUND(SUM(combined.total_price), 2) AS monthly_amount
+        FROM (
+            -- 从 depository_record 表查询金额
+            SELECT
+            dr.type_name AS type_name,
+            dr.apply_time AS date,
+            dr.quantity * dr.price AS total_price
+            FROM depository_record dr
+            WHERE dr.type_name IN (SELECT tname FROM material_type WHERE id = #{typeId})
+            AND YEAR(dr.apply_time) = #{year}
+            and depository_id =#{depositoryId}
+
+            UNION ALL
+
+            -- 从 once_fill 表查询金额
+            SELECT
+            mt.tname AS type_name,
+            off.time AS date,
+            off.unit_price * off.quantity AS total_price
+            FROM once_fill off
+            INNER JOIN material_type mt ON off.type_id = mt.id
+            WHERE mt.id = #{typeId}
+            AND YEAR(off.time) = #{year}
+            and depositoryId =#{depositoryId}
+            ) AS combined
+        GROUP BY MONTH(combined.date)
+            ),
+            TypeClassification AS (
+        SELECT
+            id AS typeId,
+            CASE
+            WHEN tname LIKE '%小径型号%' THEN 'smallDiameter'
+            WHEN tname LIKE '%中径型号%' THEN 'mediumDiameter'
+            WHEN tname LIKE '%万向节%' THEN 'gimbal'
+            WHEN tname LIKE '%RAB%' THEN 'rab'
+            -- 如果有其他分类，可以继续在此添加
+            ELSE 'other'
+            END AS classification
+        FROM material_type
+            ),
+            MonthlyProduction AS (
+        SELECT
+            MONTH(date) as month,
+            CASE
+            WHEN tc.classification = 'smallDiameter' THEN smallDiameter
+            WHEN tc.classification = 'mediumDiameter' THEN mediumDiameter
+            WHEN tc.classification = 'gimbal' THEN gimbal
+            WHEN tc.classification = 'rab' THEN rab
+            -- 如果有其他分类，可以继续在此添加
+            ELSE 0
+            END as production
+        FROM productinfo
+            JOIN TypeClassification tc ON tc.typeId = #{typeId}
+        WHERE YEAR(date) = #{year}
+          AND depositoryId = #{depositoryId}
+            )
+        SELECT
+            a.month,
+            a.monthly_amount,
+            p.production,
+            ROUND(CASE WHEN p.production = 0 THEN 0 ELSE a.monthly_amount / p.production END, 6) AS unit_price
+        FROM MonthlyAmount a
+                 JOIN MonthlyProduction p ON a.month = p.month
+        ORDER BY a.month;
+    </select>
 
 </mapper>

@@ -98,6 +98,7 @@ public interface DepositoryRecordMapper {
     Integer findCountByCondition(Map<String,Object> map);
     List<MonthlyAmountDTO> getMonthlyAmountsForYear(String year);
     List<CategoryOutboundDTO> getCategoryOutboundsForYearMonth(@Param("year") String year, @Param("month") String month, @Param("depositoryId") Integer depositoryId);
+    List<MonthlyAmountDTO> fetchMonthlyAmountByTypeAndYear(@Param("typeId") Integer typeId, @Param("year") String year, @Param("depositoryId") Integer depositoryId);
 
 
 }

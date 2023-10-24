@@ -114,6 +114,16 @@
 <script src="/static/js/lay-config.js?v=1.0.4" charset="utf-8"></script>
 <script type="text/javascript" src="/static/js/http_ajax.googleapis.com_ajax_libs_jquery_3.5.1_jquery.js" charset="utf-8"></script>
 <script>
+    $("#materialSelect").on('click', function() {
+        setTimeout(function() {
+            let atSearchInput = $("input[placeholder='搜索AT号']");
+            if (atSearchInput.length) {
+                atSearchInput.focus();
+            }
+        }, 150);
+    });
+</script>
+<script>
     let dropDataSAB = [];
     let dropDataZAB = [];
     let dropdownCount = 2;
@@ -282,8 +292,8 @@
                     },
                     cols: [ [
                         {type: 'radio'},
-                        {field: 'depositoryName',  title: '厂区', sort: true},
-                        {field: 'atId', title: 'AT号'},
+                        {field: 'depositoryName',  title: '厂区', sort: true, hide:true},
+                        {field: 'atId', title: 'AT'},
                         {field: 'mname',  title: '品名'},
                         {field: 'model', title: '规格'},
                         {field: 'typeName',  title: '分类'},

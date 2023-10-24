@@ -5,6 +5,7 @@ import com.depository_manage.pojo.CategoryOutboundDTO;
 import com.depository_manage.pojo.DepositoryRecordP;
 import com.depository_manage.pojo.MonthlyAmountDTO;
 import com.depository_manage.pojo.SimpleDepositoryRecordP;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 import java.util.Map;
@@ -110,6 +111,8 @@ public interface DepositoryRecordService {
 
     List<MonthlyAmountDTO> fetchMonthlyAmountsForYear(String year);
     public List<CategoryOutboundDTO> fetchCategoryOutboundsForYearMonth(String year, String month, Integer depositoryId);
+    public List<MonthlyAmountDTO> fetchMonthlyAmountByTypeAndYear(Integer typeId, String year,Integer depositoryId);
+
 
 
 }

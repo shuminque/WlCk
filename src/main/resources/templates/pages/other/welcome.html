@@ -238,26 +238,53 @@
 <!--                </div>-->
 <!--            </div>-->
 <!--        </div>-->
-        <select id="depository-selector">
-            <option value="">选择厂区</option>
-            <option value="1">SAB</option>
-            <option value="2">ZAB</option>
-        </select>
-        <input type="text" id="month-selector" placeholder="请选择年月">
-        <div class="layui-row">
-            <!-- 各工程使用金额分析图 -->
-            <div class="layui-col-md12">
-                <div class="layui-card">
-                    <div class="layui-card-header"><i class="fa fa-signal icon"></i>各工程使用金额分析图</div>
-                    <div class="layui-card-body">
-                        <div id="category-bar-chart" style="width: 100%; height: 500px;"></div>
+        <div>
+            <select id="depository-selector">
+                <option value="">选择厂区</option>
+                <option value="1">SAB</option>
+                <option value="2">ZAB</option>
+            </select>
+            <input type="text" id="month-selector" placeholder="请选择年月">
+            <div class="layui-row">
+                <!-- 各工程使用金额分析图 -->
+                <div class="layui-col-md12">
+                    <div class="layui-card">
+                        <div class="layui-card-header"><i class="fa fa-signal icon"></i>各工程使用金额分析图</div>
+                        <div class="layui-card-body">
+                            <div id="category-bar-chart" style="width: 100%; height: 500px;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="recordTableContainer" style="display: none">
+                <table class="layui-hide" id="recordTable" lay-filter="recordTableFilter"></table>
+            </div>
+        </div>
+
+        <div>
+            <select id="depository-selector-two">
+                <option value="">选择厂区</option>
+                <option value="1">SAB</option>
+                <option value="2">ZAB</option>
+            </select>
+            <input type="text" id="year-selector" placeholder="请选择年">
+            <select name="typeId" id="typeSelect">
+                <option value="">请选择分类</option>
+                <option th:each="type : ${materialTypes}" th:value="${type.id}" th:text="${type.id}+' '+${type.tname}"></option>
+            </select>
+            <div class="layui-row">
+                <!-- 产量柱形图 -->
+                <div class="layui-col-md12">
+                    <div class="layui-card">
+                        <div class="layui-card-header"><i class="fa fa-signal icon"></i>产量柱形图</div>
+                        <div class="layui-card-body">
+                            <div id="typeAmountChart" style="width: 100%; height: 500px;"></div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-        <div id="recordTableContainer" >
-            <table class="layui-hide" id="recordTable" lay-filter="recordTableFilter"></table>
-        </div>
+
     </div>
 </div>
 <script src="/static/lib/layui-v2.6.3/layui.js" charset="utf-8"></script>
@@ -285,6 +312,91 @@
                 }
             }
         });
+        laydate.render({
+            elem: '#year-selector',
+            type: 'year',
+        });
+        // 初始化ECharts实例
+        var myChart = echarts.init(document.getElementById('typeAmountChart')); // 请确保您的div有一个ID，例如typeAmountChart
+        function fetchTypeAmountDataAndRenderChart() {
+            var year = document.getElementById('year-selector').value;
+            var depositoryId = document.getElementById('depository-selector-two').value;
+            var typeId = document.getElementById('typeSelect').value;
+            if (!year || !depositoryId || !typeId) {
+                alert('请确保已选择厂区、年份和分类！');
+                return;
+            }
+            var url = '/type-amounts/' + year + '/' + typeId + '/' + depositoryId;
+            $.get(url, function(data) {
+                var colors = ['#5470C6', '#91CC75', '#EE6666', '#E87C25', '#FFD85C', '#73C0DE', '#3BA272', '#FC8452', '#9A60B4', '#EA7CCC'];
+
+                var option = {
+                    title: {
+                        text: '产量柱形图'
+                    },
+                    tooltip: {
+                        trigger: 'axis',
+                        axisPointer: {
+                            type: 'shadow'
+                        }
+                    },
+                    xAxis: {
+                        data: data.map(function(item) { return item.month; })
+                    },
+                    yAxis: [
+                        {
+                            type: 'value',
+                            position: 'left'
+                        },
+                        {
+                            type: 'value',
+                            position: 'right',
+                            show: true,
+                            splitLine: { show: false }
+                        }
+                    ],
+                    series: [
+                        {
+                            name: '金额',
+                            type: 'bar',
+                            yAxisIndex: 0,
+                            data: data.map(function(item) { return item.monthlyAmount; }),
+                            label: {
+                                normal: {
+                                    show: true,
+                                    position: 'top'
+                                }
+                            },
+                            itemStyle: {
+                                normal: {
+                                    color: function(params) {
+                                        return colors[params.dataIndex % colors.length];
+                                    }
+                                }
+                            }
+                        },
+                        // {
+                        //     name: '单价',
+                        //     type: 'line',
+                        //     yAxisIndex: 1,
+                        //     data: data.map(function(item) { return item.unitPrice; }),
+                        //     smooth: true,
+                        //     label: {
+                        //         normal: {
+                        //             show: true,
+                        //             position: 'top'
+                        //         }
+                        //     },
+                        // }
+                    ]
+                };
+                myChart.setOption(option);
+            });
+        }
+        document.getElementById('depository-selector-two').addEventListener('change', fetchTypeAmountDataAndRenderChart);
+        document.getElementById('year-selector').addEventListener('change', fetchTypeAmountDataAndRenderChart);
+        document.getElementById('typeSelect').addEventListener('change', fetchTypeAmountDataAndRenderChart);
+
         // 为厂区选择器添加事件监听器
         document.getElementById('depository-selector').addEventListener('change', function() {
             var selectedMonth = document.getElementById('month-selector').value;
@@ -338,7 +450,6 @@
                 btnAlign: 'c',
                 moveType: 1,
                 content:html,
-
             });
         });
 

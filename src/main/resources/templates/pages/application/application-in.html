@@ -127,6 +127,16 @@
 <script type="text/javascript" src="/static/js/lay-config.js?v=1.0.4" charset="utf-8"></script>
 <script type="text/javascript" src="/static/js/http_ajax.googleapis.com_ajax_libs_jquery_3.5.1_jquery.js" charset="utf-8"></script>
 <script>
+    $("#materialSelect").on('click', function() {
+        setTimeout(function() {
+            let atSearchInput = $("input[placeholder='搜索AT号']");
+            if (atSearchInput.length) {
+                atSearchInput.focus();
+            }
+        }, 150);
+    });
+</script>
+<script>
     var depositoryMapping = {
         'SAB': 1, // 你的实际映射
         'ZAB': 2,
