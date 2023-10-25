@@ -34,6 +34,9 @@
         <if test="rate != null">
             AND r.rate = #{rate}
         </if>
+        <if test="startDate != null and endDate != null">
+            AND r.date BETWEEN #{startDate} AND #{endDate}
+        </if>
     </select>
 
     <select id="findRateByDate" resultMap="rateMap" parameterType="date">
@@ -110,6 +113,9 @@
         </if>
         <if test="rate != null">
             AND r.rate = #{rate}
+        </if>
+        <if test="startDate != null and endDate != null">
+            AND r.date BETWEEN #{startDate} AND #{endDate}
         </if>
     </select>
 </mapper>

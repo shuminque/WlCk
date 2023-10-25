@@ -328,7 +328,7 @@
             }
             var url = '/type-amounts/' + year + '/' + typeId + '/' + depositoryId;
             $.get(url, function(data) {
-                var colors = ['#5470C6', '#91CC75', '#EE6666', '#E87C25', '#FFD85C', '#73C0DE', '#3BA272', '#FC8452', '#9A60B4', '#EA7CCC'];
+                var colors = ['#5470C6'];
 
                 var option = {
                     title: {
@@ -375,19 +375,19 @@
                                 }
                             }
                         },
-                        // {
-                        //     name: '单价',
-                        //     type: 'line',
-                        //     yAxisIndex: 1,
-                        //     data: data.map(function(item) { return item.unitPrice; }),
-                        //     smooth: true,
-                        //     label: {
-                        //         normal: {
-                        //             show: true,
-                        //             position: 'top'
-                        //         }
-                        //     },
-                        // }
+                        {
+                            name: '单价',
+                            type: 'line',
+                            yAxisIndex: 1,
+                            data: data.map(function(item) { return item.unitPrice; }),
+                            smooth: true,
+                            label: {
+                                normal: {
+                                    show: true,
+                                    position: 'top'
+                                }
+                            },
+                        }
                     ]
                 };
                 myChart.setOption(option);

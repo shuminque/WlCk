@@ -30,8 +30,8 @@
         <if test="id != null">
             AND p.id = #{id}
         </if>
-        <if test="date != null">
-            AND p.date = #{date}
+        <if test="startDate != null and endDate != null">
+            AND p.date BETWEEN #{startDate} AND #{endDate}
         </if>
         <if test="smallDiameter != null">
             AND p.smallDiameter = #{smallDiameter}
@@ -107,8 +107,8 @@
         <if test="id != null">
             AND p.id = #{id}
         </if>
-        <if test="date != null">
-            AND p.date = #{date}
+        <if test="startDate != null and endDate != null">
+            AND p.date BETWEEN #{startDate} AND #{endDate}
         </if>
         <if test="smallDiameter != null">
             AND p.smallDiameter = #{smallDiameter}

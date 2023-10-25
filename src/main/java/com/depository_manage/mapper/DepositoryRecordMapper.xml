@@ -586,6 +586,7 @@
             once_fill o
             JOIN categories c ON o.apply_remark LIKE CONCAT('%', c.title, '%')
             AND c.id NOT IN (SELECT parent_id FROM categories WHERE parent_id IS NOT NULL)
+            AND c.parent_id NOT IN (SELECT id FROM categories WHERE title = '销售出库')
         WHERE
             DATE_FORMAT(time, '%Y') = #{year} AND DATE_FORMAT(time, '%m') = #{month}
           AND o.depositoryId= #{depositoryId}
@@ -605,6 +606,7 @@
             depository_record d
             JOIN categories c ON d.apply_remark LIKE CONCAT('%', c.title, '%')
             AND c.id NOT IN (SELECT parent_id FROM categories WHERE parent_id IS NOT NULL)
+            AND c.parent_id NOT IN (SELECT id FROM categories WHERE title = '销售出库')
         WHERE
             d.type = 0
           AND d.review_pass = 1

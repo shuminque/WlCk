@@ -12,6 +12,27 @@
 <body>
 <div class="layuimini-container">
     <div class="layuimini-main">
+        <fieldset class="table-search-fieldset">
+            <legend>搜索信息</legend>
+            <div style="margin: 10px 10px 10px 10px">
+                <form class="layui-form layui-form-pane" action="">
+                    <div class="layui-form-item">
+                        <div class="layui-inline">
+                            <label class="layui-form-label">日期</label>
+                            <div class="layui-input-block">
+                                <input type="text" name="date" id="date1"  placeholder="请选择日期"
+                                       autocomplete="off" class="layui-input">
+                            </div>
+                        </div>
+                        <div class="layui-inline">
+                            <button type="submit" class="layui-btn layui-btn-primary" lay-submit
+                                    lay-filter="data-search-btn"><i class="layui-icon"></i> 搜 索
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </fieldset>
         <button id="addProductInfoBtn" class="layui-btn">添加产量信息</button>
         <table class="layui-hide" id="currentTableId" lay-filter="currentTableFilter">  </table>
         <div id="productInfoAddForm" style="display: none;">
@@ -24,7 +45,7 @@
                                     <div class="layui-form-item">
                                         <label class="layui-form-label">日期:</label>
                                         <div class="layui-input-block">
-                                            <input type="text" placeholder="请填写日期" name="date" class="layui-input"
+                                            <input type="text" placeholder="请填写日期" name="date" id="date2" class="layui-input"
                                                    lay-verify="required" required>
                                         </div>
                                     </div>
@@ -90,7 +111,7 @@
                 <div class="layui-form-item">
                     <label class="layui-form-label">日期:</label>
                     <div class="layui-input-block">
-                        <input type="text" placeholder="请填写日期" name="date" class="layui-input" lay-verify="required" required>
+                        <input type="text" placeholder="请填写日期" name="date" id="date3" class="layui-input" lay-verify="required" required>
                     </div>
                 </div>
                 <div class="layui-form-item">
@@ -139,8 +160,19 @@
             laydate = layui.laydate,
             layer = layui.layer;
         laydate.render({
-            elem: 'input[name="date"]', // 指定元素
+            elem: '#date1',
+            type: 'month'
         });
+
+        laydate.render({
+            elem: '#date2',
+        });
+
+        laydate.render({
+            elem: '#date3',
+        });
+
+
         $.ajax({
             url: '/get_user_depository',
             type: 'GET',
@@ -204,6 +236,29 @@
                         {title: ' ', align: 'center', toolbar: '#operation-bar'}
                     ]]
                 });
+                form.on('submit(data-search-btn)', function (data) {
+                    var req = {};
+                    data = data.field;
+                    if (data.date !== '') {
+                        var yearMonth = data.date.split('-');
+                        var year = parseInt(yearMonth[0], 10);
+                        var month = parseInt(yearMonth[1], 10);
+                        var startDate = new Date(year, month - 1, 1);
+                        req.startDate = startDate.toISOString().split('T')[0];
+                        var endDate = new Date(year, month, 0);
+                        req.endDate = endDate.toISOString().split('T')[0];
+                    }
+                    table.reload('currentTableId', {
+                        url: pp,
+                        page: {
+                            curr: 1
+                        },
+                        where: req
+                    }, 'data');
+
+                    return false;
+                });
+
                 $('#addProductInfoBtn').on('click', function() {
                     layer.open({
                         type: 1,  // 页面层

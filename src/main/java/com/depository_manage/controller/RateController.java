@@ -21,7 +21,7 @@ public class RateController {
 
     @GetMapping
     public RestResponse findRate(@RequestParam Map<String, Object> map) {
-        return new RestResponse(rateService.findRateAll(), // 使用实例
+        return new RestResponse(rateService.findRateByCondition(map), // 使用实例
                 rateService.findCountByCondition(map),
                 200);
     }
