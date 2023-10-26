@@ -224,10 +224,14 @@
                 let pp;
                 var userDepositoryId = data.depositoryId;
                 var authority = data.authority;
-                if (userDepositoryId === 0 || authority === '审核人') {
+                if (userDepositoryId === 0 ) {
                     toolbarTemplate = `
                         <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
                         <a class="layui-btn layui-btn-xs layui-btn-danger data-count-delete" lay-event="delete">删除</a>
+                    `;
+                } else if (authority === '审核人'){
+                    toolbarTemplate = `
+                        <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
                     `;
                 } else {
                     toolbarTemplate = ` `;
