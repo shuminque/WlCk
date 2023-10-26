@@ -264,43 +264,6 @@
                             ]
                         }
                     ]
-                },
-                {
-                    "title": "Dd",
-                    "icon": "fa fa-tasks",
-                    "target": "_self",
-                    "roles": [
-                        "ALL"
-                    ],
-                    "child": [
-                        {
-                            "title": "入库可视化",
-                            "href": "/chart_in",
-                            "icon": "fa fa-bar-chart",
-                            "target": "_self",
-                            "roles": [
-                                "ALL"
-                            ]
-                        },
-                        {
-                            "title": "出库可视化",
-                            "href": "/chart_out",
-                            "icon": "fa fa-pie-chart",
-                            "target": "_self",
-                            "roles": [
-                                "ALL"
-                            ]
-                        },
-                        {
-                            "title": "库存可视化",
-                            "href": "/chart_stock",
-                            "icon": "fa fa-area-chart",
-                            "target": "_self",
-                            "roles": [
-                                "ALL"
-                            ]
-                        }
-                    ]
                 }
             ]
         },
