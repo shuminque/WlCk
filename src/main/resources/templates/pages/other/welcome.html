@@ -568,13 +568,30 @@
                     type: 'GET',
                     dataType: 'json',
                     success: function(records) {
+                        var widthPercentage = 80; // 80%
+                        var heightPercentage = 60; // 60%
+
+                        var screenWidth = $(window).width();
+                        var screenHeight = $(window).height();
+
+                        var popupWidth = (widthPercentage / 100) * screenWidth;
+                        var popupHeight = (heightPercentage / 100) * screenHeight;
+
+                        // 确保弹出层的尺寸不超过一个最大值
+                        var maxPopupWidth = 800; // 最大宽度，您可以根据需要修改
+                        var maxPopupHeight = 600; // 最大高度
+
+                        popupWidth = Math.min(popupWidth, maxPopupWidth);
+                        popupHeight = Math.min(popupHeight, maxPopupHeight);
+
                         layer.open({
                             type: 1,
-                            title: params.name, // 使用分类名称作为标题
-                            content: $('#recordTableContainer'),  // 注意这里我们使用了上面定义的容器
-                            area: ['80%', '60%'], // 这里你可以设置弹出窗口的大小
-                            shadeClose: true  // 点击遮罩层关闭
+                            title: params.name,
+                            content: $('#recordTableContainer'),
+                            area: [popupWidth + 'px', popupHeight + 'px'], // 使用像素值而不是百分比
+                            shadeClose: true
                         });
+
                         renderTable(records);
                     },
                     error: function(error) {
@@ -597,14 +614,14 @@
                     elem: '#recordTable',
                     height: "full-50", // 设置表格高度并固定表头
                     cols: [ [
-                        { field: 'sourceTable', title: '来源表', flex:1, hide: true},
-                        { field: 'id', title: 'ID', flex:1, hide: true},
-                        { field: 'atId', title: 'AT', flex:1 },
-                        { field: 'name', title: '名称', flex:1 },
-                        { field: 'model', title: '型号', flex:1 },
-                        { field: 'quantity', title: '数量', flex:1 },
-                        { field: 'unitPrice', title: '单价', flex:1 },
-                        { field: 'totalAmount', title: '金额', flex:1, templet: function(d) {
+                        { field: 'sourceTable', title: '来源表',  hide: true},
+                        { field: 'id', title: 'ID', hide: true},
+                        { field: 'atId', title: 'AT' },
+                        { field: 'name', title: '名称' },
+                        { field: 'model', title: '型号'},
+                        { field: 'quantity', title: '数量'},
+                        { field: 'unitPrice', title: '单价' },
+                        { field: 'totalAmount', title: '金额', templet: function(d) {
                                 return parseFloat(d.totalAmount).toFixed(2);  // 格式化为两位小数
                             }},
                         {
@@ -615,8 +632,8 @@
                                 return formatDate(d.recordDate);
                             }
                         },
-                        { field: 'applyRemark', title: '备注', flex:1 ,hide: true},
-                        { field: 'categoryTitle', title: '分类标题', flex:1 ,hide: true}
+                        { field: 'applyRemark', title: '备注' ,hide: true},
+                        { field: 'categoryTitle', title: '分类标题' ,hide: true}
                     ]],
                     limit: records.length,
                     height: 280,
