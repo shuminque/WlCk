@@ -57,6 +57,7 @@
         SELECT
             'once_fill' AS source_table,
             o.id,
+            NULL AS at_id,  -- 显示at_id为空
             o.name as name,
             o.model ,
             o.quantity ,
@@ -82,6 +83,7 @@
         SELECT
             'depository_record' AS source_table,
             d.id,
+            d.at_id as at_id,
             d.mname AS name,
             d.model,
             d.quantity,
