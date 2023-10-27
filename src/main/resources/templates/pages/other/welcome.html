@@ -322,10 +322,7 @@
             var year = document.getElementById('year-selector').value;
             var depositoryId = document.getElementById('depository-selector-two').value;
             var typeId = document.getElementById('typeSelect').value;
-            if (!year || !depositoryId || !typeId) {
-                alert('请确保已选择厂区、年份和分类！');
-                return;
-            }
+
             var url = '/type-amounts/' + year + '/' + typeId + '/' + depositoryId;
             $.get(url, function(data) {
                 var colors = ['#5470C6'];

@@ -214,6 +214,19 @@ layui.define(['table', 'jquery', 'form'], function (exports) {
                 });
                 return false;
             });
+            // $(document).on('keyup', 'input[placeholder="搜索AT号"]', function(event) {
+            //     if (event.keyCode === 13) { // 如果是 Enter 键
+            //         // 获取第一个物品的选择器
+            //         var firstItem = $('[lay-id="' + tableName + '"] .layui-table-body tr:first-child');
+            //         if (firstItem.length) {
+            //             // 触发第一个物品的选择事件
+            //             firstItem.trigger('click');
+            //
+            //             // 选择第一个物品后，触发确认按钮的点击事件
+            //             $('.tableSelect_btn_select').click();
+            //         }
+            //     }
+            // });
             // 单击行选中单选框
             table.on('row('+tableName+')', function(obj){
                 var index = obj.tr.data('index');
@@ -229,12 +242,16 @@ layui.define(['table', 'jquery', 'form'], function (exports) {
                 radio.prop('checked', true);
                 radio.next().addClass('layui-form-radioed');
             })
-
-            // 双击行选中
-            table.on('rowDouble('+tableName+')', function(obj){
+            // 单击行选中
+            table.on('row('+tableName+')', function(obj){
                 var checkStatus = {data:[obj.data]};
                 selectDone(checkStatus);
             })
+            // // 双击行选中
+            // table.on('rowDouble('+tableName+')', function(obj){
+            //     var checkStatus = {data:[obj.data]};
+            //     selectDone(checkStatus);
+            // })
 
             //按钮选中
             tableBox.find('.tableSelect_btn_select').on('click', function() {

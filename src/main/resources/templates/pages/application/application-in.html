@@ -30,10 +30,15 @@
 <!--                                        </div>-->
 <!--                                    </div>-->
                                     <div class="layui-form-item">
+                                        <label class="layui-form-label">AT号:</label>
+                                        <div class="layui-input-block">
+                                            <input name="atId" type="text" id="atIdSelect" placeholder="输入AT" readonly class="layui-input" lay-verify="required"/>
+                                        </div>
+                                    </div>
+                                    <div class="layui-form-item">
                                         <label class="layui-form-label">品名:</label>
                                         <div class="layui-input-block">
                                             <input name="mname" type="text" id="materialSelect" placeholder="请填写品名" readonly class="layui-input" lay-verify="required" />
-                                            <input name="atId" type="hidden" id="atIdSelect" />
                                             <input name="depositoryId" type="hidden" id="depositorySelect" />
                                             <input name="enginName" type="hidden" id="enginSelect" />
                                             <input name="typeName" type="hidden" id="typeSelect" />
@@ -42,7 +47,8 @@
                                     <div class="layui-form-item">
                                         <label class="layui-form-label">规格:</label>
                                         <div class="layui-input-block">
-                                            <input name="model" type="text" id="modelSelect" placeholder="相关规格" readonly class="layui-input"/>                                        </div>
+                                            <input name="model" type="text" id="modelSelect" placeholder="相关规格" readonly class="layui-input"/>
+                                        </div>
                                     </div>
                                     <div class="layui-form-item">
                                         <label class="layui-form-label">数量:</label>
@@ -127,7 +133,7 @@
 <script type="text/javascript" src="/static/js/lay-config.js?v=1.0.4" charset="utf-8"></script>
 <script type="text/javascript" src="/static/js/http_ajax.googleapis.com_ajax_libs_jquery_3.5.1_jquery.js" charset="utf-8"></script>
 <script>
-    $("#materialSelect").on('click', function() {
+    $("#atIdSelect").on('click', function() {
         setTimeout(function() {
             let atSearchInput = $("input[placeholder='搜索AT号']");
             if (atSearchInput.length) {
@@ -250,7 +256,9 @@
                                     window.location.href = '/table_in' ;
                                 }
                                 else {
-                                    step.next('#stepForm');
+                                    location.reload();
+
+                                    // step.next('#stepForm');
                                 } // 进入下一步
                             }
                         });
@@ -293,7 +301,7 @@
                      pp = '/material?depositoryId=' + userDepositoryId;
                 }
                 tableSelect.render({
-                    elem: '#materialSelect', // 定义输入框input对象
+                    elem: '#atIdSelect', // 定义输入框input对象
                     checkedKey: 'id', // 表格的唯一建值
                     searchType: 'more',
                     searchList : [
@@ -357,6 +365,23 @@
                         // });
                         // 重新渲染表单
                         layui.form.render('select');
+                        $("input[name='quantity']").focus();
+                    }
+                });
+                $("#atIdSelect").trigger('click');
+                $(document).on('keyup', 'input[placeholder="搜索AT号"]', function(event) {
+                    if (event.keyCode === 13) { // 如果是 Enter 键
+                        setTimeout(function() { // 使用延迟确保表格已加载完成
+                            // 获取第一个物品的选择器
+                            var firstItem = $('.layui-table-body tr:first-child');
+                            if (firstItem.length) {
+                                // 触发第一个物品的选择事件
+                                firstItem.trigger('click');
+
+                                // 选择第一个物品后，触发确认按钮的点击事件
+                                $('.tableSelect_btn_select').click();
+                            }
+                        }, 100);
                     }
                 });
             },
@@ -379,6 +404,7 @@
         });
 
         $(document).ready(function() {
+
             // 获取URL中的查询参数
             var urlParams = new URLSearchParams(window.location.search);
             var id = urlParams.get('id');
