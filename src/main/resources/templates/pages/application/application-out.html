@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="/static/lib/layui-v2.6.3/css/layui.css" media="all">
     <link rel="stylesheet" href="/static/css/public.css" media="all">
     <link rel="stylesheet" href="/static/js/lay-module/step-lay/step.css" media="all">
+    <script src="/static/lib/layui-v2.6.3/layui.js" charset="utf-8"></script>
 </head>
 <style>
     .custom-input {
@@ -27,10 +28,15 @@
                             <div>
                                 <form class="layui-form" style="margin: 0 auto;max-width: 460px;padding-top: 40px;">
                                     <div class="layui-form-item">
+                                        <label class="layui-form-label">AT号:</label>
+                                        <div class="layui-input-block">
+                                            <input name="atId" type="text" id="atIdSelect" placeholder="输入AT" readonly class="layui-input" lay-verify="required"/>
+                                        </div>
+                                    </div>
+                                    <div class="layui-form-item">
                                         <label class="layui-form-label">品名:</label>
                                         <div class="layui-input-block">
                                             <input name="mname" type="text" id="materialSelect" placeholder="请填写品名" readonly class="layui-input" lay-verify="required"  />
-                                            <input name="atId" type="hidden" id="atIdSelect" />
                                             <input name="depositoryId" type="hidden" id="depositorySelect" />
                                             <input name="enginName" type="hidden" id="enginSelect" />
                                             <input name="typeName" type="hidden" id="typeSelect" />
@@ -56,12 +62,13 @@
                                     <div class="layui-form-item">
                                         <label class="layui-form-label">出库类型:</label>
                                         <div class="layui-input-block">
-                                            <button name="applyRemark" class="layui-input custom-input" id="ID-dropdown-demo-complex" >
+                                            <div name="applyRemark" class="layui-input custom-input" id="ID-dropdown-demo-complex" style="cursor: pointer;">
                                                 选择出库类型
-                                            </button>
+                                            </div>
                                             <input type="hidden" name="applyRemark" id="applyRemarkInput" value="" lay-verify="required">
                                         </div>
                                     </div>
+
                                     <div class="layui-form-item" id="outLocationContainer"></div>
                                     <div class="layui-form-item" id="subLocationContainer"></div>
                                     <div class="layui-form-item">
@@ -110,11 +117,10 @@
         </div>
     </div>
 </div>
-<script src="/static/lib/layui-v2.6.3/layui.js" charset="utf-8"></script>
 <script src="/static/js/lay-config.js?v=1.0.4" charset="utf-8"></script>
 <script type="text/javascript" src="/static/js/http_ajax.googleapis.com_ajax_libs_jquery_3.5.1_jquery.js" charset="utf-8"></script>
 <script>
-    $("#materialSelect").on('click', function() {
+    $("#atIdSelect").on('click', function() {
         setTimeout(function() {
             let atSearchInput = $("input[placeholder='搜索AT号']");
             if (atSearchInput.length) {
@@ -262,7 +268,7 @@
                     }
                 }
             tableSelect.render({
-                elem: '#materialSelect', // 定义输入框input对象
+                elem: '#atIdSelect', // 定义输入框input对象
                 checkedKey: 'id', // 表格的唯一建值
                 searchType: 'more',
                 searchList : [
@@ -318,8 +324,25 @@
                     var selectedDepositoryId = $('#depositorySelect').val();
                     resetOutTypeDropdown();
                     loadOutTypeDropdown(selectedDepositoryId);
+                    $("input[name='quantity']").focus();
                 }
             });
+                $("#atIdSelect").trigger('click');
+                $(document).on('keyup', 'input[placeholder="搜索AT号"]', function(event) {
+                    if (event.keyCode === 13) { // 如果是 Enter 键
+                        setTimeout(function() { // 使用延迟确保表格已加载完成
+                            // 获取第一个物品的选择器
+                            var firstItem = $('.layui-table-body tr:first-child');
+                            if (firstItem.length) {
+                                // 触发第一个物品的选择事件
+                                firstItem.trigger('click');
+
+                                // 选择第一个物品后，触发确认按钮的点击事件
+                                $('.tableSelect_btn_select').click();
+                            }
+                        }, 100);
+                    }
+                });
         },
         error: function() {
             layer.msg('无法获取用户的厂区信息');
