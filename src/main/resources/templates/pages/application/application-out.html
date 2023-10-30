@@ -14,7 +14,7 @@
 <style>
     .custom-input {
         text-align: left;  /* 使内容左对齐 */
-        font-weight: bold;
+
     }
 </style>
 <body>
@@ -63,7 +63,7 @@
                                         <label class="layui-form-label">出库类型:</label>
                                         <div class="layui-input-block">
                                             <div name="applyRemark" class="layui-input custom-input" id="ID-dropdown-demo-complex" style="cursor: pointer;">
-                                                选择出库类型
+                                                请选择出库类型
                                             </div>
                                             <input type="hidden" name="applyRemark" id="applyRemarkInput" value="" lay-verify="required">
                                         </div>
@@ -378,6 +378,7 @@
                     let inputElem = document.getElementById('applyRemarkInput');
                     if(dropdownElem) dropdownElem.innerText = path;
                     if(inputElem) inputElem.value = path;
+                    $("input[name='quantity']").focus();
                 }
             });
         }
