@@ -52,92 +52,29 @@
         SELECT * FROM categories WHERE depository_id = #{depositoryId}
     </select>
 
-    <select id="getRecordsForCategory" resultType="com.depository_manage.pojo.RecordDTO" parameterType="java.util.Map">
-        SELECT
-            source_table,
-            id,
-            name,
-            model,
-            quantity,
-            unitPrice,
-            totalAmount,
-            record_date,
-            apply_remark,
-            category_title,
-            at_id
-        FROM (
-                 SELECT
-                     'once_fill' AS source_table,
-                     o.id,
-                     o.name as name,
-                     o.model,
-                     o.quantity,
-                     o.unit_price as unitPrice,
-                     o.quantity * o.unit_price as totalAmount,
-                     o.time AS record_date,
-                     o.apply_remark,
-                     c.title AS category_title,
-                     NULL AS at_id  -- 显示at_id为空
-                 FROM
-                     once_fill AS o
-                         JOIN categories AS c ON o.apply_remark LIKE CONCAT('%', c.title, '%')
-                 WHERE
-                             c.title = #{categoryName}
-                         AND c.depository_id = #{depositoryId}
-                         AND o.depositoryId = #{depositoryId}
-                         AND YEAR(o.time) = #{year}
-            AND MONTH(o.time) = #{month}
-
-        UNION ALL
-
-        -- 从 depository_record 表中获取记录
-        SELECT
-            'depository_record' AS source_table,
-            d.id,
-            d.mname AS name,
-            d.model,
-            d.quantity,
-            d.price as unitPrice,
-            d.quantity * d.price as totalAmount,
-            d.apply_time AS record_date,
-            d.apply_remark,
-            c.title AS category_title,
-            d.at_id
-        FROM
-            depository_record AS d
-                JOIN categories AS c ON d.apply_remark LIKE CONCAT('%', c.title, '%')
-        WHERE
-                    c.title = #{categoryName}
-                AND c.depository_id = #{depositoryId}
-                AND d.depository_id = #{depositoryId}
-                AND YEAR(d.apply_time) = #{year}
-          AND MONTH(d.apply_time) = #{month}
-            ) AS combined
-        ORDER BY
-            CASE WHEN at_id IS NULL THEN 1 ELSE 0 END, -- 首先根据at_id是否为NULL进行排序
-            at_id ASC  -- 然后以at_id升序排列
-
-    </select>
-<!--不重复-->
 <!--    <select id="getRecordsForCategory" resultType="com.depository_manage.pojo.RecordDTO" parameterType="java.util.Map">-->
 <!--        SELECT-->
 <!--            source_table,-->
+<!--            id,-->
 <!--            name,-->
 <!--            model,-->
-<!--            SUM(quantity) AS quantity,-->
+<!--            quantity,-->
 <!--            unitPrice,-->
-<!--            SUM(totalAmount) AS totalAmount,-->
+<!--            totalAmount,-->
+<!--            record_date,-->
 <!--            apply_remark,-->
 <!--            category_title,-->
 <!--            at_id-->
 <!--        FROM (-->
 <!--                 SELECT-->
 <!--                     'once_fill' AS source_table,-->
+<!--                     o.id,-->
 <!--                     o.name as name,-->
 <!--                     o.model,-->
 <!--                     o.quantity,-->
 <!--                     o.unit_price as unitPrice,-->
 <!--                     o.quantity * o.unit_price as totalAmount,-->
+<!--                     o.time AS record_date,-->
 <!--                     o.apply_remark,-->
 <!--                     c.title AS category_title,-->
 <!--                     NULL AS at_id  &#45;&#45; 显示at_id为空-->
@@ -156,11 +93,13 @@
 <!--        &#45;&#45; 从 depository_record 表中获取记录-->
 <!--        SELECT-->
 <!--            'depository_record' AS source_table,-->
+<!--            d.id,-->
 <!--            d.mname AS name,-->
 <!--            d.model,-->
 <!--            d.quantity,-->
 <!--            d.price as unitPrice,-->
 <!--            d.quantity * d.price as totalAmount,-->
+<!--            d.apply_time AS record_date,-->
 <!--            d.apply_remark,-->
 <!--            c.title AS category_title,-->
 <!--            d.at_id-->
@@ -174,11 +113,72 @@
 <!--                AND YEAR(d.apply_time) = #{year}-->
 <!--          AND MONTH(d.apply_time) = #{month}-->
 <!--            ) AS combined-->
-<!--        GROUP BY-->
-<!--            source_table, name, model, unitPrice, apply_remark, category_title, at_id-->
 <!--        ORDER BY-->
 <!--            CASE WHEN at_id IS NULL THEN 1 ELSE 0 END, &#45;&#45; 首先根据at_id是否为NULL进行排序-->
-<!--    at_id ASC  &#45;&#45; 然后以at_id升序排列-->
+<!--            at_id ASC  &#45;&#45; 然后以at_id升序排列-->
 
 <!--    </select>-->
+<!--不重复-->
+    <select id="getRecordsForCategory" resultType="com.depository_manage.pojo.RecordDTO" parameterType="java.util.Map">
+        SELECT
+            source_table,
+            name,
+            model,
+            SUM(quantity) AS quantity,
+            unitPrice,
+            SUM(totalAmount) AS totalAmount,
+            apply_remark,
+            category_title,
+            at_id
+        FROM (
+                 SELECT
+                     'once_fill' AS source_table,
+                     o.name as name,
+                     o.model,
+                     o.quantity,
+                     o.unit_price as unitPrice,
+                     o.quantity * o.unit_price as totalAmount,
+                     o.apply_remark,
+                     c.title AS category_title,
+                     NULL AS at_id  -- 显示at_id为空
+                 FROM
+                     once_fill AS o
+                         JOIN categories AS c ON o.apply_remark LIKE CONCAT('%', c.title, '%')
+                 WHERE
+                             c.title = #{categoryName}
+                         AND c.depository_id = #{depositoryId}
+                         AND o.depositoryId = #{depositoryId}
+                         AND YEAR(o.time) = #{year}
+            AND MONTH(o.time) = #{month}
+
+        UNION ALL
+
+        -- 从 depository_record 表中获取记录
+        SELECT
+            'depository_record' AS source_table,
+            d.mname AS name,
+            d.model,
+            d.quantity,
+            d.price as unitPrice,
+            d.quantity * d.price as totalAmount,
+            d.apply_remark,
+            c.title AS category_title,
+            d.at_id
+        FROM
+            depository_record AS d
+                JOIN categories AS c ON d.apply_remark LIKE CONCAT('%', c.title, '%')
+        WHERE
+                    c.title = #{categoryName}
+                AND c.depository_id = #{depositoryId}
+                AND d.depository_id = #{depositoryId}
+                AND YEAR(d.apply_time) = #{year}
+          AND MONTH(d.apply_time) = #{month}
+            ) AS combined
+        GROUP BY
+            source_table, name, model, unitPrice, apply_remark, category_title, at_id
+        ORDER BY
+            CASE WHEN at_id IS NULL THEN 1 ELSE 0 END, -- 首先根据at_id是否为NULL进行排序
+    at_id ASC  -- 然后以at_id升序排列
+
+    </select>
 </mapper>

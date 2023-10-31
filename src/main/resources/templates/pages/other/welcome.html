@@ -613,7 +613,13 @@
                     cols: [ [
                         { field: 'sourceTable', title: '来源表',  hide: true},
                         { field: 'id', title: 'ID', hide: true},
-                        { field: 'atId', title: 'AT' },
+                        {
+                            field: 'atId',
+                            title: 'AT',
+                            templet: function(d) {
+                                return d.atId ? d.atId : '一次性';  // 如果atId为空，则显示“一次性”
+                            }
+                        },
                         { field: 'name', title: '名称' },
                         { field: 'model', title: '型号'},
                         { field: 'quantity', title: '数量'},
