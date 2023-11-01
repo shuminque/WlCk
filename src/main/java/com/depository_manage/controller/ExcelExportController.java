@@ -72,11 +72,14 @@ public class ExcelExportController {
             createCellWithStyle(row, 2, (String) getOrDefault(record, "品名", ""), style);
             createCellWithStyle(row, 3, (String) getOrDefault(record, "规格", ""), style);
             createCellWithStyle(row, 4, ((Double) getOrDefault(record, "入库数量", 0.0)).doubleValue(), style);
-            createCellWithStyle(row, 5, (String) getOrDefault(record, "入库金额", "0.00"), style);
+//            createCellWithStyle(row, 5, Double.parseDouble((String) getOrDefault(record, "入库金额", "0.00")), style);
             createCellWithStyle(row, 6 , ((Double) getOrDefault(record, "出库数量", 0.0)).doubleValue(), style);
-            createCellWithStyle(row, 7, (String) getOrDefault(record, "出库金额", "0.00"), style);
+//            createCellWithStyle(row, 7, Double.parseDouble((String) getOrDefault(record, "出库金额", "0.00")), style);
             createCellWithStyle(row, 8, ((Double) getOrDefault(record, "库存数量", 0.0)).doubleValue(), style);
-            createCellWithStyle(row, 9, (String) getOrDefault(record, "在库金额", "0.00"), style);
+//            createCellWithStyle(row, 9, Double.parseDouble((String) getOrDefault(record, "在库金额", "0.00")), style);
+            createCellWithStyle(row, 5, Double.parseDouble(((String) getOrDefault(record, "入库金额", "0.00")).replace(",", "")), style);
+            createCellWithStyle(row, 7, Double.parseDouble(((String) getOrDefault(record, "出库金额", "0.00")).replace(",", "")), style);
+            createCellWithStyle(row, 9, Double.parseDouble(((String) getOrDefault(record, "在库金额", "0.00")).replace(",", "")), style);
         }
 
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
