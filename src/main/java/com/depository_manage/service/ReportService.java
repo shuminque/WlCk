@@ -49,32 +49,61 @@ public class ReportService {
 
     public List<Map<String, Object>> everyTypeData(String startDate, String endDate, int depositoryId) {
         String sql =
-                "WITH CombinedData AS (\n" +
+                "WITH DepRecordSum AS (\n" +
+                        "    SELECT\n" +
+                        "        mt.id AS type_id,\n" +
+                        "        mt.tname AS material_type_name,\n" +
+                        "        SUM(CASE WHEN dr.type = 1 THEN dr.price * dr.quantity ELSE 0 END) AS in_sum,\n" +
+                        "        SUM(CASE WHEN dr.type = 0 THEN dr.price * dr.quantity ELSE 0 END) AS out_sum\n" +
+                        "    FROM material_type mt\n" +
+                        "    LEFT JOIN depository_record dr ON mt.tname = dr.type_name\n" +
+                        "        AND dr.apply_time >= ? AND dr.apply_time < DATE_ADD(?, INTERVAL 1 DAY)\n" +
+                        "        AND dr.review_pass = 1\n" +
+                        "        AND dr.depository_id = ?\n" +
+                        "    GROUP BY mt.id, mt.tname\n" +
+                        "),\n" +
+                        "OnceFillSum AS (\n" +
+                        "    SELECT\n" +
+                        "        mt.id AS type_id,\n" +
+                        "        mt.tname AS material_type_name,\n" +
+                        "        SUM(CASE WHEN once_f.time >= ? AND once_f.time < DATE_ADD(?, INTERVAL 1 DAY) THEN once_f.price ELSE 0 END) AS once_sum\n" +
+                        "    FROM material_type mt\n" +
+                        "    LEFT JOIN once_fill once_f ON mt.id = once_f.type_id\n" +
+                        "        AND once_f.depositoryId = ?\n" +
+                        "    GROUP BY mt.id, mt.tname\n" +
+                        "),\n" +
+                        "CombinedData AS (\n" +
                         "    SELECT\n" +
                         "        mt.id AS type_id,\n" +
                         "        CASE WHEN mt.tname LIKE '%(进口)' THEN 1 ELSE 0 END AS is_import,\n" +
                         "        mt.tname AS material_type_name,\n" +
-                        "        COALESCE(SUM(CASE WHEN dr.type = 1 THEN dr.price * dr.quantity ELSE 0 END), 0) AS raw_in_money,\n" +
-                        "        COALESCE(SUM(CASE WHEN dr.type = 0 THEN dr.price * dr.quantity ELSE 0 END), 0) AS raw_out_money,\n" +
-                        "        FORMAT(COALESCE(SUM(CASE WHEN dr.type = 1 THEN dr.price * dr.quantity ELSE 0 END), 0), 2) AS 入库金额,\n" +
-                        "        FORMAT(COALESCE(SUM(CASE WHEN dr.type = 0 THEN dr.price * dr.quantity ELSE 0 END), 0), 2) AS 出库金额\n" +
+                        "        COALESCE(drs.in_sum, 0) + COALESCE(ofs.once_sum, 0) AS raw_in_money,\n" +
+                        "        COALESCE(drs.out_sum, 0) + COALESCE(ofs.once_sum, 0) AS raw_out_money,\n" +
+                        "        FORMAT(COALESCE(drs.in_sum, 0) + COALESCE(ofs.once_sum, 0), 2) AS 入库金额,\n" +
+                        "        FORMAT(COALESCE(drs.out_sum, 0) + COALESCE(ofs.once_sum, 0), 2) AS 出库金额\n" +
                         "    FROM material_type mt\n" +
-                        "    LEFT JOIN depository_record dr ON mt.tname = dr.type_name\n" +
-                        "                               AND dr.apply_time >= ? AND dr.apply_time < DATE_ADD(?, INTERVAL 1 DAY)\n" + // 修改时间
-                        "                               AND dr.review_pass = 1\n" +
-                        "                               AND dr.depository_id = ?\n" +
-                        "    GROUP BY mt.tname, mt.id\n" +
+                        "    LEFT JOIN DepRecordSum drs ON mt.id = drs.type_id\n" +
+                        "    LEFT JOIN OnceFillSum ofs ON mt.id = ofs.type_id\n" +
+                        "    GROUP BY mt.id, mt.tname, is_import\n" +
                         "),\n" +
                         "StockValue AS (\n" +
-                        "                       SELECT \n" +
-                        "                                mt.id AS type_id,\n" +
-                        "                              SUM(m.price) AS raw_stock_money,\n" +
-                        "                               FORMAT(SUM(m.price), 2) AS 在库金额,\n" +
-                        "                            CASE WHEN mt.tname LIKE '%(进口)' THEN 1 ELSE 0 END AS is_import\n" +
-                        "                            FROM material_type mt\n" +
-                        "                            LEFT JOIN material m ON mt.id = m.type_id\n" +
-                        "                           WHERE m.depository_id = ?\n" +
-                        "                            GROUP BY mt.id\n" +
+                        "    SELECT\n" +
+                        "        mt.id AS type_id,\n" +
+                        "        (SUM(m.price) - COALESCE((\n" +
+                        "            SELECT SUM(CASE WHEN dr.type = 1 THEN dr.price * dr.quantity ELSE -dr.price * dr.quantity END)\n" +
+                        "            FROM depository_record dr\n" +
+                        "            WHERE dr.type_name = mt.tname AND dr.apply_time > ? AND dr.review_pass = 1 AND dr.depository_id = ?\n" +
+                        "        ), 0)) AS raw_stock_money,\n" +
+                        "        FORMAT((SUM(m.price) - COALESCE((\n" +
+                        "            SELECT SUM(CASE WHEN dr.type = 1 THEN dr.price * dr.quantity ELSE -dr.price * dr.quantity END)\n" +
+                        "            FROM depository_record dr\n" +
+                        "            WHERE dr.type_name = mt.tname AND dr.apply_time > ? AND dr.review_pass = 1 AND dr.depository_id = ?\n" +
+                        "        ), 0)), 2) AS 在库金额,\n" +
+                        "        CASE WHEN mt.tname LIKE '%(进口)' THEN 1 ELSE 0 END AS is_import\n" +
+                        "    FROM material_type mt\n" +
+                        "    LEFT JOIN material m ON mt.id = m.type_id\n" +
+                        "    WHERE m.depository_id = ?\n" +
+                        "    GROUP BY mt.id\n" +
                         "),\n" +
                         "FinalData AS (\n" +
                         "    SELECT\n" +
@@ -87,33 +116,42 @@ public class ReportService {
                         "        cd.type_id\n" +
                         "    FROM CombinedData cd\n" +
                         "    LEFT JOIN StockValue s ON cd.type_id = s.type_id\n" +
-                        "    WHERE cd.raw_in_money > 0 OR cd.raw_out_money > 0 OR COALESCE(s.raw_stock_money, 0) > 0 -- 新增过滤条件\n" +
-                        "),"+
+                        "),\n" +
                         "Totals AS (\n" +
-                        "        SELECT\n" +
-                        "                               '总计' AS 日期,\n" +
-                        "                               ' ' AS 分类,\n" +
-                        "                            FORMAT(SUM(cd.raw_in_money), 2) AS 入库金额,\n" +
-                        "                               FORMAT(SUM(cd.raw_out_money), 2) AS 出库金额,\n" +
-                        "                               FORMAT(SUM(COALESCE(s.raw_stock_money, 0)), 2) AS 在库金额,\n" +
-                        "                               cd.is_import,\n" +
-                        "                               9999 AS type_id\n" +
-                        "                           FROM CombinedData cd\n" +
-                        "                           LEFT JOIN StockValue s ON cd.type_id = s.type_id\n" +
-                        "                            GROUP BY cd.is_import\n" +
+                        "    SELECT\n" +
+                        "        '总计' AS 日期,\n" +
+                        "        ' ' AS 分类,\n" +
+                        "        FORMAT(SUM(cd.raw_in_money), 2) AS 入库金额,\n" +
+                        "        FORMAT(SUM(cd.raw_out_money), 2) AS 出库金额,\n" +
+                        "        FORMAT(SUM(COALESCE(s.raw_stock_money, 0)), 2) AS 在库金额,\n" +
+                        "        cd.is_import,\n" +
+                        "        9999 AS type_id\n" +
+                        "    FROM CombinedData cd\n" +
+                        "    LEFT JOIN StockValue s ON cd.type_id = s.type_id\n" +
+                        "    GROUP BY cd.is_import\n" +
                         ")\n" +
                         "SELECT 日期, 分类, 入库金额, 出库金额, 在库金额\n" +
-                        "                        FROM (\n" +
-                        "                            SELECT 日期, 分类, 入库金额, 出库金额, 在库金额, is_import, type_id\n" +
-                        "                            FROM FinalData\n" +
-                        "                            UNION ALL\n" +
-                        "                            SELECT 日期, 分类, 入库金额, 出库金额, 在库金额, is_import, type_id\n" +
-                        "                            FROM Totals\n" +
-                        "                        ) AS SubQuery\n" +
-                        "                        ORDER BY is_import DESC, type_id ASC, 日期 DESC;\n";
-        return jdbcTemplate.queryForList(sql, startDate, endDate, depositoryId, depositoryId, startDate, endDate);
+                        "FROM (\n" +
+                        "    SELECT 日期, 分类, 入库金额, 出库金额, 在库金额, is_import, type_id\n" +
+                        "    FROM FinalData\n" +
+                        "    UNION ALL\n" +
+                        "    SELECT 日期, 分类, 入库金额, 出库金额, 在库金额, is_import, type_id\n" +
+                        "    FROM Totals\n" +
+                        ") AS SubQuery\n" +
+                        "ORDER BY is_import DESC, type_id ASC, 日期 DESC;\n";
+        return jdbcTemplate.queryForList(sql,
+                startDate, endDate,  // 1 - 2 (仓库记录)
+                depositoryId,        // 3 (仓库记录)
+                startDate, endDate,  // 4 - 5 (一次性领用)
+                depositoryId,        // 6 (一次性领用)
+                endDate,             // 7 (库存 - 结束日期之后的记录)
+                depositoryId,        // 8 (库存 - 结束日期之后的记录)
+                endDate,             // 9 (库存 - 结束日期之后的记录)
+                depositoryId,        // 10 (库存 - 结束日期之后的记录)
+                depositoryId,        // 11 (库存)
+                startDate, endDate   // 12 - 13 (最终数据)
+        );
     }
-
 
     public List<Map<String, Object>> transferData(String startDate, String endDate) {
         String sql = "SELECT\n" +
