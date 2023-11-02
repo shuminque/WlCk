@@ -13,8 +13,8 @@ public class ReportService {
     private JdbcTemplate jdbcTemplate;
 
     public List<Map<String, Object>> fetchReportData(String startDate, String endDate, int depositoryId) {
-        String sql =
-                        "SELECT\n" +
+                String sql =
+                "SELECT\n" +
                         "    mt.tname as 分类,\n" +
                         "    m.at_id as AT号,\n" +
                         "    m.mname as 品名,\n" +
@@ -23,8 +23,20 @@ public class ReportService {
                         "    FORMAT(ROUND((SUM(CASE WHEN dr.type = 1 THEN dr.price * dr.quantity ELSE 0 END)),2), 2) AS 入库金额,\n" +
                         "    SUM(CASE WHEN dr.type = 0 THEN dr.quantity ELSE 0 END) AS 出库数量,\n" +
                         "    FORMAT(ROUND((SUM(CASE WHEN dr.type = 0 THEN dr.price * dr.quantity ELSE 0 END)),2), 2) AS 出库金额,\n" +
-                        "    m.quantity AS 库存数量,\n" +
-                        "    FORMAT(ROUND(m.price,2), 2) AS 在库金额\n" +
+                        "    m.quantity - COALESCE((SELECT SUM(CASE WHEN dr_after.type = 1 THEN dr_after.quantity ELSE -dr_after.quantity END)\n" +
+                        "                          FROM depository_record dr_after\n" +
+                        "                          WHERE dr_after.mname = m.mname\n" +
+                        "                            AND (dr_after.model IS NULL OR dr_after.model = m.model)\n" +
+                        "                            AND dr_after.depository_id = m.depository_id\n" +
+                        "                            AND dr_after.review_pass = 1\n" +
+                        "                            AND dr_after.apply_time >= ?), 0) AS 库存数量,\n" +
+                        "    FORMAT(ROUND(m.price - COALESCE((SELECT SUM(CASE WHEN dr_after.type = 1 THEN dr_after.price * dr_after.quantity ELSE -dr_after.price * dr_after.quantity END)\n" +
+                        "                                  FROM depository_record dr_after\n" +
+                        "                                  WHERE dr_after.mname = m.mname\n" +
+                        "                                    AND (dr_after.model IS NULL OR dr_after.model = m.model)\n" +
+                        "                                    AND dr_after.depository_id = m.depository_id\n" +
+                        "                                    AND dr_after.review_pass = 1\n" +
+                        "                                    AND dr_after.apply_time >= ?), 0), 2), 2) AS 在库金额\n" +
                         "FROM\n" +
                         "    material m\n" +
                         "LEFT JOIN\n" +
@@ -41,10 +53,10 @@ public class ReportService {
                         "GROUP BY\n" +
                         "    mt.id, m.at_id, m.mname, m.model, m.quantity, m.price\n" +
                         "ORDER BY\n" +
-                                "    CASE WHEN mt.id IS NULL THEN 1 ELSE 0 END,\n" +
-                                "    mt.id, \n" +
-                                "    m.at_id;";
-        return jdbcTemplate.queryForList(sql, startDate, endDate, depositoryId);
+                        "    CASE WHEN mt.id IS NULL THEN 1 ELSE 0 END,\n" +
+                        "    mt.id, \n" +
+                        "    m.at_id;";
+        return jdbcTemplate.queryForList(sql, endDate,endDate , startDate, endDate, depositoryId);
     }
 
     public List<Map<String, Object>> everyTypeData(String startDate, String endDate, int depositoryId) {
