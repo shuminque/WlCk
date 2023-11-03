@@ -150,6 +150,7 @@ public class ReportService {
                         "    SELECT 日期, 分类, 入库金额, 出库金额, 在库金额, is_import, type_id\n" +
                         "    FROM Totals\n" +
                         ") AS SubQuery\n" +
+                        "WHERE 入库金额 != '0.00' OR 出库金额 != '0.00' OR 在库金额 != '0'\n" +
                         "ORDER BY is_import DESC, type_id ASC, 日期 DESC;\n";
         return jdbcTemplate.queryForList(sql,
                 startDate, endDate,  // 1 - 2 (仓库记录)
