@@ -121,7 +121,7 @@
             dropdown.render({
                 elem: elemSelector,
                 data: dropdownData,
-                click: function(item) {
+                click: function (item) {
                     let path = item.title;
                     let currentItem = item;
                     while (currentItem.parent) {
@@ -131,6 +131,30 @@
                     $(elemSelector).text(path);
                     const remarkInputSelector = elemSelector.replace(/ID-dropdown-demo-complex(-\d+)?$/, "applyRemarkInput$1");
                     $(remarkInputSelector).val(path);
+                },
+                ready: function (elemPanel, elem) { // Added 'ready' callback to adjust dropdown position
+                    var $panel = $(elemPanel);
+                    var offsetTop = $panel.offset().top;
+                    var panelHeight = $panel.outerHeight();
+                    var windowHeight = $(window).height();
+
+                    // Check if the dropdown extends beyond the top edge of the page
+                    if (offsetTop < 0) {
+                        $panel.css({
+                            'top': '10px', // Adjust this value as needed
+                            'transform': 'none',
+                            'position': 'fixed'
+                        });
+                    }
+
+                    // Check if the dropdown extends beyond the bottom edge of the page
+                    if ((offsetTop + panelHeight) > windowHeight) {
+                        $panel.css({
+                            'top': (windowHeight - panelHeight - 10) + 'px', // Adjust this value as needed
+                            'transform': 'none',
+                            'position': 'fixed'
+                        });
+                    }
                 }
             });
         }
