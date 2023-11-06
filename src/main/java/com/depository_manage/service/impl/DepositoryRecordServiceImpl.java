@@ -264,11 +264,18 @@ public class DepositoryRecordServiceImpl implements DepositoryRecordService {
                 BigDecimal bdNewPrice = new BigDecimal(newPrice);
                 bdNewPrice = bdNewPrice.setScale(2, RoundingMode.HALF_UP);
 
+                // 计算新的均价
+                double newUnitPrice = bdNewPrice.doubleValue() / newQuantity;
+                BigDecimal bdNewUnitPrice = new BigDecimal(newUnitPrice);
+                bdNewUnitPrice = bdNewUnitPrice.setScale(2, RoundingMode.HALF_UP);
+
+                // 更新物料
                 material.setPrice(bdNewPrice.doubleValue());
                 material.setQuantity(newQuantity);
-                material.setUnitPrice(bdNewPrice.doubleValue() / newQuantity);
+                material.setUnitPrice(bdNewUnitPrice.doubleValue());
             }
             materialMapper.updateMaterial(material);
+
         } else {
             throw new MyException("库存不足于该出库请求");
         }
