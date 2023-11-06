@@ -242,7 +242,9 @@
                         {field: 'typeName',width: '18%', title: '分类'},
                         {field: 'enginName', width:'10%', title: '工程'},
                         {field: 'quantity',  width: '5%', title: '数量'},
-                        {field: 'price', title: '单价', width: '8%'},
+                        {field: 'price', title: '单价', width: '8%', templet: function(d) {
+                                return parseFloat(d.price).toFixed(2);  // 格式化为两位小数
+                            }},
                         {field: 'applyRemark', title: '类型', width: '10%'},
                         {field: 'state', width:'6%', title: '流程'},
                         {field: 'applicantName', width:'8%', title: '申请人'},

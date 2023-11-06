@@ -1,5 +1,8 @@
 package com.depository_manage.entity;
 
+import lombok.Data;
+
+@Data
 public class TransferRecord implements java.io.Serializable {
     /** 版本号 */
     private static final long serialVersionUID = 1696077392188910210L;

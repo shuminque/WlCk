@@ -17,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.math.RoundingMode;
 import java.util.*;
 
@@ -157,18 +158,86 @@ public class DepositoryRecordServiceImpl implements DepositoryRecordService {
      * @param map 仓库调度信息
      * @return
      */
+//    @Override
+//    @Transactional
+//    public Integer transferApply(Map<String, Object> map) {
+//        // 设置出库状态和申请时间
+//        map.put("state","已出库");
+//        map.put("applyTime", new Date());
+//        map.put("reviewTime", new Date());
+//        map.put("reviewPass", "1");
+//        map.put("type",0);
+//        map.put("depositoryId",map.get("fromId"));
+//        depositoryRecordMapper.insertDepositoryRecord(map);
+//        map.put("fromId",map.get("id"));
+//
+//        // 执行出库逻辑
+//        List<Material> list = materialMapper.findMaterialForOutbound(map);
+//        if (list.isEmpty()) {
+//            throw new MyException("未找到匹配的物料");
+//        }
+//        Material material = list.get(0);
+//        double recordQuantity = Double.parseDouble(String.valueOf(map.get("quantity")));
+//        double recordPrice = Double.parseDouble(String.valueOf(map.get("price")));
+//        if (material.getQuantity() >= recordQuantity) {
+//            // 计算新的总数量
+//            double newQuantity = material.getQuantity() - recordQuantity;
+//
+//            // 如果新数量为0，那么将金额、数量和单价都设置为0
+//            if (newQuantity == 0) {
+//                material.setPrice(0.00);
+//                material.setQuantity(0.00);
+//                material.setUnitPrice(0.00);
+//            } else {
+//                // 计算出库的总价
+//                double outPrice = recordPrice * recordQuantity;
+//                // 计算新的总价
+//                double newPrice = material.getPrice() - outPrice;
+//                BigDecimal bdNewPrice = new BigDecimal(newPrice);
+//                bdNewPrice = bdNewPrice.setScale(2, RoundingMode.HALF_UP);
+//
+//                // 更新物料
+//                material.setPrice(bdNewPrice.doubleValue());
+//                material.setQuantity(newQuantity);
+//
+//                // 重新设置单位价格
+//                material.setUnitPrice(bdNewPrice.doubleValue() / newQuantity);
+//            }
+//
+//            materialMapper.updateMaterial(material);
+//        } else {
+//            throw new MyException("库存不足于该出库请求");
+//        }
+//
+//        // 清除主键
+//        map.remove("id");
+//        map.put("state", "待审核");
+//        // 设置其他需要的默认值，如申请时间等
+//        map.put("applyTime", new Date());
+//        map.remove("reviewTime");
+//        map.remove("reviewPass");
+//        // 设置入库状态和申请时间
+//        map.put("depositoryId",map.get("toId"));
+//        map.put("type",1);
+//        depositoryRecordMapper.insertDepositoryRecord(map);
+//        map.put("toId",map.get("id"));
+//        // 清除主键
+//        map.remove("id");
+//        return transferRecordMapper.addTransferRecord(map);
+//    }
     @Override
     @Transactional
     public Integer transferApply(Map<String, Object> map) {
         // 设置出库状态和申请时间
-        map.put("state","已出库");
+        map.put("state", "已出库");
         map.put("applyTime", new Date());
         map.put("reviewTime", new Date());
         map.put("reviewPass", "1");
-        map.put("type",0);
-        map.put("depositoryId",map.get("fromId"));
+        map.put("type", 0);
+        map.put("depositoryId", map.get("fromId"));
         depositoryRecordMapper.insertDepositoryRecord(map);
-        map.put("fromId",map.get("id"));
+        BigInteger outRecordBigInt = (BigInteger) map.get("id");
+        Integer outRecordId = outRecordBigInt.intValue(); // 将 BigInteger 转换为 Integer
 
         // 执行出库逻辑
         List<Material> list = materialMapper.findMaterialForOutbound(map);
@@ -182,7 +251,7 @@ public class DepositoryRecordServiceImpl implements DepositoryRecordService {
             // 计算新的总数量
             double newQuantity = material.getQuantity() - recordQuantity;
 
-            // 如果新数量为0，那么将金额、数量和单价都设置为0
+            // 更新物料
             if (newQuantity == 0) {
                 material.setPrice(0.00);
                 material.setQuantity(0.00);
@@ -195,35 +264,25 @@ public class DepositoryRecordServiceImpl implements DepositoryRecordService {
                 BigDecimal bdNewPrice = new BigDecimal(newPrice);
                 bdNewPrice = bdNewPrice.setScale(2, RoundingMode.HALF_UP);
 
-                // 更新物料
                 material.setPrice(bdNewPrice.doubleValue());
                 material.setQuantity(newQuantity);
-
-                // 重新设置单位价格
                 material.setUnitPrice(bdNewPrice.doubleValue() / newQuantity);
             }
-
             materialMapper.updateMaterial(material);
         } else {
             throw new MyException("库存不足于该出库请求");
         }
 
-        // 清除主键
-        map.remove("id");
-        map.put("state", "待审核");
-        // 设置其他需要的默认值，如申请时间等
-        map.put("applyTime", new Date());
-        map.remove("reviewTime");
-        map.remove("reviewPass");
-        // 设置入库状态和申请时间
-        map.put("depositoryId",map.get("toId"));
-        map.put("type",1);
-        depositoryRecordMapper.insertDepositoryRecord(map);
-        map.put("toId",map.get("id"));
-        // 清除主键
-        map.remove("id");
-        return transferRecordMapper.addTransferRecord(map);
+        // 创建转移记录
+        Map<String, Object> transferMap = new HashMap<>();
+        transferMap.put("fromId", outRecordId);
+        // 注意: toId 在这里是未知的，因为入库记录尚未创建
+        transferMap.put("toId", null);
+
+        return transferRecordMapper.addTransferRecord(transferMap);
     }
+
+
 
     @Override
     @Transactional
@@ -261,7 +320,7 @@ public class DepositoryRecordServiceImpl implements DepositoryRecordService {
                     materialMap.put("stateId", 1);
                     materialMap.put("depositoryId", record.getDepositoryId());
                     // 插入新的物料记录
-                    materialMapper.insertMaterial(materialMap);
+//                    materialMapper.insertMaterial(materialMap);
                 } else {
                     Material material = list.get(0);
                     if (1 == record.getType()) {

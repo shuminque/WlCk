@@ -167,33 +167,27 @@ public class ReportService {
     }
 
     public List<Map<String, Object>> transferData(String startDate, String endDate) {
-        String sql = "SELECT\n" +
-                "    DATE_FORMAT(o.apply_time, '%Y/%m/%d') AS 日期,\n" +
-                "    o.mname AS 品名,\n" +
-                "    o.type_name AS 型号,\n" +
-                "    FORMAT(o.price, 2) AS 单价,\n" +
-                "    o.quantity AS 数量,\n" +
-                "    FORMAT(ROUND(o.price * o.quantity, 2), 2) AS 总价,\n" +
-                "    o.apply_remark AS 备注\n" +
-                "FROM\n" +
-                "    depository_record AS o\n" +
-                "JOIN\n" +
-                "    depository_record AS i\n" +
-                "ON\n" +
-                "    o.mname = i.mname\n" +
-                "    AND o.type = 0 AND i.type = 1\n" +
-                "    AND o.quantity = i.quantity\n" +
-                "    AND o.price = i.price\n" +
-                "    AND o.applicant_id = i.applicant_id\n" +
-                "WHERE\n" +
-                "    o.apply_time >= ? AND o.apply_time < DATE_ADD(?, INTERVAL 1 DAY)\n" +
-                "    AND (\n" +
-                "        (o.apply_remark = 'SAB转入ZAB' OR i.apply_remark = 'SAB转入ZAB')\n" +
-                "        OR (o.apply_remark = 'ZAB转入SAB' OR i.apply_remark = 'ZAB转入SAB')\n" +
-                "    )\n" +
-                "ORDER BY\n" +
-                "    FIELD(o.apply_remark, 'SAB转入ZAB', 'ZAB转入SAB'),\n" +
-                "    o.apply_time DESC;";
+        String sql =
+                "SELECT\n" +
+                        "    DATE_FORMAT(o.apply_time, '%Y/%m/%d') AS 日期,\n" +
+                        "    o.mname AS 品名,\n" +
+                        "    o.type_name AS 型号,\n" +
+                        "    FORMAT(o.price, 2) AS 单价,\n" +
+                        "    o.quantity AS 数量,\n" +
+                        "    FORMAT(ROUND(o.price * o.quantity, 2), 2) AS 总价,\n" +
+                        "    o.apply_remark AS 备注\n" +
+                        "FROM\n" +
+                        "    depository_record AS o\n" +
+                        "WHERE\n" +
+                        "    o.apply_time >= ? AND o.apply_time < DATE_ADD(?, INTERVAL 1 DAY)\n" +
+                        "    AND o.type = 0\n" +
+                        "    AND (\n" +
+                        "        o.apply_remark = 'SAB转入ZAB'\n" +
+                        "        OR o.apply_remark = 'ZAB转入SAB'\n" +
+                        "    )\n" +
+                        "ORDER BY\n" +
+                        "    FIELD(o.apply_remark, 'SAB转入ZAB', 'ZAB转入SAB'),\n" +
+                        "    o.apply_time DESC;\n";
         return jdbcTemplate.queryForList(sql, startDate, endDate);
     }
 
