@@ -171,7 +171,8 @@ public class ReportService {
                 "SELECT\n" +
                         "    DATE_FORMAT(o.apply_time, '%Y/%m/%d') AS 日期,\n" +
                         "    o.mname AS 品名,\n" +
-                        "    o.type_name AS 型号,\n" +
+                        "    o.type_name AS 分类,\n" +
+                        "    o.model AS 型号,\n" +
                         "    FORMAT(o.price, 2) AS 单价,\n" +
                         "    o.quantity AS 数量,\n" +
                         "    FORMAT(ROUND(o.price * o.quantity, 2), 2) AS 总价,\n" +

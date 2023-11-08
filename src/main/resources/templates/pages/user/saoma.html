@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>仓库管理系统</title>
+    <!-- 引入qrcode-generator库 -->
+    <script src="https://cdn.jsdelivr.net/npm/qrcode-generator"></script>
+    <script src="https://unpkg.com/html5-qrcode"></script>
+</head>
+<body>
+
+<h2>生成二维码</h2>
+<div id="qrcode"></div>
+<button onclick="generateQRCode()">生成二维码</button>
+
+<h2>扫描二维码</h2>
+<div id="qr-reader" style="width:500px"></div>
+<div id="qr-reader-results"></div>
+
+<script>
+    function generateQRCode() {
+        // 清除之前的二维码
+        document.getElementById("qrcode").innerHTML = "";
+
+        // 定义轴承数据
+        var bearingData = {
+            model: "XYZ-1234", // 轴承型号
+            batchNumber: "BATCH-20230915", // 批次号
+            quantity: 20, // 数量
+            productionDate: "2023-09-15", // 生产日期
+            inspectionNumber: "INSP-9876", // 检验号
+            packingDate: "2023-09-20", // 装箱日期
+            dimensions: "50x100x20 mm", // 尺寸规格
+            material: "Chrome Steel", // 材料
+            weight: "500g per item", // 重量
+            destination: "New York, USA", // 目的地
+            orderNumber: "ORD-1029384756", // 订单号
+            packagingMaterial: "Recyclable Paper", // 包装材料
+            installationInstructions: "Handle with care", // 安装和使用说明
+            shelfLife: "5 years", // 保质期
+            certification: "ISO 9001", // 出厂证明
+            safetyWarnings: "Keep away from magnets", // 安全警告
+            environmentalConditions: "Dry, <60% humidity", // 环境条件
+            customerInfo: "Special handling required" // 客户特定信息
+        };
+
+        // 将轴承数据转换成JSON字符串
+        var qrData = JSON.stringify(bearingData);
+
+        // 将数据编码为Base64
+        var base64Data = btoa(unescape(encodeURIComponent(qrData)));
+
+        // 使用qrcode-generator库生成二维码
+        try {
+            var typeNumber = 0; // 0表示自动选择类型号
+            var errorCorrectionLevel = 'H'; // 设置为最高错误纠正级别
+            var qr = qrcode(typeNumber, errorCorrectionLevel);
+            qr.addData(base64Data);
+            qr.make();
+            document.getElementById('qrcode').innerHTML = qr.createImgTag();
+        } catch(e) {
+            console.error('生成二维码时发生错误：', e);
+        }
+    }
+
+    // 扫描二维码的功能
+    var resultContainer = document.getElementById('qr-reader-results');
+    var lastResult, countResults = 0;
+
+    function onScanSuccess(decodedText, decodedResult) {
+        try {
+            // 假设扫描到的是Base64编码的数据
+            var base64DecodedData = atob(decodedText); // 解码Base64
+            var decodedData = decodeURIComponent(escape(base64DecodedData)); // 解码为UTF-8字符串
+
+            // 尝试解析为JSON
+            var jsonData = JSON.parse(decodedData);
+            // 如果是JSON，展示格式化后的字符串
+            displayScanResult(jsonData);
+        } catch (e) {
+            // 如果不是Base64或JSON，直接展示扫描结果
+            displayScanResult(decodedText);
+        }
+    }
+
+    function displayScanResult(result) {
+        ++countResults;
+        lastResult = result;
+        // 更新网页上的扫描结果
+        resultContainer.innerHTML = `<div>Scanned Result [${countResults}]:${JSON.stringify(result)}</div>` + resultContainer.innerHTML;
+        // 打印到控制台
+        console.log('Scan result:', result);
+    }
+
+
+    var html5QrcodeScanner = new Html5QrcodeScanner(
+        "qr-reader", { fps: 60, qrbox: 250 });
+    html5QrcodeScanner.render(onScanSuccess);
+</script>
+
+</body>
+</html>
