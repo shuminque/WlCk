@@ -38,6 +38,14 @@
                         </div>
                         <div class="layui-inline">
                             <div class="layui-input-inline">
+                                <select name="typeId" >
+                                    <option value="">请选择分类</option>
+                                    <option th:each="type : ${materialTypes}" th:value="${type.id}" th:text="${type.id}+' '+${type.tname}"></option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="layui-inline">
+                            <div class="layui-input-inline">
                                 <input type="text" name="model" autocomplete="off" class="layui-input" placeholder="搜索规格">
                             </div>
                         </div>
@@ -300,6 +308,9 @@
                     }
                     if (data.atId!==''){
                         req.atId = data.atId;
+                    }
+                    if (data.typeId && data.typeId !== ''){
+                        req.typeId = data.typeId;
                     }
                     if (data.model!==''){
                         req.model=data.model;
