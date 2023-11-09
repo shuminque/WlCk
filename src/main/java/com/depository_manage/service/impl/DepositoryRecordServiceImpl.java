@@ -1,15 +1,13 @@
 package com.depository_manage.service.impl;
 
-import com.depository_manage.entity.SimpleDepositoryRecord;
+import com.depository_manage.entity.*;
 import com.depository_manage.exception.MyException;
 import com.depository_manage.mapper.*;
 import com.depository_manage.pojo.CategoryOutboundDTO;
 import com.depository_manage.pojo.MonthlyAmountDTO;
 import com.depository_manage.service.DepositoryRecordService;
+import com.depository_manage.service.NoticeService;
 import com.depository_manage.service.NotificationService;
-import com.depository_manage.entity.DepositoryRecord;
-import com.depository_manage.entity.Material;
-import com.depository_manage.entity.Notification;
 import com.depository_manage.pojo.DepositoryRecordP;
 import com.depository_manage.pojo.SimpleDepositoryRecordP;
 import com.depository_manage.utils.ObjectFormatUtil;
@@ -39,6 +37,8 @@ public class DepositoryRecordServiceImpl implements DepositoryRecordService {
     private MaterialEnginMapper materialEnginMapper;
     @Autowired
     private MaterialTypeMapper materialTypeMapper;
+    @Autowired
+    private NoticeService noticeService;
 
     @Override
     public Integer apply(Map<String, Object> map) {
@@ -62,6 +62,7 @@ public class DepositoryRecordServiceImpl implements DepositoryRecordService {
         }
         map.put("reviewTime", map.get("applyTime"));
         map.put("reviewPass", "1");
+        DepositoryRecord record;
         List<Material> list = materialMapper.findMaterialForOutbound(map);
         if (list.isEmpty()) {
             throw new MyException("未找到匹配的物料");
@@ -85,6 +86,23 @@ public class DepositoryRecordServiceImpl implements DepositoryRecordService {
 
             // 如果新数量为0，就不计算新的均价
             if (newQuantity == 0) {
+                record = depositoryRecordMapper.findDepositoryRecordById(ObjectFormatUtil.toInteger(map.get("id")));
+                Integer id = record.getId();
+                Integer atId = record.getAtId();
+                String mname = record.getMname();
+                String typenName = record.getTypeName();
+                String model = record.getModel();
+                Integer did = record.getDepositoryId();
+                String notificationContent = "AT号:" + atId + ", 品名: " + mname + ", 分类: " +typenName + ", 型号: " + model + "库存不足";
+                Map<String, Object> notice = new HashMap<>();
+                if(did == 1){
+                    notice.put("title","SAB：" + "品名:"+ mname + "，库存不足");
+                }else {
+                    notice.put("title","ZAB" + "品名:"+ mname + "，库存不足");
+                }
+                notice.put("content",notificationContent);
+                notice.put("time",new Date());
+                noticeService.addNotice(notice);
                 material.setPrice(0.00);
                 material.setQuantity(0.00);
                 material.setUnitPrice(0.00);

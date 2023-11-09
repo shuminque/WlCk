@@ -1,7 +1,9 @@
 package com.depository_manage.entity;
 
-import java.util.Date;
+import lombok.Data;
 
+import java.util.Date;
+@Data
 public class Notice implements java.io.Serializable {
     /** 版本号 */
     private static final long serialVersionUID = -2744388334561767209L;
