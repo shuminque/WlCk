@@ -128,6 +128,10 @@ public class PageController {
     public String dropData_add() {
         return "pages/other/dropData_add";
     }
+    @GetMapping("/saoma")
+    public String saoma() {
+        return "pages/other/saoma";
+    }
     @GetMapping("/once_add")
     public ModelAndView once_add() {
         ModelAndView mv = new ModelAndView();

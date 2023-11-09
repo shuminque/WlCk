@@ -9,9 +9,9 @@
 </head>
 <body>
 
-<h2>生成二维码</h2>
-<div id="qrcode"></div>
-<button onclick="generateQRCode()">生成二维码</button>
+<!--<h2>生成二维码</h2>-->
+<!--<div id="qrcode"></div>-->
+<!--<button onclick="generateQRCode()">生成二维码</button>-->
 
 <h2>扫描二维码</h2>
 <div id="qr-reader" style="width:500px"></div>
@@ -87,9 +87,9 @@
         ++countResults;
         lastResult = result;
         // 更新网页上的扫描结果
-        resultContainer.innerHTML = `<div>Scanned Result [${countResults}]:${JSON.stringify(result)}</div>` + resultContainer.innerHTML;
+        resultContainer.innerHTML = `<div>扫描结果 [${countResults}]:${JSON.stringify(result)}</div>` + resultContainer.innerHTML;
         // 打印到控制台
-        console.log('Scan result:', result);
+        console.log('扫描结果:', result);
     }
 
 
