@@ -52,6 +52,16 @@
             max-height: 500px;
             overflow-y: auto;
         }
+        /* SAB转入ZAB的备注用一个颜色表示 */
+        .sab-to-zab {
+            background-color: #ffffff; /* 金色 */
+        }
+
+        /* ZAB转入SAB的备注用另一个颜色表示 */
+        .zab-to-sab {
+            background-color: rgb(147, 143, 143); /* 天蓝色 */
+        }
+
     </style>
 </head>
 <body>
@@ -126,14 +136,29 @@
                 let tbody = document.createElement('tbody');
                 data.forEach(row => {
                     let tr = document.createElement('tr');
-                    Object.values(row).forEach(cellData => {
+                    let remarkClass = ''; // 用于存储备注对应的类
+                    Object.entries(row).forEach(([colName, cellData]) => {
                         let td = document.createElement('td');
                         td.textContent = cellData;
+                        // 如果列名为“备注”，则根据备注内容添加相应的类
+                        if (colName === '备注') {
+                            if (cellData === 'SAB转入ZAB') {
+                                td.classList.add('sab-to-zab');
+                                remarkClass = 'sab-to-zab';//整行
+                            } else if (cellData === 'ZAB转入SAB') {
+                                td.classList.add('zab-to-sab');
+                                remarkClass = 'zab-to-sab';//整行
+                            }
+                        }
                         tr.appendChild(td);
                     });
+                    if (remarkClass) {
+                        tr.classList.add(remarkClass);
+                    }
                     tbody.appendChild(tr);
                 });
                 table.appendChild(tbody);
+
             })
             .catch(error => console.error('Error fetching data:', error));
     }

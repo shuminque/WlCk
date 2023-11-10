@@ -194,12 +194,13 @@ public class ExcelExportController {
     private void createHeaderRow(XSSFSheet sheet, int rowIndex) {
         XSSFRow headerRow = sheet.createRow(rowIndex);
         headerRow.createCell(0).setCellValue("日期");
-        headerRow.createCell(1).setCellValue("品名");
-        headerRow.createCell(2).setCellValue("型号");
-        headerRow.createCell(3).setCellValue("单价");
-        headerRow.createCell(4).setCellValue("数量");
-        headerRow.createCell(5).setCellValue("总价");
-        headerRow.createCell(6).setCellValue("备注");
+        headerRow.createCell(1).setCellValue("分类");
+        headerRow.createCell(2).setCellValue("品名");
+        headerRow.createCell(3).setCellValue("型号");
+        headerRow.createCell(4).setCellValue("单价");
+        headerRow.createCell(5).setCellValue("数量");
+        headerRow.createCell(6).setCellValue("总价");
+        headerRow.createCell(7).setCellValue("备注");
     }
 
     private int fillDataRows(XSSFSheet sheet, int startingRowIndex, List<Map<String, Object>> data) {
@@ -207,12 +208,13 @@ public class ExcelExportController {
         for (Map<String, Object> record : data) {
             XSSFRow row = sheet.createRow(rowIndex++);
             row.createCell(0).setCellValue((String) getOrDefault(record, "日期", ""));
-            row.createCell(1).setCellValue((String) getOrDefault(record, "品名", "aaa"));
-            row.createCell(2).setCellValue((String) getOrDefault(record, "型号", "aaa"));
-            row.createCell(3).setCellValue((String) getOrDefault(record, "单价", "0.00"));
-            row.createCell(4).setCellValue(((Double) getOrDefault(record, "数量", 0.0)).doubleValue());
-            row.createCell(5).setCellValue((String) getOrDefault(record, "总价", "0.00"));
-            row.createCell(6).setCellValue((String) getOrDefault(record, "备注", "aaa"));
+            row.createCell(1).setCellValue((String) getOrDefault(record, "分类", "aaa"));
+            row.createCell(2).setCellValue((String) getOrDefault(record, "品名", "aaa"));
+            row.createCell(3).setCellValue((String) getOrDefault(record, "型号", "aaa"));
+            row.createCell(4).setCellValue((String) getOrDefault(record, "单价", "0.00"));
+            row.createCell(5).setCellValue(((Double) getOrDefault(record, "数量", 0.0)).doubleValue());
+            row.createCell(6).setCellValue((String) getOrDefault(record, "总价", "0.00"));
+            row.createCell(7).setCellValue((String) getOrDefault(record, "备注", "aaa"));
         }
         return rowIndex;
     }

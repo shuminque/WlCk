@@ -30,12 +30,18 @@
         .layui-red {color:red}
         .main_btn > p {height:40px;}
         .layui-bg-number {background-color:#F8F8F8;}
+        .layuimini-notice-container {
+            max-height: 200px; /* 设置一个最大高度 */
+            overflow-y: auto; /* 添加垂直滚动条 */
+        }
+        /* 保持其他样式不变 */
         .layuimini-notice:hover {background:#f6f6f6;}
         .layuimini-notice {padding:7px 16px;clear:both;font-size:12px !important;cursor:pointer;position:relative;transition:background 0.2s ease-in-out;}
         .layuimini-notice-title,.layuimini-notice-label {
             padding-right: 70px !important;text-overflow:ellipsis!important;overflow:hidden!important;white-space:nowrap!important;}
         .layuimini-notice-title {line-height:28px;font-size:14px;}
         .layuimini-notice-extra {position:absolute;top:50%;margin-top:-8px;right:16px;display:inline-block;height:16px;color:#999;}
+
     </style>
 </head>
 <body>
@@ -185,21 +191,12 @@
             </div>
             <div class="layui-col-md4">
                 <div class="layui-card">
-                    <div class="layui-card-header"><i class="fa fa-bullhorn icon icon-tip"></i>系统公告</div>
-                    <div class="layui-card-body layui-text">
-                        <div class="layuimini-notice" th:each="notice,iterStat:${notices}">
+                    <div class="layui-card-header"><i class="fa fa-bullhorn icon icon-tip"></i>库存警报</div>
+                    <div class="layui-card-body layui-text layuimini-notice-container"> <!-- 添加滚动容器类 -->
+                        <div th:each="notice,iterStat:${notices}" class="layuimini-notice">
                             <div class="layuimini-notice-title" th:text="${notice.getTitle()}">修改选项卡样式</div>
                             <div class="layuimini-notice-extra" th:text="${#dates.format(notice.getTime(), 'yyyy-MM-dd')}">2019-07-11 23:06</div>
-                            <div class="layuimini-notice-content layui-hide" th:text="${notice.getContent()}">
-                                界<br>
-                                一<br>
-                                支<br>
-                                支<br>
-                                失<br>
-                                u<br>
-                                刷<br>
-                                移<br>
-                            </div>
+                            <div class="layuimini-notice-content layui-hide" th:text="${notice.getContent()}"></div>
                         </div>
                     </div>
                 </div>

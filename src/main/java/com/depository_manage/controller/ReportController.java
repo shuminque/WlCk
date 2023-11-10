@@ -41,6 +41,7 @@ public class ReportController {
                                                Function<String[], List<Map<String, Object>>> dataFetcher) {
         return dataFetcher.apply(new String[]{startDate, endDate});
     }
+
     private int[] setCurrentYearAndMonth(int year, int month) {
         if (year == -1) {
             year = LocalDate.now().getYear();

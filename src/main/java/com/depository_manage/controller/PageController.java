@@ -1,6 +1,7 @@
 package com.depository_manage.controller;
 
 import com.depository_manage.entity.Category;
+import com.depository_manage.entity.Notice;
 import com.depository_manage.exception.MyException;
 import com.depository_manage.service.*;
 import com.depository_manage.pojo.DepositoryRecordP;
@@ -60,7 +61,7 @@ public class PageController {
         return numberFormat.format(number);
     }
     @GetMapping("/welcome")
-    public ModelAndView welcome() {
+    public ModelAndView welcome(HttpServletRequest request) {
         ModelAndView mv = new ModelAndView();
         mv.setViewName("pages/other/welcome");
         Map<String, Object> map = new HashMap<String, Object>(2) {
@@ -69,7 +70,17 @@ public class PageController {
                 put("size",6);
             }
         };
-        mv.addObject("notices", noticeService.findNoticeByCondition(map));
+        UserToken userToken = (UserToken) request.getAttribute("userToken");
+        if (userToken != null && userToken.getUser() != null) {
+            int userDepositoryId = userToken.getUser().getDepositoryId();
+            if (userDepositoryId != 0) {
+                // 如果用户的depository_id不为0，则根据depository_id过滤公告
+                map.put("depositoryId", userDepositoryId);
+            }
+            // 如果用户的depository_id为0，则不对公告进行厂区过滤
+            List<Notice> notices = noticeService.findNoticeByCondition(map);
+            mv.addObject("notices", notices);
+        }
         mv.addObject("depositories", depositoryService.findDepositoryAll());
         mv.addObject("materials", materialService.findMaterialAll());
         mv.addObject("materialTypes", materialTypeService.findMaterialTypeAll());

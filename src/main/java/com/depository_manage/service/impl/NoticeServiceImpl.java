@@ -25,4 +25,9 @@ public class NoticeServiceImpl implements NoticeService {
     public List<Notice> findNoticeByCondition(Map<String, Object> map) {
         return noticeMapper.findNoticeByCondition(map);
     }
+
+    @Override
+    public Integer deleteNoticeById(Integer id) {
+        return noticeMapper.deleteNoticeById(id);
+    }
 }

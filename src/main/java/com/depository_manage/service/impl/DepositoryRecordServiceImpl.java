@@ -87,22 +87,31 @@ public class DepositoryRecordServiceImpl implements DepositoryRecordService {
             // 如果新数量为0，就不计算新的均价
             if (newQuantity == 0) {
                 record = depositoryRecordMapper.findDepositoryRecordById(ObjectFormatUtil.toInteger(map.get("id")));
-                Integer id = record.getId();
-                Integer atId = record.getAtId();
-                String mname = record.getMname();
-                String typenName = record.getTypeName();
-                String model = record.getModel();
-                Integer did = record.getDepositoryId();
-                String notificationContent = "AT号:" + atId + ", 品名: " + mname + ", 分类: " +typenName + ", 型号: " + model + "库存不足";
-                Map<String, Object> notice = new HashMap<>();
-                if(did == 1){
-                    notice.put("title","SAB：" + "品名:"+ mname + "，库存不足");
-                }else {
-                    notice.put("title","ZAB" + "品名:"+ mname + "，库存不足");
+                String typeName = record.getTypeName();
+                if (!typeName.contains("金加工用")) {
+                    Integer id = record.getId();
+                    Integer atId = record.getAtId();
+                    String mname = record.getMname();
+                    String model = record.getModel();
+                    Integer did = record.getDepositoryId();
+                    Double lastC = record.getQuantity();
+                    String notificationContent = "AT号:" + atId + ", 品名: " + mname + ", 分类: " + typeName + ", 型号: " + model + "，最后出库数:"+lastC;
+                    Map<String, Object> notice = new HashMap<>();
+                    if(did == 1){
+                        notice.put("title","SAB：" + "品名:"+ mname + "，库存不足");
+                    }else {
+                        notice.put("title","ZAB" + "品名:"+ mname + "，库存不足");
+                    }
+                    notice.put("content",notificationContent);
+                    notice.put("atId",atId);
+                    notice.put("mname",mname);
+                    notice.put("depositoryId",did);
+                    notice.put("model",model);
+                    notice.put("typeName",typeName);
+                    notice.put("lastCount",lastC);
+                    notice.put("time",new Date());
+                    noticeService.addNotice(notice);
                 }
-                notice.put("content",notificationContent);
-                notice.put("time",new Date());
-                noticeService.addNotice(notice);
                 material.setPrice(0.00);
                 material.setQuantity(0.00);
                 material.setUnitPrice(0.00);
@@ -253,6 +262,7 @@ public class DepositoryRecordServiceImpl implements DepositoryRecordService {
         map.put("reviewPass", "1");
         map.put("type", 0);
         map.put("depositoryId", map.get("fromId"));
+        DepositoryRecord record;
         depositoryRecordMapper.insertDepositoryRecord(map);
         BigInteger outRecordBigInt = (BigInteger) map.get("id");
         Integer outRecordId = outRecordBigInt.intValue(); // 将 BigInteger 转换为 Integer
@@ -271,6 +281,32 @@ public class DepositoryRecordServiceImpl implements DepositoryRecordService {
 
             // 更新物料
             if (newQuantity == 0) {
+                record = depositoryRecordMapper.findDepositoryRecordById(ObjectFormatUtil.toInteger(map.get("id")));
+                String typeName = record.getTypeName();
+                if (!typeName.contains("金加工用")) {
+                    Integer id = record.getId();
+                    Integer atId = record.getAtId();
+                    String mname = record.getMname();
+                    String model = record.getModel();
+                    Integer did = record.getDepositoryId();
+                    Double lastC = record.getQuantity();
+                    String notificationContent = "AT号:" + atId + ", 品名: " + mname + ", 分类: " + typeName + ", 型号: " + model + "，库存不足";
+                    Map<String, Object> notice = new HashMap<>();
+                    if(did == 1){
+                        notice.put("title","SAB：" + "品名:"+ mname + "，库存不足");
+                    }else {
+                        notice.put("title","ZAB" + "品名:"+ mname + "，库存不足");
+                    }
+                    notice.put("content",notificationContent);
+                    notice.put("atId",atId);
+                    notice.put("mname",mname);
+                    notice.put("depositoryId",did);
+                    notice.put("model",model);
+                    notice.put("typeName",typeName);
+                    notice.put("lastCount",lastC);
+                    notice.put("time",new Date());
+                    noticeService.addNotice(notice);
+                }
                 material.setPrice(0.00);
                 material.setQuantity(0.00);
                 material.setUnitPrice(0.00);
@@ -350,6 +386,16 @@ public class DepositoryRecordServiceImpl implements DepositoryRecordService {
                     Material material = list.get(0);
                     if (1 == record.getType()) {
                         map.put("state", "已入库");
+                        Map<String, Object> noticeQueryMap = new HashMap<>();
+                        noticeQueryMap.put("atId", record.getAtId());
+                        noticeQueryMap.put("depositoryId", record.getDepositoryId());
+
+                        // 查询相关通知
+                        List<Notice> notices = noticeService.findNoticeByCondition(noticeQueryMap);
+                        for (Notice notice : notices) {
+                            // 删除通知
+                            noticeService.deleteNoticeById(notice.getId());
+                        }
                         double totalPrice = material.getPrice() + (record.getPrice() * record.getQuantity());
                         BigDecimal bdTotalPrice = new BigDecimal(totalPrice);
                         bdTotalPrice = bdTotalPrice.setScale(2, RoundingMode.HALF_UP); // 保留两位小数，四舍五入

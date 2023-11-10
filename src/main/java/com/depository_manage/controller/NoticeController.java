@@ -19,5 +19,8 @@ public class NoticeController {
     public RestResponse findNotices(@RequestParam Map<String,Object> map){
         return new RestResponse(noticeService.findNoticeByCondition(map));
     }
-
+    @DeleteMapping("/notice/{id}")
+    public RestResponse deleteNotice(@PathVariable("id") Integer id) {
+        return CrudUtil.deleteHandle(noticeService.deleteNoticeById(id), 1);
+    }
 }

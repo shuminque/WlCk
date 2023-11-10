@@ -20,4 +20,7 @@ public interface NoticeService {
      * @return 符合条件的公告列表
      */
     List<Notice> findNoticeByCondition(Map<String,Object> map);
+
+    Integer deleteNoticeById(Integer id);
+
 }

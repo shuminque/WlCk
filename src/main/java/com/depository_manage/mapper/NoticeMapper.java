@@ -25,4 +25,7 @@ public interface NoticeMapper {
      */
     List<Notice> findNoticeByCondition(Map<String,Object> map);
 
+    Integer deleteNoticeById(Integer id);
+
+
 }

@@ -72,6 +72,8 @@
                             <div>
                                 <label class="layui-form-label">领用部门</label>
                                 <select name="applyRemark" xm-select="selectId" >
+                                    <option value="SAB转入ZAB" >SAB转入ZAB</option>
+                                    <option value="ZAB转入SAB" >ZAB转入SAB</option>
                                     <option th:each="categories : ${cas}" th:value="${categories.title}" th:text="${categories.title}" ></option>
                                 </select>
                             </div>
