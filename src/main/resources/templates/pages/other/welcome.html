@@ -47,10 +47,10 @@
 <body>
 <div class="layuimini-container">
     <div class="layuimini-main">
-        <div class="layui-row layui-col-space15">
-            <div class="layui-col-md8">
-                <div class="layui-row layui-col-space15">
-                    <div class="layui-col-md6">
+        <div class="layui-row layui-col-space8">
+            <div class="layui-col-md4">
+                <div class="layui-row layui-col-space10">
+                    <div class="layui-col-md15">
                         <div class="layui-card">
                             <div class="layui-card-header"><i class="fa fa-signal icon"></i>数据统计</div>
                             <div class="layui-card-body">
@@ -116,10 +116,9 @@
                                 </div>
                             </div>
                         </div>
-
                     </div>
 
-                    <div class="layui-col-md6">
+                    <div class="layui-col-md4" style="display: none;">
                         <div class="layui-card">
                             <div class="layui-card-header"><i class="fa fa-credit-card icon icon-blue"></i>快捷入口</div>
                             <div class="layui-card-body">
@@ -182,22 +181,18 @@
                                             </a>
                                         </div>
                                     </div>
-
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="layui-col-md4">
+            <!-- 公告数据表格容器 -->
+            <div class="layui-col-md8">
                 <div class="layui-card">
                     <div class="layui-card-header"><i class="fa fa-bullhorn icon icon-tip"></i>库存警报</div>
-                    <div class="layui-card-body layui-text layuimini-notice-container"> <!-- 添加滚动容器类 -->
-                        <div th:each="notice,iterStat:${notices}" class="layuimini-notice">
-                            <div class="layuimini-notice-title" th:text="${notice.getTitle()}">修改选项卡样式</div>
-                            <div class="layuimini-notice-extra" th:text="${#dates.format(notice.getTime(), 'yyyy-MM-dd')}">2019-07-11 23:06</div>
-                            <div class="layuimini-notice-content layui-hide" th:text="${notice.getContent()}"></div>
-                        </div>
+                    <div class="layui-card-body">
+                        <table id="noticeTable" lay-filter="noticeTable"></table>
                     </div>
                 </div>
             </div>
@@ -296,6 +291,45 @@
             echarts = layui.echarts,
             laydate = layui.laydate,
             table = layui.table;
+        table.render({
+            elem: '#noticeTable',
+            url: '/notices', // 数据接口
+            height: "full-50",
+            height: 200,
+            parseData: function (res) { //res 即为原始返回的数据
+                return {
+                    "status": res.status, //解析接口状态
+                    "message": res.statusInfo.message, //解析提示文本
+                    "count": res.count, //解析数据长度
+                    "data": res.data //解析数据列表
+                };
+            },
+            response: {
+                statusName: 'status' //规定数据状态的字段名称，默认：code
+                ,statusCode: 200 //规定成功的状态码，默认：0
+                ,msgName: 'message' //规定状态信息的字段名称，默认：msg
+                ,countName: 'count' //规定数据总数的字段名称，默认：count
+                ,dataName: 'data' //规定数据列表的字段名称，默认：data
+            },
+            cols: [ [ // 表头
+                {field: 'title', title: '标题'},
+                {field: 'atId', title: 'AT号'},
+                {field: 'mname', title: '品名'},
+                {field: 'model', title: '型号'},
+                {field: 'lastCount', title: '最后出库数'},
+                {field: 'time', title: '时间', sort: true,templet: function(d){
+                        return formatDate(d.time);
+                    }},
+            ]]
+        });
+        function formatDate(dateStr) {
+            if (!dateStr) return '';
+            let date = new Date(dateStr);
+            let year = date.getFullYear();
+            let month = (date.getMonth() + 1).toString().padStart(2, '0');
+            let day = date.getDate().toString().padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
         // 初始化日期选择器
         laydate.render({
             elem: '#month-selector',

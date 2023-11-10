@@ -12,6 +12,8 @@ import java.io.Serializable;
 @Accessors(chain = true)
 @Data
 public class RestResponse implements Serializable {
+    private int code; // 对应 Layui 的code
+    private String msg; // 对应 Layui 的msg
     /**
      * 业务数据
      */
@@ -52,6 +54,12 @@ public class RestResponse implements Serializable {
     public RestResponse(boolean success, String message) {
         this.success = success;
         this.message = message;
+    }
+    public RestResponse(int code, String msg, int count, Object data) {
+        this.code = code;
+        this.msg = msg;
+        this.count = count;
+        this.data = data;
     }
 
 }
