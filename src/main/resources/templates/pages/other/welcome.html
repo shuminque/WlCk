@@ -41,6 +41,19 @@
             padding-right: 70px !important;text-overflow:ellipsis!important;overflow:hidden!important;white-space:nowrap!important;}
         .layuimini-notice-title {line-height:28px;font-size:14px;}
         .layuimini-notice-extra {position:absolute;top:50%;margin-top:-8px;right:16px;display:inline-block;height:16px;color:#999;}
+        .layui-table-view .layui-table-body tr.layui-table-hover {
+            background-color: #f2f2f2; /* 高亮行的背景色，可根据需要调整 */
+        }
+
+        .layui-table-view .layui-table-body tr td {
+            padding: 2px 8px; /* 减少行内间距 */
+            line-height: 1.2; /* 调整行高 */
+        }
+
+        .layui-table-view .layui-table-header tr th {
+            padding: 2px 8px; /* 减少标题行内间距 */
+            line-height: 1.2; /* 调整标题行高 */
+        }
 
     </style>
 </head>
@@ -190,7 +203,7 @@
             <!-- 公告数据表格容器 -->
             <div class="layui-col-md8">
                 <div class="layui-card">
-                    <div class="layui-card-header"><i class="fa fa-bullhorn icon icon-tip"></i>库存警报</div>
+                    <div class="layui-card-header"><i class="fa fa-bullhorn icon icon-tip"></i>安全库存警报(在库为0)</div>
                     <div class="layui-card-body">
                         <table id="noticeTable" lay-filter="noticeTable"></table>
                     </div>
@@ -332,11 +345,19 @@
                     },
                     cols: [ [ // 表头
                         {field: 'title', title: '标题', hide: true},
-                        {field: 'atId', title: 'AT号'},
-                        {field: 'mname', title: '品名'},
-                        {field: 'model', title: '型号'},
-                        {field: 'lastCount', title: '最后出库数'},
-                        {field: 'time', title: '最后出库时间', sort: true,templet: function(d){
+                        {field: 'atId', title: 'AT号', width:'10%',templet: function(d) {
+                                return '<div style="background-color: yellow;">' + d.atId + '</div>';
+                            }},
+                        {field: 'mname', title: '品名', width:'30%',templet: function(d) {
+                                return '<div style="background-color: yellow;">' + d.mname + '</div>';
+                            }},
+                        {field: 'model', title: '型号', width:'20%', templet: function(d) {
+                                return '<div style="background-color: yellow;">' + d.model + '</div>';
+                            }},
+                        {field: 'lastCount', title: '最后领用数', width:'12%',templet: function(d) {
+                                return '<div style="background-color: yellow;">' + d.lastCount + '</div>';
+                            }},
+                        {field: 'time', title: '最后领用时间', width:'18%', sort: true,templet: function(d){
                                 return formatDate(d.time);
                             }},
                     ]]
