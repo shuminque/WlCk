@@ -171,6 +171,7 @@
         });
         var userReviewGroupId;
         var userAuthority;
+        var userDepositoryId
         //用户区分
         $.ajax({
             url: '/get_user_depository',
@@ -178,13 +179,13 @@
             dataType: 'json',
             success: function(data) {
                 let pp;
-                var userDepositoryId = data.depositoryId;
+                userDepositoryId = data.depositoryId;
                 var toolbarTemplate;
                 var globalToolbarTemplate;
                 userAuthority = data.authority;
                 userReviewGroupId = data.review_group_id;
-                let selectElem = document.getElementById('depositorySelect');
 
+                let selectElem = document.getElementById('depositorySelect');
                 if (userDepositoryId === 1) {
                     selectElem.innerHTML = '<option value="1">SAB</option>';
                 } else if (userDepositoryId === 2) {
