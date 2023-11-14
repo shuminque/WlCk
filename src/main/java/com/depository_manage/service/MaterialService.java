@@ -37,7 +37,7 @@ public interface MaterialService {
      * @param map 条件map
      * @return 符合条件的库存信息
      */
-    public List<MaterialP> findMaterialPByCondition(Map<String, Object> map);
+    List<MaterialP> findMaterialPByCondition(Map<String, Object> map);
 
     /**
      * 查询所有的库存信息

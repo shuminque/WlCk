@@ -18,7 +18,7 @@ public interface OnceFillService {
     OnceFill findOnceFillById(Integer id);
 
     // 根据条件查询一次性记录
-    public List<OnceFillP> findOnceFillPByCondition(Map<String, Object> map);
+    List<OnceFillP> findOnceFillPByCondition(Map<String, Object> map);
 
     // 根据ID删除一次性记录
     void deleteOnceFillById(Integer id);

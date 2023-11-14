@@ -24,6 +24,6 @@ public interface DepositoryService {
      */
     List<Depository> findDepositoryAll();
     Integer findCountByCondition(Map<String,Object> map);
-    public List<DepositoryP> findDepositoryPByCondition(Map<String, Object> map);
+    List<DepositoryP> findDepositoryPByCondition(Map<String, Object> map);
 
 }

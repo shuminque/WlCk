@@ -10,7 +10,7 @@ public interface MaterialEnginService {
     Integer insertMaterialEngin(Map<String,Object> map);
     List<MaterialEngin> findMaterialEnginAll();
     Integer findCountByCondition(Map<String,Object> map);
-    public List<MaterialEnginP> findMaterialEnginPByCondition(Map<String, Object> map);
+    List<MaterialEnginP> findMaterialEnginPByCondition(Map<String, Object> map);
 
     Integer deleteMaterialEngin(int id);
 }

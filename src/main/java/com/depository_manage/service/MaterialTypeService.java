@@ -10,7 +10,7 @@ public interface MaterialTypeService {
     Integer insertMaterialType(Map<String,Object> map);
     List<MaterialType> findMaterialTypeAll();
     Integer findCountByCondition(Map<String,Object> map);
-    public List<MaterialTypeP> findMaterialTypePByCondition(Map<String, Object> map);
+    List<MaterialTypeP> findMaterialTypePByCondition(Map<String, Object> map);
 
     Integer deleteMaterialType(int id);
 }
