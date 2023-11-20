@@ -24,7 +24,8 @@ public class MaterialEnginServiceImpl implements MaterialEnginService {
     @Override
     public List<MaterialEngin> findMaterialEnginAll(){
         return materialEnginMapper.findMaterialEnginAll();
-    };
+    }
+
     @Override
     public Integer findCountByCondition(Map<String, Object> map) {
         return materialEnginMapper.findCountByCondition(map);

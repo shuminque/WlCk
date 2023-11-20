@@ -20,5 +20,5 @@ public class MaterialStateServiceImpl implements MaterialStateService {
     @Override
     public List<MaterialState> findMaterialStateAll(){
         return MaterialStateService.findMaterialStateAll();
-    };
+    }
 }
