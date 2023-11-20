@@ -8,23 +8,59 @@
     <link rel="stylesheet" href="/static/css/public.css" media="all">
     <title>OnceFill Records</title>
 </head>
-<body>
+<style>
+    /* 使得表头可拖动 */
+    th {
+        position: relative;
+    }
 
+    /* 拖动把手的样式 */
+    .resize-handle {
+        position: absolute;
+        right: 0;
+        top: 0;
+        width: 5px;
+        height: 100%;
+        cursor: col-resize;
+        background-color: transparent;
+    }
+    .layui-container {
+        width: 100%;
+        max-width: 100%;
+    }
+    .layui-table {
+        width: 100%;
+    }
+
+    .layui-table td, .layui-table th {
+        padding: 4px; /* 根据需要调整 */
+    }
+    .layui-table td input.layui-input,
+    .layui-table td .layui-input-inline {
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    .layui-table td .layui-input-inline select {
+        width: 100%;
+    }
+</style>
+<body>
 <div class="layui-container">
     <h2>添加一次性部品</h2>
     <table class="layui-table" id="onceFillTable">
         <thead>
         <tr>
-            <th>品名</th>
-            <th>型号</th>
-            <th>分类</th>
-            <th>单价</th>
-            <th>数量</th>
+            <th style="width: 10%;">品名</th>
+            <th style="width: 10%;">型号</th>
+            <th style="width: 20%;">分类</th>
+            <th style="width: 5%;">单价</th>
+            <th style="width: 5%;">数量</th>
 <!--            <th>总价</th>-->
-            <th>领用部门</th>
-            <th>日期</th>
-            <th>备注</th>
-            <th>操作</th>
+            <th style="width: 20%;">领用部门</th>
+            <th style="width: 10%;">日期</th>
+            <th style="width: 5%;">备注</th>
+            <th style="width: 5%;">操作</th>
         </tr>
         </thead>
         <tbody>
@@ -306,6 +342,40 @@
 
         });
     });
+    document.addEventListener("DOMContentLoaded", function () {
+        var thElements = document.querySelectorAll(".layui-table th");
+        thElements.forEach(function (th) {
+            var resizeHandle = document.createElement("div");
+            resizeHandle.classList.add("resize-handle");
+            th.appendChild(resizeHandle);
+            resizeHandle.addEventListener("mousedown", function (e) {
+                handleColumnResizeMouseDown(e, th);
+            });
+        });
+    });
+
+    function handleColumnResizeMouseDown(e, th) {
+        e.preventDefault();  // 阻止默认事件
+        document.body.style.cursor = 'col-resize'; // 设置全局鼠标样式
+
+        var startX = e.clientX;
+        var startWidth = th.offsetWidth;
+
+        var onMouseMove = function (e) {
+            var newWidth = Math.max(startWidth + (e.clientX - startX), 10); // 10px 是最小宽度
+            th.style.width = newWidth + "px";
+        };
+
+        var onMouseUp = function () {
+            document.body.style.cursor = ''; // 恢复鼠标样式
+            document.removeEventListener("mousemove", onMouseMove);
+            document.removeEventListener("mouseup", onMouseUp);
+        };
+
+        document.addEventListener("mousemove", onMouseMove);
+        document.addEventListener("mouseup", onMouseUp);
+    }
+
 </script>
 </body>
 </html>
