@@ -269,7 +269,7 @@
             });
 
             if (!isAllFilled) {
-                layer.msg(errorMessage); // 如果有未填写的字段，显示错误消息
+                layer.msg("有未填写的信息，请检查后重新提交"); // 如果有未填写的字段，显示错误消息
                 return; // 并且返回，不进行后续的提交操作
             }
             var allData = [];
@@ -322,7 +322,7 @@
                     // 关闭加载动画
                     layer.close(loadingIndex);
                     if (response.ok) {
-                        layer.msg('添加成功！');
+                        layer.msg('提交成功！');
                         // 清除所有输入框的内容
                         $('#onceFillTable tbody tr').each(function() {
                             $(this).find('input[type="text"], input[type="date"]').val('');
@@ -331,13 +331,13 @@
                             $(this).find('select[name="typeId"]').val('');  // 清除类型ID的选择
                         });
                     } else {
-                        layer.msg('Error: ' + response.statusText);
+                        layer.msg('Error: ' + response.statusText+":填入信息格式错误");
                     }
                 })
                 .catch(error => {
                     // 关闭加载动画
                     layer.close(loadingIndex);
-                    layer.msg('Error: ' + error.message);
+                    layer.msg('Error: ' + error.message+":填入信息格式错误");
                 });
 
         });
