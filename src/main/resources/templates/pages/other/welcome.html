@@ -345,22 +345,22 @@
                     },
                     cols: [ [ // 表头
                         {field: 'title', title: '标题', hide: true},
-                        {field: 'atId', title: 'AT号', width:'10%',templet: function(d) {
-                                return '<div style="background-color: yellow;">' + d.atId + '</div>';
-                            }},
-                        {field: 'mname', title: '品名', width:'30%',templet: function(d) {
-                                return '<div style="background-color: yellow;">' + d.mname + '</div>';
-                            }},
-                        {field: 'model', title: '型号', width:'20%', templet: function(d) {
-                                return '<div style="background-color: yellow;">' + d.model + '</div>';
-                            }},
-                        {field: 'lastCount', title: '最后领用数', width:'12%',templet: function(d) {
-                                return '<div style="background-color: yellow;">' + d.lastCount + '</div>';
-                            }},
-                        {field: 'time', title: '最后领用时间', width:'18%', sort: true,templet: function(d){
+                        {field: 'atId', title: 'AT号', width:'10%'},
+                        {field: 'mname', title: '品名', width:'30%'},
+                        {field: 'model', title: '型号', width:'20%'},
+                        {field: 'lastCount', title: '最后领用数', width:'12%'},
+                        {field: 'time', title: '最后领用时间', width:'18%', sort: true, templet: function(d){
                                 return formatDate(d.time);
                             }},
-                    ]]
+                    ]],
+                    done: function(res, curr, count){
+                        // 表格渲染完成后的回调
+                        $('#noticeTable + div .layui-table-body tbody > tr').each(function(){
+                            var dataIndex = $(this).attr('data-index');
+                            var row = res.data[dataIndex];
+                            $(this).css('background-color', 'yellow');
+                        });
+                    }
                 });
                 function formatDate(dateStr) {
                     if (!dateStr) return '';
