@@ -679,13 +679,12 @@
             WHEN tc.classification = 'mediumDiameter' THEN mediumDiameter
             WHEN tc.classification = 'gimbal' THEN gimbal
             WHEN tc.classification = 'rab' THEN rab
-            -- 如果有其他分类，可以继续在此添加
+            WHEN tc.classification = 'other' THEN (smallDiameter + mediumDiameter + gimbal + rab)
             ELSE 0
             END as production
         FROM productinfo
             JOIN TypeClassification tc ON tc.typeId = #{typeId}
-        WHERE YEAR(date) = #{year}
-          AND depositoryId = #{depositoryId}
+        WHERE YEAR(date) = #{year} AND depositoryId = #{depositoryId}
             )
         SELECT
             a.month,
@@ -696,5 +695,4 @@
                  JOIN MonthlyProduction p ON a.month = p.month
         ORDER BY a.month;
     </select>
-
 </mapper>

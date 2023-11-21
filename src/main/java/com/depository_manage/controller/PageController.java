@@ -99,7 +99,6 @@ public class PageController {
         return mv;
     }
 
-
     @GetMapping("/depository_add")
     public String depository_add() {
         return "pages/other/depository_add";
