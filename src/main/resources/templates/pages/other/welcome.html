@@ -464,7 +464,8 @@
                         }
                     ]
                 };
-                myChart.setOption(option);
+                myChart.clear(); // 清除旧的图表数据
+                myChart.setOption(option, true); // 使用新数据更新图表，第二个参数为 true 表示不合并
             });
         }
         document.getElementById('depository-selector-two').addEventListener('change', fetchTypeAmountDataAndRenderChart);
