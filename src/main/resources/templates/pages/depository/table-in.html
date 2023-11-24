@@ -271,7 +271,7 @@
 
                                 // 根据userAuthority和其他条件判断是否添加修改和删除按钮
                                     if (userAuthority === '仓管员') {
-                                        if (row.state === '待审核' || row.state === '审核未通过') {
+                                        if (row.state === '待审核' ) {
                                             buttons += '<a class="layui-btn layui-btn-xs" lay-event="edit">修改</a>';
                                             if(row.state !== '审核未通过') {
                                                 buttons += '<a class="layui-btn layui-btn-xs layui-btn-danger" lay-event="delete">删除</a>';
