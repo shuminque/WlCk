@@ -25,14 +25,14 @@ public class ReportService {
                         "    FORMAT(ROUND((SUM(CASE WHEN dr.type = 0 THEN dr.price * dr.quantity ELSE 0 END)),2), 2) AS 出库金额,\n" +
                         "    m.quantity - COALESCE((SELECT SUM(CASE WHEN dr_after.type = 1 THEN dr_after.quantity ELSE -dr_after.quantity END)\n" +
                         "                          FROM depository_record dr_after\n" +
-                        "                          WHERE dr_after.mname = m.mname\n" +
+                        "                          WHERE dr_after.at_id = m.at_id\n" +
                         "                            AND (dr_after.model IS NULL OR dr_after.model = m.model)\n" +
                         "                            AND dr_after.depository_id = m.depository_id\n" +
                         "                            AND dr_after.review_pass = 1\n" +
                         "                            AND dr_after.apply_time >= ?), 0) AS 库存数量,\n" +
                         "    FORMAT(ROUND(m.price - COALESCE((SELECT SUM(CASE WHEN dr_after.type = 1 THEN dr_after.price * dr_after.quantity ELSE -dr_after.price * dr_after.quantity END)\n" +
                         "                                  FROM depository_record dr_after\n" +
-                        "                                  WHERE dr_after.mname = m.mname\n" +
+                        "                                    WHERE dr_after.at_id = m.at_id\n" +
                         "                                    AND (dr_after.model IS NULL OR dr_after.model = m.model)\n" +
                         "                                    AND dr_after.depository_id = m.depository_id\n" +
                         "                                    AND dr_after.review_pass = 1\n" +
@@ -41,7 +41,7 @@ public class ReportService {
                         "    material m\n" +
                         "LEFT JOIN\n" +
                         "    depository_record dr\n" +
-                        "    ON m.mname = dr.mname\n" +
+                        "    ON m.at_id = dr.at_id\n" +
                         "    AND (m.model IS NULL OR m.model = dr.model)\n" +
                         "    AND m.depository_id = dr.depository_id\n" +
                         "    AND dr.review_pass = 1\n" +
