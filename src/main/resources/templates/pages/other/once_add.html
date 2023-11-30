@@ -54,6 +54,7 @@
             <th style="width: 10%;">品名</th>
             <th style="width: 10%;">型号</th>
             <th style="width: 20%;">分类</th>
+            <th style="width: 5%;">货币</th>
             <th style="width: 5%;">单价</th>
             <th style="width: 5%;">数量</th>
 <!--            <th>总价</th>-->
@@ -76,7 +77,15 @@
                     </select>
                 </div>
             </td>
-            <td><input type="text" class="layui-input" name="unitPrice"></td>
+            <td>
+                <select name="currencyType" class="layui-input">
+                    <option value="CNY">人民币</option>
+                    <option value="JPY">日元</option>
+                </select>
+            </td>
+            <td>
+                <input type="text" class="layui-input" name="unitPrice">
+            </td>
             <td><input type="text" class="layui-input" name="quantity"></td>
             <td>
                 <button name="applyRemark" class="layui-input custom-input" id="ID-dropdown-demo-complex-1"></button>
@@ -98,7 +107,15 @@
                     </select>
                 </div>
             </td>
-            <td><input type="text" class="layui-input" name="unitPrice"></td>
+            <td>
+                <select name="currencyType" class="layui-input">
+                    <option value="CNY">人民币</option>
+                    <option value="JPY">日元</option>
+                </select>
+            </td>
+            <td>
+                <input type="text" class="layui-input" name="unitPrice">
+            </td>
             <td><input type="text" class="layui-input" name="quantity"></td>
             <td>
                 <button name="applyRemark" class="layui-input custom-input" id="ID-dropdown-demo-complex-template"></button>
@@ -211,6 +228,8 @@
         $('#addRow').on('click', function() {
             dropdownCount++;
             var newRow = $('#templateRow').clone().removeAttr('id').show().appendTo('#onceFillTable tbody');
+            var newCurrencySelect = newRow.find('select[name="currencyType"]');
+            var newUnitPriceInput = newRow.find('input[name="unitPrice"]');
             newRow.attr('data-dropdown-id', dropdownCount);
             newRow.find('#ID-dropdown-demo-complex-template').attr('id', 'ID-dropdown-demo-complex-' + dropdownCount);
             newRow.find('#applyRemarkInput-template').attr('id', 'applyRemarkInput-' + dropdownCount);
@@ -375,6 +394,38 @@
         document.addEventListener("mousemove", onMouseMove);
         document.addEventListener("mouseup", onMouseUp);
     }
+    var cnyToJpyRate; // 保存从数据库获取的人民币到日元的汇率
+
+    // 载入页面时获取汇率
+    $.get('/rate', function(response) {
+        var rates = response.data;
+        rates.sort((a, b) => new Date(b.date) - new Date(a.date));
+        cnyToJpyRate = rates[0].rate;
+        console.log("当前人民币到日元汇率: " + cnyToJpyRate);
+    });
+
+    function convertCurrency(event) {
+        var row = event.target.closest('tr');
+        var unitPriceInput = row.querySelector('input[name="unitPrice"]');
+        var currencyTypeSelect = row.querySelector('select[name="currencyType"]');
+        var unitPrice = parseFloat(unitPriceInput.value);
+        var currencyType = currencyTypeSelect.value;
+
+        if (currencyType === 'JPY' && !isNaN(unitPrice)) {
+            // 从日元转换为人民币
+            var convertedPrice = unitPrice * cnyToJpyRate;
+            unitPriceInput.value = convertedPrice.toFixed(2);
+        }
+    }
+
+    // 绑定事件监听器到每个货币类型选择框和单价输入框
+    document.querySelectorAll('#onceFillTable').forEach(function(table) {
+        table.addEventListener('change', function(event) {
+            if (event.target.name === 'currencyType' || event.target.name === 'unitPrice') {
+                convertCurrency(event);
+            }
+        });
+    });
 
 </script>
 </body>
