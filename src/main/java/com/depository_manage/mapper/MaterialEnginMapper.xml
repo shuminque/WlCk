@@ -8,7 +8,6 @@
     <resultMap id="materialEnginMap" type="com.depository_manage.entity.MaterialEngin">
         <id column="id" property="id" jdbcType="INTEGER" />
         <result column="ename" property="ename" jdbcType="VARCHAR" />
-
     </resultMap>
     <!-- 表查询字段 -->
     <sql id="allColumns">

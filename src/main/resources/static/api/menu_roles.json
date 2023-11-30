@@ -183,6 +183,13 @@
                             "roles": ["SAB_cg","SAB_sh","ZAB_cg","ZAB_sh","ALL"]
                         },
                         {
+                            "title": "状态信息",
+                            "href": "/materialState_add",
+                            "icon": "layui-icon layui-icon-chart",
+                            "target": "_self",
+                            "roles": ["SAB_cg","SAB_sh","ZAB_cg","ZAB_sh","ALL"]
+                        },
+                        {
                             "title": "产量信息",
                             "href": "/productInfo_add",
                             "icon": "layui-icon layui-icon-chart",

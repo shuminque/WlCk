@@ -17,7 +17,7 @@ public class MaterialEnginServiceImpl implements MaterialEnginService {
     @Autowired
     MaterialEnginMapper materialEnginMapper;
     @Override
-    public Integer insertMaterialEngin(Map<String,Object> map) {
+    public Integer insertMaterialEngin(Map<String,Object> map)   {
         return materialEnginMapper.insertMaterialEngin(map);
     }
 

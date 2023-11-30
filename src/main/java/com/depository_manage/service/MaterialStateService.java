@@ -1,6 +1,8 @@
 package com.depository_manage.service;
 
 import com.depository_manage.entity.MaterialState;
+import com.depository_manage.pojo.MaterialEnginP;
+import com.depository_manage.pojo.MaterialStateP;
 
 import java.util.List;
 import java.util.Map;
@@ -16,4 +18,8 @@ public interface MaterialStateService {
      */
     Integer insertMaterialState(Map<String,Object> map);
     List<MaterialState> findMaterialStateAll();
+    Integer findCountByCondition(Map<String,Object> map);
+    List<MaterialStateP> findMaterialStatePByCondition(Map<String, Object> map);
+    Integer deleteMaterialState(int id);
+
 }

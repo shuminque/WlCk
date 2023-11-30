@@ -37,6 +37,8 @@ public class PageController {
     @Autowired
     private MaterialTypeService materialTypeService;
     @Autowired
+    private MaterialStateService materialStateService;
+    @Autowired
     private CategoryService categoryService;
     @GetMapping("/login")
     public String login() {
@@ -112,6 +114,10 @@ public class PageController {
     @GetMapping("/materialEngin_add")
     public String materialEngin_add() {
         return "pages/other/materialEngin_add";
+    }
+    @GetMapping("/materialState_add")
+    public String materialState_add() {
+        return "pages/other/materialState_add";
     }
     @GetMapping("/total_table")
     public String total_table() {
@@ -250,6 +256,7 @@ public class PageController {
         mv.setViewName("pages/depository/table-stock");
         mv.addObject("depositories", depositoryService.findDepositoryAll());
         mv.addObject("materialTypes",materialTypeService.findMaterialTypeAll());
+        mv.addObject("materialStates",materialStateService.findMaterialStateAll());
         return mv;
     }
 

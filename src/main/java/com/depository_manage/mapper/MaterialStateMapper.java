@@ -52,4 +52,5 @@ public interface MaterialStateMapper {
      */
     List<MaterialState> findMaterialStateByCondition(Map<String,Object> map);
     List<MaterialState> findMaterialStateAll();
+    Integer findCountByCondition(Map<String,Object> map);
 }
