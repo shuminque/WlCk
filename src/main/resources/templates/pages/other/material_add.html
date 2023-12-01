@@ -197,11 +197,9 @@
                     <div class="layui-input-block">
                         <select name="stateId">
                             <option value="">请选择状态</option>
-                            <option value="1">使用中</option>
-                            <option value="2">2年以上不流动、待确认</option>
-                            <option value="3">4年以上不流动、死库存</option>
-                            <option value="4">AT号资源空、无实物</option>
-                            <option value="5">曾经使用过，现已不再使用</option>
+                            <option th:each="material_state : ${materialStates}"
+                                    th:value="${material_state.id}"
+                                    th:text="${material_state.sname}">外芯仓库</option>
                         </select>
                     </div>
                 </div>

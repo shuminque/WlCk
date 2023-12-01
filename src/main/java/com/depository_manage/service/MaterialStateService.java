@@ -21,5 +21,7 @@ public interface MaterialStateService {
     Integer findCountByCondition(Map<String,Object> map);
     List<MaterialStateP> findMaterialStatePByCondition(Map<String, Object> map);
     Integer deleteMaterialState(int id);
+    Integer updateMaterialState(Map<String, Object> map);
+
 
 }

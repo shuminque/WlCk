@@ -49,6 +49,11 @@ public class MaterialStateServiceImpl implements MaterialStateService {
     public Integer deleteMaterialState(int id) {
         return materialStateMapper.deleteMaterialStateById(id);
     }
+    @Override
+    public Integer updateMaterialState(Map<String, Object> map) {
+        // 调用MaterialStateMapper的updateMaterialState方法来更新状态信息
+        return materialStateMapper.updateMaterialState(map);
+    }
     private List<MaterialStateP> pack(List<MaterialState> list){
         List<MaterialStateP> result=new ArrayList<>(list.size());
         for (MaterialState materialState: list){
@@ -57,4 +62,5 @@ public class MaterialStateServiceImpl implements MaterialStateService {
         }
         return result;
     }
+
 }

@@ -174,6 +174,7 @@ public class PageController {
         mv.addObject("depositories", depositoryService.findDepositoryAll());
         mv.addObject("materialTypes", materialTypeService.findMaterialTypeAll());
         mv.addObject("materialEngins", materialEnginService.findMaterialEnginAll());
+        mv.addObject("materialStates",materialStateService.findMaterialStateAll());
         return mv;
     }
 
