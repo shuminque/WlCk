@@ -45,7 +45,7 @@ public class ReportService {
                         "    AND (m.model IS NULL OR m.model = dr.model)\n" +
                         "    AND m.depository_id = dr.depository_id\n" +
                         "    AND dr.review_pass = 1\n" +
-                        "    AND dr.apply_time >= ? AND dr.apply_time < DATE_ADD(?, INTERVAL 1 DAY)\n" +
+                        "    AND dr.apply_time >= ? AND dr.apply_time <= DATE_ADD(?, INTERVAL 1 DAY)\n" +
                         "LEFT JOIN\n" +
                         "    material_type mt\n" +
                         "    ON m.type_id = mt.id\n" +
