@@ -127,7 +127,6 @@
         </tr>
         </tbody>
     </table>
-
     <button class="layui-btn" id="addRow">添加条目</button>
     <button class="layui-btn" id="submitAll">提交所有</button>
 </div>
@@ -187,14 +186,26 @@
                 }
             });
         }
+        var cnyToJpyRate; // 保存从数据库获取的人民币到日元的汇率
         $(document).ready(function() {
+            $('#onceFillTable .storageDate').each(function() {
+                laydate.render({
+                    elem: this
+                });
+            });
+            // 载入页面时获取汇率
+            $.get('/rate', function(response) {
+                var rates = response.data;
+                rates.sort((a, b) => new Date(b.date) - new Date(a.date));
+                cnyToJpyRate = rates[0].rate;
+                console.log("当前人民币到日元汇率: " + cnyToJpyRate);
+            });
             $.ajax({
                 url: '/get_user_depository',
                 type: 'GET',
                 dataType: 'json',
                 success: function(data) {
                     userDepositoryId = data.depositoryId;
-
                     function loadCategoryData(category, callback) {
                         $.get('/api/categories/' + category, function(response) {
                             if (response.code === 0) {
@@ -206,7 +217,6 @@
                             layer.msg(`无法加载${category.toUpperCase()}的分类数据`);
                         });
                     }
-
                     if (userDepositoryId === 1) {
                         loadCategoryData('sab', function(data) {
                             dropDataSAB = data;
@@ -233,18 +243,16 @@
             newRow.attr('data-dropdown-id', dropdownCount);
             newRow.find('#ID-dropdown-demo-complex-template').attr('id', 'ID-dropdown-demo-complex-' + dropdownCount);
             newRow.find('#applyRemarkInput-template').attr('id', 'applyRemarkInput-' + dropdownCount);
+            // 为新行的日期输入框设置一个唯一的 ID
+            var newStorageDateId = 'storageDate-' + dropdownCount;
+            newRow.find('.storageDate').attr('id', newStorageDateId);
 
+            // 使用这个唯一的 ID 来绑定日期选择器
             laydate.render({
-                elem: newRow.find('.storageDate')[0]
+                elem: '#' + newStorageDateId
             });
-
             var dropdownData = userDepositoryId === 1 ? dropDataSAB : dropDataZAB;
             loadDepositoryDataForElem(`#ID-dropdown-demo-complex-${dropdownCount}`, dropdownData);
-        });
-
-        // 初始化日期选择器
-        laydate.render({
-            elem: '.storageDate',
         });
 
         // 删除条目
@@ -252,11 +260,23 @@
             $(this).closest('tr').remove();
         });
 
-
         // 提交所有数据
         $('#submitAll').on('click', function() {
             var isAllFilled = true;
             var errorMessage = "请输入以下字段: \n";
+            // 先执行货币转换
+            $('#onceFillTable tbody tr').each(function() {
+                var currencyTypeSelect = $(this).find('select[name="currencyType"]');
+                var unitPriceInput = $(this).find('input[name="unitPrice"]');
+                var unitPrice = parseFloat(unitPriceInput.val());
+                var currencyType = currencyTypeSelect.val();
+
+                if (currencyType === 'JPY' && !isNaN(unitPrice)) {
+                    // 从日元转换为人民币
+                    var convertedPrice = unitPrice * cnyToJpyRate;
+                    unitPriceInput.val(convertedPrice.toFixed(2));
+                }
+            });
             $('#onceFillTable tbody tr:visible').each(function() {
                 // 检查类型为 text 的输入字段
                 $(this).find('input[type="text"]').each(function() {
@@ -312,7 +332,7 @@
                         name: name,
                         model: model,
                         typeId: typeId,
-                        unitPrice: unitPrice,
+                        unitPrice: unitPrice, // 这里使用的是转换后的值
                         quantity: quantity,
                         applyRemark: applyRemark,
                         time: time,
@@ -321,7 +341,6 @@
                     allData.push(row);
                 }
             });
-
 
             if (parseFloat(allData[0].unitPrice) <= 0 || parseInt(allData[0].quantity) <= 0) {
                 layer.msg('请输入正确的单价与数量');
@@ -347,7 +366,7 @@
                             $(this).find('input[type="text"], input[type="date"]').val('');
                             $(this).find('button[name="applyRemark"]').text('');
                             $(this).find('input[name="applyRemark"]').val('');
-                            $(this).find('select[name="typeId"]').val('');  // 清除类型ID的选择
+                            $(this).find('select[name="typeId"]').val('');
                         });
                     } else {
                         layer.msg('Error: ' + response.statusText+":填入信息格式错误");
@@ -358,7 +377,6 @@
                     layer.close(loadingIndex);
                     layer.msg('Error: ' + error.message+":填入信息格式错误");
                 });
-
         });
     });
     document.addEventListener("DOMContentLoaded", function () {
@@ -394,38 +412,6 @@
         document.addEventListener("mousemove", onMouseMove);
         document.addEventListener("mouseup", onMouseUp);
     }
-    var cnyToJpyRate; // 保存从数据库获取的人民币到日元的汇率
-
-    // 载入页面时获取汇率
-    $.get('/rate', function(response) {
-        var rates = response.data;
-        rates.sort((a, b) => new Date(b.date) - new Date(a.date));
-        cnyToJpyRate = rates[0].rate;
-        console.log("当前人民币到日元汇率: " + cnyToJpyRate);
-    });
-
-    function convertCurrency(event) {
-        var row = event.target.closest('tr');
-        var unitPriceInput = row.querySelector('input[name="unitPrice"]');
-        var currencyTypeSelect = row.querySelector('select[name="currencyType"]');
-        var unitPrice = parseFloat(unitPriceInput.value);
-        var currencyType = currencyTypeSelect.value;
-
-        if (currencyType === 'JPY' && !isNaN(unitPrice)) {
-            // 从日元转换为人民币
-            var convertedPrice = unitPrice * cnyToJpyRate;
-            unitPriceInput.value = convertedPrice.toFixed(2);
-        }
-    }
-
-    // 绑定事件监听器到每个货币类型选择框和单价输入框
-    document.querySelectorAll('#onceFillTable').forEach(function(table) {
-        table.addEventListener('change', function(event) {
-            if (event.target.name === 'currencyType' || event.target.name === 'unitPrice') {
-                convertCurrency(event);
-            }
-        });
-    });
 
 </script>
 </body>
