@@ -8,7 +8,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
     <link rel="stylesheet" href="/static/lib/layui-v2.8.17/css/layui.css" media="all">
     <link rel="stylesheet" href="/static/css/public.css" media="all">
-</head>
+</head><link rel="stylesheet" type="text/css" href="/static/css/formSelects-v4.css"/>
 <body>
 <div class="layuimini-container">
     <div class="layuimini-main">
@@ -36,6 +36,11 @@
                         </div>
                         <div class="layui-inline">
                             <div class="layui-input-inline">
+                                <input type="text" name="atId" autocomplete="off" class="layui-input" placeholder="搜索AT号">
+                            </div>
+                        </div>
+                        <div class="layui-inline">
+                            <div class="layui-input-inline">
                                 <input type="text" name="mname" autocomplete="off" class="layui-input" placeholder="搜索品名">
                             </div>
                         </div>
@@ -44,12 +49,12 @@
                                 <input type="text" name="model" autocomplete="off" class="layui-input" placeholder="搜索规格">
                             </div>
                         </div>
-                        <div class="layui-inline">
-                            <div class="layui-input-inline">
-                                <input type="text" name="atId" autocomplete="off" class="layui-input" placeholder="搜索AT号">
-                            </div>
+                        <div>
+                            <select name="typeName" xm-select="selecttypeId" >
+                                <option value="" ></option>
+                                <option th:each="material_type : ${materialTypes}" th:value="${material_type.getTname()}" th:text="${material_type.tname}" ></option>
+                            </select>
                         </div>
-
                         <div class="layui-inline">
                             <div class="layui-input-inline">
                                 <select name="depositoryId" id="depositorySelect" lay-search>
@@ -77,6 +82,7 @@
     </div>
 </div>
 <script src="/static/lib/layui-v2.8.17/layui.js" charset="utf-8"></script>
+<script type="text/javascript" src="/static/js/formSelects-v4.js" charset="utf-8"></script>
 <script>
     var data;
     layui.use(['form', 'table','laydate'], function () {
@@ -320,6 +326,9 @@
                     }
                     if (data.model!==''){
                         req.model=data.model;
+                    }
+                    if (data.typeName && data.typeName !== ''){
+                        req.typeName = data.typeName.split(',');
                     }
                     if (data.applyTime!==''){
                         var dates = data.applyTime.split(' - ');

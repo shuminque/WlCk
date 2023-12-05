@@ -26,26 +26,23 @@ public class ReportService {
                         "    m.quantity - COALESCE((SELECT SUM(CASE WHEN dr_after.type = 1 THEN dr_after.quantity ELSE -dr_after.quantity END)\n" +
                         "                          FROM depository_record dr_after\n" +
                         "                          WHERE dr_after.at_id = m.at_id\n" +
-                        "                            AND (dr_after.model IS NULL OR dr_after.model = m.model)\n" +
                         "                            AND dr_after.depository_id = m.depository_id\n" +
                         "                            AND dr_after.review_pass = 1\n" +
-                        "                            AND dr_after.apply_time >= ?), 0) AS 库存数量,\n" +
+                        "                            AND dr_after.apply_time >= DATE_ADD(?, INTERVAL 1 DAY)), 0) AS 库存数量,\n" +
                         "    FORMAT(ROUND(m.price - COALESCE((SELECT SUM(CASE WHEN dr_after.type = 1 THEN dr_after.price * dr_after.quantity ELSE -dr_after.price * dr_after.quantity END)\n" +
                         "                                  FROM depository_record dr_after\n" +
                         "                                    WHERE dr_after.at_id = m.at_id\n" +
-                        "                                    AND (dr_after.model IS NULL OR dr_after.model = m.model)\n" +
                         "                                    AND dr_after.depository_id = m.depository_id\n" +
                         "                                    AND dr_after.review_pass = 1\n" +
-                        "                                    AND dr_after.apply_time >= ?), 0), 2), 2) AS 在库金额\n" +
+                        "                                    AND dr_after.apply_time >= DATE_ADD(?, INTERVAL 1 DAY)), 0), 2), 2) AS 在库金额\n" +
                         "FROM\n" +
                         "    material m\n" +
                         "LEFT JOIN\n" +
                         "    depository_record dr\n" +
                         "    ON m.at_id = dr.at_id\n" +
-                        "    AND (m.model IS NULL OR m.model = dr.model)\n" +
                         "    AND m.depository_id = dr.depository_id\n" +
                         "    AND dr.review_pass = 1\n" +
-                        "    AND dr.apply_time >= ? AND dr.apply_time <= DATE_ADD(?, INTERVAL 1 DAY)\n" +
+                        "    AND dr.apply_time >= ? AND dr.apply_time < DATE_ADD(?, INTERVAL 1 DAY)\n" +
                         "LEFT JOIN\n" +
                         "    material_type mt\n" +
                         "    ON m.type_id = mt.id\n" +
@@ -56,7 +53,7 @@ public class ReportService {
                         "    CASE WHEN mt.id IS NULL THEN 1 ELSE 0 END,\n" +
                         "    mt.id, \n" +
                         "    m.at_id;";
-        return jdbcTemplate.queryForList(sql, endDate,endDate , startDate, endDate, depositoryId);
+        return jdbcTemplate.queryForList(sql, endDate, endDate, startDate, endDate, depositoryId);
     }
 
     public List<Map<String, Object>> everyTypeData(String startDate, String endDate, int depositoryId) {
@@ -109,7 +106,7 @@ public class ReportService {
                         "        FORMAT((SUM(m.price) - COALESCE((\n" +
                         "            SELECT SUM(CASE WHEN dr.type = 1 THEN dr.price * dr.quantity ELSE -dr.price * dr.quantity END)\n" +
                         "            FROM depository_record dr\n" +
-                        "            WHERE dr.type_name = mt.tname AND dr.apply_time > ? AND dr.review_pass = 1 AND dr.depository_id = ?\n" +
+                        "            WHERE dr.type_name = mt.tname AND dr.apply_time >= DATE_ADD(?, INTERVAL 1 DAY) AND dr.review_pass = 1 AND dr.depository_id = ?\n" +
                         "        ), 0)), 2) AS 在库金额,\n" +
                         "        CASE WHEN mt.tname LIKE '%(进口)' THEN 1 ELSE 0 END AS is_import\n" +
                         "    FROM material_type mt\n" +

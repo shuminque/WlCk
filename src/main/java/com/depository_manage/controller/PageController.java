@@ -210,6 +210,7 @@ public class PageController {
         ModelAndView mv = new ModelAndView();
         mv.setViewName("pages/depository/table-in");
         mv.addObject("depositories", depositoryService.findDepositoryAll());
+        mv.addObject("materialTypes", materialTypeService.findMaterialTypeAll());
         return mv;
     }
 
