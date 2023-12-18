@@ -26,16 +26,6 @@
                         </div>
                         <div class="layui-inline">
                             <div class="layui-input-inline">
-                                <select id="state" name="state">
-                                    <option value="" selected>请选择状态</option>
-                                    <option value="已入库">已入库</option>
-                                    <option value="审核未通过">审核未通过</option>
-                                    <option value="待审核">待审核</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="layui-inline">
-                            <div class="layui-input-inline">
                                 <input type="text" name="atId" autocomplete="off" class="layui-input" placeholder="搜索AT号">
                             </div>
                         </div>
@@ -49,20 +39,29 @@
                                 <input type="text" name="model" autocomplete="off" class="layui-input" placeholder="搜索规格">
                             </div>
                         </div>
-                        <div>
-                            <select name="typeName" xm-select="selecttypeId" >
-                                <option value="" ></option>
-                                <option th:each="material_type : ${materialTypes}" th:value="${material_type.getTname()}" th:text="${material_type.tname}" ></option>
-                            </select>
-                        </div>
                         <div class="layui-inline">
                             <div class="layui-input-inline">
+                                <select id="state" name="state">
+                                    <option value="" selected>请选择状态</option>
+                                    <option value="已入库">已入库</option>
+                                    <option value="审核未通过">审核未通过</option>
+                                    <option value="待审核">待审核</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="layui-inline" >
+                            <div class="layui-input-inline" style="width: 100px;">
                                 <select name="depositoryId" id="depositorySelect" lay-search>
                                     <!-- 初始值，稍后会根据用户信息进行更新 -->
                                 </select>
                             </div>
                         </div>
-
+                        <div style="width: 57%;">
+                            <label class="layui-form-label">分类选择</label>
+                            <select name="typeName" xm-select="selecttypeId">
+                                <option th:each="material_type : ${materialTypes}" th:value="${material_type.getTname()}" th:text="${material_type.tname}" ></option>
+                            </select>
+                        </div>
                         <div class="layui-inline">
                             <button type="submit" class="layui-btn layui-btn-primary" lay-submit
                                     lay-filter="data-search-btn"><i class="layui-icon"></i> 搜 索

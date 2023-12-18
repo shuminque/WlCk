@@ -63,8 +63,9 @@
                                 </select>
                             </div>
                         </div>
-                        <div>
-                            <select name="typeName" xm-select="selecttypeId" >
+                        <div style="width: 57%;">
+                            <label class="layui-form-label">分类选择</label>
+                            <select name="typeName" xm-select="selecttypeId">
                                 <option th:each="material_type : ${materialTypes}" th:value="${material_type.getTname()}" th:text="${material_type.tname}" ></option>
                             </select>
                         </div>
