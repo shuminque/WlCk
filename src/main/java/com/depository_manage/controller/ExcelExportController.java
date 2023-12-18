@@ -32,41 +32,66 @@ public class ExcelExportController {
         List<Map<String, Object>> data = reportService.fetchReportData(startDate, endDate, depositoryId);
         XSSFWorkbook workbook = new XSSFWorkbook();
         XSSFSheet sheet = workbook.createSheet("Report");
-// 创建单元格样式并设置边框
+        XSSFSheet subtotalSheet = workbook.createSheet("分类小计");
+
+        // 创建单元格样式并设置边框
         XSSFCellStyle style = workbook.createCellStyle();
         style.setBorderTop(BorderStyle.THIN);
         style.setBorderBottom(BorderStyle.THIN);
         style.setBorderLeft(BorderStyle.THIN);
         style.setBorderRight(BorderStyle.THIN);
-// 创建表头行并设置样式
+        // 创建表头行并设置样式
         XSSFRow headerRow = sheet.createRow(0);
         createCellWithStyle(headerRow, 0, "分类", style);
         createCellWithStyle(headerRow, 1, "AT号", style);
         createCellWithStyle(headerRow, 2, "品名", style);
         createCellWithStyle(headerRow, 3, "规格", style);
         createCellWithStyle(headerRow, 4, "入库数量", style);
+//        createCellWithStyle(headerRow, 5, "", style); // 空白列
         createCellWithStyle(headerRow, 5, "入库金额", style);
+//        createCellWithStyle(headerRow, 7, "", style); // 空白列
         createCellWithStyle(headerRow, 6, "出库数量", style);
+//        createCellWithStyle(headerRow, 9, "", style); // 空白列
         createCellWithStyle(headerRow, 7, "出库金额", style);
+//        createCellWithStyle(headerRow, 11, "", style); // 空白列
         createCellWithStyle(headerRow, 8, "库存数量", style);
+//        createCellWithStyle(headerRow, 13, "", style); // 空白列
         createCellWithStyle(headerRow, 9, "在库金额", style);
+//        createCellWithStyle(headerRow, 15, "", style); // 空白列
 
-        String previousCategory = "";  // 这个变量用于存储前一行的分类
-        for (int i = 0; i < data.size(); i++) {
-            Map<String, Object> record = data.get(i);
-            XSSFRow row = sheet.createRow(i + 1);
-            // 获取当前行的分类
-            String currentCategory = (String) getOrDefault(record, "分类", "");
+        XSSFRow subtotalHeaderRow = subtotalSheet.createRow(0);
+        createCellWithStyle(subtotalHeaderRow, 0, "分类", style);
+        createCellWithStyle(subtotalHeaderRow, 1, "入库数量", style);
+        createCellWithStyle(subtotalHeaderRow, 2, "入库金额", style);
+        createCellWithStyle(subtotalHeaderRow, 3, "出库数量", style);
+        createCellWithStyle(subtotalHeaderRow, 4, "出库金额", style);
+        createCellWithStyle(subtotalHeaderRow, 5, "库存数量", style);
+        createCellWithStyle(subtotalHeaderRow, 6, "在库金额", style);
+        double totalInAmount = 0.0, totalOutAmount = 0.0, totalStockAmount = 0.0;
+        double totalInQty = 0.0, totalOutQty = 0.0, totalStockQty = 0.0;
+        String previousCategory = "";
+        int rowIndex = 1;
+        for (Map<String, Object> record : data) {
+            // 如果当前记录没有分类，则将其标记为"未分类"
+            String currentCategory = (String) getOrDefault(record, "分类", "未分类");
 
-            // 检查当前行的分类是否与上一行的分类相同
-            if(currentCategory.equals(previousCategory)) {
-                // 如果相同，则在这一行的分类列中设置为空字符串
-                createCellWithStyle(row, 0, "", style);
-            } else {
-                // 如果不同，则使用分类的名称，并更新previousCategory变量
-                createCellWithStyle(row, 0, currentCategory, style);
-                previousCategory = currentCategory;
+            // 检查当前分类是否已更改，表示一个新分类的开始
+            if (!currentCategory.equals(previousCategory) && rowIndex != 1) {
+                // 在分类小计表中添加前一个分类的小计行
+                addSubtotalRow(subtotalSheet, previousCategory.isEmpty() ? "未分类" : previousCategory, totalInQty, totalOutQty, totalStockQty, totalInAmount, totalOutAmount, totalStockAmount, style);
+
+                // 在主数据表中添加空白行
+                int blankRowIndex = rowIndex++;
+                sheet.createRow(blankRowIndex);
+
+                // 重置累计变量
+                totalInQty = totalOutQty = totalStockQty = totalInAmount = totalOutAmount = totalStockAmount = 0.0;
             }
+
+            XSSFRow row = sheet.createRow(rowIndex);
+
+            // 如果是新分类的开始并且分类名称是空的，则在这一行设置分类名称为"未分类"
+            createCellWithStyle(row, 0, currentCategory.equals(previousCategory) ? "" : currentCategory, style);
             // 其他列的处理保持不变
             createCellWithStyle(row, 1, ((Integer) getOrDefault(record, "AT号", 0)).intValue(), style);
             createCellWithStyle(row, 2, (String) getOrDefault(record, "品名", ""), style);
@@ -77,22 +102,77 @@ public class ExcelExportController {
 //            createCellWithStyle(row, 7, Double.parseDouble((String) getOrDefault(record, "出库金额", "0.00")), style);
             createCellWithStyle(row, 8, ((Double) getOrDefault(record, "库存数量", 0.0)).doubleValue(), style);
 //            createCellWithStyle(row, 9, Double.parseDouble((String) getOrDefault(record, "在库金额", "0.00")), style);
+//            createCellWithStyle(row, 6, Double.parseDouble(((String) getOrDefault(record, "入库金额", "0.00")).replace(",", "")), style);
+//            createCellWithStyle(row, 6, Double.parseDouble(((String) getOrDefault(record, "入库金额", "0.00")).replace(",", "")), style);
+//            createCellWithStyle(row, 10, Double.parseDouble(((String) getOrDefault(record, "出库金额", "0.00")).replace(",", "")), style);
+//            createCellWithStyle(row, 14, Double.parseDouble(((String) getOrDefault(record, "在库金额", "0.00")).replace(",", "")), style);
             createCellWithStyle(row, 5, Double.parseDouble(((String) getOrDefault(record, "入库金额", "0.00")).replace(",", "")), style);
             createCellWithStyle(row, 7, Double.parseDouble(((String) getOrDefault(record, "出库金额", "0.00")).replace(",", "")), style);
             createCellWithStyle(row, 9, Double.parseDouble(((String) getOrDefault(record, "在库金额", "0.00")).replace(",", "")), style);
+
+            // Accumulate totals
+            totalInQty += parseToDouble(getOrDefault(record, "入库数量", "0.0").toString());
+            totalOutQty += parseToDouble(getOrDefault(record, "出库数量", "0.0").toString());
+            totalStockQty += parseToDouble(getOrDefault(record, "库存数量", "0.0").toString());
+
+            totalInAmount += parseToDouble(getOrDefault(record, "入库金额", "0.0").toString());
+            totalOutAmount += parseToDouble(getOrDefault(record, "出库金额", "0.0").toString());
+            totalStockAmount += parseToDouble(getOrDefault(record, "在库金额", "0.0").toString());
+
+            rowIndex++;
+            previousCategory = currentCategory;
         }
 
+        if (!previousCategory.isEmpty() || rowIndex == 1) { // rowIndex == 1 表示从未添加过小计行，即所有数据都没有分类
+            // 如果前一个分类为空，表示数据未分类
+            previousCategory = previousCategory.isEmpty() ? "未分类" : previousCategory;
+            addSubtotalRow(subtotalSheet, previousCategory, totalInQty, totalOutQty, totalStockQty, totalInAmount, totalOutAmount, totalStockAmount, style);
+            // 在主数据表中添加最后的空白行
+            sheet.createRow(rowIndex);
+        }
+        subtotalSheet.autoSizeColumn(0); // 第一列的索引是0
+
+        // Add final total row
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         workbook.write(outputStream);
         workbook.close();
-
-        String filename = String.format("物品库存报表_%s_to_%s.xlsx", startDate, endDate);
+        String filename = "物品库存报表_" + startDate + "_to_" + endDate + ".xlsx";
         String encodedFilename = URLEncoder.encode(filename, "UTF-8").replace("+", "%20");
         ByteArrayResource resource = new ByteArrayResource(outputStream.toByteArray());
         return ResponseEntity.ok()
                 .header("Content-Disposition", "attachment; filename*=UTF-8''" + encodedFilename)
                 .body(resource);
     }
+    private void addSubtotalRow(XSSFSheet sheet, int rowIndex, String categoryName, double inQty, double outQty, double stockQty, double inAmount, double outAmount, double stockAmount, XSSFCellStyle style) {
+        XSSFRow totalRow = sheet.createRow(rowIndex);
+        createCellWithStyle(totalRow, 0, categoryName + " 小计", style);
+        createCellWithStyle(totalRow, 4, inQty, style); // 入库数量
+        createCellWithStyle(totalRow, 5, inAmount, style); // 入库金额
+        createCellWithStyle(totalRow, 6, outQty, style); // 出库数量
+        createCellWithStyle(totalRow, 7, outAmount, style); // 出库金额
+        createCellWithStyle(totalRow, 8, stockQty, style); // 库存数量
+        createCellWithStyle(totalRow, 9, stockAmount, style); // 在库金额
+    }
+    private void addSubtotalRow(XSSFSheet subtotalSheet, String categoryName, double inQty, double outQty, double stockQty, double inAmount, double outAmount, double stockAmount, XSSFCellStyle style) {
+        int rowIndex = subtotalSheet.getLastRowNum() + 1; // 获取下一个空行的行索引
+        XSSFRow totalRow = subtotalSheet.createRow(rowIndex);
+        createCellWithStyle(totalRow, 0, categoryName, style);
+        createCellWithStyle(totalRow, 1, inQty, style);      // 入库数量
+        createCellWithStyle(totalRow, 2, inAmount, style);   // 入库金额
+        createCellWithStyle(totalRow, 3, outQty, style);     // 出库数量
+        createCellWithStyle(totalRow, 4, outAmount, style);  // 出库金额
+        createCellWithStyle(totalRow, 5, stockQty, style);   // 库存数量
+        createCellWithStyle(totalRow, 6, stockAmount, style); // 在库金额
+    }
+
+    private double parseToDouble(String value) {
+        try {
+            return Double.parseDouble(value.replace(",", ""));
+        } catch (NumberFormatException e) {
+            return 0.0;
+        }
+    }
+
     private void createCellWithStyle(XSSFRow row, int column, String value, XSSFCellStyle style) {
         XSSFCell cell = row.createCell(column);
         cell.setCellValue(value);
@@ -134,6 +214,9 @@ public class ExcelExportController {
             row.createCell(2).setCellValue((String) getOrDefault(record, "入库金额", "0.00"));
             row.createCell(3).setCellValue((String) getOrDefault(record, "出库金额", "0.00"));
             row.createCell(4).setCellValue((String) getOrDefault(record, "在库金额", "0.00"));
+        }
+        for (int i = 0; i < 5; i++) { // 根据您的实际列数修改这里的数字
+            sheet.autoSizeColumn(i);
         }
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         workbook.write(outputStream);
