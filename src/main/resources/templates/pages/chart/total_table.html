@@ -44,6 +44,20 @@
             max-height: 500px;
             overflow-y: auto;
         }
+        .loader {
+            border: 5px solid #f3f3f3; /* Light grey */
+            border-top: 5px solid #3498db; /* Blue */
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 2s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
     </style>
 </head>
 <body>
@@ -76,6 +90,11 @@
         <!-- 表格数据由JavaScript动态生成 -->
     </table>
 </div>
+<div id="loading" style="display: none; text-align: center; padding: 10px;">
+    <div class="loader"></div>
+    <p>数据加载中，请稍候...</p>
+</div>
+
 <script src="/static/lib/layui-v2.6.3/layui.js" charset="utf-8"></script>
 <script>
     layui.use(['form', 'laydate'], function() {
@@ -124,6 +143,9 @@
             alert("请确保选择了开始和结束日期!");
             return;
         }
+
+        showLoading(); // 显示加载动画
+
         const depositorySelect = document.querySelector("[name='depository_id']");
         const depositoryId = depositorySelect.value;
         fetch(`/api/report?depositoryId=${depositoryId}&startDate=${startDate}&endDate=${endDate}`)
@@ -155,8 +177,12 @@
                     tbody.appendChild(tr);
                 });
                 table.appendChild(tbody);
+                hideLoading(); // 隐藏加载动画
             })
-            .catch(error => console.error('Error fetching data:', error));
+            .catch(error => {
+                console.error('Error fetching data:', error);
+                hideLoading(); // 隐藏加载动画
+            });
     }
     function exportReport() {
         const startDate = document.getElementById('startDatePicker').value;
@@ -165,10 +191,20 @@
             alert("请确保选择了开始和结束日期!");
             return;
         }
+        showLoading(); // 显示加载动画
         const depositorySelect = document.querySelector("[name='depository_id']");
         const depositoryId = depositorySelect.value;
         window.location.href = `/api/export/report?depositoryId=${depositoryId}&startDate=${startDate}&endDate=${endDate}`;
+        setTimeout(hideLoading, 3000);
     }
+    function showLoading() {
+        document.getElementById('loading').style.display = 'block';
+    }
+
+    function hideLoading() {
+        document.getElementById('loading').style.display = 'none';
+    }
+
 </script>
 </body>
 </html>
