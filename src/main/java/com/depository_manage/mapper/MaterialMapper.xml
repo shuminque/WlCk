@@ -344,21 +344,21 @@
     <select id="findSABpriceSum" resultType="java.math.BigDecimal">
         SELECT ROUND(SUM(price), 0)
         FROM material
-        WHERE depository_id = 1
+        WHERE depository_id = 1 AND state_id != 6;
     </select>
     <select id="findZABpriceSum" resultType="java.math.BigDecimal">
         SELECT ROUND(SUM(price), 0)
         FROM material
-        WHERE depository_id = 2
+        WHERE depository_id = 2 AND state_id != 6;
     </select>
     <select id="findSABcountSum" resultType="java.lang.Integer">
         SELECT SUM(quantity)
         FROM material
-        WHERE depository_id = 1
+        WHERE depository_id = 1 AND state_id != 6;
     </select>
     <select id="findZABcountSum" resultType="java.lang.Integer">
         SELECT SUM(quantity)
         FROM material
-        WHERE depository_id = 2
+        WHERE depository_id = 2 AND state_id != 6;
     </select>
 </mapper>

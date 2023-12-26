@@ -347,7 +347,16 @@
                     done: function (elem, data) {
                         // 获取选中的数据
                         var selectedData = data.data[0];
-                            $('#materialSelect').val(selectedData.mname);
+                        // 检查物品状态
+                        if (selectedData.stateId === 6) {
+                            // 如果stateId为6，显示提示信息并禁用提交按钮
+                            layer.alert('已入呆滞仓，入库操作无效，如有疑问请联系管理员！');
+                            $('button[lay-submit]').prop('disabled', true).addClass('layui-btn-disabled');
+                        } else {
+                            // 如果stateId不是6，确保提交按钮可用
+                            $('button[lay-submit]').prop('disabled', false).removeClass('layui-btn-disabled');
+                        }
+                        $('#materialSelect').val(selectedData.mname);
                         $('#atIdSelect').val(selectedData.atId);
                         $('#modelSelect').val(selectedData.model);
                         $('#enginSelect').val(selectedData.enginName);
