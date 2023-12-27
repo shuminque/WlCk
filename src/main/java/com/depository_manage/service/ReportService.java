@@ -69,6 +69,7 @@ public class ReportService {
                         "        AND dr.apply_time >= ? AND dr.apply_time < DATE_ADD(?, INTERVAL 1 DAY)\n" +
                         "        AND dr.review_pass = 1\n" +
                         "        AND dr.depository_id = ?\n" +
+                        "    LEFT JOIN material m ON m.at_id = dr.at_id AND m.depository_id = dr.depository_id AND m.state_id != 6\n" +
                         "    GROUP BY mt.id, mt.tname\n" +
                         "),\n" +
                         "OnceFillSum AS (\n" +
@@ -111,7 +112,7 @@ public class ReportService {
                         "        CASE WHEN mt.tname LIKE '%(进口)' THEN 1 ELSE 0 END AS is_import\n" +
                         "    FROM material_type mt\n" +
                         "    LEFT JOIN material m ON mt.id = m.type_id\n" +
-                        "    WHERE m.depository_id = ?\n" +
+                        "    WHERE m.depository_id = ? AND m.state_id != 6" +
                         "    GROUP BY mt.id\n" +
                         "),\n" +
                         "FinalData AS (\n" +
