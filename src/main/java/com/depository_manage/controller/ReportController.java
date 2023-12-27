@@ -24,6 +24,13 @@ public class ReportController {
             @RequestParam(name = "depositoryId") int depositoryId) {
         return reportService.fetchReportData(startDate, endDate, depositoryId);
     }
+    @GetMapping("/reportDz")
+    public List<Map<String, Object>> getReportDz(
+            @RequestParam(name = "startDate") String startDate,
+            @RequestParam(name = "endDate") String endDate,
+            @RequestParam(name = "depositoryId") int depositoryId) {
+        return reportService.fetchReportData(startDate, endDate, depositoryId);
+    }
     @GetMapping("/every")
     public List<Map<String, Object>> everyTypeData(
             @RequestParam(name = "startDate") String startDate,
