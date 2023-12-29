@@ -162,6 +162,11 @@
                 th.textContent = colName;
                 headerRow.appendChild(th);
               });
+              // 添加转入呆滞仓时间的表头
+              let dzDateTh = document.createElement('th');
+              dzDateTh.textContent = "转入呆滞仓时间";
+              headerRow.appendChild(dzDateTh);
+
               thead.appendChild(headerRow);
               table.appendChild(thead);
 
@@ -174,6 +179,11 @@
                   td.textContent = cellData;
                   tr.appendChild(td);
                 });
+                // 添加转入呆滞仓时间列
+                let dzDateTd = document.createElement('td');
+                dzDateTd.textContent = "2023-12-30";  // 填充日期
+                tr.appendChild(dzDateTd);
+
                 tbody.appendChild(tr);
               });
               table.appendChild(tbody);
@@ -194,7 +204,7 @@
     showLoading(); // 显示加载动画
     const depositorySelect = document.querySelector("[name='depository_id']");
     const depositoryId = depositorySelect.value;
-    window.location.href = `/api/export/report?depositoryId=${depositoryId}&startDate=${startDate}&endDate=${endDate}`;
+    window.location.href = `/api/export/reportDz?depositoryId=${depositoryId}&startDate=${startDate}&endDate=${endDate}`;
     setTimeout(hideLoading, 3000);
   }
   function showLoading() {

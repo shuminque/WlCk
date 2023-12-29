@@ -136,9 +136,7 @@ public class PageController {
         return "pages/chart/transfer_table";
     }
     @GetMapping("/rate_add")
-    public String rate_add() {
-        return "pages/other/rate_add";
-    }
+    public String rate_add() { return "pages/other/rate_add"; }
     @GetMapping("/productInfo_add")
     public String productInfo_add() {
         return "pages/other/productInfo_add";
