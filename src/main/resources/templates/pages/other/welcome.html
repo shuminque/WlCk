@@ -210,7 +210,7 @@
                 </div>
             </div>
         </div>
-
+        <input class="layui-input" type="text" id="year-selector0" placeholder="请选择查看的年份">
         <div class="layui-row">
             <!-- 入库金额折线图 -->
             <div class="layui-col-md6">
@@ -531,23 +531,36 @@
         /**
          * 图功能
          */
+        laydate.render({
+            elem: '#year-selector0',
+            type: 'year',
+            done: function(value, date, endDate){
+                // 当选择年份后，调用 fetchData 函数
+                fetchData(value);
+            }
+        });
+
         $(document).ready(function () {
-            // 获取当前年份
+            // 页面加载时获取当前年份并调用 fetchData 函数
             var year = new Date().getFullYear();
-            // 使用jQuery的AJAX功能从服务器获取数据
+            fetchData(year);
+        });
+
+        function fetchData(year) {
             $.ajax({
                 url: '/monthly-amounts/' + year,
                 type: 'GET',
                 dataType: 'json',
                 success: function (data) {
-                    // 当成功获取数据时，初始化并设置ECharts图表
+                    // 当成功获取数据时，初始化并设置 ECharts 图表
                     initECharts(data);
                 },
                 error: function (error) {
                     console.log("Error fetching data", error);
                 }
             });
-        });
+        }
+
         var echartsInstances = [];
         function initECharts(data) {
             var months = data.map(item => {
