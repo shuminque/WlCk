@@ -259,7 +259,7 @@ public class ExcelExportController {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         workbook.write(outputStream);
         workbook.close();
-        String filename = "物品库存报表_" + startDate + "_to_" + endDate + ".xlsx";
+        String filename = "呆滞仓物品库存报表_" + startDate + "_to_" + endDate + ".xlsx";
         String encodedFilename = URLEncoder.encode(filename, "UTF-8").replace("+", "%20");
         ByteArrayResource resource = new ByteArrayResource(outputStream.toByteArray());
         return ResponseEntity.ok()
