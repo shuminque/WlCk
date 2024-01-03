@@ -14,7 +14,7 @@ public class ReportService {
     public List<Map<String, Object>> fetchReportDzData(String startDate, String endDate, int depositoryId) {
         String sql =
                 "SELECT\n" +
-                        "    mt.tname as 分类,\n" +
+                        "    mt.tname as 呆滞仓分类,\n" +
                         "    m.at_id as AT号,\n" +
                         "    m.mname as 品名,\n" +
                         "    COALESCE(LEFT(m.model, 30), 'N/A') AS 规格,\n" +
@@ -91,6 +91,7 @@ public class ReportService {
                         "    material_type mt\n" +
                         "    ON m.type_id = mt.id\n" +
                         "WHERE m.depository_id = ?\n" +
+                        "  AND m.state_id != 6\n" +
                         "GROUP BY\n" +
                         "    mt.id, m.at_id, m.mname, m.model, m.quantity, m.price\n" +
                         "ORDER BY\n" +
