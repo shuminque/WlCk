@@ -230,19 +230,19 @@
                 let pp;
                 var userDepositoryId = data.depositoryId;
                 var authority = data.authority;
-                if (userDepositoryId === 0 ) {
-                    toolbarTemplate = `
-                        <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
-                        <a class="layui-btn layui-btn-xs layui-btn-danger data-count-delete" lay-event="delete">删除</a>
-                    `;
-                } else if (authority === '审核人'){
-                    toolbarTemplate = `
-                        <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
-                    `;
-                } else {
-                    toolbarTemplate = ` `;
-                }
-                $("#operation-bar").html(toolbarTemplate);
+                // if (userDepositoryId === 0 ) {
+                //     toolbarTemplate = `
+                //         <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
+                //         <a class="layui-btn layui-btn-xs layui-btn-danger data-count-delete" lay-event="delete">删除</a>
+                //     `;
+                // } else if (authority === '审核人'){
+                //     toolbarTemplate = `
+                //         <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
+                //     `;
+                // } else {
+                //     toolbarTemplate = ` `;
+                // }
+                // $("#operation-bar").html(toolbarTemplate);
 
                 $(document).ready(function(){
                     if (userDepositoryId === 1 || userDepositoryId === 2) {
@@ -289,8 +289,31 @@
                         {field: 'typeName', title: '分类'},
                         {field: 'enginName',title: '工程'},
                         {field: 'picNum',title: '图号'},
-                        {field: 'stateName',title: '状态'},
-                        {title: ' ',  align: 'center', toolbar: '#operation-bar'}
+                        {field: 'stateName', title: '状态'},
+                        {
+                            title: '操作',
+                            align: 'center',
+                            templet: function(d) {
+                                // 检查状态是否为“3年以上不流动”并且用户权限为“审核人”
+                                if (d.stateName === '3年以上不流动（23.12.30财务减值处理,转出相应的呆滞仓管理。)' && authority === '审核人') {
+                                    // 不显示编辑按钮
+                                    return '';
+                                }
+                                if (userDepositoryId === 0 ) {
+                                    return `
+                                        <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
+                                        <a class="layui-btn layui-btn-xs layui-btn-danger data-count-delete" lay-event="delete">删除</a>
+                                    `;
+                                } else if (authority === '审核人'){
+                                    return `
+                                    <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
+                                `;
+                                } else {
+                                    return ` `;
+                                }
+                            }
+                        },
+                        // {title: ' ',  align: 'center', toolbar: '#operation-bar'}
                     ]],
                     limits: [20, 54, 200, 500, 100000],
                     limit: 20,
