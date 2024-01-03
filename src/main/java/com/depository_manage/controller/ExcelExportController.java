@@ -161,7 +161,7 @@ public class ExcelExportController {
         style.setBorderRight(BorderStyle.THIN);
         // 创建表头行并设置样式
         XSSFRow headerRow = sheet.createRow(0);
-        createCellWithStyle(headerRow, 0, "分类", style);
+        createCellWithStyle(headerRow, 0, "呆滞仓分类", style);
         createCellWithStyle(headerRow, 1, "AT号", style);
         createCellWithStyle(headerRow, 2, "品名", style);
         createCellWithStyle(headerRow, 3, "规格", style);
@@ -180,7 +180,7 @@ public class ExcelExportController {
         createCellWithStyle(headerRow, 10, "转入呆滞仓时间", style); // 新添加的列
 
         XSSFRow subtotalHeaderRow = subtotalSheet.createRow(0);
-        createCellWithStyle(subtotalHeaderRow, 0, "分类", style);
+        createCellWithStyle(subtotalHeaderRow, 0, "呆滞仓分类", style);
         createCellWithStyle(subtotalHeaderRow, 1, "入库数量", style);
         createCellWithStyle(subtotalHeaderRow, 2, "入库金额", style);
         createCellWithStyle(subtotalHeaderRow, 3, "出库数量", style);
@@ -193,7 +193,7 @@ public class ExcelExportController {
         int rowIndex = 1;
         for (Map<String, Object> record : data) {
             // 如果当前记录没有分类，则将其标记为"未分类"
-            String currentCategory = (String) getOrDefault(record, "分类", "未分类");
+            String currentCategory = (String) getOrDefault(record, "呆滞仓分类", "未分类");
 
             // 检查当前分类是否已更改，表示一个新分类的开始
             if (!currentCategory.equals(previousCategory) && rowIndex != 1) {
