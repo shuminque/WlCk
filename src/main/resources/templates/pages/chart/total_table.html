@@ -192,11 +192,19 @@
             return;
         }
         showLoading(); // 显示加载动画
+
         const depositorySelect = document.querySelector("[name='depository_id']");
         const depositoryId = depositorySelect.value;
-        window.location.href = `/api/export/report?depositoryId=${depositoryId}&startDate=${startDate}&endDate=${endDate}`;
-        setTimeout(hideLoading, 3000);
+
+        // 使用 window.open 方法打开下载链接
+        const url = `/api/export/report?depositoryId=${depositoryId}&startDate=${startDate}&endDate=${endDate}`;
+        window.open(url, '_blank');
+
+        // 假定下载会在几秒内开始
+        setTimeout(hideLoading, 18000); // 可根据实际情况调整时间
     }
+
+
     function showLoading() {
         document.getElementById('loading').style.display = 'block';
     }
