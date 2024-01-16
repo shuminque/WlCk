@@ -214,6 +214,7 @@ public class ReportService {
                 "SELECT\n" +
                         "    DATE_FORMAT(o.apply_time, '%Y/%m/%d') AS 日期,\n" +
                         "    o.type_name AS 分类,\n" +
+                        "    o.at_id AS AT,\n" +
                         "    o.mname AS 品名,\n" +
                         "    o.model AS 型号,\n" +
                         "    FORMAT(o.price, 2) AS 单价,\n" +
