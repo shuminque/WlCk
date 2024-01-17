@@ -4,46 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>total_table</title>
-    <link rel="stylesheet" href="/static/lib/layui-v2.6.3/css/layui.css" media="all">
+    <link rel="stylesheet" href="/static/lib/layui-v2.8.17/css/layui.css" media="all">
     <style>
-        table {
-            border-collapse: collapse;
-            width: 100%;
-        }
-        th, td {
-            border: 1px solid #ddd;
-            padding: 8px;
-            text-align: left;
-        }
-        th {
-            background-color: #f2f2f2;
-            position: sticky;
-            top: 0;
-        }
-        /* 设置固定的列宽 */
-        th:nth-child(1),
-        td:nth-child(1) {
-            width: 15%;
-        }
-        th:nth-child(2),
-        td:nth-child(2) {
-            width: 5%;
-        }
-
-        th:nth-child(3),
-        td:nth-child(3) {
-            width: 20%;
-        }
-        /* ... 可以继续为其他列设置宽度 ... */
-        /* 鼠标悬停行高亮 */
-        tr:hover {
-            background-color: #f5f5f5;
-        }
-        /* 表格容器样式，使其可滚动 */
-        .table-container {
-            max-height: 500px;
-            overflow-y: auto;
-        }
         .loader {
             border: 5px solid #f3f3f3; /* Light grey */
             border-top: 5px solid #3498db; /* Blue */
@@ -52,12 +14,10 @@
             height: 40px;
             animation: spin 2s linear infinite;
         }
-
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
-
     </style>
 </head>
 <body>
@@ -85,22 +45,78 @@
         </div>
     </form>
 </div>
-<div class="table-container">
-    <table id="reportTable" border="1">
-        <!-- 表格数据由JavaScript动态生成 -->
-    </table>
-</div>
+<table class="layui-hide" id="currentTableId" lay-filter="currentTableFilter"></table>
+
 <div id="loading" style="display: none; text-align: center; padding: 10px;">
     <div class="loader"></div>
     <p>数据加载中，请稍候...</p>
 </div>
 
-<script src="/static/lib/layui-v2.6.3/layui.js" charset="utf-8"></script>
+<script src="/static/lib/layui-v2.8.17/layui.js" charset="utf-8"></script>
+<script type="text/javascript" src="/static/js/http_ajax.googleapis.com_ajax_libs_jquery_3.5.1_jquery.js" charset="utf-8"></script>
+
 <script>
-    layui.use(['form', 'laydate'], function() {
+    var tableInstance;  // 定义一个全局table变量
+    function loadReport() {
+        // 获取选择框和日期选择器的值
+        var depositoryId = document.getElementById('depositorySelect').value;
+        var startDate = document.getElementById('startDatePicker').value;
+        var endDate = document.getElementById('endDatePicker').value;
+
+        // 创建新的URL
+        var url = `/api/report?depositoryId=${depositoryId}&startDate=${startDate}&endDate=${endDate}`;
+        console.log(url);
+        // 更新表格的URL
+        tableInstance.render({
+            elem: "#currentTableId",
+            // url : `/api/report?depositoryId=1&startDate=2024-01-17&endDate=2024-01-17`,
+            url: url    ,
+            height: "full-50", // 设置表格高度并固定表头
+            parseData: function (res) { //res 即为原始返回的数据
+                return {
+                    "status": res.status, //解析接口状态
+                    "message": res.message, //解析提示文本
+                    "count": res.count, //解析数据长度
+                    "data": res.data //解析数据列表
+                };
+            },
+            request: {
+                pageName: 'page', //页码的参数名称，默认：page
+                limitName: 'size' //每页数据量的参数名，默认：limit
+            },
+            response: {
+                statusName: 'status' //规定数据状态的字段名称，默认：code
+                ,statusCode: 200 //规定成功的状态码，默认：0
+                ,msgName: 'message' //规定状态信息的字段名称，默认：msg
+                ,countName: 'count' //规定数据总数的字段名称，默认：count
+                ,dataName: 'data' //规定数据列表的字段名称，默认：data
+            },
+            toolbar: ['filter', 'exports', 'print'],
+            cols: [ [ // 表头
+                {field: '分类', title: '分类'},
+                {field: 'AT号', title: 'AT号'},
+                {field: '品名', title: '品名'},
+                {field: '规格', title: '规格'},
+                {field: '入库数量', title: '入库数量'},
+                {field: '入库金额', title: '入库金额'},
+                {field: '出库数量', title: '出库数量'},
+                {field: '出库金额', title: '出库金额'},
+                {field: '库存数量', title: '库存数量'},
+                {field: '在库金额', title: '在库金额'}
+            ]],
+            limits: [54, 150, 500, 2000, 100000],
+            limit: 54,
+            page: true,
+            skin: 'line',
+            done: function(res, curr, count) {
+            }
+        });
+    }
+    layui.use(['form', 'laydate', 'table'], function() {
         var form = layui.form;  // 添加这行
         var laydate = layui.laydate;
-
+        var table = layui.table;
+        tableInstance = table;  // 将table对象赋值给全局变量
         // 初始化日期选择器
         laydate.render({
             elem: '#startDatePicker'
@@ -108,86 +124,40 @@
         laydate.render({
             elem: '#endDatePicker'
         });
+        $.ajax({
+            url: '/get_user_depository',
+            type: 'GET',
+            dataType: 'json',
+            success: function(data) {
+                    let depositoryId = data.depositoryId;
+                    let selectElem = document.getElementById('depositorySelect');
+
+                    if (depositoryId === 1) {
+                        selectElem.innerHTML = '<option value="1">SAB</option>';
+                    } else if (depositoryId === 2) {
+                        selectElem.innerHTML = '<option value="2">ZAB</option>';
+                    } else if (depositoryId ===0){
+                        selectElem.innerHTML = '<option value="1">SAB</option>' +
+                            '<option value="2">ZAB</option>'
+                    }
+                    const startDate = document.getElementById('startDatePicker').value;
+                    const endDate = document.getElementById('endDatePicker').value;
+                    const depositorySelect = document.querySelector("[name='depository_id']");
+                    // 如果还有其他的depository_id, 可以继续添加其他分支
+                    layui.form.render('select'); // 重新渲染 select 元素
+            },
+            error: function() {
+                // 处理错误，例如显示一个消息
+                layer.msg('无法获取用户的厂区信息');
+            }
+        });
+
     });
-    document.addEventListener("DOMContentLoaded", function() {
-        fetch('/get_user_depository')
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                return response.json();
-            })
-            .then(data => {
-                let depositoryId = data.depositoryId;
-                let selectElem = document.getElementById('depositorySelect');
-
-                if (depositoryId === 1) {
-                    selectElem.innerHTML = '<option value="1">SAB</option>';
-                } else if (depositoryId === 2) {
-                    selectElem.innerHTML = '<option value="2">ZAB</option>';
-                } else if (depositoryId ===0){
-                    selectElem.innerHTML = '<option value="1">SAB</option>' +
-                        '<option value="2">ZAB</option>'
-                }
-                // 如果还有其他的depository_id, 可以继续添加其他分支
-                layui.form.render('select'); // 重新渲染 select 元素
-            })
-            .catch(error => {
-                console.error('Error fetching data:', error);
-            });
-    });
-    function loadReport() {
-        const startDate = document.getElementById('startDatePicker').value;
-        const endDate = document.getElementById('endDatePicker').value;
-        if (!startDate || !endDate) {
-            alert("请确保选择了开始和结束日期!");
-            return;
-        }
-
-        showLoading(); // 显示加载动画
-
-        const depositorySelect = document.querySelector("[name='depository_id']");
-        const depositoryId = depositorySelect.value;
-        fetch(`/api/report?depositoryId=${depositoryId}&startDate=${startDate}&endDate=${endDate}`)
-            .then(response => response.json())
-            .then(data => {
-                let table = document.getElementById('reportTable');
-                table.innerHTML = ''; // 清除旧数据
-
-                // 创建表头
-                let thead = document.createElement('thead');
-                let headerRow = document.createElement('tr');
-                Object.keys(data[0]).forEach(colName => {
-                    let th = document.createElement('th');
-                    th.textContent = colName;
-                    headerRow.appendChild(th);
-                });
-                thead.appendChild(headerRow);
-                table.appendChild(thead);
-                // 创建表格主体数据
-                let tbody = document.createElement('tbody');
-                data.forEach(row => {
-                    let tr = document.createElement('tr');
-                    Object.values(row).forEach(cellData => {
-                        let td = document.createElement('td');
-                        td.textContent = cellData;
-                        tr.appendChild(td);
-                    });
-                    tbody.appendChild(tr);
-                });
-                table.appendChild(tbody);
-                hideLoading(); // 隐藏加载动画
-            })
-            .catch(error => {
-                console.error('Error fetching data:', error);
-                hideLoading(); // 隐藏加载动画
-            });
-    }
     function exportReport() {
         const startDate = document.getElementById('startDatePicker').value;
         const endDate = document.getElementById('endDatePicker').value;
         if (!startDate || !endDate) {
-            alert("请确保选择了开始和结束日期!");
+            layer.alert("请确保选择了开始和结束日期!");
             return;
         }
         showLoading(); // 显示加载动画
@@ -202,8 +172,6 @@
         // 假定下载会在几秒内开始
         setTimeout(hideLoading, 18000); // 可根据实际情况调整时间
     }
-
-
     function showLoading() {
         document.getElementById('loading').style.display = 'block';
     }

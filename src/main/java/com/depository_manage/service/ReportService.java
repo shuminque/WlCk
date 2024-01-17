@@ -1,4 +1,5 @@
 package com.depository_manage.service;
+import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
@@ -57,7 +58,7 @@ public class ReportService {
     }
 
     public List<Map<String, Object>> fetchReportData(String startDate, String endDate, int depositoryId) {
-                String sql =
+        String sql =
                 "SELECT\n" +
                         "    mt.tname as 分类,\n" +
                         "    m.at_id as AT号,\n" +
@@ -99,6 +100,98 @@ public class ReportService {
                         "    mt.id, \n" +
                         "    m.at_id;";
         return jdbcTemplate.queryForList(sql, endDate, endDate, startDate, endDate, depositoryId);
+    }
+    public Pair<List<Map<String, Object>>, Integer> fetchReportData(String startDate, String endDate, int depositoryId, int page, int size) {        int offset = (page - 1) * size;
+        String sql =
+                "SELECT\n" +
+                        "    mt.tname as 分类,\n" +
+                        "    m.at_id as AT号,\n" +
+                        "    m.mname as 品名,\n" +
+                        "    COALESCE(LEFT(m.model, 30), 'N/A') AS 规格,\n" +
+                        "    SUM(CASE WHEN dr.type = 1 THEN dr.quantity ELSE 0 END) AS 入库数量,\n" +
+                        "    FORMAT(ROUND((SUM(CASE WHEN dr.type = 1 THEN dr.price * dr.quantity ELSE 0 END)),2), 2) AS 入库金额,\n" +
+                        "    SUM(CASE WHEN dr.type = 0 THEN dr.quantity ELSE 0 END) AS 出库数量,\n" +
+                        "    FORMAT(ROUND((SUM(CASE WHEN dr.type = 0 THEN dr.price * dr.quantity ELSE 0 END)),2), 2) AS 出库金额,\n" +
+                        "    m.quantity - COALESCE((SELECT SUM(CASE WHEN dr_after.type = 1 THEN dr_after.quantity ELSE -dr_after.quantity END)\n" +
+                        "                          FROM depository_record dr_after\n" +
+                        "                          WHERE dr_after.at_id = m.at_id\n" +
+                        "                            AND dr_after.depository_id = m.depository_id\n" +
+                        "                            AND dr_after.review_pass = 1\n" +
+                        "                            AND dr_after.apply_time >= DATE_ADD(?, INTERVAL 1 DAY)), 0) AS 库存数量,\n" +
+                        "    FORMAT(ROUND(m.price - COALESCE((SELECT SUM(CASE WHEN dr_after.type = 1 THEN dr_after.price * dr_after.quantity ELSE -dr_after.price * dr_after.quantity END)\n" +
+                        "                                  FROM depository_record dr_after\n" +
+                        "                                    WHERE dr_after.at_id = m.at_id\n" +
+                        "                                    AND dr_after.depository_id = m.depository_id\n" +
+                        "                                    AND dr_after.review_pass = 1\n" +
+                        "                                    AND dr_after.apply_time >= DATE_ADD(?, INTERVAL 1 DAY)), 0), 2), 2) AS 在库金额\n" +
+                        "FROM\n" +
+                        "    material m\n" +
+                        "LEFT JOIN\n" +
+                        "    depository_record dr\n" +
+                        "    ON m.at_id = dr.at_id\n" +
+                        "    AND m.depository_id = dr.depository_id\n" +
+                        "    AND dr.review_pass = 1\n" +
+                        "    AND dr.apply_time >= ? AND dr.apply_time < DATE_ADD(?, INTERVAL 1 DAY)\n" +
+                        "LEFT JOIN\n" +
+                        "    material_type mt\n" +
+                        "    ON m.type_id = mt.id\n" +
+                        "WHERE m.depository_id = ?\n" +
+                        "  AND m.state_id != 6\n" +
+                        "GROUP BY\n" +
+                        "    mt.id, m.at_id, m.mname, m.model, m.quantity, m.price\n" +
+                        "ORDER BY\n" +
+                        "    CASE WHEN mt.id IS NULL THEN 1 ELSE 0 END,\n" +
+                        "    mt.id, \n" +
+                        "    m.at_id \n" +
+                        "LIMIT ? OFFSET ?;";
+        List<Map<String, Object>> data = jdbcTemplate.queryForList(sql, endDate, endDate, startDate, endDate, depositoryId, size, offset);
+        String countSql =
+                "SELECT COUNT(*) " +
+                        "FROM (" +
+                        "SELECT\n" +
+                        "    mt.tname as 分类,\n" +
+                        "    m.at_id as AT号,\n" +
+                        "    m.mname as 品名,\n" +
+                        "    COALESCE(LEFT(m.model, 30), 'N/A') AS 规格,\n" +
+                        "    SUM(CASE WHEN dr.type = 1 THEN dr.quantity ELSE 0 END) AS 入库数量,\n" +
+                        "    FORMAT(ROUND((SUM(CASE WHEN dr.type = 1 THEN dr.price * dr.quantity ELSE 0 END)),2), 2) AS 入库金额,\n" +
+                        "    SUM(CASE WHEN dr.type = 0 THEN dr.quantity ELSE 0 END) AS 出库数量,\n" +
+                        "    FORMAT(ROUND((SUM(CASE WHEN dr.type = 0 THEN dr.price * dr.quantity ELSE 0 END)),2), 2) AS 出库金额,\n" +
+                        "    m.quantity - COALESCE((SELECT SUM(CASE WHEN dr_after.type = 1 THEN dr_after.quantity ELSE -dr_after.quantity END)\n" +
+                        "                          FROM depository_record dr_after\n" +
+                        "                          WHERE dr_after.at_id = m.at_id\n" +
+                        "                            AND dr_after.depository_id = m.depository_id\n" +
+                        "                            AND dr_after.review_pass = 1\n" +
+                        "                            AND dr_after.apply_time >= DATE_ADD(?, INTERVAL 1 DAY)), 0) AS 库存数量,\n" +
+                        "    FORMAT(ROUND(m.price - COALESCE((SELECT SUM(CASE WHEN dr_after.type = 1 THEN dr_after.price * dr_after.quantity ELSE -dr_after.price * dr_after.quantity END)\n" +
+                        "                                  FROM depository_record dr_after\n" +
+                        "                                    WHERE dr_after.at_id = m.at_id\n" +
+                        "                                    AND dr_after.depository_id = m.depository_id\n" +
+                        "                                    AND dr_after.review_pass = 1\n" +
+                        "                                    AND dr_after.apply_time >= DATE_ADD(?, INTERVAL 1 DAY)), 0), 2), 2) AS 在库金额\n" +
+                        "FROM\n" +
+                        "    material m\n" +
+                        "LEFT JOIN\n" +
+                        "    depository_record dr\n" +
+                        "    ON m.at_id = dr.at_id\n" +
+                        "    AND m.depository_id = dr.depository_id\n" +
+                        "    AND dr.review_pass = 1\n" +
+                        "    AND dr.apply_time >= ? AND dr.apply_time < DATE_ADD(?, INTERVAL 1 DAY)\n" +
+                        "LEFT JOIN\n" +
+                        "    material_type mt\n" +
+                        "    ON m.type_id = mt.id\n" +
+                        "WHERE m.depository_id = ?\n" +
+                        "  AND m.state_id != 6\n" +
+                        "GROUP BY\n" +
+                        "    mt.id, m.at_id, m.mname, m.model, m.quantity, m.price\n" +
+                        "ORDER BY\n" +
+                        "    CASE WHEN mt.id IS NULL THEN 1 ELSE 0 END,\n" +
+                        "    mt.id, \n" +
+                        "    m.at_id \n" +
+                        ") AS subquery";
+        Integer count = jdbcTemplate.queryForObject(countSql, Integer.class, endDate, endDate, startDate, endDate, depositoryId);
+
+        return Pair.of(data, count);
     }
 
     public List<Map<String, Object>> everyTypeData(String startDate, String endDate, int depositoryId) {
