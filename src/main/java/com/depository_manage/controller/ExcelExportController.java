@@ -2,6 +2,7 @@ package com.depository_manage.controller;
 
 import com.depository_manage.service.ReportService;
 import org.apache.poi.ss.usermodel.BorderStyle;
+import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.usermodel.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -41,51 +42,90 @@ public class ExcelExportController {
         style.setBorderLeft(BorderStyle.THIN);
         style.setBorderRight(BorderStyle.THIN);
         // 创建表头行并设置样式
-        XSSFRow headerRow = sheet.createRow(0);
+        XSSFRow blankRow = sheet.createRow(0); // 顶部的空白行，用于合并单元格
+        // 顶部空白行合并单元格设置
+        createCellWithStyle(blankRow, 0, "", style); // 空白单元格占位
+        createCellWithStyle(blankRow, 1, "", style); // 空白单元格占位
+        createCellWithStyle(blankRow, 2, "", style); // 空白单元格占位
+        createCellWithStyle(blankRow, 3, "", style); // 空白单元格占位
+        createCellWithStyle(blankRow, 4, "", style); // 空白单元格占位
+        createCellWithStyle(blankRow, 5, "", style); // 空白单元格占位
+        createCellWithStyle(blankRow, 6, "正常出库", style); // 合并单元格
+        sheet.addMergedRegion(new CellRangeAddress(0, 0, 6, 7));
+        createCellWithStyle(blankRow, 8, "转移出库", style); // 合并单元格
+        sheet.addMergedRegion(new CellRangeAddress(0, 0, 8, 9));
+        createCellWithStyle(blankRow, 10, "销售出库", style); // 合并单元格
+        sheet.addMergedRegion(new CellRangeAddress(0, 0, 10, 11));
+        createCellWithStyle(blankRow, 12, "", style); // 空白单元格占位
+        createCellWithStyle(blankRow, 13, "", style); // 空白单元格占位
+        XSSFRow headerRow = sheet.createRow(1); // 将原来第 0 行的表头移动到第 1 行
         createCellWithStyle(headerRow, 0, "分类", style);
         createCellWithStyle(headerRow, 1, "AT号", style);
         createCellWithStyle(headerRow, 2, "品名", style);
         createCellWithStyle(headerRow, 3, "规格", style);
         createCellWithStyle(headerRow, 4, "入库数量", style);
-//        createCellWithStyle(headerRow, 5, "", style); // 空白列
         createCellWithStyle(headerRow, 5, "入库金额", style);
-//        createCellWithStyle(headerRow, 7, "", style); // 空白列
         createCellWithStyle(headerRow, 6, "出库数量", style);
-//        createCellWithStyle(headerRow, 9, "", style); // 空白列
         createCellWithStyle(headerRow, 7, "出库金额", style);
-//        createCellWithStyle(headerRow, 11, "", style); // 空白列
-        createCellWithStyle(headerRow, 8, "库存数量", style);
-//        createCellWithStyle(headerRow, 13, "", style); // 空白列
-        createCellWithStyle(headerRow, 9, "在库金额", style);
-//        createCellWithStyle(headerRow, 15, "", style); // 空白列
+        // 新增的列放在出库金额之后
+        createCellWithStyle(headerRow, 8, "转移数量", style);
+        createCellWithStyle(headerRow, 9, "转移金额", style);
+        createCellWithStyle(headerRow, 10, "销售数量", style);
+        createCellWithStyle(headerRow, 11, "销售金额", style);
+        // 库存数量和在库金额
+        createCellWithStyle(headerRow, 12, "库存数量", style);
+        createCellWithStyle(headerRow, 13, "在库金额", style);
 
-        XSSFRow subtotalHeaderRow = subtotalSheet.createRow(0);
+// 第二张表：分类小计表
+        XSSFRow subtotalBlankRow = subtotalSheet.createRow(0); // 顶部的空白行，用于合并单元格
+// 顶部空白行合并单元格设置
+        createCellWithStyle(subtotalBlankRow, 0, "", style); // 空白单元格占位
+        createCellWithStyle(subtotalBlankRow, 1, "", style); // 空白单元格占位
+        createCellWithStyle(subtotalBlankRow, 2, "", style); // 空白单元格占位
+        createCellWithStyle(subtotalBlankRow, 3, "正常出库", style); // 合并单元格
+        subtotalSheet.addMergedRegion(new CellRangeAddress(0, 0, 3, 4));
+        createCellWithStyle(subtotalBlankRow, 5, "转移出库", style); // 合并单元格
+        subtotalSheet.addMergedRegion(new CellRangeAddress(0, 0, 5, 6));
+        createCellWithStyle(subtotalBlankRow, 7, "销售出库", style); // 合并单元格
+        subtotalSheet.addMergedRegion(new CellRangeAddress(0, 0, 7, 8));
+        createCellWithStyle(subtotalBlankRow, 9, "", style); // 空白单元格占位
+        createCellWithStyle(subtotalBlankRow, 10, "", style); // 空白单元格占位
+
+// 创建分类小计表的具体列名表头
+        XSSFRow subtotalHeaderRow = subtotalSheet.createRow(1);
         createCellWithStyle(subtotalHeaderRow, 0, "分类", style);
         createCellWithStyle(subtotalHeaderRow, 1, "入库数量", style);
         createCellWithStyle(subtotalHeaderRow, 2, "入库金额", style);
         createCellWithStyle(subtotalHeaderRow, 3, "出库数量", style);
         createCellWithStyle(subtotalHeaderRow, 4, "出库金额", style);
-        createCellWithStyle(subtotalHeaderRow, 5, "库存数量", style);
-        createCellWithStyle(subtotalHeaderRow, 6, "在库金额", style);
+        createCellWithStyle(subtotalHeaderRow, 5, "转移数量", style);
+        createCellWithStyle(subtotalHeaderRow, 6, "转移金额", style);
+        createCellWithStyle(subtotalHeaderRow, 7, "销售数量", style);
+        createCellWithStyle(subtotalHeaderRow, 8, "销售金额", style);
+        createCellWithStyle(subtotalHeaderRow, 9, "库存数量", style);
+        createCellWithStyle(subtotalHeaderRow, 10, "在库金额", style);
+
         double totalInAmount = 0.0, totalOutAmount = 0.0, totalStockAmount = 0.0;
         double totalInQty = 0.0, totalOutQty = 0.0, totalStockQty = 0.0;
+        // 下面是转移数量、转移金额、销售数量、销售金额
+        double totalTransferQty = 0.0, totalTransferAmount = 0.0;
+        double totalSalesQty = 0.0, totalSalesAmount = 0.0;
         String previousCategory = "";
-        int rowIndex = 1;
+        int rowIndex = 2;
         for (Map<String, Object> record : data) {
             // 如果当前记录没有分类，则将其标记为"未分类"
             String currentCategory = (String) getOrDefault(record, "分类", "未分类");
-
             // 检查当前分类是否已更改，表示一个新分类的开始
-            if (!currentCategory.equals(previousCategory) && rowIndex != 1) {
+            if (!currentCategory.equals(previousCategory) && rowIndex != 2) {
                 // 在分类小计表中添加前一个分类的小计行
-                addSubtotalRow(subtotalSheet, previousCategory.isEmpty() ? "未分类" : previousCategory, totalInQty, totalOutQty, totalStockQty, totalInAmount, totalOutAmount, totalStockAmount, style);
-
+//                addSubtotalRow(subtotalSheet, previousCategory.isEmpty() ? "未分类" : previousCategory, totalInQty, totalOutQty, totalStockQty, totalInAmount, totalOutAmount, totalStockAmount, style);
+                addSubtotalRow(subtotalSheet, previousCategory.isEmpty() ? "未分类" : previousCategory, totalInQty, totalOutQty, totalTransferQty, totalSalesQty, totalInAmount, totalOutAmount, totalTransferAmount, totalSalesAmount, totalStockQty, totalStockAmount, style);
                 // 在主数据表中添加空白行
                 int blankRowIndex = rowIndex++;
                 sheet.createRow(blankRowIndex);
-
                 // 重置累计变量
-                totalInQty = totalOutQty = totalStockQty = totalInAmount = totalOutAmount = totalStockAmount = 0.0;
+                totalInQty = totalOutQty = totalTransferQty = totalSalesQty = totalStockQty = 0.0;
+                totalInAmount = totalOutAmount = totalTransferAmount = totalSalesAmount = totalStockAmount = 0.0;
             }
 
             XSSFRow row = sheet.createRow(rowIndex);
@@ -98,35 +138,38 @@ public class ExcelExportController {
             createCellWithStyle(row, 3, (String) getOrDefault(record, "规格", ""), style);
             createCellWithStyle(row, 4, ((Double) getOrDefault(record, "入库数量", 0.0)).doubleValue(), style);
 //            createCellWithStyle(row, 5, Double.parseDouble((String) getOrDefault(record, "入库金额", "0.00")), style);
-            createCellWithStyle(row, 6 , ((Double) getOrDefault(record, "出库数量", 0.0)).doubleValue(), style);
-//            createCellWithStyle(row, 7, Double.parseDouble((String) getOrDefault(record, "出库金额", "0.00")), style);
-            createCellWithStyle(row, 8, ((Double) getOrDefault(record, "库存数量", 0.0)).doubleValue(), style);
-//            createCellWithStyle(row, 9, Double.parseDouble((String) getOrDefault(record, "在库金额", "0.00")), style);
-//            createCellWithStyle(row, 6, Double.parseDouble(((String) getOrDefault(record, "入库金额", "0.00")).replace(",", "")), style);
-//            createCellWithStyle(row, 6, Double.parseDouble(((String) getOrDefault(record, "入库金额", "0.00")).replace(",", "")), style);
-//            createCellWithStyle(row, 10, Double.parseDouble(((String) getOrDefault(record, "出库金额", "0.00")).replace(",", "")), style);
-//            createCellWithStyle(row, 14, Double.parseDouble(((String) getOrDefault(record, "在库金额", "0.00")).replace(",", "")), style);
             createCellWithStyle(row, 5, Double.parseDouble(((String) getOrDefault(record, "入库金额", "0.00")).replace(",", "")), style);
+            createCellWithStyle(row, 6 , ((Double) getOrDefault(record, "出库数量", 0.0)).doubleValue(), style);
             createCellWithStyle(row, 7, Double.parseDouble(((String) getOrDefault(record, "出库金额", "0.00")).replace(",", "")), style);
-            createCellWithStyle(row, 9, Double.parseDouble(((String) getOrDefault(record, "在库金额", "0.00")).replace(",", "")), style);
+            createCellWithStyle(row, 8, ((Double) getOrDefault(record, "转移数量", 0.0)).doubleValue(), style);
+            createCellWithStyle(row, 9, Double.parseDouble(((String) getOrDefault(record, "转移金额", "0.00")).replace(",", "")), style);
+            createCellWithStyle(row, 10, ((Double) getOrDefault(record, "销售数量", 0.0)).doubleValue(), style);
+            createCellWithStyle(row, 11, Double.parseDouble(((String) getOrDefault(record, "销售金额", "0.00")).replace(",", "")), style);
+            // 然后是库存数量和在库金额的填充
+            createCellWithStyle(row, 12, ((Double) getOrDefault(record, "库存数量", 0.0)).doubleValue(), style);
+            createCellWithStyle(row, 13, Double.parseDouble(((String) getOrDefault(record, "在库金额", "0.00")).replace(",", "")), style);
 
             // Accumulate totals
             totalInQty += parseToDouble(getOrDefault(record, "入库数量", "0.0").toString());
             totalOutQty += parseToDouble(getOrDefault(record, "出库数量", "0.0").toString());
             totalStockQty += parseToDouble(getOrDefault(record, "库存数量", "0.0").toString());
-
             totalInAmount += parseToDouble(getOrDefault(record, "入库金额", "0.0").toString());
             totalOutAmount += parseToDouble(getOrDefault(record, "出库金额", "0.0").toString());
             totalStockAmount += parseToDouble(getOrDefault(record, "在库金额", "0.0").toString());
+            totalTransferQty += parseToDouble(getOrDefault(record, "转移数量", "0.0").toString());
+            totalTransferAmount += parseToDouble(getOrDefault(record, "转移金额", "0.0").toString());
+            totalSalesQty += parseToDouble(getOrDefault(record, "销售数量", "0.0").toString());
+            totalSalesAmount += parseToDouble(getOrDefault(record, "销售金额", "0.0").toString());
 
             rowIndex++;
             previousCategory = currentCategory;
         }
 
-        if (!previousCategory.isEmpty() || rowIndex == 1) { // rowIndex == 1 表示从未添加过小计行，即所有数据都没有分类
+        if (!previousCategory.isEmpty() || rowIndex == 2) { // rowIndex == 1 表示从未添加过小计行，即所有数据都没有分类
             // 如果前一个分类为空，表示数据未分类
             previousCategory = previousCategory.isEmpty() ? "未分类" : previousCategory;
-            addSubtotalRow(subtotalSheet, previousCategory, totalInQty, totalOutQty, totalStockQty, totalInAmount, totalOutAmount, totalStockAmount, style);
+//            addSubtotalRow(subtotalSheet, previousCategory, totalInQty, totalOutQty, totalStockQty, totalInAmount, totalOutAmount, totalStockAmount, style);
+            addSubtotalRow(subtotalSheet, previousCategory, totalInQty, totalOutQty, totalTransferQty, totalSalesQty, totalInAmount, totalOutAmount, totalTransferAmount, totalSalesAmount, totalStockQty, totalStockAmount, style);
             // 在主数据表中添加最后的空白行
             sheet.createRow(rowIndex);
         }
@@ -287,7 +330,26 @@ public class ExcelExportController {
         createCellWithStyle(totalRow, 5, stockQty, style);   // 库存数量
         createCellWithStyle(totalRow, 6, stockAmount, style); // 在库金额
     }
-
+    private void addSubtotalRow(XSSFSheet subtotalSheet, String categoryName,
+                                double inQty, double outQty,
+                                double transferQty, double salesQty,
+                                double inAmount, double outAmount,
+                                double transferAmount, double salesAmount,
+                                double stockQty, double stockAmount, XSSFCellStyle style) {
+        int rowIndex = subtotalSheet.getLastRowNum() + 1; // 获取下一个空行的行索引
+        XSSFRow totalRow = subtotalSheet.createRow(rowIndex);
+        createCellWithStyle(totalRow, 0, categoryName, style);   // 分类名称
+        createCellWithStyle(totalRow, 1, inQty, style);          // 入库数量
+        createCellWithStyle(totalRow, 2, inAmount, style);       // 入库金额
+        createCellWithStyle(totalRow, 3, outQty, style);         // 出库数量
+        createCellWithStyle(totalRow, 4, outAmount, style);      // 出库金额
+        createCellWithStyle(totalRow, 5, transferQty, style);    // 转移数量
+        createCellWithStyle(totalRow, 6, transferAmount, style); // 转移金额
+        createCellWithStyle(totalRow, 7, salesQty, style);       // 销售数量
+        createCellWithStyle(totalRow, 8, salesAmount, style);    // 销售金额
+        createCellWithStyle(totalRow, 9, stockQty, style);       // 库存数量
+        createCellWithStyle(totalRow, 10, stockAmount, style);   // 在库金额
+    }
     private double parseToDouble(String value) {
         try {
             return Double.parseDouble(value.replace(",", ""));
