@@ -212,7 +212,9 @@ public class ReportService {
                         "        mt.id AS type_id,\n" +
                         "        mt.tname AS material_type_name,\n" +
                         "        SUM(CASE WHEN dr.type = 1 THEN dr.price * dr.quantity ELSE 0 END) AS in_sum,\n" +
-                        "        SUM(CASE WHEN dr.type = 0 THEN dr.price * dr.quantity ELSE 0 END) AS out_sum\n" +
+                        "    SUM(CASE WHEN dr.type = 0 AND dr.apply_remark NOT IN ('SAB转入ZAB', 'ZAB转入SAB') AND dr.apply_remark NOT LIKE '%销售出库%' THEN dr.price * dr.quantity ELSE 0 END) AS normal_out_sum,\n" +
+                        "    SUM(CASE WHEN dr.type = 0 AND dr.apply_remark IN ('SAB转入ZAB', 'ZAB转入SAB') THEN dr.price * dr.quantity ELSE 0 END) AS transfer_out_sum,\n" +
+                        "    SUM(CASE WHEN dr.type = 0 AND dr.apply_remark LIKE '%销售出库%' THEN dr.price * dr.quantity ELSE 0 END) AS sales_out_sum\n" +
                         "    FROM material_type mt\n" +
                         "    LEFT JOIN depository_record dr ON mt.tname = dr.type_name\n" +
                         "        AND dr.apply_time >= ? AND dr.apply_time < DATE_ADD(?, INTERVAL 1 DAY)\n" +
@@ -225,21 +227,26 @@ public class ReportService {
                         "    SELECT\n" +
                         "        mt.id AS type_id,\n" +
                         "        mt.tname AS material_type_name,\n" +
-                        "        SUM(CASE WHEN once_f.time >= ? AND once_f.time < DATE_ADD(?, INTERVAL 1 DAY) THEN once_f.price ELSE 0 END) AS once_sum\n" +
+                        "    SUM(CASE WHEN once_f.time >= ? AND once_f.time < DATE_ADD(?, INTERVAL 1 DAY) AND once_f.apply_remark NOT LIKE '%销售出库%' THEN once_f.price ELSE 0 END) AS once_normal_sum,\n" +
+                        "    SUM(CASE WHEN once_f.time >= ? AND once_f.time < DATE_ADD(?, INTERVAL 1 DAY) AND once_f.apply_remark LIKE '%销售出库%' THEN once_f.price ELSE 0 END) AS once_sales_sum \n" +
                         "    FROM material_type mt\n" +
                         "    LEFT JOIN once_fill once_f ON mt.id = once_f.type_id\n" +
                         "        AND once_f.depositoryId = ?\n" +
                         "    GROUP BY mt.id, mt.tname\n" +
                         "),\n" +
                         "CombinedData AS (\n" +
-                        "    SELECT\n" +
+                        " SELECT\n" +
                         "        mt.id AS type_id,\n" +
                         "        CASE WHEN mt.tname LIKE '%(进口)' THEN 1 ELSE 0 END AS is_import,\n" +
                         "        mt.tname AS material_type_name,\n" +
-                        "        COALESCE(drs.in_sum, 0) + COALESCE(ofs.once_sum, 0) AS raw_in_money,\n" +
-                        "        COALESCE(drs.out_sum, 0) + COALESCE(ofs.once_sum, 0) AS raw_out_money,\n" +
-                        "        FORMAT(COALESCE(drs.in_sum, 0) + COALESCE(ofs.once_sum, 0), 2) AS 入库金额,\n" +
-                        "        FORMAT(COALESCE(drs.out_sum, 0) + COALESCE(ofs.once_sum, 0), 2) AS 出库金额\n" +
+                        "        COALESCE(drs.in_sum, 0) + COALESCE(ofs.once_normal_sum, 0) + COALESCE(ofs.once_sales_sum, 0) AS raw_in_money,\n" +
+                        "        FORMAT(COALESCE(drs.in_sum, 0) + COALESCE(ofs.once_normal_sum, 0) + COALESCE(ofs.once_sales_sum, 0), 2) AS 入库金额,\n" +
+                        "        COALESCE(drs.normal_out_sum, 0) + COALESCE(ofs.once_normal_sum, 0) AS raw_normal_out_money,\n" +
+                        "        FORMAT(COALESCE(drs.normal_out_sum, 0) + COALESCE(ofs.once_normal_sum, 0), 2) AS 正常出库金额,\n" +
+                        "        COALESCE(drs.transfer_out_sum, 0) AS raw_transfer_out_money,\n" +
+                        "        FORMAT(COALESCE(drs.transfer_out_sum, 0), 2) AS 转移出库金额,\n" +
+                        "        COALESCE(drs.sales_out_sum, 0) + COALESCE(ofs.once_sales_sum, 0) AS raw_sales_out_money,\n" +
+                        "        FORMAT(COALESCE(drs.sales_out_sum, 0) + COALESCE(ofs.once_sales_sum, 0), 2) AS 销售出库金额\n" +
                         "    FROM material_type mt\n" +
                         "    LEFT JOIN DepRecordSum drs ON mt.id = drs.type_id\n" +
                         "    LEFT JOIN OnceFillSum ofs ON mt.id = ofs.type_id\n" +
@@ -251,7 +258,7 @@ public class ReportService {
                         "        (SUM(m.price) - COALESCE((\n" +
                         "            SELECT SUM(CASE WHEN dr.type = 1 THEN dr.price * dr.quantity ELSE -dr.price * dr.quantity END)\n" +
                         "            FROM depository_record dr\n" +
-                        "            WHERE dr.type_name = mt.tname AND dr.apply_time > ? AND dr.review_pass = 1 AND dr.depository_id = ?\n" +
+                        "            WHERE dr.type_name = mt.tname AND dr.apply_time >= DATE_ADD(?, INTERVAL 1 DAY) AND dr.review_pass = 1 AND dr.depository_id = ?\n" +
                         "        ), 0)) AS raw_stock_money,\n" +
                         "        FORMAT((SUM(m.price) - COALESCE((\n" +
                         "            SELECT SUM(CASE WHEN dr.type = 1 THEN dr.price * dr.quantity ELSE -dr.price * dr.quantity END)\n" +
@@ -269,40 +276,45 @@ public class ReportService {
                         "        CONCAT(?, ' 至 ', ?) AS 日期,\n" +
                         "        cd.material_type_name AS 分类,\n" +
                         "        cd.入库金额,\n" +
-                        "        cd.出库金额,\n" +
+                        "        cd.正常出库金额,\n" +
+                        "        cd.转移出库金额,\n" +
+                        "        cd.销售出库金额,\n" +
                         "        COALESCE(s.在库金额, 0) AS 在库金额,\n" +
                         "        cd.is_import,\n" +
                         "        cd.type_id\n" +
                         "    FROM CombinedData cd\n" +
                         "    LEFT JOIN StockValue s ON cd.type_id = s.type_id\n" +
                         "),\n" +
-                        "Totals AS (\n" +
-                        "    SELECT\n" +
-                        "        '总计' AS 日期,\n" +
-                        "        ' ' AS 分类,\n" +
-                        "        FORMAT(SUM(cd.raw_in_money), 2) AS 入库金额,\n" +
-                        "        FORMAT(SUM(cd.raw_out_money), 2) AS 出库金额,\n" +
-                        "        FORMAT(SUM(COALESCE(s.raw_stock_money, 0)), 2) AS 在库金额,\n" +
-                        "        cd.is_import,\n" +
-                        "        9999 AS type_id\n" +
-                        "    FROM CombinedData cd\n" +
-                        "    LEFT JOIN StockValue s ON cd.type_id = s.type_id\n" +
-                        "    GROUP BY cd.is_import\n" +
-                        ")\n" +
-                        "SELECT 日期, 分类, 入库金额, 出库金额, 在库金额\n" +
+                            "Totals AS (\n" +
+                            "    SELECT\n" +
+                            "        '总计' AS 日期,\n" +
+                            "        ' ' AS 分类,\n" +
+                            "        FORMAT(SUM(cd.raw_in_money), 2) AS 入库金额,\n" +
+                            "        FORMAT(SUM(cd.raw_normal_out_money), 2) AS 正常出库金额,\n" +
+                            "        FORMAT(SUM(cd.raw_transfer_out_money), 2) AS 转移出库金额,\n" +
+                            "        FORMAT(SUM(cd.raw_sales_out_money), 2) AS 销售出库金额,\n" +
+                            "        FORMAT(SUM(COALESCE(s.raw_stock_money, 0)), 2) AS 在库金额,\n" +
+                            "        cd.is_import,\n" +
+                            "        9999 AS type_id\n" +
+                            "    FROM CombinedData cd\n" +
+                            "    LEFT JOIN StockValue s ON cd.type_id = s.type_id\n" +
+                            "    GROUP BY cd.is_import\n" +
+                            ")\n" +
+                        "SELECT 日期, 分类, 入库金额, 正常出库金额, 转移出库金额, 销售出库金额, 在库金额\n" +
                         "FROM (\n" +
-                        "    SELECT 日期, 分类, 入库金额, 出库金额, 在库金额, is_import, type_id\n" +
+                        "    SELECT 日期, 分类, 入库金额, 正常出库金额, 转移出库金额, 销售出库金额, 在库金额, is_import, type_id\n" +
                         "    FROM FinalData\n" +
                         "    UNION ALL\n" +
-                        "    SELECT 日期, 分类, 入库金额, 出库金额, 在库金额, is_import, type_id\n" +
+                        "    SELECT 日期, 分类, 入库金额, 正常出库金额, 转移出库金额, 销售出库金额, 在库金额, is_import, type_id\n" +
                         "    FROM Totals\n" +
                         ") AS SubQuery\n" +
-                        "WHERE 入库金额 != '0.00' OR 出库金额 != '0.00' OR 在库金额 != '0'\n" +
+                        "WHERE 入库金额 != '0.00' OR 正常出库金额 != '0.00' OR 转移出库金额 != '0.00' OR 销售出库金额 != '0.00' OR 在库金额 != '0'\n" +
                         "ORDER BY is_import DESC, type_id ASC, 日期 DESC;\n";
         return jdbcTemplate.queryForList(sql,
                 startDate, endDate,  // 1 - 2 (仓库记录)
                 depositoryId,        // 3 (仓库记录)
                 startDate, endDate,  // 4 - 5 (一次性领用)
+                startDate, endDate,  // 4 - 5 (一次性销售)
                 depositoryId,        // 6 (一次性领用)
                 endDate,             // 7 (库存 - 结束日期之后的记录)
                 depositoryId,        // 8 (库存 - 结束日期之后的记录)
@@ -341,4 +353,3 @@ public class ReportService {
     }
 
 }
-
