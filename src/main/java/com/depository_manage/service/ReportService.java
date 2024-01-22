@@ -227,8 +227,8 @@ public class ReportService {
                         "    SELECT\n" +
                         "        mt.id AS type_id,\n" +
                         "        mt.tname AS material_type_name,\n" +
-                        "    SUM(CASE WHEN once_f.time >= ? AND once_f.time < DATE_ADD(?, INTERVAL 1 DAY) AND once_f.apply_remark NOT LIKE '%销售出库%' THEN once_f.price ELSE 0 END) AS once_normal_sum,\n" +
-                        "    SUM(CASE WHEN once_f.time >= ? AND once_f.time < DATE_ADD(?, INTERVAL 1 DAY) AND once_f.apply_remark LIKE '%销售出库%' THEN once_f.price ELSE 0 END) AS once_sales_sum \n" +
+                        "    SUM(CASE WHEN once_f.time >= ? AND once_f.time < DATE_ADD(?, INTERVAL 1 DAY) AND once_f.apply_remark NOT LIKE '%销售出库%' AND once_f.apply_remark NOT LIKE '%立项%' THEN once_f.price ELSE 0 END) AS once_normal_sum,\n" +
+                        "    SUM(CASE WHEN once_f.time >= ? AND once_f.time < DATE_ADD(?, INTERVAL 1 DAY) AND once_f.apply_remark LIKE '%销售出库%'  THEN once_f.price ELSE 0 END) AS once_sales_sum \n" +
                         "    FROM material_type mt\n" +
                         "    LEFT JOIN once_fill once_f ON mt.id = once_f.type_id\n" +
                         "        AND once_f.depositoryId = ?\n" +
