@@ -43,6 +43,7 @@
                 <button type="button" class="layui-btn layui-btn-primary" onclick="exportReport()">导出</button>
             </div>
         </div>
+        <h3 align="right">                                注意：未分类的项目，将不计入本报表中。</h3>
     </form>
 </div>
 <table class="layui-hide" id="currentTableId" lay-filter="currentTableFilter"></table>
@@ -108,8 +109,8 @@
                 {field: '库存数量', title: '库存数量'},
                 {field: '在库金额', title: '在库金额'}
             ]],
-            limits: [54, 150, 500, 2000, 100000],
-            limit: 54,
+            limits: [ 500, 2000, 100000],
+            limit: 500,
             page: true,
             skin: 'line',
             done: function(res, curr, count) {
