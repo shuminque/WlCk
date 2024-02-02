@@ -294,6 +294,8 @@
                                 if ( year === currentYear && month === currentMonth ) {
                                     buttons += '<a class="layui-btn layui-btn-xs" lay-event="edit">修改</a>';
                                     buttons += '<a class="layui-btn layui-btn-xs layui-btn-danger" lay-event="delete">删除</a>';
+                                } else if (userAuthority === '审核人'){
+                                    buttons += '<a class="layui-btn layui-btn-xs" lay-event="edit">修改</a>';
                                 } else if (userAuthority === '系统管理员'){
                                     buttons += '<a class="layui-btn layui-btn-xs" lay-event="edit">修改</a>';
                                     buttons += '<a class="layui-btn layui-btn-xs layui-btn-danger" lay-event="delete">删除</a>';
