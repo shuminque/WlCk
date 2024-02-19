@@ -278,22 +278,29 @@
             type: 'GET',
             dataType: 'json',
             success: function(data) {
-
-                let pp;
                 var userDepositoryId = data.depositoryId;
-                // 如果 depositoryId 为1，则自动选择 SAB审核组
+                // 根据 depositoryId 调整审核组选择
                 if (userDepositoryId === 2) {
                     $('select[name="review_group_id"]').val('2');
-                }
-                // 如果 depositoryId 为2，则自动选择 ZAB审核组
-                else {
+                } else {
                     $('select[name="review_group_id"]').val('1');
                 }
                 if (userDepositoryId === 1 || userDepositoryId === 2) {
                     $('select[name="review_group_id"]').prop('disabled', true);
                 }
-                // 刷新layui的选择框组件，以显示新的选中值
-                layui.form.render('select');
+                layui.form.render('select'); // 刷新layui的选择框组件
+                // 动态添加入库类型选项
+                var applyRemarkSelect = $('select[name="applyRemark"]');
+                applyRemarkSelect.find('option[value="SAB转入"], option[value="ZAB转入"]').remove(); // 先移除可能已经添加的选项，以避免重复
+                if (userDepositoryId === 1) {
+                    applyRemarkSelect.append('<option value="ZAB转入SAB">ZAB转入SAB</option>');
+                } else if (userDepositoryId === 2) {
+                    applyRemarkSelect.append('<option value="SAB转入ZAB">SAB转入ZAB</option>');
+                } else if (userDepositoryId === 0) {
+                    applyRemarkSelect.append('<option value="SAB转入ZAB">SAB转入ZAB</option>');
+                    applyRemarkSelect.append('<option value="ZAB转入SAB">ZAB转入SAB</option>');
+                }
+                layui.form.render('select'); // 重新渲染select，使新增的选项生效
                 // 如果depositoryId为0，则允许访问两个厂区
                 if (userDepositoryId === 0) {
                     pp = '/material';
