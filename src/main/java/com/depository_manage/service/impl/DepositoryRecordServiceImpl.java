@@ -114,7 +114,7 @@ public class DepositoryRecordServiceImpl implements DepositoryRecordService {
                 }
                 material.setPrice(0.00);
                 material.setQuantity(0.00);
-                material.setUnitPrice(0.00);
+//                material.setUnitPrice(0.00);
             } else {
                 BigDecimal bdNewPrice = new BigDecimal(newPrice);
                 bdNewPrice = bdNewPrice.setScale(2, RoundingMode.HALF_UP);
