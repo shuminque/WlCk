@@ -19,8 +19,8 @@ public class ReportService {
                         "    m.at_id as AT号,\n" +
                         "    m.mname as 品名,\n" +
                         "    COALESCE(LEFT(m.model, 30), 'N/A') AS 规格,\n" +
-                        "    SUM(CASE WHEN dr.type = 1 THEN dr.quantity ELSE 0 END) AS 入库数量,\n" +
-                        "    FORMAT(ROUND((SUM(CASE WHEN dr.type = 1 THEN dr.price * dr.quantity ELSE 0 END)),2), 2) AS 入库金额,\n" +
+                        "    SUM(CASE WHEN dr.type = 1 AND dr.apply_remark NOT LIKE ('%领用退回%')THEN dr.quantity ELSE 0 END) AS 入库数量,\n" +
+                        "    FORMAT(ROUND((SUM(CASE WHEN dr.type = 1 AND dr.apply_remark NOT LIKE ('%领用退回%') THEN dr.price * dr.quantity ELSE 0 END)),2), 2) AS 入库金额,\n" +
                         "    SUM(CASE WHEN dr.type = 0 AND dr.apply_remark NOT IN ('SAB转入ZAB','ZAB转入SAB') AND dr.apply_remark NOT LIKE ('%销售出库%') THEN dr.quantity ELSE 0 END)" +
                         "   -SUM(CASE WHEN dr.type = 1 AND dr.apply_remark LIKE ('%领用退回%') THEN dr.quantity ELSE 0 END) AS 出库数量,\n" +
                         "    FORMAT(ROUND((SUM(CASE WHEN dr.type = 0 AND dr.apply_remark NOT IN ('SAB转入ZAB','ZAB转入SAB') AND dr.apply_remark NOT LIKE ('%销售出库%') THEN dr.price * dr.quantity ELSE 0 END))" +
@@ -70,8 +70,8 @@ public class ReportService {
                         "    m.at_id as AT号,\n" +
                         "    m.mname as 品名,\n" +
                         "    COALESCE(LEFT(m.model, 30), 'N/A') AS 规格,\n" +
-                        "    SUM(CASE WHEN dr.type = 1 THEN dr.quantity ELSE 0 END) AS 入库数量,\n" +
-                        "    FORMAT(ROUND((SUM(CASE WHEN dr.type = 1 THEN dr.price * dr.quantity ELSE 0 END)),2), 2) AS 入库金额,\n" +
+                        "    SUM(CASE WHEN dr.type = 1 AND dr.apply_remark NOT LIKE ('%领用退回%')THEN dr.quantity ELSE 0 END) AS 入库数量,\n" +
+                        "    FORMAT(ROUND((SUM(CASE WHEN dr.type = 1 AND dr.apply_remark NOT LIKE ('%领用退回%') THEN dr.price * dr.quantity ELSE 0 END)),2), 2) AS 入库金额,\n" +
                         "    SUM(CASE WHEN dr.type = 0 AND dr.apply_remark NOT IN ('SAB转入ZAB','ZAB转入SAB') AND dr.apply_remark NOT LIKE ('%销售出库%') THEN dr.quantity ELSE 0 END)" +
                         "   -SUM(CASE WHEN dr.type = 1 AND dr.apply_remark LIKE ('%领用退回%') THEN dr.quantity ELSE 0 END) AS 出库数量,\n" +
                         "    FORMAT(ROUND((SUM(CASE WHEN dr.type = 0 AND dr.apply_remark NOT IN ('SAB转入ZAB','ZAB转入SAB') AND dr.apply_remark NOT LIKE ('%销售出库%') THEN dr.price * dr.quantity ELSE 0 END))-" +
@@ -121,8 +121,8 @@ public class ReportService {
                         "    m.at_id as AT号,\n" +
                         "    m.mname as 品名,\n" +
                         "    COALESCE(LEFT(m.model, 30), 'N/A') AS 规格,\n" +
-                        "    SUM(CASE WHEN dr.type = 1 THEN dr.quantity ELSE 0 END) AS 入库数量,\n" +
-                        "    FORMAT(ROUND((SUM(CASE WHEN dr.type = 1 THEN dr.price * dr.quantity ELSE 0 END)),2), 2) AS 入库金额,\n" +
+                        "    SUM(CASE WHEN dr.type = 1 AND dr.apply_remark NOT LIKE ('%领用退回%') THEN dr.quantity ELSE 0 END) AS 入库数量,\n" +
+                        "    FORMAT(ROUND((SUM(CASE WHEN dr.type = 1 AND dr.apply_remark NOT LIKE ('%领用退回%') THEN dr.price * dr.quantity ELSE 0 END)),2), 2) AS 入库金额,\n" +
                         "    SUM(CASE WHEN dr.type = 0 AND dr.apply_remark NOT IN ('SAB转入ZAB','ZAB转入SAB') AND dr.apply_remark NOT LIKE ('%销售出库%') THEN dr.quantity ELSE 0 END)" +
                         "   -SUM(CASE WHEN dr.type = 1 AND dr.apply_remark LIKE ('%领用退回%') THEN dr.quantity ELSE 0 END) AS 出库数量,\n" +
                         "    FORMAT(ROUND((SUM(CASE WHEN dr.type = 0 AND dr.apply_remark NOT IN ('SAB转入ZAB','ZAB转入SAB') AND dr.apply_remark NOT LIKE ('%销售出库%') THEN dr.price * dr.quantity ELSE 0 END))" +
@@ -182,8 +182,9 @@ public class ReportService {
                         "    SELECT\n" +
                         "        mt.id AS type_id,\n" +
                         "        mt.tname AS material_type_name,\n" +
-                        "        SUM(CASE WHEN dr.type = 1 THEN dr.price * dr.quantity ELSE 0 END) AS in_sum,\n" +
-                        "    SUM(CASE WHEN dr.type = 0 AND dr.apply_remark NOT IN ('SAB转入ZAB', 'ZAB转入SAB') AND dr.apply_remark NOT LIKE '%销售出库%' THEN dr.price * dr.quantity ELSE 0 END) AS normal_out_sum,\n" +
+                        "    SUM(CASE WHEN dr.type = 1 AND dr.apply_remark NOT LIKE ('%领用退回%') THEN dr.price * dr.quantity ELSE 0 END) AS in_sum,\n" +
+                        "    SUM(CASE WHEN dr.type = 0 AND dr.apply_remark NOT IN ('SAB转入ZAB', 'ZAB转入SAB') AND dr.apply_remark NOT LIKE '%销售出库%' THEN dr.price * dr.quantity ELSE 0 END)" +
+                        "   -SUM(CASE WHEN dr.type = 1 AND dr.apply_remark LIKE '%领用退回%' THEN dr.price * dr.quantity ELSE 0 END) AS normal_out_sum,\n" +
                         "    SUM(CASE WHEN dr.type = 0 AND dr.apply_remark IN ('SAB转入ZAB', 'ZAB转入SAB') THEN dr.price * dr.quantity ELSE 0 END) AS transfer_out_sum,\n" +
                         "    SUM(CASE WHEN dr.type = 0 AND dr.apply_remark LIKE '%销售出库%' THEN dr.price * dr.quantity ELSE 0 END) AS sales_out_sum\n" +
                         "    FROM material_type mt\n" +
