@@ -57,6 +57,15 @@
                                         </div>
                                     </div>
                                     <div class="layui-form-item">
+                                        <label class="layui-form-label">入库类型:</label>
+                                        <div class="layui-input-block">
+                                            <select name="applyRemark" class="layui-select" lay-filter="applyRemark">
+                                                <option value="采购入库">采购入库</option>
+                                                <option value="领用退回">领用退回</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="layui-form-item">
                                         <label class="layui-form-label">货币类型:</label>
                                         <div class="layui-input-block">
                                             <select name="currency" class="layui-select" lay-filter="currencyFilter">
@@ -65,22 +74,11 @@
                                             </select>
                                         </div>
                                     </div>
-
                                     <div class="layui-form-item">
                                         <label class="layui-form-label" id="priceLabel">入库单价:</label>
                                         <div class="layui-input-block">
-                                            <input name="price"  placeholder="请填写入库单价" value="" class="layui-input" lay-verify="number" required autocomplete="off">
+                                            <input name="price"  placeholder="请填写入库单价" value="" id="unitPriceSelect" class="layui-input" lay-verify="number" required autocomplete="off">
                                             <input name="convertedPrice" type="hidden" value="">
-                                        </div>
-                                    </div>
-
-                                    <div class="layui-form-item">
-                                        <label class="layui-form-label">入库类型:</label>
-                                        <div class="layui-input-block">
-                                            <select name="applyRemark" class="layui-select">
-                                                <option value="采购入库">采购入库</option>
-                                                <option value="领用退回">领用退回</option>
-                                            </select>
                                         </div>
                                     </div>
                                     <div class="layui-form-item">
@@ -143,11 +141,11 @@
     });
 </script>
 <script>
+    var usePrice;
     var depositoryMapping = {
         'SAB': 1,
         'ZAB': 2,
     };
-
     layui.use([ 'form', 'step', 'tableSelect', 'laydate'], function () {
         var $ = layui.$,
             form = layui.form,
@@ -354,6 +352,8 @@
                     done: function (elem, data) {
                         // 获取选中的数据
                         var selectedData = data.data[0];
+                        usePrice = selectedData.unitPrice;
+                        console.log(usePrice);
                         // 检查物品状态
                         if (selectedData.stateId === 6) {
                             // 如果stateId为6，显示提示信息并禁用提交按钮
@@ -368,6 +368,7 @@
                         $('#modelSelect').val(selectedData.model);
                         $('#enginSelect').val(selectedData.enginName);
                         $('#typeSelect').val(selectedData.typeName);
+                        // $('#unitPriceSelect').val(selectedData.unitPrice);
                         var depositoryId = depositoryMapping[selectedData.depositoryName];
                         $('#depositorySelect').val(depositoryId);
                         // // 获取物品的厂区名称
@@ -384,6 +385,7 @@
                         $("input[name='quantity']").focus();
                     }
                 });
+
                 $("#atIdSelect").trigger('click');
                 $(document).on('keyup', 'input[placeholder="搜索AT号"]', function(event) {
                     if (event.keyCode === 13) { // 如果是 Enter 键
@@ -393,20 +395,24 @@
                             if (firstItem.length) {
                                 // 触发第一个物品的选择事件
                                 firstItem.trigger('click');
-
                                 // 选择第一个物品后，触发确认按钮的点击事件
                                 $('.tableSelect_btn_select').click();
                             }
                         }, 100);
                     }
                 });
+
             },
             error: function() {
                 // 处理错误，例如显示一个消息
                 layer.msg('无法获取用户的厂区信息');
             }
         });
-
+        form.on('select(applyRemark)', function (data) {
+            if (data.value === '领用退回') {
+                $('#unitPriceSelect').val(usePrice);
+            }
+        });
         form.on('submit(formStep2)', function (data) {
             step.next('#stepForm');
             return false;
@@ -418,9 +424,7 @@
         $('.next').click(function () {
             step.next('#stepForm');
         });
-
         $(document).ready(function() {
-
             // 获取URL中的查询参数
             var urlParams = new URLSearchParams(window.location.search);
             var id = urlParams.get('id');
@@ -445,6 +449,7 @@
             }
         });
     });
+
 </script>
 </body>
 </html>
