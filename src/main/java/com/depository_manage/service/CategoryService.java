@@ -49,14 +49,12 @@ public class CategoryService {
 
         return topLevelCategories;
     }
-
     private List<Category> childrenHierarchy(List<Category> flatCategories) {
         List<Category> topLevelCategories = flatCategories.stream()
                 .filter(c -> c.getParentId() != null && !c.getTitle().contains("单能线") && !c.getTitle().contains("数控"))
                 .collect(Collectors.toList());
         return topLevelCategories;
     }//
-
     private void addChildren(Category parent, List<Category> flatCategories) {
         List<Category> children = flatCategories.stream()
                 .filter(c -> c.getParentId() != null && c.getParentId().equals(parent.getId()))
