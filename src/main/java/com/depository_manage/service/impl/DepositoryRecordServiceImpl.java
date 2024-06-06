@@ -403,11 +403,17 @@ public class DepositoryRecordServiceImpl implements DepositoryRecordService {
                         // 计算新的总数量
                         double totalQuantity = material.getQuantity() + record.getQuantity();
                         // 计算新的均价
-                        double unitPrice = totalPrice / totalQuantity;
-                        BigDecimal bdUnitPrice = new BigDecimal(unitPrice);
-                        bdUnitPrice = bdUnitPrice.setScale(2, RoundingMode.HALF_UP); // 保留两位小数，四舍五入
-                        material.setUnitPrice(bdUnitPrice.doubleValue());
-                        material.setQuantity(material.getQuantity() + record.getQuantity());
+                        if(totalQuantity==0){
+                            material.setUnitPrice(0.00);
+                            material.setQuantity(0.00);
+                        }else{
+                            double unitPrice = totalPrice / totalQuantity;
+                            BigDecimal bdUnitPrice = new BigDecimal(unitPrice);
+                            bdUnitPrice = bdUnitPrice.setScale(2, RoundingMode.HALF_UP); // 保留两位小数，四舍五入
+                            material.setUnitPrice(bdUnitPrice.doubleValue());
+                            material.setQuantity(material.getQuantity() + record.getQuantity());
+                        }
+
                         materialMapper.updateMaterial(material);
                     } else {
                         if (material.getQuantity() > record.getQuantity()) {
