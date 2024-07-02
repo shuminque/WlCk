@@ -34,11 +34,11 @@
                 var userDepositoryId = data.depositoryId;
                 authority = data.authority;
                 // 根据userDepositoryId显示/隐藏表格
-                if (userDepositoryId === 1) {
+                if (userDepositoryId === 1 && authority !=='仅查看') {
                     // 如果userDepositoryId为1，显示SAB表格并隐藏ZAB表格的容器
                     $('#categoryTreeSAB').parent().show();
                     $('#categoryTreeZAB').parent().hide();
-                } else if (userDepositoryId === 2) {
+                } else if (userDepositoryId === 2 && authority !=='仅查看') {
                     // 如果userDepositoryId为2，显示ZAB表格并隐藏SAB表格的容器
                     $('#categoryTreeZAB').parent().show();
                     $('#categoryTreeSAB').parent().hide();

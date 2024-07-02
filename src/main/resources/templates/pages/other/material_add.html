@@ -265,7 +265,7 @@
                 });
 
                 // 如果depositoryId为0，则允许访问两个厂区
-                if (userDepositoryId === 0) {
+                if (userDepositoryId === 0 || authority === '仅查看') {
                     pp = '/material';
                 } else {
                     pp = '/material?depositoryId=' + userDepositoryId;

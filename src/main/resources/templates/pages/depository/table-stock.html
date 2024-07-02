@@ -152,12 +152,12 @@
                                 // 获取当前行的depositoryName值
                                 var depositoryName = $(this).find("td[data-field='depositoryName']").text();
                                 // 当userDepositoryId为2且depositoryName为"SAB"时，隐藏该行的单价和金额列
-                                if (userDepositoryId === 2 && depositoryName === "SAB") {
+                                if (userDepositoryId === 2 && depositoryName === "SAB" && authority !=='仅查看') {
                                     $(this).find("td[data-field='unitPrice']").hide();
                                     $(this).find("td[data-field='price']").hide();
                                 }
                                 // 当userDepositoryId为1且depositoryName为"ZAB"时，隐藏该行的单价和金额列
-                                if (userDepositoryId === 1 && depositoryName === "ZAB") {
+                                if (userDepositoryId === 1 && depositoryName === "ZAB" && authority !=='仅查看') {
                                     $(this).find("td[data-field='unitPrice']").hide();
                                     $(this).find("td[data-field='price']").hide();
                                 }

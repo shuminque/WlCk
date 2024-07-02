@@ -186,15 +186,15 @@
                 userReviewGroupId = data.review_group_id;
 
                 let selectElem = document.getElementById('depositorySelect');
-                if (userDepositoryId === 1) {
-                    selectElem.innerHTML = '<option value="1">SAB</option>';
-                } else if (userDepositoryId === 2) {
-                    selectElem.innerHTML = '<option value="2">ZAB</option>';
-                } else if (userDepositoryId ===0){
+                if (userDepositoryId ===0 || userAuthority === '仅查看'){
                     selectElem.innerHTML =
                         '<option value="" selected>请选择厂区</option>'+
                         '<option value="1">SAB</option>' +
                         '<option value="2">ZAB</option>'
+                }else if (userDepositoryId === 2) {
+                    selectElem.innerHTML = '<option value="2">ZAB</option>';
+                } else if (userDepositoryId === 1) {
+                    selectElem.innerHTML = '<option value="1">SAB</option>';
                 }
                 layui.form.render('select');
 //                 if (userDepositoryId === 1 || userDepositoryId === 2) {
@@ -223,7 +223,7 @@
 //                 $("#currentTableId").html(toolbarTemplate);
 //                 $("#toolbarDemo").html(globalToolbarTemplate);
                 // 如果depositoryId为0，则允许访问两个厂区
-                if (userDepositoryId === 0) {
+                if (userDepositoryId === 0 || userAuthority === '仅查看') {
                     pp = '/depositoryRecord';
                 } else {
                     pp = '/depositoryRecord?depositoryId=' + userDepositoryId;
