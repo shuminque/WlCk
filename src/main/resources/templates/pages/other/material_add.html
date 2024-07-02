@@ -259,6 +259,9 @@
                         // 隐藏厂区选择框
                         $('#depositorySelectDiv').hide();
                     }
+                    if (authority === '仅查看') {
+                        $('#addEnginBtn').hide();
+                    }
                 });
 
                 // 如果depositoryId为0，则允许访问两个厂区
