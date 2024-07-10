@@ -143,7 +143,7 @@
                      NULL AS at_id  -- 显示at_id为空
                  FROM
                      once_fill AS o
-                         JOIN categories AS c ON o.apply_remark LIKE CONCAT('%', c.title, '%')
+                         JOIN categories c ON RIGHT(SUBSTRING_INDEX(o.apply_remark, '-', -1), LENGTH(c.title)) = c.title
                  WHERE
                              c.title = #{categoryName}
                          AND c.depository_id = #{depositoryId}
@@ -166,7 +166,7 @@
             d.at_id
         FROM
             depository_record AS d
-                JOIN categories AS c ON d.apply_remark LIKE CONCAT('%', c.title, '%')
+                JOIN categories c ON RIGHT(SUBSTRING_INDEX(d.apply_remark, '-', -1), LENGTH(c.title)) = c.title
         WHERE
                     c.title = #{categoryName}
                 AND c.depository_id = #{depositoryId}
