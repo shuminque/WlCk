@@ -54,7 +54,9 @@
             padding: 2px 8px; /* 减少标题行内间距 */
             line-height: 1.2; /* 调整标题行高 */
         }
-
+        .custom-input {
+            text-align: left;  /* 使内容左对齐 */
+        }
     </style>
 </head>
 <body>
@@ -210,7 +212,7 @@
                 </div>
             </div>
         </div>
-        <input class="layui-input" type="text" id="year-selector0" placeholder="请选择查看的年份">
+        <input class="layui-input" type="text" id="year-selector0" placeholder="请选择查看的年份" autocomplete="off">
         <div class="layui-row">
             <!-- 入库金额折线图 -->
             <div class="layui-col-md6">
@@ -221,7 +223,6 @@
                     </div>
                 </div>
             </div>
-
             <!-- 出库金额折线图 -->
             <div class="layui-col-md6">
                 <div class="layui-card">
@@ -249,7 +250,7 @@
                 <option value="1">SAB</option>
                 <option value="2">ZAB</option>
             </select>
-            <input type="text" id="month-selector" placeholder="请选择年月">
+            <input type="text" id="month-selector" placeholder="请选择年月" autocomplete="off">
             <div class="layui-row">
                 <!-- 各工程使用金额分析图 -->
                 <div class="layui-col-md12">
@@ -267,12 +268,34 @@
         </div>
 
         <div>
+            <select id="depository-selector-three">
+                <option value="">选择厂区</option>
+                <option value="1">SAB</option>
+                <option value="2">ZAB</option>
+            </select>
+            <input type="text" id="year-selector-three" placeholder="请选择年" autocomplete="off">
+            <button class="layui-input custom-input" id="ID-dropdown-demo-complex-1"></button>
+            <input type="hidden" name="applyRemark" id="applyRemarkInput-1" value="">
+            <div class="layui-row">
+                <!-- 产量柱形图 -->
+                <div class="layui-col-md12">
+                    <div class="layui-card">
+                        <div class="layui-card-header"><i class="fa fa-signal icon"></i>分类柱形图</div>
+                        <div class="layui-card-body">
+                            <div id="cateAmountChart" style="width: 100%; height: 500px;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div>
             <select id="depository-selector-two">
                 <option value="">选择厂区</option>
                 <option value="1">SAB</option>
                 <option value="2">ZAB</option>
             </select>
-            <input type="text" id="year-selector" placeholder="请选择年">
+            <input type="text" id="year-selector" placeholder="请选择年" autocomplete="off">
             <select name="typeId" id="typeSelect">
                 <option value="">请选择分类</option>
                 <option th:each="type : ${materialTypes}" th:value="${type.id}" th:text="${type.id}+' '+${type.tname}"></option>
@@ -297,6 +320,8 @@
 <script type="text/javascript" src="/static/js/http_ajax.googleapis.com_ajax_libs_jquery_3.5.1_jquery.js" charset="utf-8"></script>
 <script type="text/javascript" src="/static/js/http_cdn.bootcdn.net_ajax_libs_echarts_5.2.0_echarts.js" charset="utf-8"></script>
 <script>
+    let dropDataSAB = [];
+    let dropDataZAB = [];
     layui.use(['layer', 'miniTab','echarts','laydate','table'], function () {
         var $ = layui.jquery,
             layer = layui.layer,
@@ -304,8 +329,10 @@
             echarts = layui.echarts,
             laydate = layui.laydate,
             table = layui.table;
+        var dropdown = layui.dropdown;
         var userReviewGroupId;
         var userAuthority;
+        var userDepositoryId;
         //用户区分
         $.ajax({
             url: '/get_user_depository',
@@ -313,7 +340,7 @@
             dataType: 'json',
             success: function(data) {
                 let pp;
-                var userDepositoryId = data.depositoryId;
+                userDepositoryId = data.depositoryId;
                 var toolbarTemplate;
                 var globalToolbarTemplate;
                 userAuthority = data.authority;
@@ -376,6 +403,58 @@
                 layer.msg('无法获取用户的厂区信息');
             }
         });
+        function formatData(apiData) {
+            let formattedData = apiData.map(item => {
+                let formattedItem = { title: item.title };
+                if (item.children && item.children.length > 0) {
+                    formattedItem.child = formatData(item.children); // 递归处理子项目
+                }
+                return formattedItem;
+            });
+            return formattedData;
+        }
+        function loadCategoryData(category, callback) {
+            $.get('/api/categories/' + category, function(response) {
+                if (response.code === 0) {
+                    callback(formatData(response.data));
+                } else {
+                    layer.msg(`无法加载${category.toUpperCase()}的分类数据`);
+                }
+            }).fail(function() {
+                layer.msg(`无法加载${category.toUpperCase()}的分类数据`);
+            });
+        }
+
+        function loadDepositoryDataForElem(elemSelector, dropdownData) {
+            setParentForChild(dropdownData);
+            dropdown.render({
+                elem: elemSelector,
+                data: dropdownData,
+                click: function (item) {
+                    let path = item.title;
+                    let currentItem = item;
+                    while (currentItem.parent) {
+                        path = currentItem.parent.title + "-" + path;
+                        currentItem = currentItem.parent;
+                    }
+                    let displayTitle = path.split('-').pop();
+                    $(elemSelector).text(displayTitle);
+                    const remarkInputSelector = elemSelector.replace(/ID-dropdown-demo-complex(-\d+)?$/, "applyRemarkInput$1");
+                    $(remarkInputSelector).val(displayTitle);
+                    fetchCateChart();
+                }
+            });
+        }
+        function setParentForChild(data) {
+            for (let i = 0; i < data.length; i++) {
+                if (data[i].child) {
+                    for (let j = 0; j < data[i].child.length; j++) {
+                        data[i].child[j].parent = data[i];
+                    }
+                    setParentForChild(data[i].child);
+                }
+            }
+        }
         // 初始化日期选择器
         laydate.render({
             elem: '#month-selector',
@@ -393,6 +472,96 @@
             elem: '#year-selector',
             type: 'year',
         });
+        laydate.render({
+            elem: '#year-selector-three',
+            type: 'year',
+            done: function(value) {
+                fetchCateChart();
+            }
+        });
+        var myChartCate = echarts.init(document.getElementById('cateAmountChart')); // 请确保您的div有一个ID，例如cateAmountChart
+
+        function fetchCateChart() {
+            var year = document.getElementById('year-selector-three').value;
+            var depositoryId = document.getElementById('depository-selector-three').value;
+            var categoryTitle = document.getElementById('applyRemarkInput-1').value;
+
+            if (!depositoryId ) {
+                alert("请确保已选择所有条件！");
+                return;
+            }
+            var url = '/CategoryForYear/' + year + '/' + depositoryId + '/' + categoryTitle;
+            $.get(url, function(data) {
+                var colors = ['#5470C6'];
+                var option = {
+                    title: {
+                        text: '分类柱形图'
+                    },
+                    tooltip: {
+                        trigger: 'axis',
+                        axisPointer: {
+                            type: 'shadow'
+                        }
+                    },
+                    xAxis: {
+                        data: data.map(function(item) { return item.month; })
+                    },
+                    yAxis: [
+                        {
+                            type: 'value',
+                            position: 'left'
+                        }
+                    ],
+                    series: [
+                        {
+                            name: '金额',
+                            type: 'bar',
+                            yAxisIndex: 0,
+                            data: data.map(function(item) { return item.amount; }),
+                            label: {
+                                normal: {
+                                    show: true,
+                                    position: 'top'
+                                }
+                            },
+                            itemStyle: {
+                                normal: {
+                                    color: function(params) {
+                                        return colors[params.dataIndex % colors.length];
+                                    }
+                                }
+                            }
+                        }
+                    ]
+                };
+                myChartCate.clear(); // 清除旧的图表数据
+                myChartCate.setOption(option, true); // 使用新数据更新图表，第二个参数为 true 表示不合并
+            });
+        }
+
+        function handleDepositoryChange() {
+
+            var depositoryId = document.getElementById('depository-selector-three').value;
+            var catedepositoryId = (depositoryId == 1) ? "sab" : "zab";
+            console.log(depositoryId);
+            console.log(catedepositoryId);
+            // // 清空之前的分类选择器内容 有BUG
+            // document.getElementById('ID-dropdown-demo-complex-1').innerText = '选择分类';
+            // document.getElementById('applyRemarkInput-1').value = '';
+            loadCategoryData(catedepositoryId, function(data) {
+                if (depositoryId == 1) {
+                    dropDataSAB = data;
+                    loadDepositoryDataForElem('#ID-dropdown-demo-complex-1', dropDataSAB);
+                } else {
+                    dropDataZAB = data;
+                    loadDepositoryDataForElem('#ID-dropdown-demo-complex-1', dropDataZAB);
+                }
+                // 重新加载数据后调用fetchCateChart以确保图表更新
+                fetchCateChart();
+            });
+        }
+        document.getElementById('depository-selector-three').addEventListener('change', handleDepositoryChange);
+
         // 初始化ECharts实例
         var myChart = echarts.init(document.getElementById('typeAmountChart')); // 请确保您的div有一个ID，例如typeAmountChart
         function fetchTypeAmountDataAndRenderChart() {
@@ -401,6 +570,7 @@
             var typeId = document.getElementById('typeSelect').value;
 
             var url = '/type-amounts/' + year + '/' + typeId + '/' + depositoryId;
+            // var url = '/CategoryForYear/' + year + '/' + depositoryId + '/' +"N沟" ;
             $.get(url, function(data) {
                 var colors = ['#5470C6'];
 
@@ -584,6 +754,7 @@
             echartsInstances.push(initChart('outbound-chart', months, sabOutbound, zabOutbound, '出库金额'));
             echartsInstances.push(initBarChart('stock-chart', months, sabStock, zabStock, '库存流水'));
         }
+
         function initCategoryBarChart(data) {
             // 获取所有的类别
             var categories = data.map(item => item.category);

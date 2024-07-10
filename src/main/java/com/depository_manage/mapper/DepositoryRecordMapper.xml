@@ -574,6 +574,7 @@
         GROUP BY month
         ORDER BY month;
     </select>
+    <!--    厂区年月-->
     <select id="getCategoryOutboundsForYearMonth" resultType="com.depository_manage.pojo.CategoryOutboundDTO" parameterType="java.util.Map">
         WITH CategoryOutbounds AS (
             -- 从 once_fill 表查询
@@ -627,6 +628,79 @@
         ORDER BY
             month, category_id;
     </select>
+    <!--    厂区年分类-->
+    <select id="getCategoryOutboundsForYear" resultType="com.depository_manage.pojo.CategoryOutboundDTO" parameterType="java.util.Map">
+        -- 创建一个包含所有月份的临时表
+        WITH AllMonths AS (
+            SELECT CONCAT(#{year}, '-01') AS month
+        UNION ALL SELECT CONCAT(#{year}, '-02')
+                  UNION ALL SELECT CONCAT(#{year}, '-03')
+                  UNION ALL SELECT CONCAT(#{year}, '-04')
+                  UNION ALL SELECT CONCAT(#{year}, '-05')
+                  UNION ALL SELECT CONCAT(#{year}, '-06')
+                  UNION ALL SELECT CONCAT(#{year}, '-07')
+                  UNION ALL SELECT CONCAT(#{year}, '-08')
+                  UNION ALL SELECT CONCAT(#{year}, '-09')
+                  UNION ALL SELECT CONCAT(#{year}, '-10')
+                  UNION ALL SELECT CONCAT(#{year}, '-11')
+                  UNION ALL SELECT CONCAT(#{year}, '-12')
+                      ),
+    CategoryOutbounds AS (
+        -- 从 once_fill 表查询
+        SELECT
+            DATE_FORMAT(time, '%Y-%m') as month,
+            c.title AS category,
+            c.id AS category_id,
+            SUM(o.unit_price * o.quantity) AS amount
+        FROM
+            once_fill o
+            JOIN categories c ON o.apply_remark LIKE CONCAT('%', c.title, '%')
+            AND c.id NOT IN (SELECT parent_id FROM categories WHERE parent_id IS NOT NULL)
+            AND c.parent_id NOT IN (SELECT id FROM categories WHERE title = '销售出库')
+        WHERE
+            DATE_FORMAT(time, '%Y') = #{year}
+                          AND o.depositoryId = #{depositoryId}
+                          AND c.depository_id = #{depositoryId}
+                          AND c.title = #{categoryTitle}
+                          GROUP BY
+                          DATE_FORMAT(time, '%Y-%m'), c.id, c.title
+
+                      UNION ALL
+
+                            -- 从 depository_record 表查询
+                      SELECT
+                      DATE_FORMAT(apply_time, '%Y-%m') as month,
+                      c.title AS category,
+                      c.id AS category_id,
+                      SUM(d.price * d.quantity) AS amount
+                      FROM
+                      depository_record d
+                      JOIN categories c ON d.apply_remark LIKE CONCAT('%', c.title, '%')
+                      AND c.id NOT IN (SELECT parent_id FROM categories WHERE parent_id IS NOT NULL)
+                      AND c.parent_id NOT IN (SELECT id FROM categories WHERE title = '销售出库')
+                      WHERE
+                      d.type = 0
+                      AND d.review_pass = 1
+                      AND d.depository_id = #{depositoryId}
+                          AND c.depository_id = #{depositoryId}
+                          AND DATE_FORMAT(apply_time, '%Y') = #{year}
+                          AND c.title = #{categoryTitle}
+                          GROUP BY
+                          DATE_FORMAT(apply_time, '%Y-%m'), c.id, c.title
+                      )
+        SELECT
+            a.month,
+            coalesce(co.category, #{categoryTitle}) AS category,
+            coalesce(ROUND(SUM(co.amount)), 0) AS amount
+        FROM
+            AllMonths a
+                LEFT JOIN CategoryOutbounds co ON a.month = co.month
+        GROUP BY
+            a.month, co.category, co.category_id
+        ORDER BY
+            a.month, co.category_id;
+    </select>
+
     <select id="fetchMonthlyAmountByTypeAndYear" resultType="com.depository_manage.pojo.MonthlyAmountDTO" parameterType="map">
         WITH MonthlyAmount AS (
             SELECT

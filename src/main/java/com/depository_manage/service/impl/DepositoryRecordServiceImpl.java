@@ -659,8 +659,10 @@ public class DepositoryRecordServiceImpl implements DepositoryRecordService {
         return depositoryRecordMapper.getMonthlyAmountsForYear(year);
     }
     public List<CategoryOutboundDTO> fetchCategoryOutboundsForYearMonth(String year, String month, Integer depositoryId) {
-        // 逻辑调用mapper
         return depositoryRecordMapper.getCategoryOutboundsForYearMonth(year, month, depositoryId);
+    }
+    public List<CategoryOutboundDTO> getCategoryOutboundsForYear(String year, Integer depositoryId, String categoryTitle) {
+        return depositoryRecordMapper.getCategoryOutboundsForYear(year, depositoryId, categoryTitle);
     }
     public List<MonthlyAmountDTO> fetchMonthlyAmountByTypeAndYear(Integer typeId, String year,Integer depositoryId){
         return depositoryRecordMapper.fetchMonthlyAmountByTypeAndYear(typeId, year, depositoryId);
