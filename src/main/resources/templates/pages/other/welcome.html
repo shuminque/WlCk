@@ -828,7 +828,7 @@
                     dataType: 'json',
                     success: function(records) {
                         var widthPercentage = 80; // 80%
-                        var heightPercentage = 60; // 60%
+                        var heightPercentage = 80; // 60%
 
                         var screenWidth = $(window).width();
                         var screenHeight = $(window).height();
@@ -837,8 +837,8 @@
                         var popupHeight = (heightPercentage / 100) * screenHeight;
 
                         // 确保弹出层的尺寸不超过一个最大值
-                        var maxPopupWidth = 800; // 最大宽度
-                        var maxPopupHeight = 600; // 最大高度
+                        var maxPopupWidth = 2800; // 最大宽度
+                        var maxPopupHeight = 2600; // 最大高度
 
                         popupWidth = Math.min(popupWidth, maxPopupWidth);
                         popupHeight = Math.min(popupHeight, maxPopupHeight);
@@ -902,7 +902,6 @@
                         { field: 'categoryTitle', title: '分类标题' ,hide: true}
                     ]],
                     limit: records.length,
-                    height: 280,
                     data: records,
                 });
             }
