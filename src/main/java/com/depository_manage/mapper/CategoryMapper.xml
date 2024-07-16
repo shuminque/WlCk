@@ -178,7 +178,7 @@
             source_table, name, model, unitPrice, apply_remark, category_title, at_id
         ORDER BY
             CASE WHEN at_id IS NULL THEN 1 ELSE 0 END, -- 首先根据at_id是否为NULL进行排序
-    at_id ASC  -- 然后以at_id升序排列
+        totalAmount DESC  -- 然后以at_id升序排列
 
     </select>
 </mapper>
