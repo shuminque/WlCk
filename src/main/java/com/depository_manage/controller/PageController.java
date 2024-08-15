@@ -141,7 +141,10 @@ public class PageController {
     public String productInfo_add() {
         return "pages/other/productInfo_add";
     }
-
+    @GetMapping("/lineData_add")
+    public String lineData_add() {
+        return "pages/other/line_data";
+    }
     @GetMapping("/dropData_add")
     public String dropData_add() {
         return "pages/other/dropData_add";

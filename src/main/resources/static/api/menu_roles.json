@@ -191,7 +191,7 @@
                         },
                         {
                             "title": "产量信息",
-                            "href": "/productInfo_add",
+                            "href": "/lineData_add",
                             "icon": "layui-icon layui-icon-chart",
                             "target": "_self",
                             "roles": ["SAB_cg","SAB_sh","ZAB_cg","ZAB_sh","ALL"]

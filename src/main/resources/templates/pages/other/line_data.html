@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>产线数据管理</title>
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <link rel="stylesheet" href="/static/lib/layui-v2.6.3/css/layui.css" media="all">
+  <link rel="stylesheet" href="/static/css/public.css" media="all">
+</head>
+<body>
+<div class="layuimini-container">
+  <div class="layuimini-main">
+    <fieldset class="table-search-fieldset">
+      <legend>搜索产线数据</legend>
+      <div style="margin: 10px 10px 10px 10px">
+        <form class="layui-form layui-form-pane" action="">
+          <div class="layui-form-item">
+            <div class="layui-inline">
+              <label class="layui-form-label">日期</label>
+              <div class="layui-input-block">
+                <input type="text" name="date" id="date1" placeholder="请选择日期" autocomplete="off" class="layui-input">
+              </div>
+            </div>
+            <div class="layui-inline">
+              <button type="submit" class="layui-btn layui-btn-primary" lay-submit lay-filter="data-search-btn">
+                <i class="layui-icon"></i> 搜 索
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </fieldset>
+    <button id="addLineDataBtn" class="layui-btn">添加产线数据</button>
+    <button id="deleteSelectedBtn" class="layui-btn layui-btn-danger">批量删除</button>
+    <!-- 增加导入按钮 -->
+    <button id="importLineDataBtn" class="layui-btn">导入数据</button>
+
+    <!-- 导入数据的弹出层表单 -->
+    <div id="lineDataImportForm" style="display: none;">
+      <fieldset class="table-search-fieldset">
+        <div class="layui-fluid">
+          <div class="layui-card">
+            <div class="layui-card-body">
+              <div>
+                <form class="layui-form" lay-filter="form2" style="margin: 0 auto;max-width: 460px;padding-top: 20px; padding-bottom: 200px">
+                  <div class="layui-form-item">
+                    <label class="layui-form-label">日期:</label>
+                    <div class="layui-input-block">
+                      <input type="text" placeholder="请选择日期" name="date" id="importDate" class="layui-input" lay-verify="required" required>
+                    </div>
+                  </div>
+                  <div class="layui-form-item">
+                    <label class="layui-form-label">选择文件:</label>
+                    <div class="layui-input-block">
+                      <input type="file" name="file" accept=".xls,.xlsx" lay-verify="required" required>
+                    </div>
+                  </div>
+                  <div class="layui-form-item">
+                    <div class="layui-input-block">
+                      <button class="layui-btn" lay-submit lay-filter="importSubmitBtn">&emsp;导入数据&emsp;</button>
+                    </div>
+                  </div>
+                </form>
+              </div>
+            </div>
+            <hr>
+          </div>
+        </div>
+      </fieldset>
+    </div>
+
+    <table class="layui-hide" id="currentTableId" lay-filter="currentTableFilter"></table>
+    <div id="lineDataAddForm" style="display: none;">
+      <fieldset class="table-search-fieldset">
+        <div class="layui-fluid">
+          <div class="layui-card">
+            <div class="layui-card-body">
+              <div>
+                <form class="layui-form" lay-filter="form1" style="margin: 0 auto;max-width: 460px;padding-top: 20px; padding-bottom: 200px">
+                  <div class="layui-form-item">
+                    <label class="layui-form-label">日期:</label>
+                    <div class="layui-input-block">
+                      <input type="text" placeholder="请填写日期" name="date" id="date2" class="layui-input" lay-verify="required" required>
+                    </div>
+                  </div>
+                  <div class="layui-form-item">
+                    <label class="layui-form-label">产线名称:</label>
+                    <div class="layui-input-block">
+                      <input type="text" placeholder="请填写产线名称" name="lineName" class="layui-input" lay-verify="required" required>
+                    </div>
+                  </div>
+                  <div class="layui-form-item">
+                    <label class="layui-form-label">产量:</label>
+                    <div class="layui-input-block">
+                      <input type="number" placeholder="请填写产量" name="production" class="layui-input" lay-verify="required" required>
+                    </div>
+                  </div>
+                  <div class="layui-form-item">
+                    <div class="layui-input-block">
+                      <button class="layui-btn" lay-submit lay-filter="formStep">&emsp;增加产线数据&emsp;</button>
+                    </div>
+                  </div>
+                </form>
+              </div>
+            </div>
+            <hr>
+          </div>
+        </div>
+      </fieldset>
+    </div>
+    <script type="text/html" id="operation-bar">
+      <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
+      <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="delete">删除</a>
+    </script>
+    <script type="text/template" id="editModelTemplate">
+      <form class="layui-form" lay-filter="editFormFilter">
+        <input type="hidden" name="id"> <!-- 新增的隐藏字段，用于存放要编辑的数据的ID -->
+        <div class="layui-form-item">
+          <label class="layui-form-label">日期:</label>
+          <div class="layui-input-block">
+            <input type="text" placeholder="请填写日期" name="date" id="date3" class="layui-input" lay-verify="required" required>
+          </div>
+        </div>
+        <div class="layui-form-item">
+          <label class="layui-form-label">产线名称:</label>
+          <div class="layui-input-block">
+            <input type="text" placeholder="请填写产线名称" name="lineName" class="layui-input" lay-verify="required" required>
+          </div>
+        </div>
+        <div class="layui-form-item">
+          <label class="layui-form-label">产量:</label>
+          <div class="layui-input-block">
+            <input type="number" placeholder="请填写产量" name="production" class="layui-input" lay-verify="required" required>
+          </div>
+        </div>
+        <div class="layui-form-item">
+          <div class="layui-input-block">
+            <button class="layui-btn" lay-submit lay-filter="editSubmitBtnFilter">&emsp;保存修改&emsp;</button>
+          </div>
+        </div>
+      </form>
+    </script>
+  </div>
+</div>
+<script src="/static/lib/layui-v2.6.3/layui.js" charset="utf-8"></script>
+<script>
+  layui.use(['form', 'table', 'layer', 'laydate'], function () {
+    var $ = layui.jquery,
+            form = layui.form,
+            table = layui.table,
+            laydate = layui.laydate,
+            layer = layui.layer;
+
+    laydate.render({ elem: '#date1', type: 'month' });
+    laydate.render({
+      elem: '#date2',
+      type: 'month',
+      done: function(value, date, endDate) {
+        // 将选择的年-月处理为具体日期（如该月的第一天）
+        var fullDate = value + '-01';
+        $('input[name="date"]').val(fullDate);  // 将完整日期设置到隐藏字段或直接提交
+      }
+    });
+    laydate.render({
+      elem: '#date3',
+      type: 'month',
+      done: function(value, date, endDate) {
+        var fullDate = value + '-01';
+        $('input[name="date"]').val(fullDate);
+      }
+    });
+    laydate.render({ elem: '#importDate', type: 'month' });  // 日期选择器
+    // 打开导入数据的表单
+    $('#importLineDataBtn').on('click', function () {
+      layer.open({
+        type: 1,
+        title: '导入数据',
+        area: ['500px', '400px'],
+        content: $('#lineDataImportForm'),
+        success: function (layero, index) { }
+      });
+    });
+    // 监听导入数据的提交
+    form.on('submit(importSubmitBtn)', function (data) {
+      var formData = new FormData();
+      var fileInput = $('input[name="file"]')[0].files[0];
+      var date = data.field.date + '-01';  // 将月转换为完整日期
+      formData.append("file", fileInput);
+      formData.append("date", date);
+
+      $.ajax({
+        url: "/lineData/import",
+        type: 'POST',
+        data: formData,
+        processData: false,
+        contentType: false,
+        beforeSend: function () {
+          this.layerIndex = layer.load(0, { shade: [0.5, '#393D49'] });
+        },
+        success: function (res) {
+          layer.close(this.layerIndex);
+          if (res.status >= 300) {
+            layer.msg('导入失败!');
+          } else {
+            layer.msg("导入成功！", { icon: 6, time: 1000 });
+            setTimeout(function () {
+              table.reload('currentTableId');
+              layer.closeAll();
+            }, 1100);
+          }
+        },
+        error: function (jqXHR, textStatus, errorThrown) {
+          layer.close(this.layerIndex);
+          layer.msg('错误的操作，错误信息：' + errorThrown, { icon: 5, time: 3000 });
+        }
+      });
+      return false;
+    });
+    table.render({
+      elem: "#currentTableId",
+      url: "/lineData/findAll",
+      // initSort: { field: 'date', type: 'desc' },
+      parseData: function (res) {
+        return {
+          "status": res.status,
+          "message": res.statusInfo.message,
+          "count": res.count,
+          "data": res.data
+        };
+      },
+      response: {
+        statusName: 'status',
+        statusCode: 200,
+        msgName: 'message',
+        countName: 'count',
+        dataName: 'data'
+      },
+      toolbar: ['filter', 'exports', 'print'],
+      cols: [
+        [
+          { type: 'checkbox', fixed: 'left' },  // 增加复选框
+          { field: 'id', title: '编号', hide: true },
+          { field: 'date', title: '日期', sort: true, templet: function (d) {
+              var date = new Date(d.date);
+              return date.getFullYear() + '-' + (date.getMonth() + 1).toString().padStart(2, '0');
+            }},
+          { field: 'lineName', title: '产线名称', sort: true },
+          { field: 'production', title: '产量', sort: true },
+          { title: '操作', align: 'center', toolbar: '#operation-bar' }
+        ]
+      ]
+    });
+
+    form.on('submit(data-search-btn)', function (data) {
+      var req = {};
+      data = data.field;
+      if (data.date !== '') {
+        var yearMonth = data.date.split('-');
+        var year = parseInt(yearMonth[0], 10);
+        var month = parseInt(yearMonth[1], 10);
+        var startDate = new Date(year, month - 1, 1);
+        req.startDate = startDate.toISOString().split('T')[0];
+        var endDate = new Date(year, month, 0);
+        req.endDate = endDate.toISOString().split('T')[0];
+      }
+      table.reload('currentTableId', {
+        url: "/lineData",
+        page: { curr: 1 },
+        where: req
+      }, 'data');
+
+      return false;
+    });
+
+    $('#addLineDataBtn').on('click', function () {
+      layer.open({
+        type: 1,
+        title: '添加产线数据',
+        area: ['500px', '400px'],
+        content: $('#lineDataAddForm'),
+        success: function (layero, index) { }
+      });
+    });
+
+    $('#deleteSelectedBtn').on('click', function () {
+      var checkStatus = table.checkStatus('currentTableId');
+      var ids = checkStatus.data.map(function(item) { return item.id; });
+      if (ids.length === 0) {
+        layer.msg('请选择要删除的记录');
+        return;
+      }
+      layer.confirm('确定要删除选中的记录吗？', function(index) {
+        $.ajax({
+          url: "/lineData/deleteBatch",
+          type: 'POST',
+          contentType: "application/json;charset=utf-8",
+          data: JSON.stringify(ids),
+          success: function(data) {
+            layer.msg('删除成功！');
+            table.reload('currentTableId');
+          },
+          error: function() {
+            layer.msg('删除失败！');
+          }
+        });
+        layer.close(index);
+      });
+    });
+
+    form.on('submit(formStep)', function (data) {
+      $.ajax({
+        url: "/lineData/create",
+        type: 'post',
+        dataType: 'json',
+        contentType: "application/json;charset=utf-8",
+        data: JSON.stringify(data.field),
+        beforeSend: function () {
+          this.layerIndex = layer.load(0, { shade: [0.5, '#393D49'] });
+        },
+        success: function (data) {
+          layer.close(this.layerIndex);
+          if (data.status >= 300) {
+            layer.msg('添加失败!');
+          } else {
+            layer.msg("添加成功！", { icon: 6, time: 1000 });
+            setTimeout(function () {
+              table.reload('currentTableId');
+              layer.closeAll();
+            }, 1100);
+          }
+        },
+        error: function (jqXHR, textStatus, errorThrown) {
+          layer.close(this.layerIndex);
+          layer.msg('错误的操作，错误信息：' + errorThrown, { icon: 5, time: 3000 });
+        },
+        complete: function () {
+          form.val("form1", { 'date': "", 'lineName': "", 'production': "" });
+        }
+      });
+      return false;
+    });
+
+    table.on('tool(currentTableFilter)', function (obj) {
+      var data = obj.data;
+      var layEvent = obj.event;
+
+      if (layEvent === 'edit') {
+        editModel(data);
+      } else if (layEvent === 'delete') {
+        deleteModel(data.id);
+      }
+    });
+
+    function editModel(data) {
+      if (data.date) {
+        var date = new Date(data.date);
+        data.date = date.getFullYear() + '-' + (date.getMonth() + 1).toString().padStart(2, '0') + '-' + date.getDate().toString().padStart(2, '0');
+      }
+      var index = layer.open({
+        type: 1,
+        title: '编辑产线数据',
+        area: ['40%', '60%'],
+        content: $('#editModelTemplate').html(),
+        success: function (layero, index) {
+          var form = layui.form;
+          form.val("editFormFilter", data);
+          layui.laydate.render({ elem: layero.find('input[name="date"]')[0] });
+          form.on('submit(editSubmitBtnFilter)', function (formData) {
+            $.ajax({
+              url: "/lineData/" + data.id,
+              type: 'PUT',
+              dataType: 'json',
+              contentType: "application/json;charset=utf-8",
+              data: JSON.stringify(formData.field),
+              success: function (data, textStatus, xhr) {
+                layer.close(this.layerIndex);
+                if (data.status === 205) {
+                  layer.msg("更新成功！", { icon: 6, time: 1000 });
+                  table.reload('currentTableId');
+                } else if (data.status === 409) {
+                  layer.msg('更新失败：' + data.data, { icon: 5, time: 3000 });
+                } else {
+                  layer.msg('未知错误：' + xhr.status, { icon: 5, time: 3000 });
+                }
+                layer.close(index);
+              },
+              error: function (xhr, textStatus, errorThrown) {
+                layer.close(this.layerIndex);
+                layer.msg('请求失败：' + errorThrown, { icon: 5, time: 3000 });
+              }
+            });
+            return false;
+          });
+        }
+      });
+    }
+
+    function deleteModel(id) {
+      layer.confirm('确定要删除吗？', function (index) {
+        $.ajax({
+          url: "/lineData/" + id,
+          type: 'DELETE',
+          success: function (data) {
+            layer.msg('删除成功！');
+            table.reload('currentTableId');
+          },
+          error: function () {
+            layer.msg('删除失败！');
+          }
+        });
+        layer.close(index);
+      });
+    }
+  });
+</script>
+</body>
+</html>

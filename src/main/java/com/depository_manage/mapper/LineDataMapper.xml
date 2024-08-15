@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.depository_manage.mapper.LineDataMapper">
+
+    <resultMap id="lineDataMap" type="com.depository_manage.entity.LineData">
+        <id column="id" property="id" jdbcType="INTEGER" />
+        <result column="date" property="date" jdbcType="DATE" />
+        <result column="lineName" property="lineName" jdbcType="VARCHAR" />
+        <result column="production" property="production" jdbcType="INTEGER" />
+    </resultMap>
+
+    <sql id="allColumns">
+        l.id, l.date, l.lineName, l.production
+    </sql>
+
+    <select id="findLineDataAll" resultMap="lineDataMap">
+        SELECT
+        <include refid="allColumns" />
+        FROM line_data l
+        order by date desc
+    </select>
+
+    <select id="findLineDataByCondition" resultMap="lineDataMap" parameterType="map">
+        SELECT
+        <include refid="allColumns" />
+        FROM line_data l WHERE 1 = 1
+        <if test="id != null">
+            AND l.id = #{id}
+        </if>
+        <if test="startDate != null and endDate != null">
+            AND l.date BETWEEN #{startDate} AND #{endDate}
+        </if>
+        <if test="lineName != null">
+            AND l.lineName = #{lineName}
+        </if>
+        <if test="production != null">
+            AND l.production = #{production}
+        </if>
+    </select>
+
+    <select id="findLineDataByDate" resultMap="lineDataMap" parameterType="date">
+        SELECT
+        <include refid="allColumns" />
+        FROM line_data l WHERE l.date = #{date}
+    </select>
+
+    <select id="findLineDataById" resultMap="lineDataMap" parameterType="integer">
+        SELECT
+        <include refid="allColumns" />
+        FROM line_data l WHERE l.id = #{id}
+    </select>
+
+    <insert id="insertLineData" parameterType="map">
+        INSERT INTO line_data (
+            date, lineName, production
+        ) VALUES (
+                     #{date}, #{lineName}, #{production}
+                 )
+    </insert>
+
+    <insert id="batchInsert" parameterType="java.util.List">
+        INSERT INTO line_data (date, lineName, production)
+        VALUES
+        <foreach collection="list" item="item" separator=",">
+            (#{item.date}, #{item.lineName}, #{item.production})
+        </foreach>
+    </insert>
+
+    <update id="updateLineData" parameterType="map">
+        UPDATE line_data
+        <set>
+            <if test="date != null">
+                date = #{date},
+            </if>
+            <if test="lineName != null">
+                lineName = #{lineName},
+            </if>
+            <if test="production != null">
+                production = #{production}
+            </if>
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    <delete id="deleteLineDataById" parameterType="int">
+        DELETE FROM line_data WHERE id = #{id}
+    </delete>
+
+    <select id="findCountByCondition" parameterType="map" resultType="integer">
+        SELECT
+        count(*)
+        FROM line_data l WHERE 1=1
+        <if test="id != null">
+            AND l.id = #{id}
+        </if>
+        <if test="startDate != null and endDate != null">
+            AND l.date BETWEEN #{startDate} AND #{endDate}
+        </if>
+        <if test="lineName != null">
+            AND l.lineName = #{lineName}
+        </if>
+        <if test="production != null">
+            AND l.production = #{production}
+        </if>
+    </select>
+
+</mapper>

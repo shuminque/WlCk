@@ -335,7 +335,7 @@
         var userReviewGroupId;
         var userAuthority;
         var userDepositoryId;
-        //用户区分
+        // 用户区分
         $.ajax({
             url: '/get_user_depository',
             type: 'GET',
@@ -357,20 +357,20 @@
                     url: pp, // 数据接口
                     height: "full-50",
                     height: 200,
-                    parseData: function (res) { //res 即为原始返回的数据
+                    parseData: function (res) { // res 即为原始返回的数据
                         return {
-                            "status": res.status, //解析接口状态
-                            "message": res.statusInfo.message, //解析提示文本
-                            "count": res.count, //解析数据长度
-                            "data": res.data //解析数据列表
+                            "status": res.status, // 解析接口状态
+                            "message": res.statusInfo.message, // 解析提示文本
+                            "count": res.count, // 解析数据长度
+                            "data": res.data // 解析数据列表
                         };
                     },
                     response: {
-                        statusName: 'status' //规定数据状态的字段名称，默认：code
-                        ,statusCode: 200 //规定成功的状态码，默认：0
-                        ,msgName: 'message' //规定状态信息的字段名称，默认：msg
-                        ,countName: 'count' //规定数据总数的字段名称，默认：count
-                        ,dataName: 'data' //规定数据列表的字段名称，默认：data
+                        statusName: 'status', // 规定数据状态的字段名称，默认：code
+                        statusCode: 200, // 规定成功的状态码，默认：0
+                        msgName: 'message', // 规定状态信息的字段名称，默认：msg
+                        countName: 'count', // 规定数据总数的字段名称，默认：count
+                        dataName: 'data' // 规定数据列表的字段名称，默认：data
                     },
                     cols: [ [ // 表头
                         {field: 'title', title: '标题', hide: true},
@@ -383,7 +383,6 @@
                             }},
                     ]],
                     done: function(res, curr, count){
-                        // 表格渲染完成后的回调
                         $('#noticeTable + div .layui-table-body tbody > tr').each(function(){
                             var dataIndex = $(this).attr('data-index');
                             var row = res.data[dataIndex];
@@ -391,6 +390,7 @@
                         });
                     }
                 });
+
                 function formatDate(dateStr) {
                     if (!dateStr) return '';
                     let date = new Date(dateStr);
@@ -401,10 +401,10 @@
                 }
             },
             error: function() {
-                // 处理错误，例如显示一个消息
                 layer.msg('无法获取用户的厂区信息');
             }
         });
+
         function formatData(apiData) {
             let formattedData = apiData.map(item => {
                 let formattedItem = { title: item.title };
@@ -415,6 +415,7 @@
             });
             return formattedData;
         }
+
         function loadCategoryData(category, callback) {
             $.get('/api/categories/' + category, function(response) {
                 if (response.code === 0) {
@@ -447,6 +448,7 @@
                 }
             });
         }
+
         function setParentForChild(data) {
             for (let i = 0; i < data.length; i++) {
                 if (data[i].child) {
@@ -457,12 +459,12 @@
                 }
             }
         }
+
         // 初始化日期选择器
         laydate.render({
             elem: '#month-selector',
             type: 'month',
             done: function(value, date, endDate) {
-                // 检查是否已选择厂区
                 if (document.getElementById('depository-selector').value) {
                     fetchDataForMonth(value);
                 } else {
@@ -470,18 +472,11 @@
                 }
             }
         });
-        laydate.render({
-            elem: '#year-selector',
-            type: 'year',
-        });
-        laydate.render({
-            elem: '#year-selector-three',
-            type: 'year',
-            done: function(value) {
-                fetchCateChart();
-            }
-        });
-        var myChartCate = echarts.init(document.getElementById('cateAmountChart')); // 请确保您的div有一个ID，例如cateAmountChart
+
+        laydate.render({ elem: '#year-selector', type: 'year' });
+        laydate.render({ elem: '#year-selector-three', type: 'year', done: fetchCateChart });
+
+        var myChartCate = echarts.init(document.getElementById('cateAmountChart'));
 
         function fetchCateChart() {
             var year = document.getElementById('year-selector-three').value;
@@ -496,43 +491,21 @@
             $.get(url, function(data) {
                 var colors = ['#5470C6'];
                 var option = {
-                    title: {
-                        text: '分类柱形图'
-                    },
+                    title: { text: '分类柱形图' },
                     tooltip: {
                         trigger: 'axis',
-                        axisPointer: {
-                            type: 'shadow'
-                        }
+                        axisPointer: { type: 'shadow' }
                     },
-                    xAxis: {
-                        data: data.map(function(item) { return item.month; })
-                    },
-                    yAxis: [
-                        {
-                            type: 'value',
-                            position: 'left'
-                        }
-                    ],
+                    xAxis: { data: data.map(function(item) { return item.month; }) },
+                    yAxis: [ { type: 'value', position: 'left' } ],
                     series: [
                         {
                             name: '金额',
                             type: 'bar',
                             yAxisIndex: 0,
                             data: data.map(function(item) { return item.amount; }),
-                            label: {
-                                normal: {
-                                    show: true,
-                                    position: 'top'
-                                }
-                            },
-                            itemStyle: {
-                                normal: {
-                                    color: function(params) {
-                                        return colors[params.dataIndex % colors.length];
-                                    }
-                                }
-                            }
+                            label: { normal: { show: true, position: 'top' } },
+                            itemStyle: { normal: { color: function(params) { return colors[params.dataIndex % colors.length]; } } }
                         }
                     ]
                 };
@@ -542,11 +515,8 @@
         }
 
         function handleDepositoryChange() {
-
             var depositoryId = document.getElementById('depository-selector-three').value;
             var catedepositoryId = (depositoryId == 1) ? "sab" : "zab";
-            console.log(depositoryId);
-            console.log(catedepositoryId);
             // // 清空之前的分类选择器内容 有BUG
             // document.getElementById('ID-dropdown-demo-complex-1').innerText = '选择分类';
             // document.getElementById('applyRemarkInput-1').value = '';
@@ -563,9 +533,9 @@
             });
         }
         document.getElementById('depository-selector-three').addEventListener('change', handleDepositoryChange);
-
         // 初始化ECharts实例
         var myChart = echarts.init(document.getElementById('typeAmountChart')); // 请确保您的div有一个ID，例如typeAmountChart
+
         function fetchTypeAmountDataAndRenderChart() {
             var year = document.getElementById('year-selector').value;
             var depositoryId = document.getElementById('depository-selector-two').value;
@@ -575,31 +545,16 @@
             // var url = '/CategoryForYear/' + year + '/' + depositoryId + '/' +"N沟" ;
             $.get(url, function(data) {
                 var colors = ['#5470C6'];
-
                 var option = {
-                    title: {
-                        text: '产量柱形图'
-                    },
+                    title: { text: '产量柱形图' },
                     tooltip: {
                         trigger: 'axis',
-                        axisPointer: {
-                            type: 'shadow'
-                        }
+                        axisPointer: { type: 'shadow' }
                     },
-                    xAxis: {
-                        data: data.map(function(item) { return item.month; })
-                    },
+                    xAxis: { data: data.map(function(item) { return item.month; }) },
                     yAxis: [
-                        {
-                            type: 'value',
-                            position: 'left'
-                        },
-                        {
-                            type: 'value',
-                            position: 'right',
-                            show: true,
-                            splitLine: { show: false }
-                        }
+                        { type: 'value', position: 'left' },
+                        { type: 'value', position: 'right', show: true, splitLine: { show: false } }
                     ],
                     series: [
                         {
@@ -607,19 +562,8 @@
                             type: 'bar',
                             yAxisIndex: 0,
                             data: data.map(function(item) { return item.monthlyAmount; }),
-                            label: {
-                                normal: {
-                                    show: true,
-                                    position: 'top'
-                                }
-                            },
-                            itemStyle: {
-                                normal: {
-                                    color: function(params) {
-                                        return colors[params.dataIndex % colors.length];
-                                    }
-                                }
-                            }
+                            label: { normal: { show: true, position: 'top' } },
+                            itemStyle: { normal: { color: function(params) { return colors[params.dataIndex % colors.length]; } } }
                         },
                         {
                             name: '单价',
@@ -627,12 +571,7 @@
                             yAxisIndex: 1,
                             data: data.map(function(item) { return item.unitPrice; }),
                             smooth: true,
-                            label: {
-                                normal: {
-                                    show: true,
-                                    position: 'top'
-                                }
-                            },
+                            label: { normal: { show: true, position: 'top' } },
                         }
                     ]
                 };
@@ -758,8 +697,13 @@
         }
 
         function initCategoryBarChart(data) {
-            // 获取所有的类别
-            var categories = data.map(item => item.category);
+            var categories = data
+                .map(item => item.category)// 获取所有的类别
+                    .filter(category => category.includes("线") || category.endsWith("机"));//获取所有带有“线”或以“机”结尾的类别
+                // .filter(category => !category.includes("线") && !category.endsWith("机"));
+
+
+            console.log(categories);
             // 使用Set去除重复的类别
             var uniqueCategories = [...new Set(categories)];
             // 获取每个类别的总金额
@@ -768,40 +712,28 @@
                 return categoryData ? categoryData.amount : 0;
             });
 
-            // 定义一个颜色数组
             var colors = ['#5470C6', '#91CC75', '#EE6666', '#E87C25', '#FFD85C', '#73C0DE', '#3BA272', '#FC8452', '#9A60B4', '#EA7CCC'];
 
             var option = {
                 tooltip: {
                     trigger: 'axis',
-                    axisPointer: {
-                        type: 'shadow'
-                    }
+                    axisPointer: { type: 'shadow' }
                 },
-                legend: {
-                    data: uniqueCategories
-                },
+                legend: { data: uniqueCategories },
                 xAxis: {
                     type: 'category',
                     data: uniqueCategories,
                     axisLabel: {
-                        interval: 0, // 显示所有标签
-                        rotate: 90, // 默认旋转90度
+                        interval: 0,
+                        rotate: 90,
                     }
                 },
-                yAxis: {
-                    type: 'value'
-                },
+                yAxis: { type: 'value' },
                 series: [{
                     name: '金额',
                     type: 'bar',
                     data: amounts,
-                    label: {
-                        normal: {
-                            show: true,
-                            position: 'top'
-                        }
-                    },
+                    label: { normal: { show: true, position: 'top' } },
                     itemStyle: {
                         normal: {
                             color: function(params) {
@@ -812,25 +744,23 @@
                 }]
             };
             var chart = echarts.init(document.getElementById('category-bar-chart'));
-            chart.clear();  // 清除当前图表状态
-            chart.off('click');  // 移除之前注册的所有click事件处理程序
+            chart.clear();
+            chart.off('click');
             chart.setOption(option);
             chart.on('click', function (params) {
                 var selectedDepositoryId = document.getElementById('depository-selector').value;
                 var selectedMonth = document.getElementById('month-selector').value;
-                var parts = selectedMonth.split('-');  // 拆分为 ["2023", "01"]
+                var parts = selectedMonth.split('-');
                 var year = parts[0];
                 var month = parts[1];
-                // 对分类名称进行URL编码
                 var encodedCategoryName = encodeURIComponent(params.name);
-                // 发送AJAX请求获取该分类的记录
                 $.ajax({
                     url: '/api/categories/category-records/' + encodedCategoryName + '/' + selectedDepositoryId + '/' + year + '/' + month,
                     type: 'GET',
                     dataType: 'json',
                     success: function(records) {
-                        var widthPercentage = 80; // 80%
-                        var heightPercentage = 80; // 60%
+                        var widthPercentage = 80;
+                        var heightPercentage = 80;
 
                         var screenWidth = $(window).width();
                         var screenHeight = $(window).height();
@@ -838,9 +768,8 @@
                         var popupWidth = (widthPercentage / 100) * screenWidth;
                         var popupHeight = (heightPercentage / 100) * screenHeight;
 
-                        // 确保弹出层的尺寸不超过一个最大值
-                        var maxPopupWidth = 2800; // 最大宽度
-                        var maxPopupHeight = 2600; // 最大高度
+                        var maxPopupWidth = 2800;
+                        var maxPopupHeight = 2600;
 
                         popupWidth = Math.min(popupWidth, maxPopupWidth);
                         popupHeight = Math.min(popupHeight, maxPopupHeight);
@@ -849,7 +778,7 @@
                             type: 1,
                             title: params.name,
                             content: $('#recordTableContainer'),
-                            area: [popupWidth + 'px', popupHeight + 'px'], // 使用像素值而不是百分比
+                            area: [popupWidth + 'px', popupHeight + 'px'],
                             shadeClose: true
                         });
 
@@ -873,7 +802,7 @@
 
                 table.render({
                     elem: '#recordTable',
-                    height: "full-50", // 设置表格高度并固定表头
+                    height: "full-50",
                     cols: [ [
                         { field: 'sourceTable', title: '来源表',  hide: true},
                         { field: 'id', title: 'ID', hide: true},
@@ -881,7 +810,7 @@
                             field: 'atId',
                             title: 'AT',
                             templet: function(d) {
-                                return d.atId ? d.atId : '一次性';  // 如果atId为空，则显示“一次性”
+                                return d.atId ? d.atId : '一次性';
                             }
                         },
                         { field: 'name', title: '名称' },
@@ -889,7 +818,7 @@
                         { field: 'quantity', title: '数量'},
                         { field: 'unitPrice', title: '单价' },
                         { field: 'totalAmount', title: '金额', templet: function(d) {
-                                return parseFloat(d.totalAmount).toFixed(2);  // 格式化为两位小数
+                                return parseFloat(d.totalAmount).toFixed(2);
                             }},
                         {
                             field: 'recordDate',
@@ -916,63 +845,38 @@
                     trigger: 'axis',
                     axisPointer: {
                         type: "cross",
-                        label: {
-                            backgroundColor: "#6e7985"
-                        }
+                        label: { backgroundColor: "#6e7985" }
                     }
                 },
-                legend: {
-                    data: ['SAB', 'ZAB']
-                },
-                title: {
-                    text: title,
-                    left: 'left'
-                },
+                legend: { data: ['SAB', 'ZAB'] },
+                title: { text: title, left: 'left' },
                 grid: {
                     left: '3%',
                     right: '4%',
                     bottom: '3%',
                     containLabel: true
                 },
-                toolbox: {
-                    feature: {
-                        saveAsImage: {}
-                    }
-                },
+                toolbox: { feature: { saveAsImage: {} } },
                 xAxis: {
                     type: 'category',
                     boundaryGap: false,
                     data: months
                 },
-                yAxis: {
-                    type: 'value'
-                },
+                yAxis: { type: 'value' },
                 series: [
                     {
                         name: 'SAB',
                         type: 'line',
-                        // stack: '金额',
                         smooth: false,
-                        label: {
-                            normal: {
-                                show: true,
-                                position: 'left'
-                            }
-                        },
+                        label: { normal: { show: true, position: 'left' } },
                         areaStyle: {},
                         data: sabData
                     },
                     {
                         name: 'ZAB',
                         type: 'line',
-                        // stack: '金额',
                         smooth: false,
-                        label: {
-                            normal: {
-                                show: true,
-                                position: 'right'
-                            }
-                        },
+                        label: { normal: { show: true, position: 'right' } },
                         areaStyle: {},
                         data: zabData
                     }
@@ -981,60 +885,35 @@
             echartsInstance.setOption(option);
             return echartsInstance;
         }
+
         function initBarChart(chartId, months, sabData, zabData, title) {
             var echartsInstance = echarts.init(document.getElementById(chartId), 'walden');
             var option = {
-                tooltip: {
-                    trigger: 'axis'
-                },
-                legend: {
-                    data: ['SAB', 'ZAB']
-                },
-                title: {
-                    text: title,
-                    left: 'left'
-                },
+                tooltip: { trigger: 'axis' },
+                legend: { data: ['SAB', 'ZAB'] },
+                title: { text: title, left: 'left' },
                 grid: {
                     left: '3%',
                     right: '4%',
                     bottom: '3%',
                     containLabel: true
                 },
-                toolbox: {
-                    feature: {
-                        saveAsImage: {}
-                    }
-                },
-                xAxis: {
-                    type: 'category',
-                    data: months
-                },
-                yAxis: {
-                    type: 'value'
-                },
+                toolbox: { feature: { saveAsImage: {} } },
+                xAxis: { type: 'category', data: months },
+                yAxis: { type: 'value' },
                 series: [
                     {
                         name: 'SAB',
                         type: 'bar',
                         barGap: '1%',
-                        label: {
-                            normal: {
-                                show: true,
-                                position: 'top'
-                            }
-                        },
+                        label: { normal: { show: true, position: 'top' } },
                         data: sabData
                     },
                     {
                         name: 'ZAB',
                         type: 'bar',
                         barGap: '1%',
-                        label: {
-                            normal: {
-                                show: true,
-                                position: 'top'
-                            }
-                        },
+                        label: { normal: { show: true, position: 'top' } },
                         data: zabData,
                     }
                 ]
@@ -1042,6 +921,7 @@
             echartsInstance.setOption(option);
             return echartsInstance;
         }
+
         window.onresize = function(){
             for (var i = 0; i < echartsInstances.length; i++) {
                 echartsInstances[i].resize();
