@@ -2,6 +2,7 @@ package com.depository_manage.mapper;
 
 import com.depository_manage.entity.LineData;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.Date;
@@ -31,4 +32,5 @@ public interface LineDataMapper {
 
     Integer findCountByCondition(Map<String, Object> map);
 
+    List<LineData> findLineDataByMonth(@Param("year") int year, @Param("month") int month);
 }

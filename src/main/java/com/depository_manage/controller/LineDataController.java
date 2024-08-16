@@ -128,5 +128,16 @@ public class LineDataController {
         }
     }
 
-
+    @GetMapping("/{year}/{month}")
+    public RestResponse getLineDataForMonth(
+            @PathVariable("year") int year,
+            @PathVariable("month") int month) {
+        try {
+            // 根据年月和厂区ID获取对应的lineData
+            List<LineData> lineDataList = lineDataService.findLineDataByMonth(year, month);
+            return new RestResponse(lineDataList, lineDataList.size(), 200);
+        } catch (Exception e) {
+            return new RestResponse("Failed to fetch line data: " + e.getMessage(), 500, null);
+        }
+    }
 }

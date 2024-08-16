@@ -25,4 +25,6 @@ public interface LineDataService {
     Integer findCountByCondition(Map<String, Object> map);
 
     List<LineDataP> findLineDataPByCondition(Map<String, Object> map);
+
+    List<LineData> findLineDataByMonth(int year, int month);
 }

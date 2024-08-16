@@ -259,7 +259,7 @@
                     <div class="layui-card">
                         <div class="layui-card-header"><i class="fa fa-signal icon"></i>各工程使用金额分析图</div>
                         <div class="layui-card-body">
-                            <div id="category-bar-chart" style="width: 100%; height: 500px;"></div>
+                            <div id="category-bar-chart" style="width: 100%; height: 550px; margin-left: -70px"></div>
                         </div>
                     </div>
                 </div>
@@ -601,8 +601,25 @@
                     type: 'GET',
                     dataType: 'json',
                     success: function(data) {
-                        // 当成功获取数据时，初始化并设置分类柱形图
-                        initCategoryBarChart(data);
+                        // 获取 lineData 数据
+                        $.ajax({
+                            url: '/lineData/' + year + '/' + month,
+                            type: 'GET',
+                            dataType: 'json',
+                            success: function(response) {
+                                var lineData = response.data;
+                                console.log("Fetched lineData:", lineData);  // 添加调试日志
+                                if (!Array.isArray(lineData)) {
+                                    console.error("lineData is not an array:", lineData);
+                                    return;
+                                }
+                                initCategoryBarChart(data, lineData);
+                            },
+                            error: function(error) {
+                                console.log("Error fetching line data", error);
+                            }
+                        });
+
                     },
                     error: function(error) {
                         console.log("Error fetching category outbounds", error);
@@ -696,12 +713,11 @@
             echartsInstances.push(initBarChart('stock-chart', months, sabStock, zabStock, '库存流水'));
         }
 
-        function initCategoryBarChart(data) {
+        function initCategoryBarChart(data, lineData) {
             var categories = data
                 .map(item => item.category)// 获取所有的类别
                     .filter(category => category.includes("线") || category.endsWith("机"));//获取所有带有“线”或以“机”结尾的类别
                 // .filter(category => !category.includes("线") && !category.endsWith("机"));
-
 
             console.log(categories);
             // 使用Set去除重复的类别
@@ -711,7 +727,15 @@
                 var categoryData = data.find(item => item.category === category);
                 return categoryData ? categoryData.amount : 0;
             });
-
+            // 获取每个类别的产量
+            var productions = uniqueCategories.map(category => {
+                var lineDataItem = lineData.find(item => item.lineName === category);
+                return lineDataItem ? lineDataItem.production : 0;
+            });
+            // 计算每个类别的单价，并保留两位小数
+            var unitPrices = amounts.map((amount, index) => {
+                return productions[index] > 0 ? parseFloat((amount / productions[index]).toFixed(2)) : 0;
+            });
             var colors = ['#5470C6', '#91CC75', '#EE6666', '#E87C25', '#FFD85C', '#73C0DE', '#3BA272', '#FC8452', '#9A60B4', '#EA7CCC'];
 
             var option = {
@@ -719,7 +743,7 @@
                     trigger: 'axis',
                     axisPointer: { type: 'shadow' }
                 },
-                legend: { data: uniqueCategories },
+                legend: { data: uniqueCategories.concat('单个成本') }, // 添加单价到图例
                 xAxis: {
                     type: 'category',
                     data: uniqueCategories,
@@ -728,20 +752,47 @@
                         rotate: 90,
                     }
                 },
-                yAxis: { type: 'value' },
-                series: [{
-                    name: '金额',
-                    type: 'bar',
-                    data: amounts,
-                    label: { normal: { show: true, position: 'top' } },
-                    itemStyle: {
-                        normal: {
-                            color: function(params) {
-                                return colors[params.dataIndex % colors.length];
+                yAxis: [
+                    { type: 'value', name: '金额' },
+                    {
+                        type: 'value',
+                        name: '单个成本',
+                    }
+                ],
+                series: [
+                    {
+                        name: '金额',
+                        type: 'bar',
+                        data: amounts,
+                        label: { normal: { show: true, position: 'top' } },
+                        itemStyle: {
+                            normal: {
+                                color: function(params) {
+                                    return colors[params.dataIndex % colors.length];
+                                }
                             }
                         }
+                    },
+                    {
+                        name: '单个成本',
+                        type: 'line',
+                        yAxisIndex: 1,  // 使用第二个Y轴
+                        data: unitPrices,
+                        smooth: true,  // 设置折线为平滑曲线
+                        label: {
+                            normal: {
+                                show: true,
+                                position: 'top',
+                                textStyle: {
+                                    color: '#000000'  // 将数字标注颜色设置为黑色
+                                }
+                            }
+                        },
+                        itemStyle: {
+                            normal: { color: '#262527' }  // 折线颜色
+                        }
                     }
-                }]
+                ]
             };
             var chart = echarts.init(document.getElementById('category-bar-chart'));
             chart.clear();

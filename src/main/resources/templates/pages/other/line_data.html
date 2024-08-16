@@ -159,7 +159,7 @@
       type: 'month',
       done: function(value, date, endDate) {
         // 将选择的年-月处理为具体日期（如该月的第一天）
-        var fullDate = value + '-01';
+        var fullDate = value + '-15';
         $('input[name="date"]').val(fullDate);  // 将完整日期设置到隐藏字段或直接提交
       }
     });
@@ -167,7 +167,7 @@
       elem: '#date3',
       type: 'month',
       done: function(value, date, endDate) {
-        var fullDate = value + '-01';
+        var fullDate = value + '-15';
         $('input[name="date"]').val(fullDate);
       }
     });
@@ -186,7 +186,7 @@
     form.on('submit(importSubmitBtn)', function (data) {
       var formData = new FormData();
       var fileInput = $('input[name="file"]')[0].files[0];
-      var date = data.field.date + '-01';  // 将月转换为完整日期
+      var date = data.field.date + '-15';  // 将月转换为完整日期
       formData.append("file", fileInput);
       formData.append("date", date);
 

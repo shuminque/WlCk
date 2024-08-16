@@ -104,5 +104,12 @@
             AND l.production = #{production}
         </if>
     </select>
+    <select id="findLineDataByMonth" parameterType="map" resultType="com.depository_manage.entity.LineData">
+        SELECT *
+        FROM line_data
+        WHERE YEAR(date) = #{year}
+          AND MONTH(date) = #{month}
+    </select>
+
 
 </mapper>
