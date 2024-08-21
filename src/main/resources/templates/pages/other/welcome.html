@@ -610,19 +610,19 @@
                                 var lineData = response.data;
                                 console.log("Fetched lineData:", lineData);  // 添加调试日志
                                 if (!Array.isArray(lineData)) {
-                                    console.error("lineData is not an array:", lineData);
+                                    console.error("lineData is not an array: 不是数组", lineData);
                                     return;
                                 }
                                 initCategoryBarChart(data, lineData);
                             },
                             error: function(error) {
-                                console.log("Error fetching line data", error);
+                                console.log("Error fetching line data：获取行数据时出错", error);
                             }
                         });
 
                     },
                     error: function(error) {
-                        console.log("Error fetching category outbounds", error);
+                        console.log("Error fetching category outbounds：提取类别出站时出错", error);
                     }
                 });
             } else {
