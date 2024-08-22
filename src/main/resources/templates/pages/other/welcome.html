@@ -254,12 +254,22 @@
             </select>
             <input type="text" id="month-selector" placeholder="请选择年月" autocomplete="off">
             <div class="layui-row">
+<!--&lt;!&ndash;                 左侧显示其他类别的柱形图 &ndash;&gt;-->
+<!--                <div class="layui-col-md12">-->
+<!--                    <div class="layui-card">-->
+<!--                        <div class="layui-card-header"><i class="fa fa-signal icon"></i>其他类别分析图</div>-->
+<!--                        &lt;!&ndash; 左侧的横向条形图 &ndash;&gt;-->
+<!--                        <div id="other-category-bar-chart" style="width: 100%; height: 550px; margin-left: 2px;"></div>-->
+<!--                    </div>-->
+<!--                </div>-->
                 <!-- 各工程使用金额分析图 -->
                 <div class="layui-col-md12">
                     <div class="layui-card">
                         <div class="layui-card-header"><i class="fa fa-signal icon"></i>各工程使用金额分析图</div>
-                        <div class="layui-card-body">
-                            <div id="category-bar-chart" style="width: 100%; height: 550px; margin-left: -70px"></div>
+                        <div class="layui-card-body" style="display: flex; align-items: flex-start;">
+                            <div id="other-category-bar-chart" style="width: 40%; height: 550px; margin-left: 5px;"></div>
+                            <!-- 右侧的纵向柱形图 -->
+                            <div id="category-bar-chart" style="width: 100%; height: 550px;margin-left: 5px;"></div>
                         </div>
                     </div>
                 </div>
@@ -614,6 +624,7 @@
                                     return;
                                 }
                                 initCategoryBarChart(data, lineData);
+                                initOtherCategoryBarChart(data, lineData);
                             },
                             error: function(error) {
                                 console.log("Error fetching line data：获取行数据时出错", error);
@@ -778,7 +789,6 @@
                         type: 'line',
                         yAxisIndex: 1,  // 使用第二个Y轴
                         data: unitPrices,
-                        smooth: true,  // 设置折线为平滑曲线
                         label: {
                             normal: {
                                 show: true,
@@ -789,7 +799,7 @@
                             }
                         },
                         itemStyle: {
-                            normal: { color: '#262527' }  // 折线颜色
+                            normal: { color: '#bf2222' }  // 折线颜色
                         }
                     }
                 ]
@@ -887,6 +897,122 @@
                     data: records,
                 });
             }
+        }
+        function initOtherCategoryBarChart(data, lineData) {
+            var otherCategories = data
+                .map(item => item.category)
+                .filter(category => !category.includes("线") && !category.endsWith("机"));
+
+            var categories = data
+                .map(item => item.category)
+                .filter(category => category.includes("线") || category.endsWith("机"));
+
+            console.log(otherCategories);
+
+            var uniqueOtherCategories = [...new Set(otherCategories)].reverse();
+            var uniqueCategories = [...new Set(categories)];
+
+            var otherAmounts = uniqueOtherCategories.map(category => {
+                var categoryData = data.find(item => item.category === category);
+                return categoryData ? categoryData.amount : 0;
+            });
+
+            var productions = uniqueCategories.map(category => {
+                var lineDataItem = lineData.find(item => item.lineName === category);
+                return lineDataItem ? lineDataItem.production : 0;
+            });
+
+            // 计算总产量
+            var totalProduction = productions.reduce((acc, curr) => acc + curr, 0);
+
+            // 计算单个成本
+            var otherUnitPrices = otherAmounts.map((amount) => {
+                return totalProduction > 0 ? parseFloat((amount / totalProduction).toFixed(4)) : 0;
+            });
+
+            var colors = ['#5470C6', '#91CC75', '#EE6666', '#E87C25', '#FFD85C', '#73C0DE', '#3BA272', '#FC8452', '#9A60B4', '#EA7CCC'];
+
+            var option = {
+                tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
+                yAxis: {
+                    type: 'category',
+                    data: uniqueOtherCategories,
+                    axisLabel: {
+                        interval: 0,
+                        rotate: 0,
+                        margin: 40,
+                        align: 'left',
+                        inside: false
+                    },
+                    position: 'left',
+                    z: 10  // 确保y轴标签在最顶层
+                },
+                xAxis: [
+                    {
+                        type: 'value',
+                        name: '金额',
+                        position: 'bottom',  // 位置在底部
+                        axisLabel: {
+                            formatter: '{value}'  // 显示单位
+                        }
+                    },
+                    {
+                        type: 'value',
+                        name: '单个成本',
+                        position: 'top',  // 位置在顶部
+                        axisLabel: {
+                            formatter: '{value}'  // 保留两位小数
+                        }
+                    }
+                ],
+                series: [
+                    {
+                        name: '金额',
+                        type: 'bar',
+                        data: otherAmounts,
+                        label: {
+                            normal: {
+                                show: true,
+                                position: 'right',
+                                formatter: function(params) {
+                                    return params.value;  // 显示实际金额
+                                }
+                            }
+                        },
+                        itemStyle: {
+                            normal: {
+                                color: function(params) {
+                                    return colors[params.dataIndex % colors.length];
+                                }
+                            }
+                        }
+                    },
+                    {
+                        name: '单个成本',
+                        type: 'line',
+                        xAxisIndex: 1,  // 使用第二个x轴
+                        data: otherUnitPrices,
+                        label: {
+                            normal: {
+                                show: true,
+                                position: 'top',
+                                formatter: function(params) {
+                                    return params.value;  // 显示实际单个成本
+                                },
+                                textStyle: {
+                                    color: '#000000'  // 将数字标注颜色设置为黑色
+                                }
+                            }
+                        },
+                        itemStyle: {
+                            normal: { color: '#bf2222' }  // 折线颜色
+                        }
+                    }
+                ]
+            };
+
+            var chart = echarts.init(document.getElementById('other-category-bar-chart'));
+            chart.setOption(option);
         }
 
         function initChart(chartId, months, sabData, zabData, title) {
