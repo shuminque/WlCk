@@ -823,9 +823,13 @@
                                 }
                             }
                         },
-                        itemStyle: {
-                            normal: { color: '#bf2222' }  // 折线颜色
-                        }
+                        lineStyle: {
+                            normal: {
+                                color: '#bf2222',  // 折线颜色
+                                opacity: 0.5  // 设置透明度，将折线虚化
+                            }
+                        },
+
                     }
                 ]
             };
@@ -1046,8 +1050,16 @@
                                 }
                             }
                         },
+                        lineStyle: {
+                            normal: {
+                                color: '#bf2222',  // 折线颜色
+                                opacity: 0.5  // 设置透明度，将折线虚化
+                            }
+                        },
                         itemStyle: {
-                            normal: { color: '#bf2222' }  // 折线颜色
+                            normal: {
+                                opacity: 0.5  // 设置点的透明度为0，使得点不被显示
+                            }
                         }
                     }
                 ]
