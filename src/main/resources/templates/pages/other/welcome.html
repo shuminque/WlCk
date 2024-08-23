@@ -265,11 +265,11 @@
                 <!-- 各工程使用金额分析图 -->
                 <div class="layui-col-md12">
                     <div class="layui-card">
-                        <div class="layui-card-header"><i class="fa fa-signal icon"></i>各工程使用金额分析图</div>
+                        <div class="layui-card-header"><i class="fa fa-signal icon"></i>各工程使用成本分析图</div>
                         <div class="layui-card-body" style="display: flex; align-items: flex-start;">
-                            <div id="other-category-bar-chart" style="width: 40%; height: 550px; margin-left: 5px;"></div>
+                            <div id="other-category-bar-chart" style="width: 35%; height: 800px; margin-left: 15px;"></div>
                             <!-- 右侧的纵向柱形图 -->
-                            <div id="category-bar-chart" style="width: 100%; height: 550px;margin-left: 5px;"></div>
+                            <div id="category-bar-chart" style="width: 100%; height: 600px;margin-top: 200px;"></div>
                         </div>
                     </div>
                 </div>
@@ -750,11 +750,26 @@
             var colors = ['#5470C6', '#91CC75', '#EE6666', '#E87C25', '#FFD85C', '#73C0DE', '#3BA272', '#FC8452', '#9A60B4', '#EA7CCC'];
 
             var option = {
+                title: {
+                    text: '单能线',  // 设置标题文本
+                    left: 'center',  // 标题居中
+                    top: 'top',  // 标题在图表的顶部
+                    textStyle: {
+                        fontSize: 16,  // 标题字体大小
+                        fontWeight: 'bold',  // 标题字体加粗
+                    }
+                },
                 tooltip: {
                     trigger: 'axis',
                     axisPointer: { type: 'shadow' }
                 },
-                legend: { data: uniqueCategories.concat('单个成本') }, // 添加单价到图例
+                grid: {
+                    left: '3%',   // 图表左边距
+                    right: '3%',  // 图表右边距
+                    // top: '15%',    // 图表上边距
+                    // bottom: '15%'  // 图表下边距
+                },
+                legend: { data: uniqueCategories.concat('单个成本'),                    left: 'right',}, // 添加单价到图例
                 xAxis: {
                     type: 'category',
                     data: uniqueCategories,
@@ -764,11 +779,21 @@
                     }
                 },
                 yAxis: [
-                    { type: 'value', name: '金额' },
+                    { type: 'value', name: '金额',axisLabel: {
+                            formatter: '{value}',
+                            rotate: 90  // 旋转x轴第二轴标签90度，使其竖着显示
+                        },
+                    },
                     {
                         type: 'value',
                         name: '单个成本',
-                    }
+                        axisTick: { show: false },  // 隐藏y轴的刻度线
+                        splitLine: { show: false },  // 隐藏y轴的网格线
+                        axisLabel: {
+                            formatter: '{value}',
+                            rotate: 90  // 旋转x轴第二轴标签90度，使其竖着显示
+                        },
+                    },
                 ],
                 series: [
                     {
@@ -927,25 +952,40 @@
 
             // 计算单个成本
             var otherUnitPrices = otherAmounts.map((amount) => {
-                return totalProduction > 0 ? parseFloat((amount / totalProduction).toFixed(4)) : 0;
+                return totalProduction > 0 ? parseFloat((amount / totalProduction).toFixed(3)) : 0;
             });
 
             var colors = ['#5470C6', '#91CC75', '#EE6666', '#E87C25', '#FFD85C', '#73C0DE', '#3BA272', '#FC8452', '#9A60B4', '#EA7CCC'];
 
             var option = {
+                title: {
+                    text: '共通工程',  // 设置标题文本
+                    left: 'center',  // 标题居中
+                    top: 'top',  // 标题在图表的顶部
+                    textStyle: {
+                        fontSize: 16,  // 标题字体大小
+                        fontWeight: 'bold',  // 标题字体加粗
+                    }
+                },
                 tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
+                grid: {
+                    left: '20%',   // 图表左边距
+                    right: '10%',  // 图表右边距
+                    // top: '15%',    // 图表上边距
+                    // bottom: '15%'  // 图表下边距
+                },
                 yAxis: {
                     type: 'category',
                     data: uniqueOtherCategories,
                     axisLabel: {
                         interval: 0,
-                        rotate: 0,
-                        margin: 40,
-                        align: 'left',
+                        rotate: 35,
+                        margin: 0,
+                        align: 'right',
                         inside: false
                     },
                     position: 'left',
-                    z: 10  // 确保y轴标签在最顶层
+                    z: 10,  // 确保y轴标签在最顶层
                 },
                 xAxis: [
                     {
@@ -958,11 +998,13 @@
                     },
                     {
                         type: 'value',
-                        name: '单个成本',
+                        name: '',
                         position: 'top',  // 位置在顶部
                         axisLabel: {
                             formatter: '{value}'  // 保留两位小数
-                        }
+                        },
+                        axisTick: { show: false },  // 隐藏y轴的刻度线
+                        splitLine: { show: false }  // 隐藏y轴的网格线
                     }
                 ],
                 series: [
@@ -988,7 +1030,7 @@
                         }
                     },
                     {
-                        name: '单个成本',
+                        name: '',
                         type: 'line',
                         xAxisIndex: 1,  // 使用第二个x轴
                         data: otherUnitPrices,
