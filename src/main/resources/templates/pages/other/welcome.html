@@ -266,10 +266,11 @@
                 <div class="layui-col-md12">
                     <div class="layui-card">
                         <div class="layui-card-header"><i class="fa fa-signal icon"></i>各工程使用成本分析图</div>
+
                         <div class="layui-card-body" style="display: flex; align-items: flex-start;">
                             <div id="other-category-bar-chart" style="width: 35%; height: 800px; margin-left: 15px;"></div>
                             <!-- 右侧的纵向柱形图 -->
-                            <div id="category-bar-chart" style="width: 100%; height: 600px;margin-top: 200px;"></div>
+                            <div id="category-bar-chart" style="width: 100%; height: 800px;margin-top: 0px;"></div>
                         </div>
                     </div>
                 </div>
@@ -600,6 +601,9 @@
                 fetchDataForMonth(selectedMonth);
             }
         });
+        var legendData = ['金额', '单个成本'];
+        var chart1;
+        var chart2;
         function fetchDataForMonth(yearMonth) {
             var parts = yearMonth.split('-');  // 拆分为 ["2023", "01"]
             var year = parts[0];
@@ -625,6 +629,13 @@
                                 }
                                 initCategoryBarChart(data, lineData);
                                 initOtherCategoryBarChart(data, lineData);
+                                // 在图表初始化完成后调用 syncLegend 同步图例
+                                if (chart1 && chart2) {
+                                    console.log("Charts initialized successfully:", chart1, chart2);
+                                    syncLegend(chart1, chart2);
+                                } else {
+                                    console.error("Chart initialization failed. chart1:", chart1, "chart2:", chart2);
+                                }
                             },
                             error: function(error) {
                                 console.log("Error fetching line data：获取行数据时出错", error);
@@ -749,7 +760,7 @@
             });
             var colors = ['#5470C6', '#91CC75', '#EE6666', '#E87C25', '#FFD85C', '#73C0DE', '#3BA272', '#FC8452', '#9A60B4', '#EA7CCC'];
 
-            var option = {
+            var option2 = {
                 title: {
                     text: '单能线',  // 设置标题文本
                     left: 'center',  // 标题居中
@@ -766,10 +777,15 @@
                 grid: {
                     left: '3%',   // 图表左边距
                     right: '3%',  // 图表右边距
-                    // top: '15%',    // 图表上边距
+                    top: '200px',    // 图表上边距
                     // bottom: '15%'  // 图表下边距
                 },
-                legend: { data: uniqueCategories.concat('单个成本'),                    left: 'right',}, // 添加单价到图例
+                legend: {
+                    data: legendData,
+                    left: 'right',
+                    // top: '200px',
+                    selected: { '金额': true, '单个成本': true }
+                },
                 xAxis: {
                     type: 'category',
                     data: uniqueCategories,
@@ -781,14 +797,14 @@
                 yAxis: [
                     { type: 'value', name: '金额',axisLabel: {
                             formatter: '{value}',
-                            rotate: 90  // 旋转x轴第二轴标签90度，使其竖着显示
+                            rotate: 90  // 旋转x轴第二轴标签90度，使其  竖着显示
                         },
                     },
                     {
                         type: 'value',
                         name: '单个成本',
                         axisTick: { show: false },  // 隐藏y轴的刻度线
-                        splitLine: { show: false },  // 隐藏y轴的网格线
+                        splitLine: { show: false }, // 隐藏y轴的网格线
                         axisLabel: {
                             formatter: '{value}',
                             rotate: 90  // 旋转x轴第二轴标签90度，使其竖着显示
@@ -799,8 +815,23 @@
                     {
                         name: '金额',
                         type: 'bar',
-                        data: amounts,
-                        label: { normal: { show: true, position: 'top' } },
+                        data: amounts.map((amount, index) => ({
+                            value: amount,
+                            label: {
+                                distance: index % 2 === 0 ? 15 : 2  // Manually setting distance alternation
+                            }
+                        })),
+                        barWidth: '60%',  // 调整条形图宽度
+                        barCategoryGap: '30%',  // 调整类别间距
+                        label: {
+                            normal: {
+                                show: true,
+                                position: 'top',
+                                formatter: function(params) {
+                                    return params.value;
+                                }
+                            }
+                        },
                         itemStyle: {
                             normal: {
                                 color: function(params) {
@@ -820,24 +851,29 @@
                                 position: 'top',
                                 textStyle: {
                                     color: '#000000'  // 将数字标注颜色设置为黑色
-                                }
+                                },
                             }
                         },
                         lineStyle: {
                             normal: {
                                 color: '#bf2222',  // 折线颜色
+
                                 opacity: 0.5  // 设置透明度，将折线虚化
                             }
                         },
-
+                        itemStyle: {
+                            normal: {
+                                opacity: 0.5  // 设置透明度，将折线虚化
+                            }
+                        }
                     }
                 ]
             };
-            var chart = echarts.init(document.getElementById('category-bar-chart'));
-            chart.clear();
-            chart.off('click');
-            chart.setOption(option);
-            chart.on('click', function (params) {
+            chart2 = echarts.init(document.getElementById('category-bar-chart'));
+            chart2.clear();
+            chart2.off('click');
+            chart2.setOption(option2);
+            chart2.on('click', function (params) {
                 var selectedDepositoryId = document.getElementById('depository-selector').value;
                 var selectedMonth = document.getElementById('month-selector').value;
                 var parts = selectedMonth.split('-');
@@ -879,7 +915,6 @@
                     }
                 });
             });
-
             function renderTable(records) {
                 function formatDate(dateStr) {
                     if (!dateStr) return '';
@@ -961,7 +996,7 @@
 
             var colors = ['#5470C6', '#91CC75', '#EE6666', '#E87C25', '#FFD85C', '#73C0DE', '#3BA272', '#FC8452', '#9A60B4', '#EA7CCC'];
 
-            var option = {
+            var option1 = {
                 title: {
                     text: '共通工程',  // 设置标题文本
                     left: 'center',  // 标题居中
@@ -970,6 +1005,12 @@
                         fontSize: 16,  // 标题字体大小
                         fontWeight: 'bold',  // 标题字体加粗
                     }
+                },
+                legend: {
+                    data: legendData,
+                    left: 'left',
+                    selected: { '金额': true, '单个成本': true },
+                    show: false  // 隐藏图例
                 },
                 tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
                 grid: {
@@ -1034,7 +1075,7 @@
                         }
                     },
                     {
-                        name: '',
+                        name: '单个成本',
                         type: 'line',
                         xAxisIndex: 1,  // 使用第二个x轴
                         data: otherUnitPrices,
@@ -1065,8 +1106,113 @@
                 ]
             };
 
-            var chart = echarts.init(document.getElementById('other-category-bar-chart'));
-            chart.setOption(option);
+            chart1 = echarts.init(document.getElementById('other-category-bar-chart'));
+            chart1.clear();
+            chart1.off('click');
+            chart1.setOption(option1);
+            chart1.on('click', function (params) {
+                var selectedDepositoryId = document.getElementById('depository-selector').value;
+                var selectedMonth = document.getElementById('month-selector').value;
+                var parts = selectedMonth.split('-');
+                var year = parts[0];
+                var month = parts[1];
+                var encodedCategoryName = encodeURIComponent(params.name);
+                $.ajax({
+                    url: '/api/categories/category-records/' + encodedCategoryName + '/' + selectedDepositoryId + '/' + year + '/' + month,
+                    type: 'GET',
+                    dataType: 'json',
+                    success: function(records) {
+                        var widthPercentage = 80;
+                        var heightPercentage = 80;
+
+                        var screenWidth = $(window).width();
+                        var screenHeight = $(window).height();
+
+                        var popupWidth = (widthPercentage / 100) * screenWidth;
+                        var popupHeight = (heightPercentage / 100) * screenHeight;
+
+                        var maxPopupWidth = 2800;
+                        var maxPopupHeight = 2600;
+
+                        popupWidth = Math.min(popupWidth, maxPopupWidth);
+                        popupHeight = Math.min(popupHeight, maxPopupHeight);
+
+                        layer.open({
+                            type: 1,
+                            title: params.name,
+                            content: $('#recordTableContainer'),
+                            area: [popupWidth + 'px', popupHeight + 'px'],
+                            shadeClose: true
+                        });
+
+                        renderTable(records);
+                    },
+                    error: function(error) {
+                        console.log("Error fetching records for category", error);
+                    }
+                });
+            });
+            function renderTable(records) {
+                function formatDate(dateStr) {
+                    if (!dateStr) return '';
+                    let date = new Date(dateStr);
+                    let year = date.getFullYear();
+                    let month = (date.getMonth() + 1).toString().padStart(2, '0');
+                    let day = date.getDate().toString().padStart(2, '0');
+                    return `${year}-${month}-${day}`;
+                }
+
+                table.render({
+                    elem: '#recordTable',
+                    height: "full-50",
+                    cols: [ [
+                        { field: 'sourceTable', title: '来源表',  hide: true},
+                        { field: 'id', title: 'ID', hide: true},
+                        {
+                            field: 'atId',
+                            title: 'AT',
+                            templet: function(d) {
+                                return d.atId ? d.atId : '一次性';
+                            }
+                        },
+                        { field: 'name', title: '名称' },
+                        { field: 'model', title: '型号'},
+                        { field: 'quantity', title: '数量'},
+                        { field: 'unitPrice', title: '单价' },
+                        { field: 'totalAmount', title: '金额', templet: function(d) {
+                                return parseFloat(d.totalAmount).toFixed(2);
+                            }},
+                        {
+                            field: 'recordDate',
+                            title: '记录日期',
+                            hide: true,
+                            flex:1,
+                            templet: function(d) {
+                                return formatDate(d.recordDate);
+                            }
+                        },
+                        { field: 'applyRemark', title: '备注' ,hide: true},
+                        { field: 'categoryTitle', title: '分类标题' ,hide: true}
+                    ]],
+                    limit: records.length,
+                    data: records,
+                });
+            }
+        }
+        function syncLegend(chart1, chart2) {
+            chart1.on('legendselectchanged', function(event) {
+                chart2.dispatchAction({
+                    type: event.selected[event.name] ? 'legendSelect' : 'legendUnSelect',
+                    name: event.name
+                });
+            });
+
+            chart2.on('legendselectchanged', function(event) {
+                chart1.dispatchAction({
+                    type: event.selected[event.name] ? 'legendSelect' : 'legendUnSelect',
+                    name: event.name
+                });
+            });
         }
 
         function initChart(chartId, months, sabData, zabData, title) {
@@ -1159,6 +1305,7 @@
             }
         }
     });
+
 </script>
 </body>
 </html>
