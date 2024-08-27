@@ -754,6 +754,9 @@
                 var lineDataItem = lineData.find(item => item.lineName === category);
                 return lineDataItem ? lineDataItem.production : 0;
             });
+            var totalProduction = productions.reduce((acc, curr) => acc + curr, 0);
+            var referenceLineValue = amounts.reduce((acc, curr) => acc + curr, 0) / totalProduction;
+
             // 计算每个类别的单价，并保留两位小数
             var unitPrices = amounts.map((amount, index) => {
                 return productions[index] > 0 ? parseFloat((amount / productions[index]).toFixed(2)) : 0;
@@ -865,6 +868,23 @@
                             normal: {
                                 opacity: 0.5  // 设置透明度，将折线虚化
                             }
+                        },
+                        markLine: {
+                            data: [
+                                {
+                                    name: '平均',
+                                    yAxis: referenceLineValue,  // 在x轴上显示平均值
+                                    label: {
+                                        show:false,
+                                        formatter: '{c}',
+                                        position: 'end'
+                                    },
+                                    lineStyle: {
+                                        type: 'solid', //dotted
+                                        color: '#bf2222'  // 线的颜色
+                                    }
+                                }
+                            ]
                         }
                     }
                 ]
@@ -993,6 +1013,8 @@
             var otherUnitPrices = otherAmounts.map((amount) => {
                 return totalProduction > 0 ? parseFloat((amount / totalProduction).toFixed(3)) : 0;
             });
+            var referenceLineValue = (otherAmounts.reduce((acc, curr) => acc + curr, 0) / totalProduction / 17).toFixed(3);
+            console.log(referenceLineValue);
 
             var colors = ['#5470C6', '#91CC75', '#EE6666', '#E87C25', '#FFD85C', '#73C0DE', '#3BA272', '#FC8452', '#9A60B4', '#EA7CCC'];
 
@@ -1036,7 +1058,7 @@
                     {
                         type: 'value',
                         name: '金额',
-                        position: 'bottom',  // 位置在底部
+                        position: 'top',  // 位置在顶部
                         axisLabel: {
                             formatter: '{value}'  // 显示单位
                         }
@@ -1044,7 +1066,7 @@
                     {
                         type: 'value',
                         name: '',
-                        position: 'top',  // 位置在顶部
+                        position: 'bottom',  // 位置在底部
                         axisLabel: {
                             formatter: '{value}'  // 保留两位小数
                         },
@@ -1101,7 +1123,8 @@
                             normal: {
                                 opacity: 0.5  // 设置点的透明度为0，使得点不被显示
                             }
-                        }
+                        },
+
                     }
                 ]
             };
