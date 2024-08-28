@@ -488,43 +488,91 @@
         laydate.render({ elem: '#year-selector-three', type: 'year', done: fetchCateChart });
 
         var myChartCate = echarts.init(document.getElementById('cateAmountChart'));
-        function fetchCateChart() {
+        async function fetchCateChart() {
             var year = document.getElementById('year-selector-three').value;
             var depositoryId = document.getElementById('depository-selector-three').value;
             var categoryTitle = encodeURIComponent(document.getElementById('applyRemarkInput-1').value);
-            if (!depositoryId ) {
+
+            if (!depositoryId) {
                 alert("请确保已选择所有条件！");
                 return;
             }
-            var url = '/CategoryForYear/' + year + '/' + depositoryId + '/' + categoryTitle;
-            var amountUrl = '/CategoryForYear/' + year + '/' + depositoryId + '/' + categoryTitle;
-            var lineNameUrl = '/getLineNameData/' + year + '/' + categoryTitle;
 
-            $.get(url, function(data) {
-                var colors = ['#5470C6'];
+            var amountUrl = '/CategoryForYear/' + year + '/' + depositoryId + '/' + categoryTitle;
+            var lineNameUrl = '/lineData/data/' + year + '/' + categoryTitle;
+
+            try {
+                // 获取金额数据
+                const amountData = await $.get(amountUrl);
+                // 获取产量数据
+                const lineDataResponse = await $.get(lineNameUrl);
+                const lineData = lineDataResponse.data;
+
+                if (!Array.isArray(lineData)) {
+                    console.error("lineData is not an array: 不是数组", lineData);
+                    return;
+                }
+
+                // 规范化 lineData 中的日期，并计算单个成本
+                const costPerUnit = amountData.map(function(item) {
+                    var productionData = lineData.find(lineItem => {
+                        // 解析日期并将其转换为 "YYYY-MM" 格式
+                        const date = new Date(lineItem.date);
+                        const month = date.getMonth() + 1; // getMonth() 返回 0-11，需要加 1
+                        const monthString = month < 10 ? '0' + month : month; // 确保月份是两位数
+                        const normalizedMonth = `${date.getFullYear()}-${monthString}`;
+
+                        return normalizedMonth === item.month;
+                    });
+                    return productionData ? (item.amount / productionData.production).toFixed(3) : 0;
+                });
+
+                var colors = ['#5470C6', '#91CC75']; // 定义柱形图和折线图的颜色
                 var option = {
-                    title: { text: '分类柱形图' },
+                    title: { text: '分类柱形图和单个成本折线图' },
                     tooltip: {
                         trigger: 'axis',
                         axisPointer: { type: 'shadow' }
                     },
-                    xAxis: { data: data.map(function(item) { return item.month; }) },
-                    yAxis: [ { type: 'value', position: 'left' } ],
+                    legend: {
+                        data: ['金额', '单个成本'],
+                        left: 'right',
+                        // top: '200px',
+                        selected: { '金额': true, '单个成本': true }
+                    },
+                    xAxis: { data: amountData.map(function(item) { return item.month; }) },
+                    yAxis: [
+                        { type: 'value', name: '金额', position: 'left' },
+                        { type: 'value', name: '单个成本', position: 'right' }
+                    ],
                     series: [
                         {
                             name: '金额',
                             type: 'bar',
                             yAxisIndex: 0,
-                            data: data.map(function(item) { return item.amount; }),
+                            data: amountData.map(function(item) { return item.amount; }),
                             label: { normal: { show: true, position: 'top' } },
-                            itemStyle: { normal: { color: function(params) { return colors[params.dataIndex % colors.length]; } } }
+                            itemStyle: { normal: { color: function(params) { return colors[0]; } } }
+                        },
+                        {
+                            name: '单个成本',
+                            type: 'line',
+                            yAxisIndex: 1,
+                            data: costPerUnit,
+                            label: { normal: { show: true, position: 'top' } },
+                            itemStyle: { normal: { color: function(params) { return colors[1]; } } }
                         }
                     ]
                 };
+
                 myChartCate.clear(); // 清除旧的图表数据
                 myChartCate.setOption(option, true); // 使用新数据更新图表，第二个参数为 true 表示不合并
-            });
+
+            } catch (error) {
+                console.error("Error fetching data:", error);
+            }
         }
+
 
         function handleDepositoryChange() {
             var depositoryId = document.getElementById('depository-selector-three').value;
@@ -740,7 +788,16 @@
                 .map(item => item.category)// 获取所有的类别
                     .filter(category => category.includes("线") || category.endsWith("机"));//获取所有带有“线”或以“机”结尾的类别
                 // .filter(category => !category.includes("线") && !category.endsWith("机"));
-
+            //sort排序
+            categories.sort((a, b) => {
+                if (a.includes("线") && b.endsWith("机")) {
+                    return -1; // "线" 在前
+                } else if (a.endsWith("机") && b.includes("线")) {
+                    return 1; // "机" 在后
+                } else {
+                    return 0; // 保持原有顺序
+                }
+            });
             console.log(categories);
             // 使用Set去除重复的类别
             var uniqueCategories = [...new Set(categories)];
@@ -823,9 +880,10 @@
                         type: 'value',
                         name: '',
                         position: 'right',
-                        axisLabel: {
-                            show:false
-                        }
+                        axisLabel: { show: false },  // 隐藏第三个Y轴的标签
+                        axisLine: { show: false },   // 隐藏第三个Y轴的轴线
+                        axisTick: { show: false },   // 隐藏第三个Y轴的刻度线
+                        splitLine: { show: false }   // 隐藏第三个Y轴的网格线
                     }
                 ],
                 series: [
@@ -874,7 +932,6 @@
                         lineStyle: {
                             normal: {
                                 color: '#bf2222',  // 折线颜色
-
                                 opacity: 0.5  // 设置透明度，将折线虚化
                             }
                         },

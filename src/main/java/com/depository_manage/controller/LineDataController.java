@@ -144,5 +144,17 @@ public class LineDataController {
         }
     }
 
-
+    @GetMapping("/data/{year}/{lineName}")
+    public RestResponse getLineNameData(
+            @PathVariable("year") int year,
+            @PathVariable("lineName") String lineName) throws UnsupportedEncodingException{
+            try {
+            // 根据年月和厂区ID获取对应的lineData
+                lineName = URLDecoder.decode(lineName, StandardCharsets.UTF_8.name());
+                List<LineData> lineDataList = lineDataService.findLineNameData(year, lineName);
+            return new RestResponse(lineDataList, lineDataList.size(), 200);
+        } catch (Exception e) {
+            return new RestResponse("Failed to fetch line data: " + e.getMessage(), 500, null);
+        }
+    }
 }
