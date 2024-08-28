@@ -33,4 +33,6 @@ public interface LineDataMapper {
     Integer findCountByCondition(Map<String, Object> map);
 
     List<LineData> findLineDataByMonth(@Param("year") int year, @Param("month") int month);
+    List<LineData> findLineNameData   (@Param("year") int year, @Param("lineName") String lineName);
+
 }

@@ -27,4 +27,5 @@ public interface LineDataService {
     List<LineDataP> findLineDataPByCondition(Map<String, Object> map);
 
     List<LineData> findLineDataByMonth(int year, int month);
+    List<LineData> findLineNameData(int year, String lineName);
 }

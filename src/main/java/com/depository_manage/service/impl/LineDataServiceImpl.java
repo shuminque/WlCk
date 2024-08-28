@@ -83,6 +83,12 @@ public class LineDataServiceImpl implements LineDataService {
         return lineDataMapper.findLineDataByMonth(year, month);
     }
 
+    @Override
+    public List<LineData> findLineNameData(int year, String lineName) {
+        return lineDataMapper.findLineNameData(year, lineName);
+
+    }
+
     private List<LineDataP> pack(List<LineData> list) {
         List<LineDataP> result = new ArrayList<>(list.size());
         for (LineData lineData : list) {

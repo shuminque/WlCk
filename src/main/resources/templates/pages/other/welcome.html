@@ -488,17 +488,18 @@
         laydate.render({ elem: '#year-selector-three', type: 'year', done: fetchCateChart });
 
         var myChartCate = echarts.init(document.getElementById('cateAmountChart'));
-
         function fetchCateChart() {
             var year = document.getElementById('year-selector-three').value;
             var depositoryId = document.getElementById('depository-selector-three').value;
-            var categoryTitle = document.getElementById('applyRemarkInput-1').value;
-
+            var categoryTitle = encodeURIComponent(document.getElementById('applyRemarkInput-1').value);
             if (!depositoryId ) {
                 alert("请确保已选择所有条件！");
                 return;
             }
             var url = '/CategoryForYear/' + year + '/' + depositoryId + '/' + categoryTitle;
+            var amountUrl = '/CategoryForYear/' + year + '/' + depositoryId + '/' + categoryTitle;
+            var lineNameUrl = '/getLineNameData/' + year + '/' + categoryTitle;
+
             $.get(url, function(data) {
                 var colors = ['#5470C6'];
                 var option = {
@@ -546,7 +547,6 @@
         document.getElementById('depository-selector-three').addEventListener('change', handleDepositoryChange);
         // 初始化ECharts实例
         var myChart = echarts.init(document.getElementById('typeAmountChart')); // 请确保您的div有一个ID，例如typeAmountChart
-
         function fetchTypeAmountDataAndRenderChart() {
             var year = document.getElementById('year-selector').value;
             var depositoryId = document.getElementById('depository-selector-two').value;
@@ -769,7 +769,7 @@
 
             var option2 = {
                 title: {
-                    text: '单能线',  // 设置标题文本
+                    text: `单能线和数控NC(单个成本：${referenceLineValue})`,  // 动态设置标题文本
                     left: 'center',  // 标题居中
                     top: 'top',  // 标题在图表的顶部
                     textStyle: {
@@ -889,7 +889,7 @@
                                     name: '平均',
                                     yAxis: referenceLineValue,  // 在x轴上显示平均值
                                     label: {
-                                        // show:false,
+                                        show:false,
                                         formatter: '{c}',
                                         position: 'middle'
                                     },
@@ -914,7 +914,6 @@
                             opacity: 0  // 将条形图样式的透明度设置为0
                         }
                     }
-
                 ]
             };
             chart2 = echarts.init(document.getElementById('category-bar-chart'));

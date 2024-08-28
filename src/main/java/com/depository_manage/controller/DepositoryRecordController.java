@@ -18,8 +18,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -204,10 +207,12 @@ public class DepositoryRecordController {
     public ResponseEntity<List<CategoryOutboundDTO>> getCategoryOutboundsForYear(
             @PathVariable String year,
             @PathVariable Integer depositoryId,
-            @PathVariable String categoryTitle) {
+            @PathVariable String categoryTitle) throws UnsupportedEncodingException {
+        categoryTitle = URLDecoder.decode(categoryTitle, StandardCharsets.UTF_8.name());
         List<CategoryOutboundDTO> categoryOutbounds = depositoryRecordService.getCategoryOutboundsForYear(year, depositoryId, categoryTitle);
         return ResponseEntity.ok(categoryOutbounds);
     }
+
 
     @GetMapping("/type-amounts/{year}/{typeId}/{depositoryId}")
     public ResponseEntity<List<MonthlyAmountDTO>> getTypeAmounts(

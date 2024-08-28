@@ -110,6 +110,13 @@
         WHERE YEAR(date) = #{year}
           AND MONTH(date) = #{month}
     </select>
+    <select id="findLineNameData" parameterType="map" resultType="com.depository_manage.entity.LineData">
+        SELECT *
+        FROM line_data
+        WHERE YEAR(date) = #{year}
+        AND lineName = #{lineName}
+        order by date;
+    </select>
 
 
 </mapper>
