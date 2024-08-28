@@ -755,11 +755,15 @@
                 return lineDataItem ? lineDataItem.production : 0;
             });
             var totalProduction = productions.reduce((acc, curr) => acc + curr, 0);
-            var referenceLineValue = amounts.reduce((acc, curr) => acc + curr, 0) / totalProduction;
+            var totalPrice = amounts.reduce((acc, curr) => acc + curr, 0)
+            var referenceLineValue = (totalPrice / totalProduction).toFixed(3);
+            console.log(totalPrice);
+            console.log(totalProduction);
+            console.log(referenceLineValue);
 
             // 计算每个类别的单价，并保留两位小数
             var unitPrices = amounts.map((amount, index) => {
-                return productions[index] > 0 ? parseFloat((amount / productions[index]).toFixed(2)) : 0;
+                return productions[index] > 0 ? parseFloat((amount / productions[index]).toFixed(3)) : 0;
             });
             var colors = ['#5470C6', '#91CC75', '#EE6666', '#E87C25', '#FFD85C', '#73C0DE', '#3BA272', '#FC8452', '#9A60B4', '#EA7CCC'];
 
@@ -809,10 +813,20 @@
                         axisTick: { show: false },  // 隐藏y轴的刻度线
                         splitLine: { show: false }, // 隐藏y轴的网格线
                         axisLabel: {
-                            formatter: '{value}',
+                            formatter: function(value) {
+                                return value.toFixed(3); // 保留三位小数
+                            },
                             rotate: 90  // 旋转x轴第二轴标签90度，使其竖着显示
                         },
                     },
+                    {
+                        type: 'value',
+                        name: '',
+                        position: 'right',
+                        axisLabel: {
+                            show:false
+                        }
+                    }
                 ],
                 series: [
                     {
@@ -875,9 +889,9 @@
                                     name: '平均',
                                     yAxis: referenceLineValue,  // 在x轴上显示平均值
                                     label: {
-                                        show:false,
+                                        // show:false,
                                         formatter: '{c}',
-                                        position: 'end'
+                                        position: 'middle'
                                     },
                                     lineStyle: {
                                         type: 'solid', //dotted
@@ -886,7 +900,21 @@
                                 }
                             ]
                         }
+                    },
+                    {
+                        name: '产量',
+                        type: 'bar',
+                        yAxisIndex: 2,  // 使用第三个Y轴
+                        data: productions,
+                        barWidth: '0%',  // 将条形图宽度设置为0%
+                        label: {
+                            show: false  // 隐藏标签
+                        },
+                        itemStyle: {
+                            opacity: 0  // 将条形图样式的透明度设置为0
+                        }
                     }
+
                 ]
             };
             chart2 = echarts.init(document.getElementById('category-bar-chart'));
@@ -1013,14 +1041,15 @@
             var otherUnitPrices = otherAmounts.map((amount) => {
                 return totalProduction > 0 ? parseFloat((amount / totalProduction).toFixed(3)) : 0;
             });
+            var totalUnitCost = otherUnitPrices.reduce((acc, curr) => acc + curr, 0).toFixed(3);
+
             var referenceLineValue = (otherAmounts.reduce((acc, curr) => acc + curr, 0) / totalProduction / 17).toFixed(3);
-            console.log(referenceLineValue);
 
             var colors = ['#5470C6', '#91CC75', '#EE6666', '#E87C25', '#FFD85C', '#73C0DE', '#3BA272', '#FC8452', '#9A60B4', '#EA7CCC'];
 
             var option1 = {
                 title: {
-                    text: '共通工程',  // 设置标题文本
+                    text: `共通工程（单个成本：${totalUnitCost}）`,  // 动态设置标题文本
                     left: 'center',  // 标题居中
                     top: 'top',  // 标题在图表的顶部
                     textStyle: {
@@ -1046,7 +1075,7 @@
                     data: uniqueOtherCategories,
                     axisLabel: {
                         interval: 0,
-                        rotate: 35,
+                        rotate: 0,
                         margin: 0,
                         align: 'right',
                         inside: false
