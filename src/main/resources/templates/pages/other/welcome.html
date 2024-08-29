@@ -543,7 +543,12 @@
                     xAxis: { data: amountData.map(function(item) { return item.month; }) },
                     yAxis: [
                         { type: 'value', name: '金额', position: 'left' },
-                        { type: 'value', name: '单个成本', position: 'right' }
+                        { type: 'value', name: '单个成本', position: 'right' ,
+                            // axisLabel: { show: false },  // 隐藏第三个Y轴的标签
+                            // axisLine: { show: false },   // 隐藏第三个Y轴的轴线
+                            // axisTick: { show: false },   // 隐藏第三个Y轴的刻度线
+                            splitLine: { show: false }   // 隐藏第三个Y轴的网格线
+                        }
                     ],
                     series: [
                         {
@@ -560,7 +565,7 @@
                             yAxisIndex: 1,
                             data: costPerUnit,
                             label: { normal: { show: true, position: 'top' } },
-                            itemStyle: { normal: { color: function(params) { return colors[1]; } } }
+                            itemStyle: { normal: { color: function(params) { return colors[1]; } } },
                         }
                     ]
                 };
