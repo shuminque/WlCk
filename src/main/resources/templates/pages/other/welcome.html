@@ -554,14 +554,14 @@
                             label: { normal: { show: true, position: 'top' } },
                             itemStyle: { normal: { color: function(params) { return colors[0]; } } }
                         },
-                        // {
-                        //     name: '单个成本',
-                        //     type: 'line',
-                        //     yAxisIndex: 1,
-                        //     data: costPerUnit,
-                        //     label: { normal: { show: true, position: 'top' } },
-                        //     itemStyle: { normal: { color: function(params) { return colors[1]; } } }
-                        // }
+                        {
+                            name: '单个成本',
+                            type: 'line',
+                            yAxisIndex: 1,
+                            data: costPerUnit,
+                            label: { normal: { show: true, position: 'top' } },
+                            itemStyle: { normal: { color: function(params) { return colors[1]; } } }
+                        }
                     ]
                 };
 
@@ -795,7 +795,7 @@
                 } else if (a.endsWith("机") && b.includes("线")) {
                     return 1; // "机" 在后
                 } else {
-                    return 0; // 保持原有顺序
+                    return a.localeCompare(b);
                 }
             });
             console.log(categories);
@@ -817,7 +817,6 @@
             console.log(totalPrice);
             console.log(totalProduction);
             console.log(referenceLineValue);
-
             // 计算每个类别的单价，并保留两位小数
             var unitPrices = amounts.map((amount, index) => {
                 return productions[index] > 0 ? parseFloat((amount / productions[index]).toFixed(3)) : 0;
