@@ -8,10 +8,11 @@
         <result column="date" property="date" jdbcType="DATE" />
         <result column="lineName" property="lineName" jdbcType="VARCHAR" />
         <result column="production" property="production" jdbcType="INTEGER" />
+        <result column="model" property="model" jdbcType="VARCHAR" /> <!-- 新增的 model 字段 -->
     </resultMap>
 
     <sql id="allColumns">
-        l.id, l.date, l.lineName, l.production
+        l.id, l.date, l.lineName, l.production, l.model <!-- 添加 model 字段 -->
     </sql>
 
     <select id="findLineDataAll" resultMap="lineDataMap">
@@ -37,6 +38,9 @@
         <if test="production != null">
             AND l.production = #{production}
         </if>
+        <if test="model != null">
+            AND l.model = #{model} <!-- 添加 model 的条件查询 -->
+        </if>
     </select>
 
     <select id="findLineDataByDate" resultMap="lineDataMap" parameterType="date">
@@ -53,17 +57,17 @@
 
     <insert id="insertLineData" parameterType="map">
         INSERT INTO line_data (
-            date, lineName, production
+        date, lineName, production, model <!-- 添加 model 字段 -->
         ) VALUES (
-                     #{date}, #{lineName}, #{production}
-                 )
+        #{date}, #{lineName}, #{production}, #{model} <!-- 添加 model 的值 -->
+        )
     </insert>
 
     <insert id="batchInsert" parameterType="java.util.List">
-        INSERT INTO line_data (date, lineName, production)
+        INSERT INTO line_data (date, lineName, production, model) <!-- 添加 model 字段 -->
         VALUES
         <foreach collection="list" item="item" separator=",">
-            (#{item.date}, #{item.lineName}, #{item.production})
+            (#{item.date}, #{item.lineName}, #{item.production}, #{item.model}) <!-- 添加 model 的值 -->
         </foreach>
     </insert>
 
@@ -77,7 +81,10 @@
                 lineName = #{lineName},
             </if>
             <if test="production != null">
-                production = #{production}
+                production = #{production},
+            </if>
+            <if test="model != null">
+                model = #{model} <!-- 添加 model 字段的更新 -->
             </if>
         </set>
         WHERE id = #{id}
@@ -103,20 +110,24 @@
         <if test="production != null">
             AND l.production = #{production}
         </if>
+        <if test="model != null">
+            AND l.model = #{model} <!-- 添加 model 的条件查询 -->
+        </if>
     </select>
+
     <select id="findLineDataByMonth" parameterType="map" resultType="com.depository_manage.entity.LineData">
         SELECT *
         FROM line_data
         WHERE YEAR(date) = #{year}
           AND MONTH(date) = #{month}
     </select>
+
     <select id="findLineNameData" parameterType="map" resultType="com.depository_manage.entity.LineData">
         SELECT *
         FROM line_data
         WHERE YEAR(date) = #{year}
-        AND lineName = #{lineName}
+          AND lineName = #{lineName}
         order by date;
     </select>
-
 
 </mapper>

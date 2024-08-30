@@ -9,4 +9,5 @@ public class LineData {
     private Date date;
     private String lineName;
     private Integer production;
+    private String model; // 新增的 model 字段
 }

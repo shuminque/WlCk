@@ -98,6 +98,12 @@
                     </div>
                   </div>
                   <div class="layui-form-item">
+                    <label class="layui-form-label">型号:</label>
+                    <div class="layui-input-block">
+                      <input type="text" placeholder="请填写型号" name="model" class="layui-input" >
+                    </div>
+                  </div>
+                  <div class="layui-form-item">
                     <div class="layui-input-block">
                       <button class="layui-btn" lay-submit lay-filter="formStep">&emsp;增加产线数据&emsp;</button>
                     </div>
@@ -133,6 +139,12 @@
           <label class="layui-form-label">产量:</label>
           <div class="layui-input-block">
             <input type="number" placeholder="请填写产量" name="production" class="layui-input" lay-verify="required" required>
+          </div>
+        </div>
+        <div class="layui-form-item">
+          <label class="layui-form-label">型号:</label> <!-- 新增的 model 字段 -->
+          <div class="layui-input-block">
+            <input type="text" placeholder="请填写型号" name="model" class="layui-input" >
           </div>
         </div>
         <div class="layui-form-item">
@@ -248,6 +260,7 @@
             }},
           { field: 'lineName', title: '产线名称', sort: true },
           { field: 'production', title: '产量', sort: true },
+          { field: 'model', title: '型号', sort: true },
           { title: '操作', align: 'center', toolbar: '#operation-bar' }
         ]
       ]
