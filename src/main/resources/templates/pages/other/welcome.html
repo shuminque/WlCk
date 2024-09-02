@@ -271,7 +271,7 @@
             <div class="layui-row">
                 <div class="layui-col-md12">
                     <div class="layui-card">
-                        <div class="layui-card-header"><i class="fa fa-bar-chart icon"></i>各型号分析图</div>
+                        <div class="layui-card-header"><i class="fa fa-bar-chart icon"></i>各型号成本分布</div>
                         <div class="layui-card-body">
                             <div id="model-analysis-chart" style="width: 100%; height: 500px;"></div>
                         </div>
@@ -1347,7 +1347,8 @@
             referenceLineValue = Number(referenceLineValue) || 0; // Ensure it is a number
             var unitPrices = amounts.map((amount, index) => {
                 var cost = productions[index] > 0 ? (amount / productions[index]) : 0;
-                return parseFloat((cost + totalUnitCost).toFixed(3)); // Ensure `totalUnitCost` is a number
+                var finalCost = cost > 0 ? (cost + totalUnitCost) : cost;
+                return parseFloat(finalCost.toFixed(3));
             });
 
             var colors = ['#5470C6', '#91CC75', '#EE6666', '#E87C25', '#FFD85C', '#73C0DE', '#3BA272', '#FC8452', '#9A60B4', '#EA7CCC'];
