@@ -250,18 +250,10 @@
             <select id="depository-selector">
                 <option value="">选择厂区</option>
                 <option value="1">SAB</option>
-                <option value="2">ZAB</option>
+                <option value="2" selected>ZAB</option>
             </select>
             <input type="text" id="month-selector" placeholder="请选择年月" autocomplete="off">
             <div class="layui-row">
-<!--&lt;!&ndash;                 左侧显示其他类别的柱形图 &ndash;&gt;-->
-<!--                <div class="layui-col-md12">-->
-<!--                    <div class="layui-card">-->
-<!--                        <div class="layui-card-header"><i class="fa fa-signal icon"></i>其他类别分析图</div>-->
-<!--                        &lt;!&ndash; 左侧的横向条形图 &ndash;&gt;-->
-<!--                        <div id="other-category-bar-chart" style="width: 100%; height: 550px; margin-left: 2px;"></div>-->
-<!--                    </div>-->
-<!--                </div>-->
                 <!-- 各工程使用金额分析图 -->
                 <div class="layui-col-md12">
                     <div class="layui-card">
@@ -271,6 +263,17 @@
                             <div id="other-category-bar-chart" style="width: 35%; height: 800px; margin-left: 15px;"></div>
                             <!-- 右侧的纵向柱形图 -->
                             <div id="category-bar-chart" style="width: 100%; height: 800px;margin-top: 0px;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- 新增的各型号分析图 -->
+            <div class="layui-row">
+                <div class="layui-col-md12">
+                    <div class="layui-card">
+                        <div class="layui-card-header"><i class="fa fa-bar-chart icon"></i>各型号分析图</div>
+                        <div class="layui-card-body">
+                            <div id="model-analysis-chart" style="width: 100%; height: 500px;"></div>
                         </div>
                     </div>
                 </div>
@@ -302,29 +305,29 @@
             </div>
         </div>
 
-        <div>
-            <select id="depository-selector-two">
-                <option value="">选择厂区</option>
-                <option value="1">SAB</option>
-                <option value="2">ZAB</option>
-            </select>
-            <input type="text" id="year-selector" placeholder="请选择年" autocomplete="off">
-            <select name="typeId" id="typeSelect">
-                <option value="">请选择分类</option>
-                <option th:each="type : ${materialTypes}" th:value="${type.id}" th:text="${type.id}+' '+${type.tname}"></option>
-            </select>
-            <div class="layui-row">
-                <!-- 产量柱形图 -->
-                <div class="layui-col-md12">
-                    <div class="layui-card">
-                        <div class="layui-card-header"><i class="fa fa-signal icon"></i>产量柱形图</div>
-                        <div class="layui-card-body">
-                            <div id="typeAmountChart" style="width: 100%; height: 500px;"></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+<!--        <div>-->
+<!--            <select id="depository-selector-two">-->
+<!--                <option value="">选择厂区</option>-->
+<!--                <option value="1">SAB</option>-->
+<!--                <option value="2">ZAB</option>-->
+<!--            </select>-->
+<!--            <input type="text" id="year-selector" placeholder="请选择年" autocomplete="off">-->
+<!--            <select name="typeId" id="typeSelect">-->
+<!--                <option value="">请选择分类</option>-->
+<!--                <option th:each="type : ${materialTypes}" th:value="${type.id}" th:text="${type.id}+' '+${type.tname}"></option>-->
+<!--            </select>-->
+<!--            <div class="layui-row">-->
+<!--                &lt;!&ndash; 产量柱形图 &ndash;&gt;-->
+<!--                <div class="layui-col-md12">-->
+<!--                    <div class="layui-card">-->
+<!--                        <div class="layui-card-header"><i class="fa fa-signal icon"></i>产量柱形图</div>-->
+<!--                        <div class="layui-card-body">-->
+<!--                            <div id="typeAmountChart" style="width: 100%; height: 500px;"></div>-->
+<!--                        </div>-->
+<!--                    </div>-->
+<!--                </div>-->
+<!--            </div>-->
+<!--        </div>-->
 
     </div>
 </div>
@@ -376,6 +379,7 @@
                             "data": res.data // 解析数据列表
                         };
                     },
+
                     response: {
                         statusName: 'status', // 规定数据状态的字段名称，默认：code
                         statusCode: 200, // 规定成功的状态码，默认：0
@@ -577,16 +581,14 @@
                 console.error("Error fetching data:", error);
             }
         }
-
-
         function handleDepositoryChange() {
             var depositoryId = document.getElementById('depository-selector-three').value;
-            var catedepositoryId = (depositoryId == 1) ? "sab" : "zab";
+            var catedepositoryId = (depositoryId === 1) ? "sab" : "zab";
             // // 清空之前的分类选择器内容 有BUG
             // document.getElementById('ID-dropdown-demo-complex-1').innerText = '选择分类';
             // document.getElementById('applyRemarkInput-1').value = '';
             loadCategoryData(catedepositoryId, function(data) {
-                if (depositoryId == 1) {
+                if (depositoryId === 1) {
                     dropDataSAB = data;
                     loadDepositoryDataForElem('#ID-dropdown-demo-complex-1', dropDataSAB);
                 } else {
@@ -598,54 +600,55 @@
             });
         }
         document.getElementById('depository-selector-three').addEventListener('change', handleDepositoryChange);
-        // 初始化ECharts实例
-        var myChart = echarts.init(document.getElementById('typeAmountChart')); // 请确保您的div有一个ID，例如typeAmountChart
-        function fetchTypeAmountDataAndRenderChart() {
-            var year = document.getElementById('year-selector').value;
-            var depositoryId = document.getElementById('depository-selector-two').value;
-            var typeId = document.getElementById('typeSelect').value;
 
-            var url = '/type-amounts/' + year + '/' + typeId + '/' + depositoryId;
-            // var url = '/CategoryForYear/' + year + '/' + depositoryId + '/' +"N沟" ;
-            $.get(url, function(data) {
-                var colors = ['#5470C6'];
-                var option = {
-                    title: { text: '产量柱形图' },
-                    tooltip: {
-                        trigger: 'axis',
-                        axisPointer: { type: 'shadow' }
-                    },
-                    xAxis: { data: data.map(function(item) { return item.month; }) },
-                    yAxis: [
-                        { type: 'value', position: 'left' },
-                        { type: 'value', position: 'right', show: true, splitLine: { show: false } }
-                    ],
-                    series: [
-                        {
-                            name: '金额',
-                            type: 'bar',
-                            yAxisIndex: 0,
-                            data: data.map(function(item) { return item.monthlyAmount; }),
-                            label: { normal: { show: true, position: 'top' } },
-                            itemStyle: { normal: { color: function(params) { return colors[params.dataIndex % colors.length]; } } }
-                        },
-                        {
-                            name: '单价',
-                            type: 'line',
-                            yAxisIndex: 1,
-                            data: data.map(function(item) { return item.unitPrice; }),
-                            smooth: true,
-                            label: { normal: { show: true, position: 'top' } },
-                        }
-                    ]
-                };
-                myChart.clear(); // 清除旧的图表数据
-                myChart.setOption(option, true); // 使用新数据更新图表，第二个参数为 true 表示不合并
-            });
-        }
-        document.getElementById('depository-selector-two').addEventListener('change', fetchTypeAmountDataAndRenderChart);
-        document.getElementById('year-selector').addEventListener('change', fetchTypeAmountDataAndRenderChart);
-        document.getElementById('typeSelect').addEventListener('change', fetchTypeAmountDataAndRenderChart);
+        // 初始化ECharts实例
+        // var myChart = echarts.init(document.getElementById('typeAmountChart')); // 请确保您的div有一个ID，例如typeAmountChart
+        // function fetchTypeAmountDataAndRenderChart() {
+        //     var year = document.getElementById('year-selector').value;
+        //     var depositoryId = document.getElementById('depository-selector-two').value;
+        //     var typeId = document.getElementById('typeSelect').value;
+        //
+        //     var url = '/type-amounts/' + year + '/' + typeId + '/' + depositoryId;
+        //     // var url = '/CategoryForYear/' + year + '/' + depositoryId + '/' +"N沟" ;
+        //     $.get(url, function(data) {
+        //         var colors = ['#5470C6'];
+        //         var option = {
+        //             title: { text: '产量柱形图' },
+        //             tooltip: {
+        //                 trigger: 'axis',
+        //                 axisPointer: { type: 'shadow' }
+        //             },
+        //             xAxis: { data: data.map(function(item) { return item.month; }) },
+        //             yAxis: [
+        //                 { type: 'value', position: 'left' },
+        //                 { type: 'value', position: 'right', show: true, splitLine: { show: false } }
+        //             ],
+        //             series: [
+        //                 {
+        //                     name: '金额',
+        //                     type: 'bar',
+        //                     yAxisIndex: 0,
+        //                     data: data.map(function(item) { return item.monthlyAmount; }),
+        //                     label: { normal: { show: true, position: 'top' } },
+        //                     itemStyle: { normal: { color: function(params) { return colors[params.dataIndex % colors.length]; } } }
+        //                 },
+        //                 {
+        //                     name: '单价',
+        //                     type: 'line',
+        //                     yAxisIndex: 1,
+        //                     data: data.map(function(item) { return item.unitPrice; }),
+        //                     smooth: true,
+        //                     label: { normal: { show: true, position: 'top' } },
+        //                 }
+        //             ]
+        //         };
+        //         myChart.clear(); // 清除旧的图表数据
+        //         myChart.setOption(option, true); // 使用新数据更新图表，第二个参数为 true 表示不合并
+        //     });
+        // }
+        // document.getElementById('depository-selector-two').addEventListener('change', fetchTypeAmountDataAndRenderChart);
+        // document.getElementById('year-selector').addEventListener('change', fetchTypeAmountDataAndRenderChart);
+        // document.getElementById('typeSelect').addEventListener('change', fetchTypeAmountDataAndRenderChart);
 
         // 为厂区选择器添加事件监听器
         document.getElementById('depository-selector').addEventListener('change', function() {
@@ -682,6 +685,7 @@
                                 }
                                 initCategoryBarChart(data, lineData);
                                 initOtherCategoryBarChart(data, lineData);
+                                initModelBarChart(data, lineData);
                                 // 在图表初始化完成后调用 syncLegend 同步图例
                                 if (chart1 && chart2) {
                                     console.log("Charts initialized successfully:", chart1, chart2);
@@ -1070,6 +1074,7 @@
                 });
             }
         }
+        var totalUnitCost;
         function initOtherCategoryBarChart(data, lineData) {
             var otherCategories = data
                 .map(item => item.category)
@@ -1101,7 +1106,7 @@
             var otherUnitPrices = otherAmounts.map((amount) => {
                 return totalProduction > 0 ? parseFloat((amount / totalProduction).toFixed(3)) : 0;
             });
-            var totalUnitCost = otherUnitPrices.reduce((acc, curr) => acc + curr, 0).toFixed(3);
+            totalUnitCost = otherUnitPrices.reduce((acc, curr) => acc + curr, 0).toFixed(3);
 
             var referenceLineValue = (otherAmounts.reduce((acc, curr) => acc + curr, 0) / totalProduction / 17).toFixed(3);
 
@@ -1311,6 +1316,126 @@
                 });
             }
         }
+        function initModelBarChart(data, lineData) {
+            // 以 model 进行分类汇总
+            var modelMap = {};
+
+            lineData.forEach(item => {
+                if (item.model) {
+                    if (!modelMap[item.model]) {
+                        modelMap[item.model] = {
+                            amount: 0,
+                            production: 0
+                        };
+                    }
+                    var correspondingData = data.find(d => d.category === item.lineName);
+                    if (correspondingData) {
+                        modelMap[item.model].amount += correspondingData.amount || 0;
+                    }
+                    modelMap[item.model].production += item.production || 0;
+                }
+            });
+
+            var models = Object.keys(modelMap);
+            var amounts = models.map(model => modelMap[model].amount);
+            var productions = models.map(model => modelMap[model].production);
+
+            var totalProduction = productions.reduce((acc, curr) => acc + curr, 0);
+            var totalPrice = amounts.reduce((acc, curr) => acc + curr, 0);
+            var referenceLineValue = (totalPrice / totalProduction).toFixed(3);
+            totalUnitCost = Number(totalUnitCost) || 0;
+            referenceLineValue = Number(referenceLineValue) || 0; // Ensure it is a number
+            var unitPrices = amounts.map((amount, index) => {
+                var cost = productions[index] > 0 ? (amount / productions[index]) : 0;
+                return parseFloat((cost + totalUnitCost).toFixed(3)); // Ensure `totalUnitCost` is a number
+            });
+
+            var colors = ['#5470C6', '#91CC75', '#EE6666', '#E87C25', '#FFD85C', '#73C0DE', '#3BA272', '#FC8452', '#9A60B4', '#EA7CCC'];
+
+            var option = {
+                title: {
+                    text: `各型号分析图（单个成本：${(referenceLineValue + totalUnitCost).toFixed(3)}）`,
+                    left: 'center',
+                    top: 'top',
+                    textStyle: {
+                        fontSize: 16,
+                        fontWeight: 'bold',
+                    }
+                },
+                tooltip: {
+                    trigger: 'axis',
+                    axisPointer: { type: 'shadow' }
+                },
+                grid: {
+                    left: '3%',
+                    right: '3%',
+                    top: '10%',
+                    bottom: '20%'
+                },
+                legend: {
+                    data: ['金额', '单个成本'],
+                    left: 'right',
+                    selected: { '金额': true, '单个成本': true }
+                },
+                xAxis: {
+                    type: 'category',
+                    data: models,
+                    axisLabel: {
+                        interval: 0,
+                        rotate: 90,
+                    }
+                },
+                yAxis: [
+                    { type: 'value', name: '金额', axisLabel: { formatter: '{value}', rotate: 90 } },
+                    { type: 'value', name: '单个成本', axisTick: { show: false }, splitLine: { show: false }, axisLabel: { formatter: function(value) { return value.toFixed(3); }, rotate: 90 } },
+                    { type: 'value', name: '', position: 'right', axisLabel: { show: false }, axisLine: { show: false }, axisTick: { show: false }, splitLine: { show: false } }
+                ],
+                series: [
+                    {
+                        name: '金额',
+                        type: 'bar',
+                        data: amounts,
+                        barWidth: '60%',
+                        barCategoryGap: '30%',
+                        label: { normal: { show: true, position: 'top', formatter: function(params) { return params.value; } } },
+                        itemStyle: { normal: { color: function(params) { return colors[params.dataIndex % colors.length]; } } }
+                    },
+                    {
+                        name: '单个成本',
+                        type: 'line',
+                        yAxisIndex: 1,
+                        data: unitPrices,
+                        label: { normal: { show: true, position: 'top', textStyle: { color: '#000000' } } },
+                        lineStyle: { normal: { color: '#bf2222', opacity: 0.5 } },
+                        itemStyle: { normal: { opacity: 0.5 } },
+                        markLine: {
+                            data: [
+                                {
+                                    name: '平均',
+                                    yAxis: (referenceLineValue+totalUnitCost),
+                                    label: { show:false, formatter: '{c}', position: 'middle' },
+                                    lineStyle: { type: 'solid', color: '#bf2222' }
+                                }
+                            ]
+                        }
+                    },
+                    {
+                        name: '产量',
+                        type: 'bar',
+                        yAxisIndex: 2,
+                        data: productions,
+                        barWidth: '0%',
+                        label: { show: false },
+                        itemStyle: { opacity: 0 }
+                    }
+                ]
+            };
+
+            var modelChart = echarts.init(document.getElementById('model-analysis-chart'));
+            modelChart.clear();
+            modelChart.setOption(option);
+        }
+
         function syncLegend(chart1, chart2) {
             chart1.on('legendselectchanged', function(event) {
                 chart2.dispatchAction({
