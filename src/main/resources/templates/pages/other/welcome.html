@@ -803,12 +803,37 @@
         }
 
         function initCategoryBarChart(data, lineData) {
-            var categories = data
-                .map(item => item.category)// 获取所有的类别
-                    .filter(category => category.includes("线") || category.endsWith("机"));//获取所有带有“线”或以“机”结尾的类别
-                // .filter(category => !category.includes("线") && !category.endsWith("机"));
-            //sort排序
-            categories.sort((a, b) => {
+            // 获取所有金额数据中的类别
+            var categoriesFromData = data
+                .map(item => item.category)
+                .filter(category => category.includes("线") || category.endsWith("机"));
+
+            // 获取所有产量数据中的类别
+            var categoriesFromLineData = lineData
+                .map(item => item.lineName)
+                .filter(lineName => lineName.includes("线") || lineName.endsWith("机"));
+
+            // 合并类别并去重
+            var allCategories = [...new Set([...categoriesFromData, ...categoriesFromLineData])];
+
+            // 获取每个类别的产量和金额
+            var amounts = allCategories.map(category => {
+                var categoryData = data.find(item => item.category === category);
+                return categoryData ? categoryData.amount : 0;
+            });
+
+            var productions = allCategories.map(category => {
+                var lineDataItem = lineData.find(item => item.lineName === category);
+                return lineDataItem ? lineDataItem.production : 0;
+            });
+
+            // 过滤掉金额和产量都为0的类别
+            var validCategories = allCategories.filter((category, index) => {
+                return productions[index] > 0 || amounts[index] > 0;
+            });
+
+            // 排序逻辑保持不变
+            validCategories.sort((a, b) => {
                 if (a.includes("线") && b.endsWith("机")) {
                     return -1; // "线" 在前
                 } else if (a.endsWith("机") && b.includes("线")) {
@@ -817,39 +842,44 @@
                     return a.localeCompare(b);
                 }
             });
-            console.log(categories);
-            // 使用Set去除重复的类别
-            var uniqueCategories = [...new Set(categories)];
-            // 获取每个类别的总金额
-            var amounts = uniqueCategories.map(category => {
+
+            console.log(validCategories);
+
+            // 获取有效类别的总金额
+            var validAmounts = validCategories.map(category => {
                 var categoryData = data.find(item => item.category === category);
                 return categoryData ? categoryData.amount : 0;
             });
-            // 获取每个类别的产量
-            var productions = uniqueCategories.map(category => {
+
+            // 重新计算有效类别的产量
+            var validProductions = validCategories.map(category => {
                 var lineDataItem = lineData.find(item => item.lineName === category);
                 return lineDataItem ? lineDataItem.production : 0;
             });
-            var totalProduction = productions.reduce((acc, curr) => acc + curr, 0);
-            var totalPrice = amounts.reduce((acc, curr) => acc + curr, 0)
+
+            var totalProduction = validProductions.reduce((acc, curr) => acc + curr, 0);
+            var totalPrice = validAmounts.reduce((acc, curr) => acc + curr, 0);
             var referenceLineValue = (totalPrice / totalProduction).toFixed(3);
+
             console.log(totalPrice);
             console.log(totalProduction);
             console.log(referenceLineValue);
-            // 计算每个类别的单价，并保留两位小数
-            var unitPrices = amounts.map((amount, index) => {
-                return productions[index] > 0 ? parseFloat((amount / productions[index]).toFixed(3)) : 0;
+
+            // 计算每个类别的单价，并保留三位小数
+            var unitPrices = validAmounts.map((amount, index) => {
+                return validProductions[index] > 0 ? parseFloat((amount / validProductions[index]).toFixed(3)) : 0;
             });
+
             var colors = ['#5470C6', '#91CC75', '#EE6666', '#E87C25', '#FFD85C', '#73C0DE', '#3BA272', '#FC8452', '#9A60B4', '#EA7CCC'];
 
             var option2 = {
                 title: {
-                    text: `单能线和数控NC(单个成本：${referenceLineValue})`,  // 动态设置标题文本
-                    left: 'center',  // 标题居中
-                    top: 'top',  // 标题在图表的顶部
+                    text: `单能线和数控NC(单个成本：${referenceLineValue})`,
+                    left: 'center',
+                    top: 'top',
                     textStyle: {
-                        fontSize: 16,  // 标题字体大小
-                        fontWeight: 'bold',  // 标题字体加粗
+                        fontSize: 16,
+                        fontWeight: 'bold',
                     }
                 },
                 tooltip: {
@@ -857,65 +887,66 @@
                     axisPointer: { type: 'shadow' }
                 },
                 grid: {
-                    left: '3%',   // 图表左边距
-                    right: '3%',  // 图表右边距
-                    top: '200px',    // 图表上边距
-                    // bottom: '15%'  // 图表下边距
+                    left: '3%',
+                    right: '3%',
+                    top: '200px',
                 },
                 legend: {
                     data: legendData,
                     left: 'right',
-                    // top: '200px',
                     selected: { '金额': true, '单个成本': true }
                 },
                 xAxis: {
                     type: 'category',
-                    data: uniqueCategories,
+                    data: validCategories,
                     axisLabel: {
                         interval: 0,
                         rotate: 90,
                     }
                 },
                 yAxis: [
-                    { type: 'value', name: '金额',axisLabel: {
+                    {
+                        type: 'value',
+                        name: '金额',
+                        axisLabel: {
                             formatter: '{value}',
-                            rotate: 90  // 旋转x轴第二轴标签90度，使其  竖着显示
+                            rotate: 90,
                         },
                     },
                     {
                         type: 'value',
                         name: '单个成本',
-                        axisTick: { show: false },  // 隐藏y轴的刻度线
-                        splitLine: { show: false }, // 隐藏y轴的网格线
+                        axisTick: { show: false },
+                        splitLine: { show: false },
                         axisLabel: {
                             formatter: function(value) {
-                                return value.toFixed(3); // 保留三位小数
+                                return value.toFixed(3);
                             },
-                            rotate: 90  // 旋转x轴第二轴标签90度，使其竖着显示
+                            rotate: 90,
                         },
                     },
                     {
                         type: 'value',
                         name: '',
                         position: 'right',
-                        axisLabel: { show: false },  // 隐藏第三个Y轴的标签
-                        axisLine: { show: false },   // 隐藏第三个Y轴的轴线
-                        axisTick: { show: false },   // 隐藏第三个Y轴的刻度线
-                        splitLine: { show: false }   // 隐藏第三个Y轴的网格线
+                        axisLabel: { show: false },
+                        axisLine: { show: false },
+                        axisTick: { show: false },
+                        splitLine: { show: false }
                     }
                 ],
                 series: [
                     {
                         name: '金额',
                         type: 'bar',
-                        data: amounts.map((amount, index) => ({
+                        data: validAmounts.map((amount, index) => ({
                             value: amount,
                             label: {
-                                distance: index % 2 === 0 ? 15 : 2  // Manually setting distance alternation
+                                distance: index % 2 === 0 ? 15 : 2
                             }
                         })),
-                        barWidth: '60%',  // 调整条形图宽度
-                        barCategoryGap: '30%',  // 调整类别间距
+                        barWidth: '60%',
+                        barCategoryGap: '30%',
                         label: {
                             normal: {
                                 show: true,
@@ -936,41 +967,41 @@
                     {
                         name: '单个成本',
                         type: 'line',
-                        yAxisIndex: 1,  // 使用第二个Y轴
+                        yAxisIndex: 1,
                         data: unitPrices,
                         label: {
                             normal: {
                                 show: true,
                                 position: 'top',
                                 textStyle: {
-                                    color: '#000000'  // 将数字标注颜色设置为黑色
+                                    color: '#000000'
                                 },
                             }
                         },
                         lineStyle: {
                             normal: {
-                                color: '#bf2222',  // 折线颜色
-                                opacity: 0.5  // 设置透明度，将折线虚化
+                                color: '#bf2222',
+                                opacity: 0.5
                             }
                         },
                         itemStyle: {
                             normal: {
-                                opacity: 0.5  // 设置透明度，将折线虚化
+                                opacity: 0.5
                             }
                         },
                         markLine: {
                             data: [
                                 {
                                     name: '平均',
-                                    yAxis: referenceLineValue,  // 在x轴上显示平均值
+                                    yAxis: referenceLineValue,
                                     label: {
-                                        show:false,
+                                        show: false,
                                         formatter: '{c}',
                                         position: 'middle'
                                     },
                                     lineStyle: {
-                                        type: 'solid', //dotted
-                                        color: '#bf2222'  // 线的颜色
+                                        type: 'solid',
+                                        color: '#bf2222'
                                     }
                                 }
                             ]
@@ -979,18 +1010,19 @@
                     {
                         name: '产量',
                         type: 'bar',
-                        yAxisIndex: 2,  // 使用第三个Y轴
-                        data: productions,
-                        barWidth: '0%',  // 将条形图宽度设置为0%
+                        yAxisIndex: 2,
+                        data: validProductions,
+                        barWidth: '0%',
                         label: {
-                            show: false  // 隐藏标签
+                            show: false
                         },
                         itemStyle: {
-                            opacity: 0  // 将条形图样式的透明度设置为0
+                            opacity: 0
                         }
                     }
                 ]
             };
+
             chart2 = echarts.init(document.getElementById('category-bar-chart'));
             chart2.clear();
             chart2.off('click');
@@ -1331,19 +1363,36 @@
             var modelMap = {};
 
             lineData.forEach(item => {
-                if (item.model) {
-                    if (!modelMap[item.model]) {
-                        modelMap[item.model] = {
-                            amount: 0,
-                            production: 0
-                        };
-                    }
-                    var correspondingData = data.find(d => d.category === item.lineName);
-                    if (correspondingData) {
-                        modelMap[item.model].amount += correspondingData.amount || 0;
-                    }
-                    modelMap[item.model].production += item.production || 0;
+                var modelKey = item.model || "无规格";  // Use "无规格分类" for empty models
+
+                if (!modelMap[modelKey]) {
+                    modelMap[modelKey] = {
+                        amount: 0,
+                        production: 0,
+                        categories: []  // 添加一个数组来存储相关类别和金额
+                    };
                 }
+
+                var correspondingData = data.find(d => d.category === item.lineName);
+                if (correspondingData) {
+                    modelMap[modelKey].amount += correspondingData.amount || 0;
+                    // 保存类别和金额信息
+                    modelMap[modelKey].categories.push({ category: item.lineName, amount: correspondingData.amount || 0 });
+                }
+                modelMap[modelKey].production += item.production || 0;
+            });
+
+            var categoriesFromData = data
+                .map(item => item.category)
+                .filter(category => category.includes("线") || category.endsWith("机"));
+
+            // 合并类别并去重
+            var allCategories = [...new Set([...categoriesFromData])];
+
+            // 获取每个类别的产量和金额
+            var amountsALL = allCategories.map(category => {
+                var categoryData = data.find(item => item.category === category);
+                return categoryData ? categoryData.amount : 0;
             });
 
             var models = Object.keys(modelMap);
@@ -1351,8 +1400,13 @@
             var productions = models.map(model => modelMap[model].production);
 
             var totalProduction = productions.reduce((acc, curr) => acc + curr, 0);
-            var totalPrice = amounts.reduce((acc, curr) => acc + curr, 0);
+            var totalPrice = amountsALL.reduce((acc, curr) => acc + curr, 0);
             var referenceLineValue = (totalPrice / totalProduction).toFixed(3);
+
+            console.log(totalPrice);
+            console.log(totalProduction);
+            console.log(referenceLineValue);
+
             totalUnitCost = Number(totalUnitCost) || 0;
             referenceLineValue = Number(referenceLineValue) || 0; // Ensure it is a number
             var unitPrices = amounts.map((amount, index) => {
@@ -1380,7 +1434,7 @@
                 grid: {
                     left: '3%',
                     right: '3%',
-                    top: '10%',
+                    top: '15%',
                     bottom: '20%'
                 },
                 legend: {
@@ -1423,8 +1477,8 @@
                             data: [
                                 {
                                     name: '平均',
-                                    yAxis: (referenceLineValue+totalUnitCost),
-                                    label: { show:false, formatter: '{c}', position: 'middle' },
+                                    yAxis: (referenceLineValue + totalUnitCost),
+                                    label: { show: false, formatter: '{c}', position: 'middle' },
                                     lineStyle: { type: 'solid', color: '#bf2222' }
                                 }
                             ]
@@ -1447,21 +1501,26 @@
             modelChart.setOption(option);
         }
 
+
         function syncLegend(chart1, chart2) {
+            function sync(event, sourceChart, targetChart) {
+                if (event.name && event.selected.hasOwnProperty(event.name)) {
+                    targetChart.dispatchAction({
+                        type: event.selected[event.name] ? 'legendSelect' : 'legendUnSelect',
+                        name: event.name
+                    });
+                }
+            }
+
             chart1.on('legendselectchanged', function(event) {
-                chart2.dispatchAction({
-                    type: event.selected[event.name] ? 'legendSelect' : 'legendUnSelect',
-                    name: event.name
-                });
+                sync(event, chart1, chart2);
             });
 
             chart2.on('legendselectchanged', function(event) {
-                chart1.dispatchAction({
-                    type: event.selected[event.name] ? 'legendSelect' : 'legendUnSelect',
-                    name: event.name
-                });
+                sync(event, chart2, chart1);
             });
         }
+
 
         function initChart(chartId, months, sabData, zabData, title) {
             var echartsInstance = echarts.init(document.getElementById(chartId), 'walden');
