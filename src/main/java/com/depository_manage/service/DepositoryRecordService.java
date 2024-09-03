@@ -81,7 +81,7 @@ public interface DepositoryRecordService {
      * 根据id集合删除多条仓库记录
      * @param list id集合
      * @return 受影响的行数
-     * 
+     *
      */
     Integer deleteDepositoryRecordByIds(List<Integer> list);
 
@@ -112,6 +112,8 @@ public interface DepositoryRecordService {
     List<MonthlyAmountDTO> fetchMonthlyAmountsForYear(String year);
     List<CategoryOutboundDTO> fetchCategoryOutboundsForYearMonth(String year, String month, Integer depositoryId);
     List<CategoryOutboundDTO> getCategoryOutboundsForYear(String year, Integer depositoryId, String categoryTitle);
+
+    List<CategoryOutboundDTO> getTotalCategoryOutboundsForYear(String year, Integer depositoryId);
     List<MonthlyAmountDTO> fetchMonthlyAmountByTypeAndYear(Integer typeId, String year, Integer depositoryId);
 
 

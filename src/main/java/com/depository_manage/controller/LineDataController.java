@@ -107,30 +107,52 @@ public class LineDataController {
     @PostMapping("/import")
     public RestResponse importLineData(@RequestParam("file") MultipartFile file, @RequestParam("date") String date) {
         try {
-            // 创建一个列表来存储解析出来的 LineData 实体
             List<LineData> lineDataList = new ArrayList<>();
-            // 使用 Apache POI 解析 Excel 文件
             Workbook workbook = WorkbookFactory.create(file.getInputStream());
             Sheet sheet = workbook.getSheetAt(0);
-            // 遍历 Excel 行，从第二行开始（假设第一行为标题行）
+
             for (Row row : sheet) {
                 if (row.getRowNum() == 0 || row.getRowNum() == 1) continue;  // 跳过标题行
-                // 创建新的 LineData 实体并设置属性
+
                 LineData lineData = new LineData();
-                lineData.setDate(Date.valueOf(date));  // 使用传入的日期
-                lineData.setLineName(row.getCell(0).getStringCellValue());
+                lineData.setDate(Date.valueOf(date));
+
+                // 处理第一列的名称和型号
+                String nameAndModel = row.getCell(0).getStringCellValue();
+                String lineName = nameAndModel;
+                String model = null;
+
+                // 检查是否包含括号，分离名称和型号
+                if ((nameAndModel.contains("（") && nameAndModel.contains("）")) ||
+                        (nameAndModel.contains("(") && nameAndModel.contains(")"))) {
+
+                    // 判断是中文括号还是英文括号，并提取内容
+                    if (nameAndModel.contains("（") && nameAndModel.contains("）")) {
+                        int startIndex = nameAndModel.indexOf("（");
+                        int endIndex = nameAndModel.indexOf("）");
+                        lineName = nameAndModel.substring(0, startIndex);
+                        model = nameAndModel.substring(startIndex + 1, endIndex);
+                    } else if (nameAndModel.contains("(") && nameAndModel.contains(")")) {
+                        int startIndex = nameAndModel.indexOf("(");
+                        int endIndex = nameAndModel.indexOf(")");
+                        lineName = nameAndModel.substring(0, startIndex);
+                        model = nameAndModel.substring(startIndex + 1, endIndex);
+                    }
+                }
+
+                lineData.setLineName(lineName);
+                lineData.setModel(model);
                 lineData.setProduction((int) row.getCell(1).getNumericCellValue());
-                // 添加到列表中
+
                 lineDataList.add(lineData);
             }
+
             lineDataService.batchInsertLineData(lineDataList);
             return new RestResponse("导入成功", 200, null);
         } catch (Exception e) {
-            // 处理任何异常并返回失败响应
             return new RestResponse("导入失败：" + e.getMessage(), 500, null);
         }
     }
-
     @GetMapping("/{year}/{month}")
     public RestResponse getLineDataForMonth(
             @PathVariable("year") int year,

@@ -101,6 +101,9 @@ public interface DepositoryRecordMapper {
     List<CategoryOutboundDTO> getCategoryOutboundsForYear(@Param("year") String year,
                                                           @Param("depositoryId") Integer depositoryId,
                                                           @Param("categoryTitle") String categoryTitle);
+
+    List<CategoryOutboundDTO> getTotalCategoryOutboundsForYear(@Param("year") String year,
+                                                          @Param("depositoryId") Integer depositoryId);
     List<MonthlyAmountDTO> fetchMonthlyAmountByTypeAndYear(@Param("typeId") Integer typeId, @Param("year") String year, @Param("depositoryId") Integer depositoryId);
 
 

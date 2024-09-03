@@ -203,15 +203,26 @@ public class DepositoryRecordController {
         List<CategoryOutboundDTO> categoryOutbounds = depositoryRecordService.fetchCategoryOutboundsForYearMonth(year, month, depositoryId);
         return ResponseEntity.ok(categoryOutbounds);
     }
-    @GetMapping("/CategoryForYear/{year}/{depositoryId}/{categoryTitle}")
+    @RequestMapping(value = {"/CategoryForYear/{year}/{depositoryId}", "/CategoryForYear/{year}/{depositoryId}/{categoryTitle}"})
     public ResponseEntity<List<CategoryOutboundDTO>> getCategoryOutboundsForYear(
             @PathVariable String year,
             @PathVariable Integer depositoryId,
-            @PathVariable String categoryTitle) throws UnsupportedEncodingException {
-        categoryTitle = URLDecoder.decode(categoryTitle, StandardCharsets.UTF_8.name());
-        List<CategoryOutboundDTO> categoryOutbounds = depositoryRecordService.getCategoryOutboundsForYear(year, depositoryId, categoryTitle);
+            @PathVariable(required = false) String categoryTitle) throws UnsupportedEncodingException {
+        if (categoryTitle != null && !categoryTitle.isEmpty()) {
+            categoryTitle = URLDecoder.decode(categoryTitle, StandardCharsets.UTF_8.name());
+        }
+
+        List<CategoryOutboundDTO> categoryOutbounds;
+
+        if (categoryTitle == null || categoryTitle.isEmpty()) {
+            categoryOutbounds = depositoryRecordService.getTotalCategoryOutboundsForYear(year, depositoryId);
+        } else {
+            categoryOutbounds = depositoryRecordService.getCategoryOutboundsForYear(year, depositoryId, categoryTitle);
+        }
+
         return ResponseEntity.ok(categoryOutbounds);
     }
+
 
 
     @GetMapping("/type-amounts/{year}/{typeId}/{depositoryId}")
