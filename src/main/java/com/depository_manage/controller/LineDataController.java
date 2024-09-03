@@ -5,10 +5,7 @@ import com.depository_manage.pojo.LineDataP;
 import com.depository_manage.pojo.RestResponse;
 import com.depository_manage.service.LineDataService;
 import com.depository_manage.utils.CrudUtil;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.ss.usermodel.WorkbookFactory;
+import org.apache.poi.ss.usermodel.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.web.bind.annotation.*;
@@ -118,7 +115,12 @@ public class LineDataController {
                 lineData.setDate(Date.valueOf(date));
 
                 // 处理第一列的名称和型号
-                String nameAndModel = row.getCell(0).getStringCellValue();
+                Cell nameCell = row.getCell(0);
+                if (nameCell == null) {
+                    continue; // 如果名称单元格为空，跳过这一行
+                }
+
+                String nameAndModel = nameCell.getStringCellValue();
                 String lineName = nameAndModel;
                 String model = null;
 
@@ -140,9 +142,16 @@ public class LineDataController {
                     }
                 }
 
-                lineData.setLineName(lineName);
-                lineData.setModel(model);
-                lineData.setProduction((int) row.getCell(1).getNumericCellValue());
+                lineData.setLineName(lineName.trim());
+                lineData.setModel(model != null ? model.trim() : null);
+
+                // 处理第二列的产量
+                Cell productionCell = row.getCell(1);
+                if (productionCell == null) {
+                    lineData.setProduction(0);  // 如果产量单元格为空，设置为0，或者你可以选择跳过这一行
+                } else {
+                    lineData.setProduction((int) productionCell.getNumericCellValue());
+                }
 
                 lineDataList.add(lineData);
             }
@@ -150,7 +159,8 @@ public class LineDataController {
             lineDataService.batchInsertLineData(lineDataList);
             return new RestResponse("导入成功", 200, null);
         } catch (Exception e) {
-            return new RestResponse("导入失败：" + e.getMessage(), 500, null);
+            // 返回更加详细的错误信息，便于调试
+            return new RestResponse("导入失败：" + e.getClass().getName() + ": " + e.getMessage(), 500, null);
         }
     }
     @GetMapping("/{year}/{month}")
