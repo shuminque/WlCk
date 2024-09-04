@@ -296,7 +296,7 @@
                 <!-- 产量柱形图 -->
                 <div class="layui-col-md12">
                     <div class="layui-card">
-                        <div class="layui-card-header"><i class="fa fa-signal icon"></i>分类柱形图</div>
+                        <div class="layui-card-header"><i class="fa fa-signal icon"></i>月别分析图</div>
                         <div class="layui-card-body">
                             <div id="cateAmountChart" style="width: 100%; height: 500px;"></div>
                         </div>
@@ -550,7 +550,7 @@
 
                 var colors = ['#5470C6', '#bf2222']; // 定义柱形图和折线图的颜色
                 var option = {
-                    title: { text: '分类柱形图和单个成本折线图' },
+                    // title: { text: '分类柱形图和单个成本折线图' },
                     tooltip: {
                         trigger: 'axis',
                         axisPointer: { type: 'shadow' }
@@ -869,6 +869,7 @@
             var totalProduction = validProductions.reduce((acc, curr) => acc + curr, 0);
             var totalPrice = validAmounts.reduce((acc, curr) => acc + curr, 0);
             var referenceLineValue = (totalPrice / totalProduction).toFixed(3);
+            var formattedTotalPrice = totalPrice.toLocaleString();
 
             console.log(totalPrice);
             console.log(totalProduction);
@@ -883,12 +884,19 @@
 
             var option2 = {
                 title: {
-                    text: `单能线和数控NC\n单个成本：${referenceLineValue}   消耗金额：${totalPrice}`, // 使用换行符对齐
+                    text: `单能线和数控NC\n\n\n{small|(单个成本：${referenceLineValue}   消耗金额：${formattedTotalPrice}元)}`,
                     left: 'center',
                     top: 'top',
                     textStyle: {
-                        fontSize: 16,
-                        fontWeight: 'bold',
+                        fontSize: 16,  // 主标题字体大小
+                        fontWeight: 'bold',  // 主标题字体加粗
+                        rich: {
+                            small: {
+                                fontSize: 12,  // 副标题（单个成本和消耗金额）字体大小
+                                fontWeight: 'normal',  // 副标题不加粗
+                                color: '#666'  // 副标题颜色
+                            }
+                        }
                     }
                 },
                 tooltip: {
@@ -1126,6 +1134,7 @@
             }
         }
         var totalUnitCost;
+        var OtherAllPrice;
         function initOtherCategoryBarChart(data, lineData) {
             var otherCategories = data
                 .map(item => item.category)
@@ -1159,18 +1168,25 @@
             });
             totalUnitCost = otherUnitPrices.reduce((acc, curr) => acc + curr, 0).toFixed(3);
 
-            var referenceLineValue = (otherAmounts.reduce((acc, curr) => acc + curr, 0) ).toFixed(0);
-
+            var referenceLineValue = (otherAmounts.reduce((acc, curr) => acc + curr, 0) );
+            OtherAllPrice=referenceLineValue;
+            var formattedReferenceLineValue = referenceLineValue.toLocaleString();
             var colors = ['#5470C6', '#91CC75', '#EE6666', '#E87C25', '#FFD85C', '#73C0DE', '#3BA272', '#FC8452', '#9A60B4', '#EA7CCC'];
-
             var option1 = {
                 title: {
-                    text: `共通工程\n（单个成本：${totalUnitCost}）    消耗金额：${referenceLineValue}`,  // 动态设置标题文本
+                    text: `共通工程{small|(单个成本：${totalUnitCost}    消耗金额：${formattedReferenceLineValue}元)}`, // 使用 rich 属性
                     left: 'center',  // 标题居中
                     top: 'top',  // 标题在图表的顶部
                     textStyle: {
-                        fontSize: 16,  // 标题字体大小
-                        fontWeight: 'bold',  // 标题字体加粗
+                        fontSize: 16,  // 主标题字体大小
+                        fontWeight: 'bold',  // 主标题字体加粗
+                        rich: {
+                            small: {
+                                fontSize: 12,  // 副标题（单个成本和消耗金额）字体大小
+                                fontWeight: 'normal',  // 副标题不加粗
+                                color: '#666'  // 副标题颜色
+                            }
+                        }
                     }
                 },
                 legend: {
@@ -1418,6 +1434,9 @@
 
             totalUnitCost = Number(totalUnitCost) || 0;
             referenceLineValue = Number(referenceLineValue) || 0; // Ensure it is a number
+            totalPrice =Number(totalPrice) || 0;
+            OtherAllPrice =Number(OtherAllPrice) || 0;
+            var formattedTotalALL= (totalPrice+OtherAllPrice).toLocaleString();
             var unitPrices = amounts.map((amount, index) => {
                 var cost = productions[index] > 0 ? (amount / productions[index]) : 0;
                 var finalCost = cost > 0 ? (cost + totalUnitCost) : cost;
@@ -1428,12 +1447,19 @@
 
             var option = {
                 title: {
-                    text: `各型号成本图\n单个成本：${(referenceLineValue + totalUnitCost).toFixed(3)} 消耗金额：${totalPrice}`,
+                    text: `各型号成本图\n\n{small|(单个成本：${(referenceLineValue + totalUnitCost).toFixed(3)} 消耗金额：${(formattedTotalALL)}元)}`,
                     left: 'center',
                     top: 'top',
                     textStyle: {
-                        fontSize: 16,
-                        fontWeight: 'bold',
+                        fontSize: 16,  // 主标题字体大小
+                        fontWeight: 'bold',  // 主标题字体加粗
+                        rich: {
+                            small: {
+                                fontSize: 12,  // 副标题（单个成本和消耗金额）字体大小
+                                fontWeight: 'normal',  // 副标题不加粗
+                                color: '#666'  // 副标题颜色
+                            }
+                        }
                     }
                 },
                 tooltip: {
