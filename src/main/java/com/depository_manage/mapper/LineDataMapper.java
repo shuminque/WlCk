@@ -34,5 +34,7 @@ public interface LineDataMapper {
 
     List<LineData> findLineDataByMonth(@Param("year") int year, @Param("month") int month);
     List<LineData> findLineNameData   (@Param("year") int year, @Param("lineName") String lineName);
+    List<LineData> findYearlyProductionData(@Param("year") int year);
+
 
 }

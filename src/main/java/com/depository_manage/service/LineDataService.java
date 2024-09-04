@@ -28,4 +28,5 @@ public interface LineDataService {
 
     List<LineData> findLineDataByMonth(int year, int month);
     List<LineData> findLineNameData(int year, String lineName);
+    List<LineData> findYearlyProductionData(int year);
 }

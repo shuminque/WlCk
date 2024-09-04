@@ -130,4 +130,18 @@
         order by date;
     </select>
 
+    <select id="findYearlyProductionData" parameterType="map" resultType="com.depository_manage.entity.LineData">
+        SELECT
+            date,
+            SUM(production) as production
+        FROM
+            line_data
+        WHERE
+            YEAR(date) = #{year}
+        GROUP BY
+            date
+        ORDER BY
+            date;
+    </select>
+
 </mapper>

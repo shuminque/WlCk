@@ -89,6 +89,11 @@ public class LineDataServiceImpl implements LineDataService {
 
     }
 
+    @Override
+    public List<LineData> findYearlyProductionData(int year) {
+        return lineDataMapper.findYearlyProductionData(year);
+    }
+
     private List<LineDataP> pack(List<LineData> list) {
         List<LineDataP> result = new ArrayList<>(list.size());
         for (LineData lineData : list) {

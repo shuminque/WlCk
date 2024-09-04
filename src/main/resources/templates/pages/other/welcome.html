@@ -504,9 +504,18 @@
             var amountUrl = '/CategoryForYear/' + year + '/' + depositoryId;
             var lineData = []; // 默认设置为一个空数组
             var isLineDataEmpty = true; // 用于判断 lineData 是否为空
+
+            // 如果 categoryTitle 不为空，则增加到 URL 中
             if (categoryTitle) {
-                amountUrl += '/' + encodeURIComponent(categoryTitle);
-                var lineNameUrl = '/lineData/data/' + year + '/' + encodeURIComponent(categoryTitle);
+                categoryTitle = encodeURIComponent(categoryTitle);
+                amountUrl += '/' + categoryTitle;
+            }
+
+            // 构建 lineNameUrl
+            var lineNameUrl = '/lineData/data/' + year;
+            if (categoryTitle) {
+                lineNameUrl += '/' + categoryTitle;
+            }
 
                 try {
                     // 获取产量数据
@@ -522,7 +531,6 @@
                     console.error("Error fetching line data:", error);
                     lineData = []; // 请求失败时，设置为一个空数组
                 }
-            }
             try {
                 // 获取金额数据
                 const amountData = await $.get(amountUrl);
@@ -540,7 +548,7 @@
                     return productionData ? (item.amount / productionData.production).toFixed(3) : 0;
                 });
 
-                var colors = ['#5470C6', '#91CC75']; // 定义柱形图和折线图的颜色
+                var colors = ['#5470C6', '#bf2222']; // 定义柱形图和折线图的颜色
                 var option = {
                     title: { text: '分类柱形图和单个成本折线图' },
                     tooltip: {
@@ -581,6 +589,7 @@
                             data: costPerUnit,
                             label: { normal: { show: true, position: 'top' } },
                             itemStyle: { normal: { color: function(params) { return colors[1]; } } },
+                            lineStyle: { color: colors[1] } // 确保折线的颜色为 '#91CC75'
                         }
                     ]
                 };
@@ -1419,7 +1428,7 @@
 
             var option = {
                 title: {
-                    text: `各型号分析图（单个成本：${(referenceLineValue + totalUnitCost).toFixed(3)}）`,
+                    text: `各型号成本图（单个成本：${(referenceLineValue + totalUnitCost).toFixed(3)}）`,
                     left: 'center',
                     top: 'top',
                     textStyle: {
