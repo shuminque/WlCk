@@ -517,40 +517,51 @@
                 lineNameUrl += '/' + categoryTitle;
             }
 
-                try {
-                    // 获取产量数据
-                    const lineDataResponse = await $.get(lineNameUrl);
-                    lineData = lineDataResponse.data;
-                    if (Array.isArray(lineData) && lineData.length > 0) {
-                        isLineDataEmpty = false;
-                    } else {
-                        console.error("lineData is not an array or is empty: 不是数组或为空", lineData);
-                        lineData = []; // 如果不是数组或为空，设置为一个空数组
-                    }
-                } catch (error) {
-                    console.error("Error fetching line data:", error);
-                    lineData = []; // 请求失败时，设置为一个空数组
+            try {
+                // 获取产量数据
+                const lineDataResponse = await $.get(lineNameUrl);
+                lineData = lineDataResponse.data;
+                if (Array.isArray(lineData) && lineData.length > 0) {
+                    isLineDataEmpty = false;
+                } else {
+                    console.error("lineData is not an array or is empty: 不是数组或为空", lineData);
+                    lineData = []; // 如果不是数组或为空，设置为一个空数组
                 }
+            } catch (error) {
+                console.error("Error fetching line data:", error);
+                lineData = []; // 请求失败时，设置为一个空数组
+            }
+
             try {
                 // 获取金额数据
                 const amountData = await $.get(amountUrl);
-                // 规范化 lineData 中的日期，并计算单个成本
+
+                // 计算每个月的单个成本
                 const costPerUnit = amountData.map(function(item) {
                     var productionData = lineData.find(lineItem => {
-                        // 解析日期并将其转换为 "YYYY-MM" 格式
                         const date = new Date(lineItem.date);
-                        const month = date.getMonth() + 1; // getMonth() 返回 0-11，需要加 1
-                        const monthString = month < 10 ? '0' + month : month; // 确保月份是两位数
+                        const month = date.getMonth() + 1;
+                        const monthString = month < 10 ? '0' + month : month;
                         const normalizedMonth = `${date.getFullYear()}-${monthString}`;
-
                         return normalizedMonth === item.month;
                     });
                     return productionData ? (item.amount / productionData.production).toFixed(3) : 0;
                 });
 
+                // 提取产量数据
+                const productionData = amountData.map(function(item) {
+                    var productionItem = lineData.find(lineItem => {
+                        const date = new Date(lineItem.date);
+                        const month = date.getMonth() + 1;
+                        const monthString = month < 10 ? '0' + month : month;
+                        const normalizedMonth = `${date.getFullYear()}-${monthString}`;
+                        return normalizedMonth === item.month;
+                    });
+                    return productionItem ? productionItem.production : 0;
+                });
+
                 var colors = ['#5470C6', '#bf2222']; // 定义柱形图和折线图的颜色
                 var option = {
-                    // title: { text: '分类柱形图和单个成本折线图' },
                     tooltip: {
                         trigger: 'axis',
                         axisPointer: { type: 'shadow' }
@@ -560,18 +571,14 @@
                         left: 'right',
                         selected: {
                             '金额': true,
-                            '单个成本': !isLineDataEmpty // 如果 lineData 为空，则默认取消选择单个成本
+                            '单个成本': !isLineDataEmpty, // 如果 lineData 为空，则默认取消选择单个成本
                         }
                     },
                     xAxis: { data: amountData.map(function(item) { return item.month; }) },
                     yAxis: [
                         { type: 'value', name: '金额', position: 'left' },
-                        { type: 'value', name: '单个成本', position: 'right' ,
-                            // axisLabel: { show: false },  // 隐藏第三个Y轴的标签
-                            // axisLine: { show: false },   // 隐藏第三个Y轴的轴线
-                            // axisTick: { show: false },   // 隐藏第三个Y轴的刻度线
-                            splitLine: { show: false }   // 隐藏第三个Y轴的网格线
-                        }
+                        { type: 'value', name: '单个成本', position: 'right', splitLine: { show: false } },
+                        { type: 'value', name: '', position: 'right', axisLabel: { show: false }, splitLine: { show: false } }
                     ],
                     series: [
                         {
@@ -580,7 +587,7 @@
                             yAxisIndex: 0,
                             data: amountData.map(function(item) { return item.amount; }),
                             label: { normal: { show: true, position: 'top' } },
-                            itemStyle: { normal: { color: function(params) { return colors[0]; } } }
+                            itemStyle: { normal: { color: colors[0] } }
                         },
                         {
                             name: '单个成本',
@@ -588,18 +595,28 @@
                             yAxisIndex: 1,
                             data: costPerUnit,
                             label: { normal: { show: true, position: 'top' } },
-                            itemStyle: { normal: { color: function(params) { return colors[1]; } } },
-                            lineStyle: { color: colors[1] } // 确保折线的颜色为 '#91CC75'
+                            itemStyle: { normal: { color: colors[1] } },
+                            lineStyle: { color: colors[1] }
+                        },
+                        {
+                            name: '产量',
+                            type: 'bar',
+                            yAxisIndex: 2,
+                            data: productionData,
+                            barWidth: '0%',
+                            label: { show: false },
+                            itemStyle: { opacity: 0 }
                         }
                     ]
                 };
                 myChartCate.clear(); // 清除旧的图表数据
-                myChartCate.setOption(option, true); // 使用新数据更新图表，第二个参数为 true 表示不合并
+                myChartCate.setOption(option, true); // 使用新数据更新图表
 
             } catch (error) {
                 console.error("Error fetching data:", error);
             }
         }
+
         function handleDepositoryChange() {
             var depositoryId = document.getElementById('depository-selector-three').value;
             var catedepositoryId = (depositoryId === 1) ? "sab" : "zab";
@@ -1469,7 +1486,7 @@
                 grid: {
                     left: '3%',
                     right: '3%',
-                    top: '15%',
+                    top: '25%',
                     bottom: '20%'
                 },
                 legend: {
