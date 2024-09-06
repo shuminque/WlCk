@@ -246,6 +246,29 @@
 <!--                </div>-->
 <!--            </div>-->
 <!--        </div>-->
+
+        <div>
+            <select id="depository-selector-three">
+                <option value="">选择厂区</option>
+                <option value="1">SAB</option>
+                <option value="2" selected>ZAB</option>
+            </select>
+            <input type="text" id="year-selector-three" placeholder="请选择年" autocomplete="off">
+            <button class="layui-input custom-input" id="ID-dropdown-demo-complex-1" >请选择分类</button>
+            <input type="hidden" name="applyRemark" id="applyRemarkInput-1" value="">
+            <div class="layui-row">
+                <!-- 产量柱形图 -->
+                <div class="layui-col-md12">
+                    <div class="layui-card">
+                        <div class="layui-card-header"><i class="fa fa-signal icon"></i>月别成本分析图</div>
+                        <div class="layui-card-body">
+                            <div id="cateAmountChart" style="width: 100%; height: 500px;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <div>
             <select id="depository-selector">
                 <option value="">选择厂区</option>
@@ -283,27 +306,6 @@
             </div>
         </div>
 
-        <div>
-            <select id="depository-selector-three">
-                <option value="">选择厂区</option>
-                <option value="1">SAB</option>
-                <option value="2" selected>ZAB</option>
-            </select>
-            <input type="text" id="year-selector-three" placeholder="请选择年" autocomplete="off">
-            <button class="layui-input custom-input" id="ID-dropdown-demo-complex-1" >请选择分类</button>
-            <input type="hidden" name="applyRemark" id="applyRemarkInput-1" value="">
-            <div class="layui-row">
-                <!-- 产量柱形图 -->
-                <div class="layui-col-md12">
-                    <div class="layui-card">
-                        <div class="layui-card-header"><i class="fa fa-signal icon"></i>月别成本分析图</div>
-                        <div class="layui-card-body">
-                            <div id="cateAmountChart" style="width: 100%; height: 500px;"></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
 
 <!--        <div>-->
 <!--            <select id="depository-selector-two">-->
