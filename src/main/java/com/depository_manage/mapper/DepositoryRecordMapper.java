@@ -106,5 +106,6 @@ public interface DepositoryRecordMapper {
                                                           @Param("depositoryId") Integer depositoryId);
     List<MonthlyAmountDTO> fetchMonthlyAmountByTypeAndYear(@Param("typeId") Integer typeId, @Param("year") String year, @Param("depositoryId") Integer depositoryId);
 
+    List<Map<String, Object>> getMonthlyReport(@Param("year") String year);
 
 }

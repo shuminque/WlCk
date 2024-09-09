@@ -215,6 +215,17 @@
             </div>
         </div>
         <input class="layui-input" type="text" id="year-selector0" placeholder="请选择查看的年份" autocomplete="off">
+        <!-- 库存数据分析表格 -->
+        <div class="layui-row">
+            <div class="layui-col-md12">
+                <div class="layui-card">
+                    <div class="layui-card-header"><i class="fa fa-table icon"></i>库存数据分析表</div>
+                    <div class="layui-card-body">
+                        <table class="layui-table" id="inventory-table" lay-filter="inventoryTable"></table>
+                    </div>
+                </div>
+            </div>
+        </div>
         <div class="layui-row">
             <!-- 入库金额折线图 -->
             <div class="layui-col-md6">
@@ -235,6 +246,7 @@
                 </div>
             </div>
         </div>
+
 <!--        <div class="layui-row">-->
 <!--            &lt;!&ndash; 在库金额柱形图 &ndash;&gt;-->
 <!--            <div class="layui-col-md12">-->
@@ -782,9 +794,43 @@
             done: function(value, date, endDate){
                 // 当选择年份后，调用 fetchData 函数
                 fetchData(value);
+                fetchVlure(value);
             }
         });
+// 根据年份加载库存数据
+        function fetchVlure(year) {
+            if (year) {
+                var url = '/getMonthlyReport/' + year; // 拼接年份到URL
 
+                table.render({
+                    elem: '#inventory-table',
+                    url: url, // 数据接口
+                    height: "full-50", // 表格高度
+                    parseData: function (res) { // 解析后端返回的数据
+                        return {
+                            "code": res.code, // layui要求的状态码
+                            "msg": res.msg, // layui要求的提示文本
+                            "count": res.count, // 数据总条数
+                            "data": res.data // 数据列表
+                        };
+                    },
+                    response: {
+                        statusName: 'code', // 规定数据状态的字段名称，后端返回的是'code'
+                        statusCode: 0, // 规定成功的状态码，layui默认0表示成功
+                        msgName: 'msg', // 规定状态信息的字段名称，后端返回的是'msg'
+                        countName: 'count', // 规定数据总数的字段名称，后端返回的是'count'
+                        dataName: 'data' // 规定数据列表的字段名称，后端返回的是'data'
+                    },
+                    cols: [ [ // 表头
+                        { field: 'month', title: '月份',  sort: true },
+                        { field: 'inboundAmount', title: '入库金额',  sort: true },
+                        { field: 'outboundAmount', title: '出库金额',  sort: true },
+                        { field: 'inventoryAmount', title: '库存金额',  sort: true }
+                    ]],
+                    page: true
+                });
+            }
+        }
         $(document).ready(function () {
             // 页面加载时获取当前年份并调用 fetchData 函数
             var year = new Date().getFullYear();

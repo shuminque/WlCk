@@ -671,7 +671,8 @@ public class DepositoryRecordServiceImpl implements DepositoryRecordService {
     public List<MonthlyAmountDTO> fetchMonthlyAmountByTypeAndYear(Integer typeId, String year,Integer depositoryId){
         return depositoryRecordMapper.fetchMonthlyAmountByTypeAndYear(typeId, year, depositoryId);
     }
-
-
+    public List<Map<String, Object>> getMonthlyReport(String year) {
+        return depositoryRecordMapper.getMonthlyReport(year);
+    }
 
 }

@@ -115,7 +115,7 @@ public interface DepositoryRecordService {
 
     List<CategoryOutboundDTO> getTotalCategoryOutboundsForYear(String year, Integer depositoryId);
     List<MonthlyAmountDTO> fetchMonthlyAmountByTypeAndYear(Integer typeId, String year, Integer depositoryId);
-
+    List<Map<String, Object>> getMonthlyReport(String year);
 
 
 }

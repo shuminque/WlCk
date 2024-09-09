@@ -235,5 +235,22 @@ public class DepositoryRecordController {
     }
 
 
+    @GetMapping("/getMonthlyReport/{year}")
+    public ResponseEntity<?> getTransferData(
+            @PathVariable String year) {
+        // 调用服务层获取数据
+        List<Map<String, Object>> result = depositoryRecordService.getMonthlyReport(year);
+
+        // 构建响应
+        Map<String, Object> response = new HashMap<>();
+        response.put("code", 0);  // layui Table组件通常使用"0"作为成功状态码
+        response.put("msg", "");  // 可以根据需求设置消息
+        response.put("count", result.size());  // 总记录数
+        response.put("data", result);  // 返回的数据列表
+
+        return ResponseEntity.ok(response);
+    }
+
+
 
 }
