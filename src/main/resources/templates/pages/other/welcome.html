@@ -227,25 +227,36 @@
             </div>
         </div>
         <div class="layui-row">
-            <!-- 入库金额折线图 -->
-            <div class="layui-col-md6">
+            <!-- 月度库存分析柱形图 -->
+            <div class="layui-col-md12">
                 <div class="layui-card">
-                    <div class="layui-card-header"><i class="fa fa-signal icon"></i>入库折线图</div>
+                    <div class="layui-card-header"><i class="fa fa-bar-chart icon"></i>月度库存分析柱形图</div>
                     <div class="layui-card-body">
-                        <div id="inbound-chart" style="width: 100%; height: 500px;"></div>
-                    </div>
-                </div>
-            </div>
-            <!-- 出库金额折线图 -->
-            <div class="layui-col-md6">
-                <div class="layui-card">
-                    <div class="layui-card-header"><i class="fa fa-signal icon"></i>出库折线图</div>
-                    <div class="layui-card-body">
-                        <div id="outbound-chart" style="width: 100%; height: 500px;"></div>
+                        <div id="inventory-bar-chart" style="width: 100%; height: 500px;"></div>
                     </div>
                 </div>
             </div>
         </div>
+<!--        <div class="layui-row">-->
+<!--            &lt;!&ndash; 入库金额折线图 &ndash;&gt;-->
+<!--            <div class="layui-col-md6">-->
+<!--                <div class="layui-card">-->
+<!--                    <div class="layui-card-header"><i class="fa fa-signal icon"></i>入库折线图</div>-->
+<!--                    <div class="layui-card-body">-->
+<!--                        <div id="inbound-chart" style="width: 100%; height: 500px;"></div>-->
+<!--                    </div>-->
+<!--                </div>-->
+<!--            </div>-->
+<!--            &lt;!&ndash; 出库金额折线图 &ndash;&gt;-->
+<!--            <div class="layui-col-md6">-->
+<!--                <div class="layui-card">-->
+<!--                    <div class="layui-card-header"><i class="fa fa-signal icon"></i>出库折线图</div>-->
+<!--                    <div class="layui-card-body">-->
+<!--                        <div id="outbound-chart" style="width: 100%; height: 500px;"></div>-->
+<!--                    </div>-->
+<!--                </div>-->
+<!--            </div>-->
+<!--        </div>-->
 
 <!--        <div class="layui-row">-->
 <!--            &lt;!&ndash; 在库金额柱形图 &ndash;&gt;-->
@@ -793,7 +804,7 @@
             type: 'year',
             done: function(value, date, endDate){
                 // 当选择年份后，调用 fetchData 函数
-                fetchData(value);
+                // fetchData(value);
                 fetchVlure(value);
             }
         });
@@ -801,11 +812,10 @@
         function fetchVlure(year) {
             if (year) {
                 var url = '/getMonthlyReport/' + year; // 拼接年份到URL
-
                 table.render({
                     elem: '#inventory-table',
                     url: url, // 数据接口
-                    height: "full-50", // 表格高度
+                    height: 450, // 表格高度
                     parseData: function (res) { // 解析后端返回的数据
                         return {
                             "code": res.code, // layui要求的状态码
@@ -821,13 +831,135 @@
                         countName: 'count', // 规定数据总数的字段名称，后端返回的是'count'
                         dataName: 'data' // 规定数据列表的字段名称，后端返回的是'data'
                     },
-                    cols: [ [ // 表头
-                        { field: 'month', title: '月份',  sort: true },
-                        { field: 'inboundAmount', title: '入库金额',  sort: true },
-                        { field: 'outboundAmount', title: '出库金额',  sort: true },
-                        { field: 'inventoryAmount', title: '库存金额',  sort: true }
+                    cols: [ [
+                        {field: 'month',
+                            title: '月份', sort: true,width:'15%',templet: function(d) {
+                                // 只显示月份部分 (将 '2024-01-31' 改为 '2024-01')
+                                return d.month.substring(0, 7);}},
+                        {field: 'inboundAmount',
+                            title: '入库金额', sort: true,width:'20%', templet: function(d) {
+                                // 金额保留整数
+                                return Math.round(d.inboundAmount);}},
+                        {
+                            field: 'outboundAmount',
+                            title: '出库金额',width:'20%',
+                            sort: true,
+                            templet: function(d) {
+                                // 金额保留整数
+                                return Math.round(d.outboundAmount);
+                            }
+                        },
+                        {
+                            field: 'inventoryAmount',
+                            title: '期末库存',width:'20%',
+                            sort: true,
+                            templet: function(d) {
+                                // 金额保留整数
+                                return Math.round(d.inventoryAmount);
+                            }
+                        },  {
+                            field: 'turnoverRate',
+                            title: '库存周转率',width:'15%',
+                            templet: function(d) {
+                                // 计算库存周转率 = 出库金额 / 期末库存金额
+                                if (d.inventoryAmount !== 0) {
+                                    return ((d.outboundAmount / d.inventoryAmount) * 100).toFixed(2) + '%';  // 保留两位小数并转为百分比
+                                } else {
+                                    return 'N/A';  // 避免除以0的情况
+                                }
+                            }
+                        }
                     ]],
-                    page: true
+                    done: function(res, curr, count) {
+                        // 计算各列的平均值
+                        let totalInbound = 0;
+                        let totalOutbound = 0;
+                        let totalInventory = 0;
+                        let totalTurnoverRate = 0;
+                        let validTurnoverEntries = 0;
+                        let months = [], inboundData = [], outboundData = [], inventoryData = [];
+
+                        res.data.forEach(function(item) {
+                            totalInbound += item.inboundAmount;
+                            totalOutbound += item.outboundAmount;
+                            totalInventory += item.inventoryAmount;
+                            months.push(item.month.substring(0, 7)); // 月份
+                            inboundData.push(Math.round(item.inboundAmount)); // 入库金额
+                            outboundData.push(Math.round(item.outboundAmount)); // 出库金额
+                            inventoryData.push(Math.round(item.inventoryAmount)); // 库存金额
+                            if (item.inventoryAmount !== 0) {
+                                totalTurnoverRate += (item.outboundAmount / item.inventoryAmount);
+                                validTurnoverEntries++;
+                            }
+                        });
+
+                        // 计算平均值
+                        let avgInbound = (totalInbound / res.data.length).toFixed(0);
+                        let avgOutbound = (totalOutbound / res.data.length).toFixed(0);
+                        let avgInventory = (totalInventory / res.data.length).toFixed(0);
+                        let avgTurnoverRate = (validTurnoverEntries !== 0) ? ((totalTurnoverRate / validTurnoverEntries) * 100).toFixed(2) + '%' : 'N/A';
+
+                        // 在表格底部插入一行平均值
+                        $('div.layui-table-box .layui-table-main tbody').append(`
+                            <tr class="layui-table-total">
+                                <td>平均值</td>
+                                <td>${avgInbound}</td>
+                                <td>${avgOutbound}</td>
+                                <td>${avgInventory}</td>
+                                <td>${avgTurnoverRate}</td>
+                            </tr>
+                        `);
+                        // 绘制柱形图
+                        var barChart = echarts.init(document.getElementById('inventory-bar-chart'));
+                        var barOption = {
+                            title: {
+                                text: '月度库存分析',
+                                left: 'center'
+                            },
+                            grid: {
+                                left: '5%',   // 图表左边距
+                                right: '5%',  // 图表右边距
+                                // top: '15%',    // 图表上边距
+                                // bottom: '15%'  // 图表下边距
+                            },
+                            tooltip: {
+                                trigger: 'axis'
+                            },
+                            legend: {
+                                data: ['入库金额', '出库金额', '期末库存'],
+                                top: 'bottom'
+                            },
+                            xAxis: {
+                                type: 'category',
+                                data: months
+                            },
+                            yAxis: {
+                                type: 'value'
+                            },
+                            series: [
+                                {
+                                    name: '入库金额',
+                                    type: 'bar',
+                                    data: inboundData,
+                                    label: { normal: { show: true, position: 'top', formatter: function(params) { return params.value; } } },
+                                },
+                                {
+                                    name: '出库金额',
+                                    type: 'bar',
+                                    data: outboundData,
+                                    label: { normal: { show: true, position: 'top', formatter: function(params) { return params.value; } } },
+                                    z: 10 // 将 z 设为较大值，保证该系列在最上层
+                                },
+                                {
+                                    name: '期末库存',
+                                    type: 'bar',
+                                    data: inventoryData,
+                                    label: { normal: { show: true, position: 'top', formatter: function(params) { return params.value; } } },
+                                }
+                            ]
+                        };
+                        barChart.setOption(barOption);
+                    },
                 });
             }
         }
@@ -837,53 +969,66 @@
             fetchData(year);
         });
 
-        function fetchData(year) {
-            $.ajax({
-                url: '/monthly-amounts/' + year,
-                type: 'GET',
-                dataType: 'json',
-                success: function (data) {
-                    // 当成功获取数据时，初始化并设置 ECharts 图表
-                    initECharts(data);
-                },
-                error: function (error) {
-                    console.log("Error fetching data", error);
-                }
-            });
-        }
+        // function fetchData(year) {
+        //     $.ajax({
+        //         url: '/monthly-amounts/' + year,
+        //         type: 'GET',
+        //         dataType: 'json',
+        //         success: function (data) {
+        //             // 当成功获取数据时，初始化并设置 ECharts 图表
+        //             initECharts(data);
+        //         },
+        //         error: function (error) {
+        //             console.log("Error fetching data", error);
+        //         }
+        //     });
+        // }
 
-        var echartsInstances = [];
-        function initECharts(data) {
-            var months = data.map(item => {
-                var dateParts = item.month.split("-");
-                return dateParts[1] + '月';  // 返回“月份 + '月'”格式
-            });
-
-            // 入库金额图
-            var sabInbound = data.map(item => item.sabInboundAmount);
-            var zabInbound = data.map(item => item.zabInboundAmount);
-
-            // 出库金额图
-            var sabOutbound = data.map(item => item.sabOutboundAmount);
-            var zabOutbound = data.map(item => item.zabOutboundAmount);
-
-            // 在库金额图
-            var sabStock = data.map(item => item.sabStockAmount);
-            var zabStock = data.map(item => item.zabStockAmount);
-
-            echartsInstances.push(initChart('inbound-chart', months, sabInbound, zabInbound, '入库金额'));
-            echartsInstances.push(initChart('outbound-chart', months, sabOutbound, zabOutbound, '出库金额'));
-            echartsInstances.push(initBarChart('stock-chart', months, sabStock, zabStock, '库存流水'));
-        }
+        // var echartsInstances = [];
+        // function initECharts(data) {
+        //     var months = data.map(item => {
+        //         var dateParts = item.month.split("-");
+        //         return dateParts[1] + '月';  // 返回“月份 + '月'”格式
+        //     });
+        //
+        //     // 入库金额图
+        //     var sabInbound = data.map(item => item.sabInboundAmount);
+        //     var zabInbound = data.map(item => item.zabInboundAmount);
+        //
+        //     // 出库金额图
+        //     var sabOutbound = data.map(item => item.sabOutboundAmount);
+        //     var zabOutbound = data.map(item => item.zabOutboundAmount);
+        //
+        //     // 在库金额图
+        //     var sabStock = data.map(item => item.sabStockAmount);
+        //     var zabStock = data.map(item => item.zabStockAmount);
+        //
+        //     echartsInstances.push(initChart('inbound-chart', months, sabInbound, zabInbound, '入库金额'));
+        //     echartsInstances.push(initChart('outbound-chart', months, sabOutbound, zabOutbound, '出库金额'));
+        //     echartsInstances.push(initBarChart('stock-chart', months, sabStock, zabStock, '库存流水'));
+        // }
 
         function initCategoryBarChart(data, lineData) {
+            // 汇总相同 lineName 的 production
+            var aggregatedLineData = lineData.reduce((acc, item) => {
+                if (acc[item.lineName]) {
+                    acc[item.lineName].production += item.production;
+                } else {
+                    acc[item.lineName] = { ...item };
+                }
+                return acc;
+            }, {});
+
+            // 转换回数组
+            var aggregatedLineDataArray = Object.values(aggregatedLineData);
+
             // 获取所有金额数据中的类别
             var categoriesFromData = data
                 .map(item => item.category)
                 .filter(category => category.includes("线") || category.endsWith("机"));
 
             // 获取所有产量数据中的类别
-            var categoriesFromLineData = lineData
+            var categoriesFromLineData = aggregatedLineDataArray
                 .map(item => item.lineName)
                 .filter(lineName => lineName.includes("线") || lineName.endsWith("机"));
 
@@ -897,7 +1042,7 @@
             });
 
             var productions = allCategories.map(category => {
-                var lineDataItem = lineData.find(item => item.lineName === category);
+                var lineDataItem = aggregatedLineDataArray.find(item => item.lineName === category);
                 return lineDataItem ? lineDataItem.production : 0;
             });
 
@@ -927,7 +1072,7 @@
 
             // 重新计算有效类别的产量
             var validProductions = validCategories.map(category => {
-                var lineDataItem = lineData.find(item => item.lineName === category);
+                var lineDataItem = aggregatedLineDataArray.find(item => item.lineName === category);
                 return lineDataItem ? lineDataItem.production : 0;
             });
 
@@ -944,8 +1089,7 @@
             var unitPrices = validAmounts.map((amount, index) => {
                 return validProductions[index] > 0 ? parseFloat((amount / validProductions[index]).toFixed(3)) : 0;
             });
-
-            var colors = ['#5470C6', '#91CC75', '#EE6666', '#E87C25', '#FFD85C', '#73C0DE', '#3BA272', '#FC8452', '#9A60B4', '#EA7CCC'];
+        var colors = ['#5470C6', '#91CC75', '#EE6666', '#E87C25', '#FFD85C', '#73C0DE', '#3BA272', '#FC8452', '#9A60B4', '#EA7CCC'];
 
             var option2 = {
                 title: {

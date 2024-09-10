@@ -14,6 +14,7 @@ import com.depository_manage.service.DepositoryRecordService;
 import com.depository_manage.utils.CrudUtil;
 import com.depository_manage.utils.ObjectFormatUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -238,6 +239,15 @@ public class DepositoryRecordController {
     @GetMapping("/getMonthlyReport/{year}")
     public ResponseEntity<?> getTransferData(
             @PathVariable String year) {
+        try {
+            Thread.sleep(15000);
+        } catch (InterruptedException e) {
+            // 处理异常
+            Thread.currentThread().interrupt();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("服务器出现错误，无法延迟返回");
+        }
+
         // 调用服务层获取数据
         List<Map<String, Object>> result = depositoryRecordService.getMonthlyReport(year);
 
@@ -250,6 +260,7 @@ public class DepositoryRecordController {
 
         return ResponseEntity.ok(response);
     }
+
 
 
 
