@@ -137,7 +137,7 @@
 
                     <div class="layui-col-md4" style="display: none;">
                         <div class="layui-card">
-                            <div class="layui-card-header"><i class="fa fa-credit-card icon icon-blue"></i>快捷入口</div>
+                            <div class="layui-card-he   ader"><i class="fa fa-credit-card icon icon-blue"></i>快捷入口</div>
                             <div class="layui-card-body">
                                 <div class="welcome-module">
                                     <div class="layui-row layui-col-space10 layuimini-qiuck">
@@ -233,6 +233,17 @@
                     <div class="layui-card-header"><i class="fa fa-bar-chart icon"></i>月度库存分析柱形图</div>
                     <div class="layui-card-body">
                         <div id="inventory-bar-chart" style="width: 100%; height: 500px;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="layui-row">
+            <!-- 库存周转率分析柱形图 -->
+            <div class="layui-col-md12">
+                <div class="layui-card">
+                    <div class="layui-card-header"><i class="fa fa-bar-chart icon"></i>库存周转率分析柱形图</div>
+                    <div class="layui-card-body">
+                        <div id="turnover-bar-chart" style="width: 100%; height: 500px;"></div>
                     </div>
                 </div>
             </div>
@@ -877,7 +888,7 @@
                         let totalInventory = 0;
                         let totalTurnoverRate = 0;
                         let validTurnoverEntries = 0;
-                        let months = [], inboundData = [], outboundData = [], inventoryData = [];
+                        let months = [], inboundData = [], outboundData = [], inventoryData = [], turnoverRateData= [];
 
                         res.data.forEach(function(item) {
                             totalInbound += item.inboundAmount;
@@ -887,9 +898,14 @@
                             inboundData.push(Math.round(item.inboundAmount)); // 入库金额
                             outboundData.push(Math.round(item.outboundAmount)); // 出库金额
                             inventoryData.push(Math.round(item.inventoryAmount)); // 库存金额
+
                             if (item.inventoryAmount !== 0) {
-                                totalTurnoverRate += (item.outboundAmount / item.inventoryAmount);
+                                let turnoverRate = (item.outboundAmount / item.inventoryAmount) * 100;
+                                turnoverRateData.push(turnoverRate.toFixed(2)); // 保留两位小数并存储
+                                totalTurnoverRate += turnoverRate;
                                 validTurnoverEntries++;
+                            } else {
+                                turnoverRateData.push(0); // 避免除以0的情况
                             }
                         });
 
@@ -897,7 +913,7 @@
                         let avgInbound = (totalInbound / res.data.length).toFixed(0);
                         let avgOutbound = (totalOutbound / res.data.length).toFixed(0);
                         let avgInventory = (totalInventory / res.data.length).toFixed(0);
-                        let avgTurnoverRate = (validTurnoverEntries !== 0) ? ((totalTurnoverRate / validTurnoverEntries) * 100).toFixed(2) + '%' : 'N/A';
+                        let avgTurnoverRate = (validTurnoverEntries !== 0) ? (totalTurnoverRate / validTurnoverEntries).toFixed(2) + '%' : 'N/A';
 
                         // 在表格底部插入一行平均值
                         $('div.layui-table-box .layui-table-main tbody').append(`
@@ -927,7 +943,7 @@
                             },
                             legend: {
                                 data: ['入库金额', '出库金额', '期末库存'],
-                                top: 'bottom'
+                                left: 'right',
                             },
                             xAxis: {
                                 type: 'category',
@@ -959,6 +975,52 @@
                             ]
                         };
                         barChart.setOption(barOption);
+                        // 初始化周转率分析的柱形图
+                        var turnoverChart = echarts.init(document.getElementById('turnover-bar-chart'));
+                        var turnoverOption = {
+                            title: {
+                                text: '月度库存周转率分析',
+                                left: 'center'
+                            },
+                            tooltip: {
+                                trigger: 'axis',
+                                formatter: function (params) {
+                                    var result = params[0].name + '<br/>';
+                                    params.forEach(function (item) {
+                                        result += item.marker + item.seriesName + ': ' + item.value + '%' + '<br/>';
+                                    });
+                                    return result;
+                                }
+                            },
+                            xAxis: {
+                                type: 'category',
+                                data: months // 使用月份作为X轴数据
+                            },
+                            yAxis: {
+                                type: 'value',
+                                axisLabel: {
+                                    formatter: '{value}%' // Y轴显示为百分比
+                                }
+                            },
+                            series: [
+                                {
+                                    name: '库存周转率',
+                                    type: 'bar',
+                                    data: turnoverRateData, // 使用计算得出的周转率数据
+                                    label: {
+                                        normal: {
+                                            show: true,
+                                            position: 'top',
+                                            formatter: '{c}%' // 显示为百分比
+                                        }
+                                    },
+                                    itemStyle: { normal: { color: '#61a0a8' } },
+                                    z: 10 // 使柱形图在最高层级显示
+                                }
+                            ]
+                        };
+                        // 渲染周转率柱形图
+                        turnoverChart.setOption(turnoverOption);
                     },
                 });
             }
@@ -1850,11 +1912,11 @@
             return echartsInstance;
         }
 
-        window.onresize = function(){
-            for (var i = 0; i < echartsInstances.length; i++) {
-                echartsInstances[i].resize();
-            }
-        }
+        // window.onresize = function(){
+        //     for (var i = 0; i < echartsInstances.length; i++) {
+        //         echartsInstances[i].resize();
+        //     }
+        // }
     });
 
 </script>

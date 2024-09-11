@@ -240,7 +240,7 @@ public class DepositoryRecordController {
     public ResponseEntity<?> getTransferData(
             @PathVariable String year) {
         try {
-            Thread.sleep(15000);
+            Thread.sleep(1000);
         } catch (InterruptedException e) {
             // 处理异常
             Thread.currentThread().interrupt();
