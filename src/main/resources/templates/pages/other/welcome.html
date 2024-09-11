@@ -216,7 +216,7 @@
         </div>
         <input class="layui-input" type="text" id="year-selector0" placeholder="请选择查看的年份" autocomplete="off">
         <!-- 库存数据分析表格 -->
-        <div class="layui-row">
+        <div class="layui-row" style="display: none">
             <div class="layui-col-md12">
                 <div class="layui-card">
                     <div class="layui-card-header"><i class="fa fa-table icon"></i>库存数据分析表</div>
@@ -1438,10 +1438,12 @@
                 return totalProduction > 0 ? parseFloat((amount / totalProduction).toFixed(3)) : 0;
             });
             totalUnitCost = otherUnitPrices.reduce((acc, curr) => acc + curr, 0).toFixed(3);
-
+            console.log(totalProduction);
             var referenceLineValue = (otherAmounts.reduce((acc, curr) => acc + curr, 0) );
             OtherAllPrice=referenceLineValue;
             var formattedReferenceLineValue = referenceLineValue.toLocaleString();
+            console.log(formattedReferenceLineValue);
+            console.log(totalUnitCost);
             var colors = ['#5470C6', '#91CC75', '#EE6666', '#E87C25', '#FFD85C', '#73C0DE', '#3BA272', '#FC8452', '#9A60B4', '#EA7CCC'];
             var option1 = {
                 title: {
