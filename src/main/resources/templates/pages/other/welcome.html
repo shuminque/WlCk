@@ -1069,7 +1069,7 @@
         //     echartsInstances.push(initChart('outbound-chart', months, sabOutbound, zabOutbound, '出库金额'));
         //     echartsInstances.push(initBarChart('stock-chart', months, sabStock, zabStock, '库存流水'));
         // }
-
+        var totalProductions;
         function initCategoryBarChart(data, lineData) {
             // 汇总相同 lineName 的 production
             var aggregatedLineData = lineData.reduce((acc, item) => {
@@ -1142,7 +1142,7 @@
             var totalPrice = validAmounts.reduce((acc, curr) => acc + curr, 0);
             var referenceLineValue = (totalPrice / totalProduction).toFixed(3);
             var formattedTotalPrice = totalPrice.toLocaleString();
-
+            totalProductions=totalProduction;
             console.log(totalPrice);
             console.log(totalProduction);
             console.log(referenceLineValue);
@@ -1435,13 +1435,13 @@
 
             // 计算单个成本
             var otherUnitPrices = otherAmounts.map((amount) => {
-                return totalProduction > 0 ? parseFloat((amount / totalProduction).toFixed(3)) : 0;
+                return totalProductions > 0 ? parseFloat((amount / totalProductions).toFixed(3)) : 0;
             });
             totalUnitCost = otherUnitPrices.reduce((acc, curr) => acc + curr, 0).toFixed(3);
-            console.log(totalProduction);
             var referenceLineValue = (otherAmounts.reduce((acc, curr) => acc + curr, 0) );
             OtherAllPrice=referenceLineValue;
             var formattedReferenceLineValue = referenceLineValue.toLocaleString();
+            console.log(totalProductions);
             console.log(formattedReferenceLineValue);
             console.log(totalUnitCost);
             var colors = ['#5470C6', '#91CC75', '#EE6666', '#E87C25', '#FFD85C', '#73C0DE', '#3BA272', '#FC8452', '#9A60B4', '#EA7CCC'];
