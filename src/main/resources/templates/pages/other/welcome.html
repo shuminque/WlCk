@@ -1437,10 +1437,11 @@
             var otherUnitPrices = otherAmounts.map((amount) => {
                 return totalProductions > 0 ? parseFloat((amount / totalProductions).toFixed(3)) : 0;
             });
-            totalUnitCost = otherUnitPrices.reduce((acc, curr) => acc + curr, 0).toFixed(3);
             var referenceLineValue = (otherAmounts.reduce((acc, curr) => acc + curr, 0) );
             OtherAllPrice=referenceLineValue;
             var formattedReferenceLineValue = referenceLineValue.toLocaleString();
+            // totalUnitCost = otherUnitPrices.reduce((acc, curr) => acc + curr, 0).toFixed(3);
+            totalUnitCost = parseFloat((OtherAllPrice / totalProductions).toFixed(3));
             console.log(totalProductions);
             console.log(formattedReferenceLineValue);
             console.log(totalUnitCost);
