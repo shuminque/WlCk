@@ -367,6 +367,7 @@
 
     </div>
 </div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
 <script src="/static/lib/layui-v2.6.3/layui.js" charset="utf-8"></script>
 <script src="/static/js/lay-config.js?v=1.0.4" charset="utf-8"></script>
 <script type="text/javascript" src="/static/js/http_ajax.googleapis.com_ajax_libs_jquery_3.5.1_jquery.js" charset="utf-8"></script>
@@ -425,6 +426,7 @@
                     },
                     cols: [ [ // 表头
                         {field: 'title', title: '标题', hide: true},
+
                         {field: 'atId', title: 'AT号', width:'10%'},
                         {field: 'mname', title: '品名', width:'30%'},
                         {field: 'model', title: '型号', width:'20%'},
@@ -515,6 +517,7 @@
         laydate.render({
             elem: '#month-selector',
             type: 'month',
+            range: true,
             done: function(value, date, endDate) {
                 if (document.getElementById('depository-selector').value) {
                     fetchDataForMonth(value);
@@ -732,55 +735,123 @@
         var legendData = ['金额', '单个成本'];
         var chart1;
         var chart2;
-        function fetchDataForMonth(yearMonth) {
-            var parts = yearMonth.split('-');  // 拆分为 ["2023", "01"]
-            var year = parts[0];
-            var month = parts[1];
+        function fetchDataForMonth(monthRange) {
             var selectedDepositoryId = document.getElementById('depository-selector').value;
             if (selectedDepositoryId) {
-                $.ajax({
-                    url: '/category-outbounds/' + year + '/' + month + '/' + selectedDepositoryId,
-                    type: 'GET',
-                    dataType: 'json',
-                    success: function(data) {
-                        // 获取 lineData 数据
-                        $.ajax({
-                            url: '/lineData/' + year + '/' + month,
-                            type: 'GET',
-                            dataType: 'json',
-                            success: function(response) {
-                                var lineData = response.data;
-                                console.log("Fetched lineData:", lineData);  // 添加调试日志
-                                if (!Array.isArray(lineData)) {
-                                    console.error("lineData is not an array: 不是数组", lineData);
-                                    return;
-                                }
-                                initCategoryBarChart(data, lineData);
-                                initOtherCategoryBarChart(data, lineData);
-                                initModelBarChart(data, lineData);
-                                // 在图表初始化完成后调用 syncLegend 同步图例
-                                if (chart1 && chart2) {
-                                    console.log("Charts initialized successfully:", chart1, chart2);
-                                    syncLegend(chart1, chart2);
-                                } else {
-                                    console.error("Chart initialization failed. chart1:", chart1, "chart2:", chart2);
-                                }
-                            },
-                            error: function(error) {
-                                console.log("Error fetching line data：获取行数据时出错", error);
-                            }
+                var parts = monthRange.split(' - '); // 拆分开始和结束月份
+                var startMonth = parts[0];
+                var endMonth = parts[1];
+
+                // 生成开始和结束月份之间的所有月份数组
+                var yearMonths = getMonthRangeArray(startMonth, endMonth);
+
+                // 使用所有月份的数组来获取数据
+                let requests = yearMonths.map(yearMonth => {
+                    let parts = yearMonth.split('-');
+                    let year = parts[0];
+                    let month = parts[1];
+
+                    return $.ajax({
+                        url: `/category-outbounds/${year}/${month}/${selectedDepositoryId}`,
+                        type: 'GET',
+                        dataType: 'json',
+                    });
+                });
+
+                // 并行请求多个月份的数据
+                Promise.all(requests)
+                    .then(allData => {
+                        // 将多个月份的数据合并
+                        let mergedData = mergeMonthlyData(allData);
+
+                        // 获取 lineData 数据，处理方式同上
+                        let lineDataRequests = yearMonths.map(yearMonth => {
+                            let parts = yearMonth.split('-');
+                            let year = parts[0];
+                            let month = parts[1];
+
+                            return $.ajax({
+                                url: `/lineData/${year}/${month}`,
+                                type: 'GET',
+                                dataType: 'json',
+                            });
                         });
 
-                    },
-                    error: function(error) {
-                        console.log("Error fetching category outbounds：提取类别出站时出错", error);
-                    }
-                });
+                        Promise.all(lineDataRequests)
+                            .then(allLineData => {
+                                // 合并所有月份的 lineData
+                                let mergedLineData = mergeLineData(allLineData);
+
+                                // 初始化图表
+                                initCategoryBarChart(mergedData, mergedLineData);
+                                initOtherCategoryBarChart(mergedData, mergedLineData);
+                                initModelBarChart(mergedData, mergedLineData);
+
+                                // 同步图例
+                                if (chart1 && chart2) {
+                                    syncLegend(chart1, chart2);
+                                }
+                            })
+                            .catch(error => {
+                                console.log("Error fetching line data：获取行数据时出错", error);
+                            });
+                    })
+                    .catch(error => {
+                        console.log("Error fetching category outbounds for multiple months：", error);
+                    });
             } else {
                 alert("请先选择一个厂区！");
-                // layer.msg('请先选择一个厂区！');
             }
         }
+
+// 辅助函数：生成开始和结束月份之间的所有月份数组
+        function getMonthRangeArray(startMonth, endMonth) {
+            var start = moment(startMonth, 'YYYY-MM');
+            var end = moment(endMonth, 'YYYY-MM');
+            var result = [];
+
+            while (start <= end) {
+                result.push(start.format('YYYY-MM'));
+                start.add(1, 'month');
+            }
+
+            return result;
+        }
+
+// 合并多个月份的 category-outbounds 数据
+        function mergeMonthlyData(allData) {
+            let mergedDataMap = {};
+
+            allData.forEach(monthData => {
+                monthData.forEach(item => {
+                    if (mergedDataMap[item.category]) {
+                        mergedDataMap[item.category].amount += item.amount;
+                    } else {
+                        mergedDataMap[item.category] = { ...item };
+                    }
+                });
+            });
+
+            return Object.values(mergedDataMap);
+        }
+
+// 合并多个月份的 lineData 数据
+        function mergeLineData(allLineData) {
+            let mergedLineDataMap = {};
+
+            allLineData.forEach(lineDataArray => {
+                lineDataArray.data.forEach(item => {
+                    if (mergedLineDataMap[item.lineName]) {
+                        mergedLineDataMap[item.lineName].production += item.production;
+                    } else {
+                        mergedLineDataMap[item.lineName] = { ...item };
+                    }
+                });
+            });
+
+            return Object.values(mergedLineDataMap);
+        }
+
         miniTab.listen();
 
         /**
@@ -1025,11 +1096,11 @@
                 });
             }
         }
-        $(document).ready(function () {
-            // 页面加载时获取当前年份并调用 fetchData 函数
-            var year = new Date().getFullYear();
-            fetchData(year);
-        });
+        // $(document).ready(function () {
+        //     // 页面加载时获取当前年份并调用 fetchData 函数
+        //     var year = new Date().getFullYear();
+        //     fetchData(year);
+        // });
 
         // function fetchData(year) {
         //     $.ajax({
