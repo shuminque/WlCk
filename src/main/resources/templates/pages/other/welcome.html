@@ -330,7 +330,7 @@
                     <div class="layui-card">
                         <div class="layui-card-header"><i class="fa fa-bar-chart icon"></i>各型号成本分布</div>
                         <div class="layui-card-body">
-                            <div id="model-analysis-chart" style="width: 100%; height: 500px;"></div>
+                            <div id="model-analysis-chart" style="width: 100%; height: 600px;"></div>
                         </div>
                     </div>
                 </div>
@@ -1812,7 +1812,7 @@
                     axisPointer: { type: 'shadow' }
                 },
                 grid: {
-                    left: '3%',
+                    left: '5%',
                     right: '3%',
                     top: '25%',
                     bottom: '20%'
@@ -1831,8 +1831,8 @@
                     }
                 },
                 yAxis: [
-                    { type: 'value', name: '金额', axisLabel: { formatter: '{value}', rotate: 90 } },
-                    { type: 'value', name: '单个成本', axisTick: { show: false }, splitLine: { show: false }, axisLabel: { formatter: function(value) { return value.toFixed(3); }, rotate: 90 } },
+                    { type: 'value', name: '金额', axisLabel: { formatter: '{value}' } },
+                    { type: 'value', name: '单个成本', axisTick: { show: false }, splitLine: { show: false }, axisLabel: { formatter: function(value) { return value.toFixed(3); }, } },
                     { type: 'value', name: '', position: 'right', axisLabel: { show: false }, axisLine: { show: false }, axisTick: { show: false }, splitLine: { show: false } }
                 ],
                 series: [
