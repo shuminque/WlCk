@@ -841,14 +841,15 @@
 
             allLineData.forEach(lineDataArray => {
                 lineDataArray.data.forEach(item => {
-                    if (mergedLineDataMap[item.lineName]) {
-                        mergedLineDataMap[item.lineName].production += item.production;
+                    // 使用 lineName 和 model 作为合并的键
+                    const key = `${item.lineName}-${item.model}`;
+                    if (mergedLineDataMap[key]) {
+                        mergedLineDataMap[key].production += item.production;
                     } else {
-                        mergedLineDataMap[item.lineName] = { ...item };
+                        mergedLineDataMap[key] = { ...item };
                     }
                 });
             });
-
             return Object.values(mergedLineDataMap);
         }
 
@@ -1742,12 +1743,22 @@
             }
         }
         function initModelBarChart(data, lineData) {
+            console.log(data);
+            console.log(lineData);
             // 以 model 进行分类汇总
             var modelMap = {};
-
+            var totalProductionMap = {};
+            // 首先计算每个 lineName 的总生产量
+            lineData.forEach(item => {
+                var lineName = item.lineName;
+                if (!totalProductionMap[lineName]) {
+                    totalProductionMap[lineName] = 0;
+                }
+                totalProductionMap[lineName] += item.production || 0;
+            });
             lineData.forEach(item => {
                 var modelKey = item.model || "无规格";  // Use "无规格分类" for empty models
-
+                var lineName = item.lineName;
                 if (!modelMap[modelKey]) {
                     modelMap[modelKey] = {
                         amount: 0,
@@ -1755,16 +1766,19 @@
                         categories: []  // 添加一个数组来存储相关类别和金额
                     };
                 }
-
                 var correspondingData = data.find(d => d.category === item.lineName);
                 if (correspondingData) {
-                    modelMap[modelKey].amount += correspondingData.amount || 0;
+                    // 计算分配的 amount
+                    var currentProduction = totalProductionMap[lineName];
+                    var currentAmount = correspondingData.amount || 0;
+                    // 计算分配后的 amount
+                    modelMap[modelKey].amount += Math.floor(currentAmount * (item.production / currentProduction));
                     // 保存类别和金额信息
-                    modelMap[modelKey].categories.push({ category: item.lineName, amount: correspondingData.amount || 0 });
+                    modelMap[modelKey].categories.push({ category: lineName, amount: currentAmount });
                 }
                 modelMap[modelKey].production += item.production || 0;
             });
-
+            console.log(modelMap);
             var categoriesFromData = data
                 .map(item => item.category)
                 .filter(category => category.includes("线") || category.endsWith("机"));
@@ -1779,6 +1793,7 @@
             });
 
             var models = Object.keys(modelMap);
+            console.log(models);
             var amounts = models.map(model => modelMap[model].amount);
             var productions = models.map(model => modelMap[model].production);
 
