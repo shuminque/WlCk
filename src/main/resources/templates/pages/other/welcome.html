@@ -890,7 +890,7 @@
                 fetchVlure(value);
             }
         });
-// 根据年份加载库存数据
+        // 根据年份加载库存数据
         function fetchVlure(year) {
             if (year) {
                 var url = '/getMonthlyReport/' + year; // 拼接年份到URL
@@ -968,8 +968,11 @@
                             months.push(item.month.substring(0, 7)); // 月份
                             inboundData.push(Math.round(item.inboundAmount)); // 入库金额
                             outboundData.push(Math.round(item.outboundAmount)); // 出库金额
-                            inventoryData.push(Math.round(item.inventoryAmount)); // 库存金额
-
+                            if (item.inboundAmount === 0 && item.outboundAmount === 0) {
+                                inventoryData.push(0); // 库存金额设置为 0
+                            } else {
+                                inventoryData.push(Math.round(item.inventoryAmount)); // 库存金额
+                            }
                             if (item.inventoryAmount !== 0) {
                                 let turnoverRate = (item.outboundAmount / item.inventoryAmount) * 100;
                                 turnoverRateData.push(turnoverRate.toFixed(2)); // 保留两位小数并存储
@@ -979,12 +982,17 @@
                                 turnoverRateData.push(0); // 避免除以0的情况
                             }
                         });
-
+                        let firstZeroIndex = turnoverRateData.findIndex(value => value === "0.00");
+                        if (firstZeroIndex > 0) {
+                            turnoverRateData[firstZeroIndex - 1] = "0.00"; // 将前一位设置为"0.00"
+                        }
+                        let nonZeroValues = turnoverRateData.filter(value => value !== "0.00");
                         // 计算平均值
                         let avgInbound = (totalInbound / res.data.length).toFixed(0);
                         let avgOutbound = (totalOutbound / res.data.length).toFixed(0);
                         let avgInventory = (totalInventory / res.data.length).toFixed(0);
-                        let avgTurnoverRate = (validTurnoverEntries !== 0) ? (totalTurnoverRate / validTurnoverEntries).toFixed(2) + '%' : 'N/A';
+                        let avgTurnoverRate = (nonZeroValues.length !== 0) ? (nonZeroValues.reduce((sum, val) => sum + parseFloat(val), 0) / nonZeroValues.length).toFixed(2) + '%' : 'N/A';
+                        console.log(avgTurnoverRate);
 
                         // 在表格底部插入一行平均值
                         $('div.layui-table-box .layui-table-main tbody').append(`
@@ -1086,8 +1094,13 @@
                                         }
                                     },
                                     itemStyle: { normal: { color: '#61a0a8' } },
-                                    z: 10 // 使柱形图在最高层级显示
-                                }
+                                    markLine: {
+                                        data: [
+                                            { name: '平均周转率', yAxis: parseFloat(avgTurnoverRate) }, // 使用实际数值
+                                        ],
+                                        lineStyle: { type: 'dashed', color: '#d48265' }
+                                    }
+                                },
                             ]
                         };
                         // 渲染周转率柱形图
