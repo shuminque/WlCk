@@ -1097,7 +1097,16 @@
                                     itemStyle: { normal: { color: '#61a0a8' } },
                                     markLine: {
                                         data: [
-                                            { name: '平均周转率', yAxis: parseFloat(avgTurnoverRate) }, // 使用实际数值
+                                            {
+                                                name: '平均周转率',
+                                                yAxis: parseFloat(avgTurnoverRate),
+                                                label: {
+                                                    normal: {
+                                                        show: true,
+                                                        formatter: '{c}%' // 显示为百分比
+                                                    }
+                                                },
+                                            }, // 使用实际数值
                                         ],
                                         lineStyle: { type: 'dashed', color: '#d48265' }
                                     }
