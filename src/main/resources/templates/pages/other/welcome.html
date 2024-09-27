@@ -1037,21 +1037,32 @@
                                     name: '入库金额',
                                     type: 'bar',
                                     data: inboundData,
-                                    label: { normal: { show: true, position: 'top', formatter: function(params) { return params.value; } } },
+                                    barWidth: 20, // 设置柱形宽度为20
+                                    label: { normal: { show: true, position: 'top', formatter: function(params) { return params.value.toLocaleString(); } } },
                                 },
                                 {
                                     name: '出库金额',
                                     type: 'bar',
                                     data: outboundData,
-                                    label: { normal: { show: true, position: 'top', formatter: function(params) { return params.value; } } },
+                                    barWidth: 20, // 设置柱形宽度为20
+                                    label: { normal: { show: true, position: 'top', formatter: function(params) { return params.value.toLocaleString(); } } },
                                     z: 10 // 将 z 设为较大值，保证该系列在最上层
                                 },
                                 {
                                     name: '期末库存',
                                     type: 'bar',
                                     data: inventoryData,
-                                    label: { normal: { show: true, position: 'top', formatter: function(params) { return params.value; } } },
-                                }
+                                    barWidth: 20, // 设置柱形宽度为20
+                                    label: { normal: { show: true, position: 'top', formatter: function(params) { return params.value.toLocaleString(); } } },
+                                },
+                                // {
+                                //     name: '库存折线',
+                                //     type: 'line',
+                                //     data: inventoryData,
+                                //     yAxisIndex: 0,
+                                //     symbol: 'circle', // 可调整的符号
+                                //     symbolSize: [8, 8] // 符号大小
+                                // }
                             ]
                         };
                         barChart.setOption(barOption);
@@ -1781,7 +1792,11 @@
                     var currentProduction = totalProductionMap[lineName];
                     var currentAmount = correspondingData.amount || 0;
                     // 计算分配后的 amount
-                    modelMap[modelKey].amount += Math.floor(currentAmount * (item.production / currentProduction));
+                    if (currentProduction > 0) {
+                        modelMap[modelKey].amount += Math.floor(currentAmount * (item.production / currentProduction));
+                    } else {
+                        modelMap[modelKey].amount += currentAmount; // 如果 currentProduction 是 0，直接使用 currentAmount
+                    }
                     // 保存类别和金额信息
                     modelMap[modelKey].categories.push({ category: lineName, amount: currentAmount });
                 }
