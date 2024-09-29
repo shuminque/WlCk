@@ -1036,9 +1036,19 @@
                                 {
                                     name: '入库金额',
                                     type: 'bar',
-                                    data: inboundData,
+                                    data: inboundData.map((amount, index) => {
+                                        const diff = amount - outboundData[index]; // 计算差值
+                                        const distance = Math.abs(diff) < 300000 ? 30 : 10;
+                                        return {
+                                            value: amount,
+                                            label: {
+                                                distance: distance
+                                            }
+                                        };
+                                    }),
                                     barWidth: 20, // 设置柱形宽度为20
-                                    label: { normal: { show: true, position: 'top', formatter: function(params) { return params.value.toLocaleString(); } } },
+                                    label: {
+                                        normal: { show: true, position: 'top', formatter: function(params) { return params.value.toLocaleString(); } } },
                                 },
                                 {
                                     name: '出库金额',
@@ -1052,6 +1062,7 @@
                                     name: '期末库存',
                                     type: 'bar',
                                     data: inventoryData,
+
                                     barWidth: 20, // 设置柱形宽度为20
                                     label: { normal: { show: true, position: 'top', formatter: function(params) { return params.value.toLocaleString(); } } },
                                 },
