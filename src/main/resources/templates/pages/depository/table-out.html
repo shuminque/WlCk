@@ -231,6 +231,7 @@
                 table.render({
                     elem: "#currentTableId",
                     url: pp,
+                    title: '出库查询',
                     parseData: function (res) { //res 即为原始返回的数据
                         return {
                             "status": res.status, //解析接口状态
@@ -255,6 +256,7 @@
                     },
                     toolbar: '#toolbarDemo',
                     defaultToolbar: ['filter', 'exports', 'print'],
+                    height: "full-50", // 设置表格高度并固定表头
                     //这里layui和thymeleaf冲突了，要加个空格
                     cols: [ [
                         // {type: "checkbox", width: 50},
@@ -264,7 +266,7 @@
                         {field: 'mname', width: '12%', title: '品名'},
                         {field: 'model', width: '12%', title: '规格'},
                         {field: 'typeName', width: '16%', title: '分类'},
-                        {field: 'enginName', width: '10%', title: '工程'},
+                        {field: 'enginName', width: '10%', title: '工程',totalRowText: '合计'},
                         {field: 'quantity', width: '5%', title: '数量'},
                         {field: 'price', width: '8%', title: '单价', templet: function(d) {
                                 return parseFloat(d.price).toFixed(2);  // 格式化为两位小数
@@ -309,6 +311,27 @@
                             }
                         }
                     ]],
+                    done: function(res, curr, count) {
+                        var totalQuantity = res.data.reduce(function(sum, item) {
+                            return sum + parseInt(item.quantity);
+                        }, 0);
+                        var totalPrice = res.data.reduce(function(sum, item) {
+                            return sum + parseFloat(item.price); // 使用parseFloat
+                        }, 0).toFixed(2); // 保留两位小数
+
+                        var totalRow = document.querySelector('.layui-table-total');
+                        if (totalRow) {
+                            var totalCell = totalRow.querySelector('td[data-field="quantity"] .layui-table-cell');
+                            if (totalCell) {
+                                totalCell.innerText = totalQuantity.toString();
+                            }
+                            var totalBoxCountCell = totalRow.querySelector('td[data-field="price"] .layui-table-cell');
+                            if (totalBoxCountCell) {
+                                totalBoxCountCell.innerText = totalPrice.toString(); // 这里已经是两位小数了
+                            }
+                        }
+                    },
+                    totalRow: true, // 开启合计行
                     limits: [10, 54, 100, 500, 100000],
                     limit: 54,
                     page: true,
