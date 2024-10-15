@@ -126,17 +126,23 @@ public class LineDataController {
 
                 // 检查是否包含括号，分离名称和型号
                 if ((nameAndModel.contains("（") && nameAndModel.contains("）")) ||
-                        (nameAndModel.contains("(") && nameAndModel.contains(")"))) {
+                        (nameAndModel.contains("(") && nameAndModel.contains(")")) ||
+                        (nameAndModel.contains("(") && nameAndModel.contains("）")) ||
+                        (nameAndModel.contains("（") && nameAndModel.contains(")"))) {
 
-                    // 判断是中文括号还是英文括号，并提取内容
-                    if (nameAndModel.contains("（") && nameAndModel.contains("）")) {
-                        int startIndex = nameAndModel.indexOf("（");
-                        int endIndex = nameAndModel.indexOf("）");
-                        lineName = nameAndModel.substring(0, startIndex);
-                        model = nameAndModel.substring(startIndex + 1, endIndex);
-                    } else if (nameAndModel.contains("(") && nameAndModel.contains(")")) {
-                        int startIndex = nameAndModel.indexOf("(");
-                        int endIndex = nameAndModel.indexOf(")");
+                    // 找到第一个左括号的位置，不论是中文还是英文
+                    int startIndex = Math.min(
+                            nameAndModel.contains("（") ? nameAndModel.indexOf("（") : nameAndModel.length(),
+                            nameAndModel.contains("(") ? nameAndModel.indexOf("(") : nameAndModel.length()
+                    );
+
+                    // 找到第一个右括号的位置，不论是中文还是英文
+                    int endIndex = Math.min(
+                            nameAndModel.contains("）") ? nameAndModel.indexOf("）") : nameAndModel.length(),
+                            nameAndModel.contains(")") ? nameAndModel.indexOf(")") : nameAndModel.length()
+                    );
+
+                    if (startIndex < endIndex) {
                         lineName = nameAndModel.substring(0, startIndex);
                         model = nameAndModel.substring(startIndex + 1, endIndex);
                     }
