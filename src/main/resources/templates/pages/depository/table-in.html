@@ -50,9 +50,19 @@
                             </div>
                         </div>
                         <div class="layui-inline" >
-                            <div class="layui-input-inline" style="width: 100px;">
+                            <div class="layui-input-inline" style="width: 120px;">
                                 <select name="depositoryId" id="depositorySelect" lay-search>
                                     <!-- 初始值，稍后会根据用户信息进行更新 -->
+                                </select>
+                            </div>
+                        </div>
+                        <div class="layui-inline">
+                            <label class="layui-form-label">入库类型</label>
+                            <div class="layui-input-inline">
+                                <select id="applyRemark" name="applyRemark">
+                                    <option value="" selected>请选择</option>
+                                    <option value="采购入库">采购入库</option>
+                                    <option value="领用退回">领用退回</option>
                                 </select>
                             </div>
                         </div>
@@ -62,6 +72,7 @@
                                 <option th:each="material_type : ${materialTypes}" th:value="${material_type.getTname()}" th:text="${material_type.tname}" ></option>
                             </select>
                         </div>
+
                         <div class="layui-inline">
                             <button type="submit" class="layui-btn layui-btn-primary" lay-submit
                                     lay-filter="data-search-btn"><i class="layui-icon"></i> 搜 索
@@ -325,6 +336,9 @@
                     }
                     if (data.model!==''){
                         req.model=data.model;
+                    }
+                    if (data.applyRemark!==''){
+                        req.applyRemark=data.applyRemark;
                     }
                     if (data.typeName && data.typeName !== ''){
                         req.typeName = data.typeName.split(',');
