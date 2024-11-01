@@ -471,8 +471,10 @@
 
         function loadCategoryData(category, callback) {
             $.get('/api/categories/' + category, function(response) {
+                console.log("数据内容",response.data);
                 if (response.code === 0) {
-                    callback(formatData(response.data));
+                    const filteredData = response.data.filter(item => item.title !== "销售出库");
+                    callback(formatData(filteredData));
                 } else {
                     layer.msg(`无法加载${category.toUpperCase()}的分类数据`);
                 }
