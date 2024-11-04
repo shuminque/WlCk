@@ -288,6 +288,7 @@
                 <option value="2" selected>ZAB</option>
             </select>
             <input type="text" id="year-selector-three" placeholder="请选择年" autocomplete="off">
+            <button id="clear-category-btn" type="button">清空分类</button>
             <button class="layui-input custom-input" id="ID-dropdown-demo-complex-1" >请选择分类</button>
             <input type="hidden" name="applyRemark" id="applyRemarkInput-1" value="">
             <div class="layui-row">
@@ -300,6 +301,9 @@
                         </div>
                     </div>
                 </div>
+            </div>
+            <div id="recordTableContainer2" style="display: none">
+                <table class="layui-hide" id="recordTable2" lay-filter="recordTableFilter2"></table>
             </div>
         </div>
 
@@ -531,6 +535,11 @@
 
         laydate.render({ elem: '#year-selector', type: 'year' });
         laydate.render({ elem: '#year-selector-three', type: 'year', done: fetchCateChart });
+        document.getElementById('clear-category-btn').addEventListener('click', function() {
+            document.getElementById('applyRemarkInput-1').value = ''; // 清空分类输入框
+            document.getElementById('ID-dropdown-demo-complex-1').textContent = '请选择分类'; // 重置按钮文本
+            fetchCateChart(); // 调用 fetchCateChart 函数
+        });
 
         var myChartCate = echarts.init(document.getElementById('cateAmountChart'));
         async function fetchCateChart() {
@@ -586,7 +595,9 @@
                         const normalizedMonth = `${date.getFullYear()}-${monthString}`;
                         return normalizedMonth === item.month;
                     });
-                    return productionData ? (item.amount / productionData.production).toFixed(3) : 0;
+                    return productionData && productionData.production > 0
+                        ? (item.amount / productionData.production).toFixed(4)
+                        : 0;
                 });
 
                 // 提取产量数据
@@ -638,26 +649,118 @@
                             label: { normal: { show: true, position: 'top' } },
                             itemStyle: { normal: { color: colors[1] } },
                             lineStyle: { color: colors[1] }
-                        },
-                        {
+                        }
+                        , {
                             name: '产量',
                             type: 'bar',
                             yAxisIndex: 2,
                             data: productionData,
-                            barWidth: '0%',
+                            barWidth: 0, // 将 barWidth 设置为 0
                             label: { show: false },
                             itemStyle: { opacity: 0 }
                         }
                     ]
                 };
                 myChartCate.clear(); // 清除旧的图表数据
+                myChartCate.off('click');
                 myChartCate.setOption(option, true); // 使用新数据更新图表
+                // 添加点击事件
+                myChartCate.on('click', async function(params) {
+                    var selectedMonth = params.name; // 获取点击的柱形下方的年月，例如 "2024-06"
+                    // 分割字符串以提取年份和月份
+                    var [year, month] = selectedMonth.split('-');
+                    var categoryTitleInput = document.getElementById('applyRemarkInput-1').value;
+                    var categoryTitle = categoryTitleInput ? encodeURIComponent(categoryTitleInput) : '';
+                    const url =`/api/categories/category-records/${categoryTitle}/${depositoryId}/${year}/${month}`;
+                    $.ajax({
+                        url: url,
+                        type: 'GET',
+                        dataType: 'json',
+                        success: function(records) {
+                            var widthPercentage = 80;
+                            var heightPercentage = 80;
+
+                            var screenWidth = $(window).width();
+                            var screenHeight = $(window).height();
+
+                            var popupWidth = (widthPercentage / 100) * screenWidth;
+                            var popupHeight = (heightPercentage / 100) * screenHeight;
+
+                            var maxPopupWidth = 2800;
+                            var maxPopupHeight = 2600;
+
+                            popupWidth = Math.min(popupWidth, maxPopupWidth);
+                            popupHeight = Math.min(popupHeight, maxPopupHeight);
+
+                            layer.open({
+                                type: 1,
+                                title: selectedMonth, // 显示选择的年月
+                                content: $('#recordTableContainer2'),
+                                area: [popupWidth + 'px', popupHeight + 'px'],
+                                shadeClose: true, // 点击遮罩关闭
+                                closeBtn: 1, // 显示关闭按钮
+                                success: function(layero, index) {
+                                }
+                            });
+                            renderTable2(records);
+
+                        },
+                        error: function(error) {
+                            console.log("Error fetching records for category", error);
+                        }
+                    });
+                });
+                function renderTable2(records) {
+                    function formatDate(dateStr) {
+                        if (!dateStr) return '';
+                        let date = new Date(dateStr);
+                        let year = date.getFullYear();
+                        let month = (date.getMonth() + 1).toString().padStart(2, '0');
+                        let day = date.getDate().toString().padStart(2, '0');
+                        return `${year}-${month}-${day}`;
+                    }
+
+                    table.render({
+                        elem: '#recordTable2',
+                        height: "full-50",
+                        cols: [ [
+                            { field: 'sourceTable', title: '来源表',  hide: true},
+                            { field: 'id', title: 'ID', hide: true},
+                            {
+                                field: 'atId',
+                                title: 'AT',
+                                templet: function(d) {
+                                    return d.atId ? d.atId : '一次性';
+                                }
+                            },
+                            { field: 'name', title: '名称' },
+                            { field: 'model', title: '型号'},
+                            { field: 'quantity', title: '数量'},
+                            // { field: 'unitPrice', title: '单价' },
+                            { field: 'totalAmount', title: '金额', templet: function(d) {
+                                    return parseFloat(d.totalAmount).toFixed(2);
+                                }},
+                            {
+                                field: 'recordDate',
+                                title: '记录日期',
+                                hide: true,
+                                flex:1,
+                                templet: function(d) {
+                                    return formatDate(d.recordDate);
+                                }
+                            },
+                            { field: 'applyRemark', title: '备注' ,hide: true},
+                            { field: 'categoryTitle', title: '分类标题' ,hide: true}
+                        ]],
+                        limit: records.length,
+                        data: records,
+                    });
+                }
 
             } catch (error) {
                 console.error("Error fetching data:", error);
             }
         }
-
         function handleDepositoryChange() {
             var depositoryId = document.getElementById('depository-selector-three').value;
             var catedepositoryId = (depositoryId === 1) ? "sab" : "zab";
@@ -806,7 +909,7 @@
             }
         }
 
-// 辅助函数：生成开始和结束月份之间的所有月份数组
+        // 辅助函数：生成开始和结束月份之间的所有月份数组
         function getMonthRangeArray(startMonth, endMonth) {
             var start = moment(startMonth, 'YYYY-MM');
             var end = moment(endMonth, 'YYYY-MM');
