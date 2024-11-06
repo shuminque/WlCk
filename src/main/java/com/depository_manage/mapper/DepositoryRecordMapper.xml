@@ -592,6 +592,8 @@
             DATE_FORMAT(time, '%Y') = #{year} AND DATE_FORMAT(time, '%m') = #{month}
           AND o.depositoryId= #{depositoryId}
           AND c.depository_id= #{depositoryId}
+          AND o.introduce !='立项'
+
         GROUP BY
             DATE_FORMAT(time, '%Y-%m'), c.id, c.title
 
@@ -668,7 +670,8 @@
                           AND o.depositoryId = #{depositoryId}
                           AND c.depository_id = #{depositoryId}
                           AND c.title = #{categoryTitle}
-                          GROUP BY
+                          AND o.introduce !='立项'
+                                  GROUP BY
                           DATE_FORMAT(time, '%Y-%m'), c.id, c.title
 
                       UNION ALL
@@ -749,7 +752,8 @@
             DATE_FORMAT(time, '%Y') = #{year}
                           AND o.depositoryId = #{depositoryId}
                           AND c.depository_id = #{depositoryId}
-                          GROUP BY
+                          AND o.introduce !='立项'
+                                  GROUP BY
                           DATE_FORMAT(time, '%Y-%m')
 
                       UNION ALL
