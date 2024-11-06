@@ -149,6 +149,7 @@
                          AND c.depository_id = #{depositoryId}
                          AND o.depositoryId = #{depositoryId}
                          AND YEAR(o.time) = #{year}
+                         AND introduce !='立项'
             AND MONTH(o.time) = #{month}
 
         UNION ALL
