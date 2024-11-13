@@ -41,11 +41,11 @@
                     <div class="layui-card">
                         <div class="layui-card-body" style="padding-top: 10px;">
                             <div>
-                                <form class="layui-form" lay-filter="form1" style="margin: 0 auto;max-width: 460px;padding-top: 100px; padding-bottom: 200px">
+                                <form class="layui-form" lay-filter="form1" style="margin: 0 auto;max-width: 460px;padding-top: 20px; padding-bottom: 20px">
                                     <div class="layui-form-item">
                                         <label class="layui-form-label">日期:</label>
                                         <div class="layui-input-block">
-                                            <input type="text" placeholder="请填写日期" name="date" id="date2" class="layui-input"
+                                            <input type="text" placeholder="请填写日期" name="date" id="date2" class="layui-input" autocomplete="off"
                                                    lay-verify="required" required>
                                             <input name="currency_from" type="hidden" id="currency_from" value="JPY"/>
                                             <input name="currency_to" type="hidden" id="currency_to"  value="CNY"/>
@@ -54,14 +54,14 @@
                                     <div class="layui-form-item">
                                         <label class="layui-form-label">汇率:</label>
                                         <div class="layui-input-block">
-                                            <input type="text" placeholder="请填写汇率" name="rate" class="layui-input"
+                                            <input type="text" placeholder="请填写汇率" name="rate" class="layui-input" autocomplete="off"
                                                    lay-verify="required" required>
                                         </div>
                                     </div>
                                     <div class="layui-form-item">
                                         <label class="layui-form-label">税率:</label>
                                         <div class="layui-input-block">
-                                            <input type="text" placeholder="请填写税率" name="tax" class="layui-input"
+                                            <input type="text" placeholder="请填写税率" name="tax" class="layui-input" autocomplete="off"
                                                    lay-verify="required" required value="0.08">
                                         </div>
                                     </div>
@@ -101,6 +101,7 @@
             });
             laydate.render({
                 elem: '#date2', // 指定元素
+                value: new Date(),
             });
             $.ajax({
                 url: '/get_user_depository',
@@ -207,7 +208,7 @@
                             },
                             error: function(jqXHR, textStatus, errorThrown) {
                                 layer.close(this.layerIndex);
-                                layer.msg('错误的操作，错误信息：' + errorThrown, {
+                                layer.msg('错误的操作，当前月已有汇率' + errorThrown, {
                                     icon: 5, //失败的表情
                                     time: 3000 //3秒关闭
                                 });
