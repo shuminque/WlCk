@@ -9,10 +9,11 @@
         <result column="currency_from" property="currency_from" jdbcType="VARCHAR" />
         <result column="currency_to" property="currency_to" jdbcType="VARCHAR" />
         <result column="rate" property="rate" jdbcType="DOUBLE" />
+        <result column="tax" property="tax" jdbcType="DOUBLE" />
     </resultMap>
 
     <sql id="allColumns">
-        r.id, r.date, r.currency_from, r.currency_to, r.rate
+        r.id, r.date, r.currency_from, r.currency_to, r.rate, r.tax
     </sql>
 
     <select id="findRateAll" resultMap="rateMap">
@@ -69,13 +70,14 @@
 
     <insert id="insertRate" parameterType="map">
         INSERT INTO rate (
-            date, currency_from, currency_to, rate
+            date, currency_from, currency_to, rate, tax
         ) VALUES (
                      #{date},
                      #{currency_from},
                      #{currency_to},
-                     #{rate}
-                 )
+                     #{rate},
+                     #{tax}
+                         )
     </insert>
 
     <update id="updateRate" parameterType="map">
@@ -92,6 +94,9 @@
             </if>
             <if test="rate != null">
                 rate = #{rate}
+            </if>
+            <if test="tax != null">
+                tax = #{tax}
             </if>
         </set>
         WHERE id = #{id}

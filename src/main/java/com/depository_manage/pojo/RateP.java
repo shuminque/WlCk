@@ -12,13 +12,15 @@ public class RateP {
     private String currency_from;
     private String currency_to;
     private Double rate;
+    private Double tax;
 
-    public RateP(Integer id, Date date, String currency_from, String currency_to, Double rate){
+    public RateP(Integer id, Date date, String currency_from, String currency_to, Double rate, Double tax ){
         this.id = id;
         this.date = date;
         this.currency_from = currency_from;
         this.currency_to = currency_to;
         this.rate = rate;
+        this.tax = tax;
     }
     public RateP(Rate rate){
         this.id = rate.getId();
@@ -26,5 +28,6 @@ public class RateP {
         this.currency_from = rate.getCurrency_from();
         this.currency_to = rate.getCurrency_to();
         this.rate = rate.getRate();
+        this.tax = rate.getTax();
     }
 }

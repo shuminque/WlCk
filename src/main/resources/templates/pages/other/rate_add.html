@@ -59,9 +59,16 @@
                                         </div>
                                     </div>
                                     <div class="layui-form-item">
+                                        <label class="layui-form-label">税率:</label>
+                                        <div class="layui-input-block">
+                                            <input type="text" placeholder="请填写税率" name="tax" class="layui-input"
+                                                   lay-verify="required" required value="0.08">
+                                        </div>
+                                    </div>
+                                    <div class="layui-form-item">
                                         <div class="layui-input-block">
                                             <button class="layui-btn" lay-submit lay-filter="formStep">
-                                                &emsp;增加汇率&emsp;
+                                                &emsp;增加&emsp;
                                             </button>
                                         </div>
                                     </div>
@@ -139,6 +146,7 @@
                                     return date.getFullYear() + '-' + (date.getMonth() + 1).toString().padStart(2, '0');
                                 }},
                             {field: 'rate',  title: '汇率', sort: true},
+                            {field: 'tax',  title: '税率', sort: true},
                             {title: ' ', align: 'center', toolbar: '#operation-bar'}
                         ]]
                     });
