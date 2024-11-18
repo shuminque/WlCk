@@ -1,10 +1,13 @@
 package com.depository_manage.controller;
 
+import com.depository_manage.entity.Rate;
 import com.depository_manage.pojo.RestResponse;
 import com.depository_manage.service.RateService;
 import com.depository_manage.utils.CrudUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -30,5 +33,12 @@ public class RateController {
     public RestResponse deleteRate(@PathVariable int id) {
         int result = rateService.deleteRate(id); // 使用实例
         return CrudUtil.deleteHandle(result, 1);
+    }
+
+    @GetMapping("/taxByYearMonth/{year}/{month}")
+    public List<Rate> getRatesByYearAndMonth(
+            @PathVariable String year,
+            @PathVariable String month) {
+        return rateService.getRatesByYearAndMonth(year, month);
     }
 }

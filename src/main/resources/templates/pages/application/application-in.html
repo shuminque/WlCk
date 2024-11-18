@@ -189,16 +189,49 @@
                 $('#priceLabel').text("入库单价(CNY):");
             }
         });
-
+        var taxRate;
         form.on('submit(formStep)', function (data) {
             data=data.field;
             data.type=1;
+            // 获取日期
+            var value = document.getElementById('storageDate').value;
+            var today = new Date();
+            var year, month;
+            // 如果日期为空，使用当前日期
+            if (!value) {
+                year = today.getFullYear();
+                month = today.getMonth() + 1; // getMonth() 返回的是 0-11，所以要加 1
+            } else {
+                // 如果输入了日期
+                year = value.split('-')[0];  // 获取年份
+                month = value.split('-')[1];  // 获取月份
+            }
+            $.ajax({
+                url: `/rate/taxByYearMonth/${year}/${month}`,
+                type: 'GET',
+                dataType: 'json',
+                async: false,  // 设置为同步请求
+                success: function(response) {
+                    if (response && response.length > 0) {
+                        taxRate = parseFloat(response[0].tax);  // 获取返回的税率
+                    } else {
+                        alert("未能获取税率，请稍后再试");
+                        return false;  // 阻止表单提交
+                    }
+                },
+                error: function(error) {
+                    console.error("获取税率失败", error);
+                    alert("获取税率失败，请稍后再试");
+                    return false;  // 阻止表单提交
+                }
+            });
+
             if (data.currency === 'JPY') {
                 // 如果是日元，转换为人民币并直接保存在price中
                 var jpyPrice = parseFloat(data.price);
                 if (!isNaN(jpyPrice)) {
                     var cnyPrice = convertCurrency(jpyPrice, cnyToJpyRate);
-                    data.price = cnyPrice.toFixed(2); // 直接修改price字段的值
+                    data.price = (cnyPrice*(1+taxRate)).toFixed(2); // 直接修改price字段的值
                 } else {
                     // 可能要添加一些错误处理，例如弹出一个警告
                     alert("请输入有效的价格");

@@ -76,6 +76,12 @@ public class RateServiceImpl implements RateService {
         List<Rate> list=rateMapper.findRateByCondition(map);
         return pack(list);
     }
+
+    public List<Rate> getRatesByYearAndMonth(String year, String month) {
+        // 调用 RateMapper 查询，直接传递 year 和 month 参数
+        return rateMapper.findTaxByYearMonth(year, month);
+    }
+
     private List<RateP> pack(List<Rate> list){
         List<RateP> result=new ArrayList<>(list.size());
         for (Rate Rate: list){

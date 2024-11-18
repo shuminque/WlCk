@@ -2,6 +2,7 @@ package com.depository_manage.mapper;
 
 import com.depository_manage.entity.Rate;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.Date;
@@ -30,4 +31,8 @@ public interface RateMapper {
     List<Rate> findRateAll();
 
     Integer findCountByCondition(Map<String, Object> map);
+
+    List<Rate> findTaxByYearMonth(@Param("year") String year, @Param("month") String month);
+
+
 }

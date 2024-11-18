@@ -27,4 +27,6 @@ public interface RateService {
     Integer findCountByCondition(Map<String, Object> map);
 
     List<RateP> findRatePByCondition(Map<String, Object> map);
+
+    List<Rate> getRatesByYearAndMonth(String year, String month);
 }

@@ -85,15 +85,15 @@
                 </select>
             </td>
             <td>
-                <input type="text" class="layui-input" name="unitPrice">
+                <input type="text" class="layui-input" name="unitPrice" autocomplete="off">
             </td>
-            <td><input type="text" class="layui-input" name="quantity"></td>
+            <td><input type="text" class="layui-input" name="quantity" autocomplete="off"></td>
             <td>
                 <button name="applyRemark" class="layui-input custom-input" id="ID-dropdown-demo-complex-1"></button>
                 <input type="hidden" name="applyRemark" id="applyRemarkInput-1" value="">
             </td>
-            <td><input type="text" class="layui-input storageDate" name="time"></td>
-            <td><input type="text" class="layui-input" name="introduce"></td>
+            <td><input type="text" class="layui-input storageDate" name="time" autocomplete="off"></td>
+            <td><input type="text" class="layui-input" name="introduce" autocomplete="off"></td>
             <td><button class="layui-btn layui-btn-xs layui-btn-danger delete-row">删除</button></td>
         </tr>
         <!-- 服务端渲染的隐藏行 -->
@@ -188,7 +188,10 @@
             });
         }
         var cnyToJpyRate; // 保存从数据库获取的人民币到日元的汇率
+        var tax;
         $(document).ready(function() {
+            var year = (new Date()).getFullYear();
+            var month = (new Date()).getMonth() + 1;
             $('#onceFillTable .storageDate').each(function() {
                 laydate.render({
                     elem: this
@@ -200,6 +203,10 @@
                 rates.sort((a, b) => new Date(b.date) - new Date(a.date));
                 cnyToJpyRate = rates[0].rate;
                 console.log("当前人民币到日元汇率: " + cnyToJpyRate);
+            });
+            $.get(`/rate/taxByYearMonth/${year}/${month}`, function(response) {
+                tax = parseFloat(response[0].tax);
+                console.log("当前税率: " + response[0].tax);
             });
             $.ajax({
                 url: '/get_user_depository',
@@ -274,7 +281,7 @@
 
                 if (currencyType === 'JPY' && !isNaN(unitPrice)) {
                     // 从日元转换为人民币
-                    var convertedPrice = unitPrice * cnyToJpyRate;
+                    var convertedPrice = unitPrice * cnyToJpyRate*(1+tax);
                     unitPriceInput.val(convertedPrice.toFixed(2));
                 }
             });

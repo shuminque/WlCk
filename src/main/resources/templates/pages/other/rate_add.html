@@ -62,7 +62,7 @@
                                         <label class="layui-form-label">税率:</label>
                                         <div class="layui-input-block">
                                             <input type="text" placeholder="请填写税率" name="tax" class="layui-input" autocomplete="off"
-                                                   lay-verify="required" required value="0.08">
+                                                   lay-verify="required" required value="0.08" readonly>
                                         </div>
                                     </div>
                                     <div class="layui-form-item">
@@ -97,8 +97,21 @@
                 layer = layui.layer;
             laydate.render({
                 elem: '#date1',
-                type: 'month'
+                type: 'month',
+                done: function(value) {
+                    // 获取到的值是 "2024-11"
+                    var year = value.split('-')[0];  // 例如：2024
+                    var month = value.split('-')[1]; // 例如：11
+                    // 发起请求，将 year 和 month 放入 URL 路径中
+                    fetch(`/rate/taxByYearMonth/${year}/${month}`)
+                        .then(response => response.json())
+                        .then(data => {
+                            // 处理返回的数据
+                            console.log(data[0].tax)
+                        });
+                }
             });
+
             laydate.render({
                 elem: '#date2', // 指定元素
                 value: new Date(),

@@ -123,4 +123,11 @@
             AND r.date BETWEEN #{startDate} AND #{endDate}
         </if>
     </select>
+
+    <select id="findTaxByYearMonth" resultType="com.depository_manage.entity.Rate" parameterType="map" >
+        SELECT  *
+        FROM rate
+        WHERE YEAR(date) = #{year} AND MONTH(date) = #{month}
+            LIMIT 1
+    </select>
 </mapper>
