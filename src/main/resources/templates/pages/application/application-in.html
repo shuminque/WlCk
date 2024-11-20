@@ -29,10 +29,22 @@
 <!--                                            </select>-->
 <!--                                        </div>-->
 <!--                                    </div>-->
-                                    <div class="layui-form-item">
+                                    <div class="layui-form-item" style="position: relative;">
+                                        <!-- AT号输入框 -->
                                         <label class="layui-form-label">AT号:</label>
                                         <div class="layui-input-block">
                                             <input name="atId" type="text" id="atIdSelect" placeholder="输入AT" readonly class="layui-input" lay-verify="required"/>
+                                        </div>
+                                        <!-- 备注框 -->
+                                        <div style="position: absolute; right: 0; top: 0; width: 240px; padding: 10px; border-left: 1px solid #ddd; background: #f9f9f9;left:500px">
+                                            <p style="font-size: 14px; color: #555; margin-bottom: 5px;">
+                                                当供应商退货时，操作要求：
+                                            </p>
+                                            <ul style="font-size: 14px; color: #555; line-height: 1.5;">
+                                                <li>数量栏里输入负数；</li>
+                                                <li>单价栏里输入采购时的单价；</li>
+                                                <li>提交！</li>
+                                            </ul>
                                         </div>
                                     </div>
                                     <div class="layui-form-item">
