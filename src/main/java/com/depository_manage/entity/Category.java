@@ -10,4 +10,5 @@ public class Category {
     private Integer parentId;
     private String title;
     private List<Category> children;
+    private String bracketContent; // 新增字段
 }

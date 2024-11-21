@@ -149,7 +149,11 @@
 
         function formatData(apiData) {
             let formattedData = apiData.map(item => {
-                let formattedItem = { title: item.title };
+                let formattedItem = {
+                    title: item.bracketContent
+                        ? `${item.title}(${item.bracketContent})`
+                        : item.title
+                };
                 if (item.children && item.children.length > 0) {
                     formattedItem.child = formatData(item.children); // 递归处理子项目
                 }

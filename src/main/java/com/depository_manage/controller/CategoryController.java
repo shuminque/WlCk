@@ -30,6 +30,23 @@ public class CategoryController {
         response.put("data", categories);
         return ResponseEntity.ok(response);
     }
+    // 递归处理 categories 列表
+    private void processCategories(List<Category> categories) {
+        if (categories == null || categories.isEmpty()) {
+            return;
+        }
+        for (Category category : categories) {
+            // 处理 title 字段
+            String title = category.getTitle();
+            if (title != null && title.contains("线")) {
+                // 去掉“线”后括号中的内容
+                title = title.replaceAll("线\\([^)]*\\)", "线");
+                category.setTitle(title);
+            }
+            // 递归处理子分类
+            processCategories(category.getChildren());
+        }
+    }
     @GetMapping("/zab")
     public ResponseEntity<Map<String, Object>> getZABCategories() {
         List<Category> categories = categoryService.getAllZABCategories();

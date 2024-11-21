@@ -75,6 +75,13 @@ public class OnceFillServiceImpl implements OnceFillService {
                 throw new IllegalArgumentException("Unit price and quantity must not be null");
             }
             record.setDepositoryId(depositoryId);
+            // 处理 applyRemark
+            String applyRemark = record.getApplyRemark();
+            if (applyRemark != null && applyRemark.contains("线")) {
+                // 使用正则表达式去除括号及内容
+                applyRemark = applyRemark.replaceAll("(线\\([^)]*\\))", "线");
+                record.setApplyRemark(applyRemark);
+            }
             DecimalFormat decimalFormat = new DecimalFormat("#.00");
             double price = record.getUnitPrice() * record.getQuantity();
             String formattedPrice = decimalFormat.format(price);

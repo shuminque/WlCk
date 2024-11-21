@@ -11,13 +11,15 @@ public class CategoryP {
     private Integer parentId;
     private String title;
     private List<Category> children;
+    private String bracketContent; // 新增字段
 
-    public CategoryP(Integer id, Integer depositoryId, Integer parentId, String title, List<Category> children) {
+    public CategoryP(Integer id, Integer depositoryId, Integer parentId, String title, List<Category> children, String bracketContent) {
         this.id = id;
         this.depositoryId = depositoryId;
         this.parentId = parentId;
         this.title = title;
         this.children = children;
+        this.bracketContent = bracketContent;
     }
     public CategoryP(Category category) {
         this.id = category.getId();
@@ -25,5 +27,6 @@ public class CategoryP {
         this.parentId = category.getParentId();
         this.title = category.getTitle();
         this.children = category.getChildren();
+        this.bracketContent = category.getBracketContent();
     }
 }

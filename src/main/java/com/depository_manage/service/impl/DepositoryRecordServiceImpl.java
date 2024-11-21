@@ -62,6 +62,12 @@ public class DepositoryRecordServiceImpl implements DepositoryRecordService {
         }
         map.put("reviewTime", map.get("applyTime"));
         map.put("reviewPass", "1");
+        String applyRemark = (String) map.get("applyRemark");
+        if (applyRemark != null && applyRemark.contains("线")) {
+            // 去掉“线”后括号中的内容
+            applyRemark = applyRemark.replaceAll("线\\([^)]*\\)", "线");
+            map.put("applyRemark", applyRemark);
+        }
         DepositoryRecord record;
         List<Material> list = materialMapper.findMaterialForOutbound(map);
         if (list.isEmpty()) {
