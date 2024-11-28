@@ -123,12 +123,22 @@
     </select>
 
     <select id="findLineNameData" parameterType="map" resultType="com.depository_manage.entity.LineData">
-        SELECT *
-        FROM line_data
-        WHERE YEAR(date) = #{year}
+        SELECT
+            date,
+            lineName,
+            SUM(production) AS production
+        FROM
+            line_data
+        WHERE
+            YEAR(date) = #{year}
           AND lineName = #{lineName}
-        order by date;
+        GROUP BY
+            date,
+            lineName
+        ORDER BY
+            date;
     </select>
+
 
     <select id="findYearlyProductionData" parameterType="map" resultType="com.depository_manage.entity.LineData">
         SELECT
