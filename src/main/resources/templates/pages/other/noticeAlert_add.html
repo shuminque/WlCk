@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>物品预警管理</title>
+    <!-- LayUI CSS -->
+    <link rel="stylesheet" href="/static/lib/layui-v2.8.17/css/layui.css" media="all">
+    <!-- jQuery 库 -->
+    <script src="/static/js/http_ajax.googleapis.com_ajax_libs_jquery_3.5.1_jquery.js"></script>
+    <script src="/static/lib/layui-v2.8.17/layui.js" charset="utf-8"></script>
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .container {
+            margin: 10px;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <button id="addNoticeAlertBtn" class="layui-btn">添加预警</button>
+    <br>
+    <table id="noticeAlertTable" lay-filter="noticeAlertTableFilter"></table>
+</div>
+
+<script type="text/html" id="actionBar">
+    <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
+    <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="delete">删除</a>
+</script>
+
+<div id="addNoticeAlertForm" style="display: none; padding: 20px;">
+    <form class="layui-form" lay-filter="addForm">
+        <div class="layui-form-item" >
+            <label class="layui-form-label">AT号:</label>
+            <div class="layui-input-block">
+                <input type="number" name="atId" required lay-verify="required" placeholder="请输入AT号" class="layui-input"  autocomplete="off">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">预警数量：</label>
+            <div class="layui-input-block">
+                <input type="number" name="alertQuantity" required lay-verify="required" placeholder="请输入预警数量" class="layui-input" autocomplete="off">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <div class="layui-input-block">
+                <button type="submit" class="layui-btn" lay-submit lay-filter="submitAddForm">提交</button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<!-- 编辑预警记录的表单模板 -->
+<script type="text/template" id="editNoticeAlertTemplate">
+    <form class="layui-form" lay-filter="editNoticeAlertFormFilter">
+        <div class="layui-form-item">
+            <div class="layui-input-block">
+                <input type="hidden" name="id" required class="layui-input" readonly>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">AT号:</label>
+            <div class="layui-input-block">
+                <input type="number" name="atId" required lay-verify="required" placeholder="请输入AT号" class="layui-input" autocomplete="off">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">预警数量：</label>
+            <div class="layui-input-block">
+                <input type="number" name="alertQuantity" required lay-verify="required" placeholder="请输入预警数量" class="layui-input" autocomplete="off">
+            </div>
+        </div>
+        <div class="layui-form-item" style="text-align: center;">
+            <button class="layui-btn layui-btn-normal" lay-submit lay-filter="editNoticeAlertSubmitBtnFilter">
+                更新
+            </button>
+        </div>
+    </form>
+</script>
+
+<script>
+    layui.use(['table', 'form', 'layer', 'jquery'], function(){
+        var table = layui.table;
+        var form = layui.form;
+        var layer = layui.layer;
+        var $ = layui.jquery;
+
+        // 初始化表格
+        table.render({
+            elem: '#noticeAlertTable',
+            url: '/noticeAlerts/', // 后端获取预警记录的接口
+            parseData: function(res) {
+                return {
+                    "code": 0,
+                    "msg": "",
+                    "count": res.length,
+                    "data": res
+                };
+            },
+            cols: [ [
+                {field: 'id', title: 'ID', sort: true},
+                {field: 'atId', title: 'AT号', sort: true},
+                {field: 'alertQuantity', title: '预警数量', sort: true},
+                {title: '操作', toolbar: '#actionBar'}
+            ]],
+            limits: [400,1000,50000],
+            limit: 200,
+            page: true
+        });
+
+        // 添加预警按钮
+        $('#addNoticeAlertBtn').click(function() {
+            layer.open({
+                type: 1,
+                title: '添加预警',
+                content: $('#addNoticeAlertForm'),
+                area: ['500px', '250px']
+            });
+        });
+
+        // 提交添加表单
+        form.on('submit(submitAddForm)', function(data) {
+            var formData = data.field;
+            $.ajax({
+                url: '/noticeAlerts/', // 添加预警记录的接口
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(formData),
+                success: function(response) {
+                    layer.msg('添加成功！', {icon: 1, time: 2000});
+                    table.reload('noticeAlertTable'); // 重新加载表格数据
+                },
+                error: function(xhr, status, error) {
+                    layer.msg('添加失败！', {icon: 2, time: 2000});
+                },
+                complete: function () {
+                    form.val("addForm", {
+                        'atId': "",
+                        'alertQuantity': ""
+                    })
+                }
+            });
+            return false;
+        });
+
+        // 编辑和删除操作
+        table.on('tool(noticeAlertTableFilter)', function(obj) {
+            var data = obj.data;
+            var layEvent = obj.event;
+            if (layEvent === 'edit') {
+                editNoticeAlert(data);
+            } else if (layEvent === 'delete') {
+                deleteNoticeAlert(data.id);
+            }
+        });
+
+        // 编辑预警记录
+        function editNoticeAlert(data) {
+            layer.open({
+                type: 1,
+                title: '编辑预警',
+                content: $('#editNoticeAlertTemplate').html(),
+                area: ['500px', '250px'],
+                success: function(layero, index) {
+                    form.val('editNoticeAlertFormFilter', {
+                        'id': data.id,
+                        'atId': data.atId,
+                        'alertQuantity': data.alertQuantity
+                    });
+                }
+            });
+        }
+
+        // 提交编辑表单
+        form.on('submit(editNoticeAlertSubmitBtnFilter)', function(data) {
+            var formData = data.field;
+            $.ajax({
+                url: '/noticeAlerts/' + formData.id, // 更新预警记录的接口
+                type: 'PUT',
+                contentType: 'application/json',
+                data: JSON.stringify(formData),
+                success: function(response) {
+                    layer.msg('更新成功！', {icon: 1, time: 2000});
+                    table.reload('noticeAlertTable');
+                    layer.closeAll();
+                },
+                error: function(xhr, status, error) {
+                    layer.msg('更新失败！', {icon: 2, time: 2000});
+                }
+            });
+            return false;
+        });
+
+        // 删除预警记录
+        function deleteNoticeAlert(id) {
+            layer.confirm('确定要删除吗？', function (index) {
+                $.ajax({
+                    url: '/noticeAlerts/' + id,
+                    type: 'DELETE',
+                    success: function(res) {
+                        layer.msg('删除成功！');
+                        table.reload('noticeAlertTable');
+                    },
+                    error: function(err) {
+                        layer.msg('删除失败！');
+                    }
+                });
+                layer.close(index);
+            });
+        }
+    });
+</script>
+</body>
+</html>
