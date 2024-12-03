@@ -6,6 +6,7 @@ import com.depository_manage.mapper.*;
 import com.depository_manage.pojo.CategoryOutboundDTO;
 import com.depository_manage.pojo.MonthlyAmountDTO;
 import com.depository_manage.service.DepositoryRecordService;
+import com.depository_manage.service.NoticeAlertService;
 import com.depository_manage.service.NoticeService;
 import com.depository_manage.service.NotificationService;
 import com.depository_manage.pojo.DepositoryRecordP;
@@ -39,7 +40,8 @@ public class DepositoryRecordServiceImpl implements DepositoryRecordService {
     private MaterialTypeMapper materialTypeMapper;
     @Autowired
     private NoticeService noticeService;
-
+    @Autowired
+    private NoticeAlertService noticeAlertService;
     @Override
     public Integer apply(Map<String, Object> map) {
         // 如果map中没有applyTime，则使用当前时间
@@ -130,6 +132,35 @@ public class DepositoryRecordServiceImpl implements DepositoryRecordService {
                 BigDecimal bdNewUnitPrice = new BigDecimal(newUnitPrice);
                 bdNewUnitPrice = bdNewUnitPrice.setScale(2, RoundingMode.HALF_UP);
 
+                record = depositoryRecordMapper.findDepositoryRecordById(ObjectFormatUtil.toInteger(map.get("id")));
+                int alertQuantity = noticeAlertService.findAlertQuantityByAtId(record.getAtId());
+                String typeName = record.getTypeName();
+                if (newQuantity <= alertQuantity) {
+                    if (!typeName.contains("金加工用")) {
+                        Integer id = record.getId();
+                        Integer atId = record.getAtId();
+                        String mname = record.getMname();
+                        String model = record.getModel();
+                        Integer did = record.getDepositoryId();
+                        Double lastC = record.getQuantity();
+                        String notificationContent = "AT号:" + atId + ", 品名: " + mname + ", 分类: " + typeName + ", 型号: " + model + "，最后出库数:" + lastC;
+                        Map<String, Object> notice = new HashMap<>();
+                        if (did == 1) {
+                            notice.put("title", "SAB：" + "品名:" + mname + "，库存不足");
+                        } else {
+                            notice.put("title", "ZAB" + "品名:" + mname + "，库存不足");
+                        }
+                        notice.put("content", notificationContent);
+                        notice.put("atId", atId);
+                        notice.put("mname", mname);
+                        notice.put("depositoryId", did);
+                        notice.put("model", model);
+                        notice.put("typeName", typeName);
+                        notice.put("lastCount", lastC);
+                        notice.put("time", new Date());
+                        noticeService.addNotice(notice);
+                    }
+                }
                 // 更新物料
                 material.setPrice(bdNewPrice.doubleValue());
                 material.setQuantity(newQuantity);
@@ -398,16 +429,21 @@ public class DepositoryRecordServiceImpl implements DepositoryRecordService {
 
                         // 查询相关通知
                         List<Notice> notices = noticeService.findNoticeByCondition(noticeQueryMap);
-                        for (Notice notice : notices) {
-                            // 删除通知
-                            noticeService.deleteNoticeById(notice.getId());
-                        }
+                        Integer alertQuantity = noticeAlertService.findAlertQuantityByAtId(record.getAtId());
+
                         double totalPrice = material.getPrice() + (record.getPrice() * record.getQuantity());
                         BigDecimal bdTotalPrice = new BigDecimal(totalPrice);
                         bdTotalPrice = bdTotalPrice.setScale(2, RoundingMode.HALF_UP); // 保留两位小数，四舍五入
                         material.setPrice(bdTotalPrice.doubleValue());
                         // 计算新的总数量
                         double totalQuantity = material.getQuantity() + record.getQuantity();
+                        // 如果查询不到预警数量或物料的数量大于预警数量，则删除相关通知
+                        if (alertQuantity == null || alertQuantity == 0 || totalQuantity > alertQuantity) {
+                            for (Notice notice : notices) {
+                                // 删除通知
+                                noticeService.deleteNoticeById(notice.getId());
+                            }
+                        }
                         // 计算新的均价
                         if(totalQuantity==0){
                             material.setUnitPrice(0.00);
