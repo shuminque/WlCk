@@ -663,10 +663,12 @@
                                     {
                                         name: '平均',
                                         yAxis: referenceLineValue,
+                                        yAxisIndex: 1, // 指定使用第二个 y 轴
                                         label: {
                                             show: true,
                                             formatter: '{c}',
-                                            position: 'right'
+                                            position: 'end',
+                                            x: 20 // 调整 x 坐标，增加偏移量
                                         },
                                         lineStyle: {
                                             type: 'solid',
