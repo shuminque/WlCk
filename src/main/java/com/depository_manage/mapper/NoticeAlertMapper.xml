@@ -20,7 +20,7 @@
                 AND alert_quantity = #{alertQuantity}
             </if>
         </where>
-        ORDER BY id3
+        ORDER BY id
     </select>
 
     <!-- 根据物品ID查询单个预警记录 -->

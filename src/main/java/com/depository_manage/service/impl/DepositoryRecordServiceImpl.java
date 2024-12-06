@@ -133,9 +133,10 @@ public class DepositoryRecordServiceImpl implements DepositoryRecordService {
                 bdNewUnitPrice = bdNewUnitPrice.setScale(2, RoundingMode.HALF_UP);
 
                 record = depositoryRecordMapper.findDepositoryRecordById(ObjectFormatUtil.toInteger(map.get("id")));
-                int alertQuantity = noticeAlertService.findAlertQuantityByAtId(record.getAtId());
+                Integer alertQuantity = noticeAlertService.findAlertQuantityByAtId(record.getAtId());
                 String typeName = record.getTypeName();
-                if (newQuantity <= alertQuantity) {
+
+                if (alertQuantity != null && newQuantity <= alertQuantity) {
                     if (!typeName.contains("金加工用")) {
                         Integer id = record.getId();
                         Integer atId = record.getAtId();

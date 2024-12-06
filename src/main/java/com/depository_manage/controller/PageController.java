@@ -145,6 +145,11 @@ public class PageController {
     public String lineData_add() {
         return "pages/other/line_data";
     }
+
+    @GetMapping("/noticeAlert_add")
+    public String noticeAlert_add() {
+        return "pages/other/noticeAlert_add";
+    }
     @GetMapping("/dropData_add")
     public String dropData_add() {
         return "pages/other/dropData_add";
