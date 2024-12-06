@@ -7,6 +7,8 @@
         <id property="id" column="id" />
         <result property="atId" column="at_id" />
         <result property="alertQuantity" column="alert_quantity" />
+        <result property="mname" column="mname"  />
+        <result property="model" column="model"  />
     </resultMap>
 
     <!-- 查询所有预警记录 -->
@@ -30,16 +32,24 @@
 
     <!-- 插入新的预警记录 -->
     <insert id="insert" parameterType="com.depository_manage.entity.NoticeAlert">
-        INSERT INTO notice_alerts (at_id, alert_quantity)
-        VALUES (#{atId}, #{alertQuantity})
+        INSERT INTO notice_alerts (at_id, alert_quantity, mname, model)
+        SELECT #{atId}, #{alertQuantity}, mname, model
+        FROM material
+        WHERE at_id = #{atId} and depository_id=2
+            LIMIT 1
     </insert>
 
     <!-- 更新预警记录 -->
     <update id="update" parameterType="com.depository_manage.entity.NoticeAlert">
         UPDATE notice_alerts
-        SET at_id = #{atId}, alert_quantity = #{alertQuantity}
+        SET
+            at_id = #{atId},
+            alert_quantity = #{alertQuantity},
+            mname = (SELECT mname FROM material WHERE at_id = #{atId} and depository_id=2 LIMIT 1),
+            model = (SELECT model FROM material WHERE at_id = #{atId} and depository_id=2 LIMIT 1)
         WHERE id = #{id}
     </update>
+
 
     <!-- 根据ID删除预警记录 -->
     <delete id="deleteById" parameterType="int">
