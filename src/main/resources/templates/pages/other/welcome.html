@@ -642,14 +642,7 @@
                         { type: 'value', name: '', position: 'right', axisLabel: { show: false }, splitLine: { show: false } }
                     ],
                     series: [
-                        {
-                            name: '金额',
-                            type: 'bar',
-                            yAxisIndex: 0,
-                            data: amountData.map(function(item) { return item.amount; }),
-                            label: { normal: { show: true, position: 'top' } },
-                            itemStyle: { normal: { color: colors[0] } }
-                        },
+
                         {
                             name: '单个成本',
                             type: 'line',
@@ -663,31 +656,54 @@
                                     {
                                         name: '平均',
                                         yAxis: referenceLineValue,
-                                        yAxisIndex: 1, // 指定使用第二个 y 轴
+                                        yAxisIndex: 1,
                                         label: {
                                             show: true,
                                             formatter: '{c}',
                                             position: 'end',
-                                            x: 20 // 调整 x 坐标，增加偏移量
+                                            rich: {
+                                                a: {
+                                                    align: 'center' ,
+                                                    padding: [40, 10, 0, -45] // 左侧内边距负值，使其左移
+                                                }
+                                            },
+                                            formatter: (params) => `{a|${params.value}}`
                                         },
                                         lineStyle: {
                                             type: 'solid',
-                                            color: '#bf2222'
+                                            color: '#ffcf00'
                                         },
                                         xAxis: 'max'
                                     }
                                 ]
                             }
-                        }
-                        , {
-                            name: '产量',
+                        },
+                        {
+                            name: '金额',
                             type: 'bar',
-                            yAxisIndex: 2,
-                            data: productionData,
-                            barWidth: 0, // 将 barWidth 设置为 0
-                            label: { show: false },
-                            itemStyle: { opacity: 0 }
+                            yAxisIndex: 0,
+                            data: amountData.map(function(item) { return item.amount; }),
+                            label: { normal: { show: true, position: 'top' } },
+                            itemStyle: { normal: { color: colors[0] } },
+                            barWidth: '50%' // 设置柱宽为原本宽度的一半
+                        },
+                        {
+                            name: '产量',
+                            type: 'line', // 改成折线
+                            yAxisIndex: 2, // 依然绑定到第3个Y轴
+                            data: productionData, // 数据仍然传入
+                            lineStyle: { opacity: 0 }, // 隐藏线条
+                            symbol: 'none', // 不显示拐点
                         }
+                        // {
+                        //     name: '产量',
+                        //     type: 'bar',
+                        //     yAxisIndex: 2,
+                        //     data: productionData,
+                        //     barWidth: 0, // 将 barWidth 设置为 0
+                        //     label: { show: false },
+                        //     itemStyle: { opacity: 0 }
+                        // }
                     ]
                 };
                 myChartCate.clear(); // 清除旧的图表数据
