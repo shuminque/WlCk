@@ -648,7 +648,29 @@
                             type: 'line',
                             yAxisIndex: 1,
                             data: costPerUnit,
-                            label: { normal: { show: true, position: 'top' } },
+                            label: {
+                                normal: {
+                                    show: true,
+                                    position: 'top',
+                                    formatter: function(params) {
+                                        // 获取当前标签的坐标
+                                        const currentIndex = params.dataIndex;
+                                        const prevIndex = currentIndex - 1;
+
+                                        // 检查前后标签是否重叠，若重叠，则调整
+                                        if (currentIndex > 0 && Math.abs(params.data - costPerUnit[prevIndex]) < 10) {
+                                            return '{a| ' + params.value + '}';
+                                        }
+                                        return params.value;
+                                    },
+                                    rich: {
+                                        a: {
+                                            align: 'center',
+                                            padding: [15, 0, 15, 0] // 可以根据需要调整位置
+                                        }
+                                    }
+                                }
+                            },
                             itemStyle: { normal: { color: colors[1] } },
                             lineStyle: { color: colors[1] },
                             markLine: {
@@ -683,7 +705,27 @@
                             type: 'bar',
                             yAxisIndex: 0,
                             data: amountData.map(function(item) { return item.amount; }),
-                            label: { normal: { show: true, position: 'top' } },
+                            label: {
+                                normal: {
+                                    show: true,
+                                    position: 'inside',
+                                    formatter: function(params) {
+                                        const currentIndex = params.dataIndex;
+                                        const prevIndex = currentIndex - 1;
+                                        // 检查前后标签是否重叠，若重叠，则调整
+                                        if (currentIndex > 0 && Math.abs(params.data - amountData[prevIndex].amount) < 10) {
+                                            return '{a| ' + params.value + '}';
+                                        }
+                                        return params.value;
+                                    },
+                                    rich: {
+                                        a: {
+                                            align: 'center',
+                                            padding: [-15, 0, 5, 0] // 调整位置
+                                        }
+                                    }
+                                }
+                            },
                             itemStyle: { normal: { color: colors[0] } },
                             barWidth: '50%' // 设置柱宽为原本宽度的一半
                         },
