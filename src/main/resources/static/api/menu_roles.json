@@ -250,6 +250,15 @@
                             "roles": [
                                 "SAB_cg", "SAB_sh", "ZAB_cg", "ZAB_sh", "ALL"
                             ]
+                        },
+                        {
+                            "title": "消耗工具统计",
+                            "href": "/category_table",
+                            "icon": "layui-icon layui-icon-list",
+                            "target": "_self",
+                            "roles": [
+                                "SAB_cg", "SAB_sh", "ZAB_cg", "ZAB_sh", "ALL"
+                            ]
                         }
                     ]
                 },

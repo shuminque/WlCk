@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.depository_manage.mapper.ItemCategoryMapper">
+
+    <!-- 结果映射 -->
+    <resultMap id="ItemCategoryMap" type="com.depository_manage.entity.ItemCategory">
+        <id property="id" column="id" />
+        <result property="enginName" column="engin_name" />
+        <result property="engin" column="engin" />
+        <result property="itemCategory" column="item_category" />
+        <result property="atId" column="at_id" />
+    </resultMap>
+
+    <!-- 查询所有物品类别映射 -->
+    <select id="findAll" parameterType="map" resultMap="ItemCategoryMap">
+        SELECT * FROM item_category_mapping
+        <where>
+            <if test="enginName != null">
+                AND engin_name = #{enginName}
+            </if>
+            <if test="engin != null">
+                AND engin = #{engin}
+            </if>
+            <if test="itemCategory != null">
+                AND item_category = #{itemCategory}
+            </if>
+            <if test="atId != null">
+                AND at_id = #{atId}
+            </if>
+        </where>
+        ORDER BY id
+    </select>
+
+    <!-- 根据物品ID查询单个物品类别映射 -->
+    <select id="findByAtId" parameterType="int" resultMap="ItemCategoryMap">
+        SELECT * FROM item_category_mapping WHERE at_id = #{atId}
+    </select>
+
+    <!-- 插入新的物品类别映射 -->
+    <insert id="insert" parameterType="com.depository_manage.entity.ItemCategory">
+        INSERT INTO item_category_mapping (engin_name, engin, item_category, at_id)
+        VALUES (#{enginName}, #{engin}, #{itemCategory}, #{atId})
+    </insert>
+
+    <!-- 更新物品类别映射 -->
+    <update id="update" parameterType="com.depository_manage.entity.ItemCategory">
+        UPDATE item_category_mapping
+        SET6
+            engin_name = #{enginName},
+            engin = #{engin},
+            item_category = #{itemCategory},
+            at_id = #{atId}
+        WHERE id = #{id}
+    </update>
+
+    <!-- 根据ID删除物品类别映射 -->
+    <delete id="deleteById" parameterType="int">
+        DELETE FROM item_category_mapping WHERE id = #{id}
+    </delete>
+
+    <select id="findTotalQuantityByCategoryAndEngin" parameterType="map" resultType="map">
+        SELECT
+            icm.engin,
+            CONCAT(icm.item_category, ' [',
+                   (SELECT GROUP_CONCAT(DISTINCT at_id ORDER BY at_id ASC SEPARATOR ',')
+                    FROM item_category_mapping
+                    WHERE item_category = icm.item_category),
+                   ']') AS item_category,
+            SUM(dr.quantity) AS total_quantity
+        FROM
+            depository_record dr
+                JOIN
+            item_category_mapping icm ON dr.at_id = icm.at_id
+        WHERE
+            dr.apply_time BETWEEN #{startDate} AND #{endDate}
+          AND dr.state = '已出库'
+        GROUP BY
+            icm.item_category, icm.engin
+    </select>
+
+</mapper>

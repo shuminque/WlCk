@@ -123,6 +123,10 @@ public class PageController {
     public String total_table() {
         return "pages/chart/total_table";
     }
+    @GetMapping("/category_table")
+    public String category_table() {
+        return "pages/chart/category_table";
+    }
     @GetMapping("/sluggish_table")
     public String sluggish_table() {
         return "pages/chart/sluggish_table";
