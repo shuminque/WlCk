@@ -94,8 +94,9 @@
             },
             toolbar: ['filter', 'exports', 'print'],
             cols: [ [ // 表头
-                {field: 'engin', title: '工程名',align: 'center'},
-                {field: 'item_category', title: '工具',align: 'left'},
+                {field: 'engin', title: '工程名',align: 'left', maxWidth: 200},
+                {field: 'item_category', title: '工具',align: 'left',maxWidth: 300},
+                {field: 'at_id', title: 'AT号'},
                 {field: 'total_quantity', title: '数量',maxWidth: 100},
             ]],
             limits: [ 500, 2000, 100000],

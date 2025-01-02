@@ -46,4 +46,10 @@ public class ItemCategoryServiceImpl implements ItemCategoryService {
         String endDate = (String) params.get("endDate");
         return itemCategoryMapper.findTotalQuantityByCategoryAndEngin(startDate, endDate);
     }
+    @Override
+    public List<Map<String, Object>> findTotalQuantityByCategoryAndEnginTwo(Map<String, Object> params) {
+        String startDate = (String) params.get("startDate");
+        String endDate = (String) params.get("endDate");
+        return itemCategoryMapper.findTotalQuantityByCategoryAndEnginTwo(startDate, endDate);
+    }
 }

@@ -61,11 +61,10 @@
     <select id="findTotalQuantityByCategoryAndEngin" parameterType="map" resultType="map">
         SELECT
             icm.engin,
-            CONCAT(icm.item_category, ' [',
-                   (SELECT GROUP_CONCAT(DISTINCT at_id ORDER BY at_id ASC SEPARATOR ',')
-                    FROM item_category_mapping
-                    WHERE item_category = icm.item_category),
-                   ']') AS item_category,
+            icm.item_category,
+            (SELECT GROUP_CONCAT(DISTINCT at_id ORDER BY at_id ASC SEPARATOR ',')
+             FROM item_category_mapping
+             WHERE item_category = icm.item_category) AS at_id,
             SUM(dr.quantity) AS total_quantity
         FROM
             depository_record dr
@@ -78,4 +77,25 @@
             icm.item_category, icm.engin
     </select>
 
+    <select id="findTotalQuantityByCategoryAndEnginTwo" parameterType="map" resultType="map">
+        SELECT
+            SUBSTRING_INDEX(dr.apply_remark, '-', -1) AS engin, -- 提取最后一段
+            dr.type_name as item_category,
+            GROUP_CONCAT(DISTINCT dr.at_id) AS at_id,  -- 确保 at_id 不重复
+            SUM(dr.quantity) AS total_quantity         -- 合并 quantity（求和）
+        FROM
+            depository_record dr
+        WHERE
+            dr.apply_time BETWEEN #{startDate} AND #{endDate}
+          AND dr.state = '已出库'
+          AND dr.apply_remark LIKE '%线%'
+          AND dr.type_name IN (
+            SELECT DISTINCT icm.item_category
+            FROM item_category_mapping icm
+            WHERE icm.at_id IS NULL
+        )
+        GROUP BY
+            SUBSTRING_INDEX(dr.apply_remark, '-', -1), -- 按提取后的 apply_remark 分组
+            dr.type_name;
+    </select>
 </mapper>

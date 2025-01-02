@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.*;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @RestController
 @RequestMapping("/itemCategories")
@@ -71,10 +73,14 @@ public class ItemCategoryController {
         params.put("startDate", startDate+ " 00:00:00");
         params.put("endDate", endDate+ " 23:59:59");
         List<Map<String, Object>> results = itemCategoryService.findTotalQuantityByCategoryAndEngin(params);
+        List<Map<String, Object>> resultsTwo = itemCategoryService.findTotalQuantityByCategoryAndEnginTwo(params);
+        List<Map<String, Object>> combinedResults = Stream.concat(results.stream(), resultsTwo.stream())
+                .collect(Collectors.toList());
         RestResponse response = new RestResponse();
         response.setStatus(200);
-        response.setData(results);
-        response.setCount(results.size());
+        response.setData(combinedResults);
+        response.setCount(combinedResults.size());
         return response;
     }
+
 }

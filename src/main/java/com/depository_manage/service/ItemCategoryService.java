@@ -22,5 +22,6 @@ public interface ItemCategoryService {
     int deleteById(Integer id);
 
     List<Map<String, Object>> findTotalQuantityByCategoryAndEngin(Map<String, Object> params);
+    List<Map<String, Object>> findTotalQuantityByCategoryAndEnginTwo(Map<String, Object> params);
 
 }

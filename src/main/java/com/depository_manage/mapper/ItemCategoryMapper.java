@@ -26,5 +26,5 @@ public interface ItemCategoryMapper {
     int deleteById(@Param("id") Integer id);
 
     List<Map<String, Object>> findTotalQuantityByCategoryAndEngin(@Param("startDate") String startDate, @Param("endDate") String endDate);
-
+    List<Map<String, Object>> findTotalQuantityByCategoryAndEnginTwo(@Param("startDate") String startDate, @Param("endDate") String endDate);
 }
