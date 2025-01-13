@@ -9,10 +9,12 @@
         <result column="lineName" property="lineName" jdbcType="VARCHAR" />
         <result column="production" property="production" jdbcType="INTEGER" />
         <result column="model" property="model" jdbcType="VARCHAR" /> <!-- 新增的 model 字段 -->
+        <result column="craft" property="craft" jdbcType="VARCHAR" />
+
     </resultMap>
 
     <sql id="allColumns">
-        l.id, l.date, l.lineName, l.production, l.model <!-- 添加 model 字段 -->
+        l.id, l.date, l.lineName, l.production, l.model, l.craft<!-- 添加 model 字段 -->
     </sql>
 
     <select id="findLineDataAll" resultMap="lineDataMap">
@@ -57,19 +59,23 @@
 
     <insert id="insertLineData" parameterType="map">
         INSERT INTO line_data (
-        date, lineName, production, model <!-- 添加 model 字段 -->
+            date, lineName, production, model, craft
         ) VALUES (
-        #{date}, #{lineName}, #{production}, #{model} <!-- 添加 model 的值 -->
-        )
+                     #{date}, #{lineName}, #{production}, #{model},
+                     (SELECT c.craft FROM craft c WHERE c.lineName = #{lineName} LIMIT 1)
+            )
     </insert>
 
+
     <insert id="batchInsert" parameterType="java.util.List">
-        INSERT INTO line_data (date, lineName, production, model) <!-- 添加 model 字段 -->
+        INSERT INTO line_data (date, lineName, production, model, craft)
         VALUES
         <foreach collection="list" item="item" separator=",">
-            (#{item.date}, #{item.lineName}, #{item.production}, #{item.model}) <!-- 添加 model 的值 -->
+            (#{item.date}, #{item.lineName}, #{item.production}, #{item.model},
+            (SELECT c.craft FROM craft c WHERE c.lineName = #{item.lineName} LIMIT 1))
         </foreach>
     </insert>
+
 
     <update id="updateLineData" parameterType="map">
         UPDATE line_data
@@ -85,6 +91,9 @@
             </if>
             <if test="model != null">
                 model = #{model} <!-- 添加 model 字段的更新 -->
+            </if>
+            <if test="craft != null">
+                craft = #{craft} <!-- 添加 craft 字段的更新 -->
             </if>
         </set>
         WHERE id = #{id}
@@ -112,6 +121,9 @@
         </if>
         <if test="model != null">
             AND l.model = #{model} <!-- 添加 model 的条件查询 -->
+        </if>
+        <if test="craft != null">
+            AND l.craft = #{craft} <!-- 添加 craft 的条件查询 -->
         </if>
     </select>
 

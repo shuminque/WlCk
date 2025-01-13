@@ -336,6 +336,9 @@
                         <div class="layui-card-body">
                             <div id="model-analysis-chart" style="width: 100%; height: 600px;"></div>
                         </div>
+                        <div class="layui-card-body">
+                            <div id="model-analysisTwo-chart" style="width: 100%; height: 600px;"></div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -978,6 +981,7 @@
                                 initCategoryBarChart(mergedData, mergedLineData);
                                 initOtherCategoryBarChart(mergedData, mergedLineData);
                                 initModelBarChart(mergedData, mergedLineData);
+                                initModelBarChartTwo(mergedData, mergedLineData);
 
                                 // 同步图例
                                 if (chart1 && chart2) {
@@ -1967,10 +1971,11 @@
         function initModelBarChart(data, lineData) {
             console.log(data);
             console.log(lineData);
-            // 以 model 进行分类汇总
+// 以 model 进行分类汇总
             var modelMap = {};
             var totalProductionMap = {};
-            // 首先计算每个 lineName 的总生产量
+
+// 首先计算每个 lineName 的总生产量
             lineData.forEach(item => {
                 var lineName = item.lineName;
                 if (!totalProductionMap[lineName]) {
@@ -1978,14 +1983,15 @@
                 }
                 totalProductionMap[lineName] += item.production || 0;
             });
+
             lineData.forEach(item => {
-                var modelKey = item.model || "无规格";  // Use "无规格分类" for empty models
+                var modelKey = item.model || "无规格"; // Use "无规格分类" for empty models
                 var lineName = item.lineName;
                 if (!modelMap[modelKey]) {
                     modelMap[modelKey] = {
                         amount: 0,
                         production: 0,
-                        categories: []  // 添加一个数组来存储相关类别和金额
+                        categories: [] // 添加一个数组来存储相关类别和金额
                     };
                 }
                 var correspondingData = data.find(d => d.category === item.lineName);
@@ -1993,18 +1999,30 @@
                     // 计算分配的 amount
                     var currentProduction = totalProductionMap[lineName];
                     var currentAmount = correspondingData.amount || 0;
-                    // 计算分配后的 amount
+                    var allocatedAmount = 0;
+
                     if (currentProduction > 0) {
-                        modelMap[modelKey].amount += Math.floor(currentAmount * (item.production / currentProduction));
+                        // 按比例分配金额
+                        allocatedAmount = Math.floor(currentAmount * (item.production / currentProduction));
                     } else {
-                        modelMap[modelKey].amount += currentAmount; // 如果 currentProduction 是 0，直接使用 currentAmount
+                        // 如果生产量为 0，直接使用总金额
+                        allocatedAmount = currentAmount;
                     }
+
+                    modelMap[modelKey].amount += allocatedAmount;
+
                     // 保存类别和金额信息
-                    modelMap[modelKey].categories.push({ category: lineName, amount: currentAmount });
+                    modelMap[modelKey].categories.push({
+                        category: lineName,
+                        craft: item.craft,
+                        amount: allocatedAmount, // 使用分配后的金额
+                        production: item.production || 0 // 在这里添加具体线路的 production
+                    });
                 }
                 modelMap[modelKey].production += item.production || 0;
             });
             console.log(modelMap);
+
             var categoriesFromData = data
                 .map(item => item.category)
                 .filter(category => category.includes("线") || category.endsWith("机"));
@@ -2020,33 +2038,103 @@
 
             var models = Object.keys(modelMap);
             console.log(models);
-            var amounts = models.map(model => modelMap[model].amount);
-            var productions = models.map(model => modelMap[model].production);
+            // 筛选后的 amounts 和 productions
+            var amounts = models.map(model => {
+                var categories = modelMap[model].categories; // 获取该型号的所有类别
+                var filteredCategories = categories.filter(categoryData => categoryData.craft !== "管材工艺"); // 筛选出 craft 不为 "管材工艺" 的类别
 
+                // 计算筛选后的总 amount
+                return filteredCategories.reduce((sum, categoryData) => sum + (categoryData.amount || 0), 0);
+            });
+
+            console.log(amounts);
+
+            var productions = models.map(model => {
+                var categories = modelMap[model].categories; // 获取该型号的所有类别
+                var filteredCategories = categories.filter(categoryData => categoryData.craft !== "管材工艺"); // 筛选出 craft 不为 "管材工艺" 的类别
+
+                // 计算筛选后的总 production
+                return filteredCategories.reduce((sum, categoryData) => sum + (categoryData.production || 0), 0);
+            });
+
+            console.log(productions);
+
+// 计算总产量和总金额
             var totalProduction = productions.reduce((acc, curr) => acc + curr, 0);
-            var totalPrice = amountsALL.reduce((acc, curr) => acc + curr, 0);
-            var referenceLineValue = (totalPrice / totalProduction).toFixed(3);
+            var totalPrice = amounts.reduce((acc, curr) => acc + curr, 0);
+
+// 计算参考线值
+            var referenceLineValue = totalProduction > 0 ? (totalPrice / totalProduction).toFixed(3) : 0;
 
             console.log(totalPrice);
             console.log(totalProduction);
             console.log(referenceLineValue);
 
+// 确保数值有效
             totalUnitCost = Number(totalUnitCost) || 0;
-            referenceLineValue = Number(referenceLineValue) || 0; // Ensure it is a number
-            totalPrice =Number(totalPrice) || 0;
-            OtherAllPrice =Number(OtherAllPrice) || 0;
-            var formattedTotalALL= (totalPrice+OtherAllPrice).toLocaleString();
-            var unitPrices = amounts.map((amount, index) => {
-                var cost = productions[index] > 0 ? (amount / productions[index]) : 0;
-                var finalCost = cost > 0 ? (cost + totalUnitCost) : cost;
+            referenceLineValue = Number(referenceLineValue) || 0; // 确保是数字
+            totalPrice = Number(totalPrice) || 0;
+            OtherAllPrice = Number(OtherAllPrice) || 0;
+
+// 格式化总金额
+            var formattedTotalALL = (totalPrice ).toLocaleString();
+
+            var unitPrices = models.map((model) => {
+                var modelData = modelMap[model];
+                var categories = modelData.categories; // 获取该型号的所有类别
+                var filteredCategories = categories.filter(categoryData => categoryData.craft !== "管材工艺"); // 筛选出 craft 不为 "管材工艺" 的类别
+
+                var totalAmount = 0; // 总金额
+                var totalProduction = 0; // 总产量
+
+                // 计算总 amount 和总 production
+                filteredCategories.forEach((categoryData) => {
+                    totalAmount += categoryData.amount || 0; // 累加 amount
+                    totalProduction += categoryData.production || 0; // 累加 production
+                });
+
+                var finalCost = 0; // 用于保存最终的单价
+                if (totalProduction > 0) {
+                    finalCost = totalAmount / totalProduction; // 总 amount 除以总 production
+                }
+
+                // 如果有其他单位成本 (totalUnitCost)，可以将其加到最终单价上
+                finalCost = finalCost > 0 ? (finalCost + totalUnitCost) : finalCost;
+
+                // 返回保留三位小数的最终单价
                 return parseFloat(finalCost.toFixed(3));
             });
+// 过滤掉金额和产量均为 0 的条目
+            var filteredData = models.map((model, index) => {
+                var categories = modelMap[model].categories;
+                var filteredCategories = categories.filter(categoryData => categoryData.craft !== "管材工艺");
+
+                var amount = filteredCategories.reduce((sum, categoryData) => sum + (categoryData.amount || 0), 0);
+                var production = filteredCategories.reduce((sum, categoryData) => sum + (categoryData.production || 0), 0);
+                var unitPrice = unitPrices[index];
+
+                return {
+                    model,
+                    amount,
+                    production,
+                    unitPrice,
+                    valid: amount !== 0 || production !== 0 // 标记有效条目
+                };
+            }).filter(item => item.valid); // 只保留有效条目
+
+// 提取过滤后的数据
+            var filteredModels = filteredData.map(item => item.model);
+            var filteredAmounts = filteredData.map(item => item.amount);
+            var filteredProductions = filteredData.map(item => item.production);
+            var filteredUnitPrices = filteredData.map(item => item.unitPrice);
+
+
 
             var colors = ['#5470C6', '#91CC75', '#EE6666', '#E87C25', '#FFD85C', '#73C0DE', '#3BA272', '#FC8452', '#9A60B4', '#EA7CCC'];
 
             var option = {
                 title: {
-                    text: `各型号成本图\n\n{small|(单个成本：${(referenceLineValue + totalUnitCost).toFixed(3)} 消耗金额：${(formattedTotalALL)}元)}`,
+                    text: `棒材及数控NC工艺成本图\n\n{small|(单个成本：${(referenceLineValue + totalUnitCost).toFixed(3)} 消耗金额：${(formattedTotalALL)}元)}`,
                     left: 'center',
                     top: 'top',
                     textStyle: {
@@ -2078,7 +2166,7 @@
                 },
                 xAxis: {
                     type: 'category',
-                    data: models,
+                    data: filteredModels,
                     axisLabel: {
                         interval: 0,
                         rotate: 90,
@@ -2093,7 +2181,7 @@
                     {
                         name: '金额',
                         type: 'bar',
-                        data: amounts,
+                        data: filteredAmounts,
                         barWidth: '60%',
                         barCategoryGap: '30%',
                         label: { normal: { show: true, position: 'top', formatter: function(params) { return params.value; } } },
@@ -2103,7 +2191,7 @@
                         name: '单个成本',
                         type: 'line',
                         yAxisIndex: 1,
-                        data: unitPrices,
+                        data: filteredUnitPrices,
                         label: { normal: { show: true, position: 'top', textStyle: { color: '#000000' } } },
                         lineStyle: { normal: { color: '#bf2222', opacity: 0.5 } },
                         itemStyle: { normal: { opacity: 0.5 } },
@@ -2122,7 +2210,7 @@
                         name: '产量',
                         type: 'bar',
                         yAxisIndex: 2,
-                        data: productions,
+                        data: filteredProductions,
                         barWidth: '0%',
                         label: { show: false },
                         itemStyle: { opacity: 0 }
@@ -2135,6 +2223,247 @@
             modelChart.setOption(option);
         }
 
+        function initModelBarChartTwo(data, lineData) {
+            var modelMap = {};
+            var totalProductionMap = {};
+            lineData.forEach(item => {
+                var lineName = item.lineName;
+                if (!totalProductionMap[lineName]) {
+                    totalProductionMap[lineName] = 0;
+                }
+                totalProductionMap[lineName] += item.production || 0;
+            });
+            lineData.forEach(item => {
+                var modelKey = item.model || "无规格"; // Use "无规格分类" for empty models
+                var lineName = item.lineName;
+                if (!modelMap[modelKey]) {
+                    modelMap[modelKey] = {
+                        amount: 0,
+                        production: 0,
+                        categories: [] // 添加一个数组来存储相关类别和金额
+                    };
+                }
+                var correspondingData = data.find(d => d.category === item.lineName);
+                if (correspondingData) {
+                    // 计算分配的 amount
+                    var currentProduction = totalProductionMap[lineName];
+                    var currentAmount = correspondingData.amount || 0;
+                    var allocatedAmount = 0;
+
+                    if (currentProduction > 0) {
+                        // 按比例分配金额
+                        allocatedAmount = Math.floor(currentAmount * (item.production / currentProduction));
+                    } else {
+                        // 如果生产量为 0，直接使用总金额
+                        allocatedAmount = currentAmount;
+                    }
+                    modelMap[modelKey].amount += allocatedAmount;
+                    modelMap[modelKey].categories.push({
+                        category: lineName,
+                        craft: item.craft,
+                        amount: allocatedAmount, // 使用分配后的金额
+                        production: item.production || 0 // 在这里添加具体线路的 production
+                    });
+                }
+                modelMap[modelKey].production += item.production || 0;
+            });
+            var categoriesFromData = data
+                .map(item => item.category)
+                .filter(category => category.includes("线") || category.endsWith("机"));
+            var allCategories = [...new Set([...categoriesFromData])];
+            var amountsALL = allCategories.map(category => {
+                var categoryData = data.find(item => item.category === category);
+                return categoryData ? categoryData.amount : 0;
+            });
+            var models = Object.keys(modelMap);
+            console.log(models);
+            var amounts = models.map(model => {
+                var categories = modelMap[model].categories; // 获取该型号的所有类别
+                var filteredCategories = categories.filter(categoryData => categoryData.craft === "管材工艺"); // 筛选出 craft 不为 "管材工艺" 的类别
+                return filteredCategories.reduce((sum, categoryData) => sum + (categoryData.amount || 0), 0);
+            });
+            console.log(amounts);
+            var productions = models.map(model => {
+                var categories = modelMap[model].categories; // 获取该型号的所有类别
+                var filteredCategories = categories.filter(categoryData => categoryData.craft === "管材工艺"); // 筛选出 craft 不为 "管材工艺" 的类别
+                return filteredCategories.reduce((sum, categoryData) => sum + (categoryData.production || 0), 0);
+            });
+            console.log(productions);
+            var totalProduction = productions.reduce((acc, curr) => acc + curr, 0);
+            var totalPrice = amounts.reduce((acc, curr) => acc + curr, 0);
+// 计算参考线值
+//             var referenceLineValue = totalProduction > 0 ? (totalPrice / totalProduction).toFixed(3) : 0;
+            console.log(totalPrice);
+            console.log(totalProduction);
+            console.log(referenceLineValue);
+// 确保数值有效
+            totalUnitCost = Number(totalUnitCost) || 0;
+            totalPrice = Number(totalPrice) || 0;
+            OtherAllPrice = Number(OtherAllPrice) || 0;
+// 格式化总金额
+            var formattedTotalALL = (totalPrice ).toLocaleString();
+
+            var unitPrices = models.map((model) => {
+                var modelData = modelMap[model];
+                var categories = modelData.categories; // 获取该型号的所有类别
+                var filteredCategories = categories.filter(categoryData => categoryData.craft === "管材工艺"); // 筛选出 craft 为 "管材工艺" 的类别
+
+                var totalProduction = 0; // 总产量
+                var amountA = 0; // category 带有 A 的总金额
+                var amountB = 0; // category 带有 B 的总金额
+                var productionA = 0; // category 带有 A 的总产量
+                var productionB = 0; // category 带有 B 的总产量
+
+                // 对 filteredCategories 进行分类和累加
+                filteredCategories.forEach((categoryData) => {
+                    totalProduction += categoryData.production || 0; // 累加总生产量
+                    if (categoryData.category.includes("A")) {
+                        amountA += categoryData.amount || 0;
+                        productionA += categoryData.production || 0;
+                    } else if (categoryData.category.includes("B")) {
+                        amountB += categoryData.amount || 0;
+                        productionB += categoryData.production || 0;
+                    }
+                });
+
+                // 计算单价
+                var costA = productionA > 0 ? amountA / productionA : 0; // 带 A 的单个成本
+                var costB = productionB > 0 ? amountB / productionB : 0; // 带 B 的单个成本
+
+                var finalCost = costA + costB; // A 和 B 的单个成本求和
+
+                // 如果有其他单位成本 (totalUnitCost)，可以将其加到最终单价上
+                finalCost = finalCost > 0 ? (finalCost + totalUnitCost) : finalCost;
+
+                // 返回保留三位小数的最终单价
+                return parseFloat(finalCost.toFixed(3));
+            });
+            // 过滤掉金额和产量均为 0 的条目
+            var filteredData = models.map((model, index) => {
+                var categories = modelMap[model].categories;
+                var filteredCategories = categories.filter(categoryData => categoryData.craft === "管材工艺");
+
+                var amount = filteredCategories.reduce((sum, categoryData) => sum + (categoryData.amount || 0), 0);
+                var production = filteredCategories.reduce((sum, categoryData) => sum + (categoryData.production || 0), 0);
+                var unitPrice = unitPrices[index];
+
+                return {
+                    model,
+                    amount,
+                    production,
+                    unitPrice,
+                    valid: amount !== 0 || production !== 0 // 标记有效条目
+                };
+            }).filter(item => item.valid); // 只保留有效条目
+
+// 提取过滤后的数据
+            var filteredModels = filteredData.map(item => item.model);
+            var filteredAmounts = filteredData.map(item => item.amount);
+            var filteredProductions = filteredData.map(item => item.production);
+            var filteredUnitPrices = filteredData.map(item => item.unitPrice);
+
+            // 计算参考线值
+            var totalUnitPrices = unitPrices.reduce((acc, price) => acc + (price > 0 ? price : 0), 0); // 单价的总和（排除无效单价）
+            var validUnitPricesCount = unitPrices.filter(price => price > 0).length; // 有效单价的数量
+            var referenceLineValue = validUnitPricesCount > 0
+                ? (totalUnitPrices / validUnitPricesCount).toFixed(3)
+                : 0;
+
+            console.log("参考线值:", referenceLineValue);
+            referenceLineValue = Number(referenceLineValue) || 0; // 确保是数字
+
+            var colors = ['#5470C6', '#91CC75', '#EE6666', '#E87C25', '#FFD85C', '#73C0DE', '#3BA272', '#FC8452', '#9A60B4', '#EA7CCC'];
+
+            var option = {
+                title: {
+                    text: `管材工艺成本图\n\n{small|(单个成本：${(referenceLineValue).toFixed(3)} 消耗金额：${(formattedTotalALL)}元)}`,
+                    left: 'center',
+                    top: 'top',
+                    textStyle: {
+                        fontSize: 16,
+                        fontWeight: 'bold',
+                        rich: {
+                            small: {
+                                fontSize: 12,
+                                fontWeight: 'normal',
+                                color: '#666'
+                            }
+                        }
+                    }
+                },
+                tooltip: {
+                    trigger: 'axis',
+                    axisPointer: { type: 'shadow' }
+                },
+                grid: {
+                    left: '5%',
+                    right: '3%',
+                    top: '25%',
+                    bottom: '20%'
+                },
+                legend: {
+                    data: ['金额', '单个成本'],
+                    left: 'right',
+                    selected: { '金额': true, '单个成本': true }
+                },
+                xAxis: {
+                    type: 'category',
+                    data: filteredModels,
+                    axisLabel: {
+                        interval: 0,
+                        rotate: 90,
+                    }
+                },
+                yAxis: [
+                    { type: 'value', name: '金额', axisLabel: { formatter: '{value}' } },
+                    { type: 'value', name: '单个成本', axisTick: { show: false }, splitLine: { show: false }, axisLabel: { formatter: value => value.toFixed(3) } },
+                    { type: 'value', name: '', position: 'right', axisLabel: { show: false }, axisLine: { show: false }, axisTick: { show: false }, splitLine: { show: false } }
+                ],
+                series: [
+                    {
+                        name: '金额',
+                        type: 'bar',
+                        data: filteredAmounts,
+                        barWidth: '60%',
+                        barCategoryGap: '30%',
+                        label: { normal: { show: true, position: 'top', formatter: params => params.value } },
+                        itemStyle: { normal: { color: params => colors[params.dataIndex % colors.length] } }
+                    },
+                    {
+                        name: '单个成本',
+                        type: 'line',
+                        yAxisIndex: 1,
+                        data: filteredUnitPrices,
+                        label: { normal: { show: true, position: 'top', textStyle: { color: '#000000' } } },
+                        lineStyle: { normal: { color: '#bf2222', opacity: 0.5 } },
+                        itemStyle: { normal: { opacity: 0.5 } },
+                        markLine: {
+                            data: [
+                                {
+                                    name: '平均',
+                                    yAxis: referenceLineValue,
+                                    label: { show: false, formatter: '{c}', position: 'middle' },
+                                    lineStyle: { type: 'solid', color: '#bf2222' }
+                                }
+                            ]
+                        }
+                    },
+                    {
+                        name: '产量',
+                        type: 'bar',
+                        yAxisIndex: 2,
+                        data: filteredProductions,
+                        barWidth: '0%',
+                        label: { show: false },
+                        itemStyle: { opacity: 0 }
+                    }
+                ]
+            };
+
+            var modelChart = echarts.init(document.getElementById('model-analysisTwo-chart'));
+            modelChart.clear();
+            modelChart.setOption(option);
+        }
 
         function syncLegend(chart1, chart2) {
             function sync(event, sourceChart, targetChart) {

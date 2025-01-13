@@ -10,4 +10,5 @@ public class LineData {
     private String lineName;
     private Integer production;
     private String model; // 新增的 model 字段
+    private String craft; // 新增的 model 字段
 }
