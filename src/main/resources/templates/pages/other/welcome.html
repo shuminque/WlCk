@@ -2064,7 +2064,7 @@
             var totalPrice = amounts.reduce((acc, curr) => acc + curr, 0);
 
 // 计算参考线值
-            var referenceLineValue = totalProduction > 0 ? (totalPrice / totalProduction).toFixed(3) : 0;
+//             var referenceLineValue = totalProduction > 0 ? (totalPrice / totalProduction).toFixed(3) : 0;
 
             console.log(totalPrice);
             console.log(totalProduction);
@@ -2072,7 +2072,6 @@
 
 // 确保数值有效
             totalUnitCost = Number(totalUnitCost) || 0;
-            referenceLineValue = Number(referenceLineValue) || 0; // 确保是数字
             totalPrice = Number(totalPrice) || 0;
             OtherAllPrice = Number(OtherAllPrice) || 0;
 
@@ -2129,7 +2128,15 @@
             var filteredUnitPrices = filteredData.map(item => item.unitPrice);
 
 
+// 计算参考线值
+            var totalUnitPrices = unitPrices.reduce((acc, price) => acc + (price > 0 ? price : 0), 0); // 单价的总和（排除无效单价）
+            var validUnitPricesCount = unitPrices.filter(price => price > 0).length; // 有效单价的数量
+            var referenceLineValue = validUnitPricesCount > 0
+                ? (totalUnitPrices / validUnitPricesCount).toFixed(3)
+                : 0;
 
+            console.log("参考线值:", referenceLineValue);
+            referenceLineValue = Number(referenceLineValue) || 0; // 确保是数字
             var colors = ['#5470C6', '#91CC75', '#EE6666', '#E87C25', '#FFD85C', '#73C0DE', '#3BA272', '#FC8452', '#9A60B4', '#EA7CCC'];
 
             var option = {
