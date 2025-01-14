@@ -2137,10 +2137,12 @@
 
 
 // 计算参考线值
-            var totalUnitPrices = unitPrices.reduce((acc, price) => acc + (price > 0 ? price : 0), 0); // 单价的总和（排除无效单价）
-            var validUnitPricesCount = unitPrices.filter(price => price > 0).length; // 有效单价的数量
-            var referenceLineValue = validUnitPricesCount > 0
-                ? (totalUnitPrices / validUnitPricesCount).toFixed(3)
+            var totalAmountAll = filteredData.reduce((sum, item) => sum + item.amount, 0); // 总金额
+            var totalProductionAll = filteredData.reduce((sum, item) => sum + item.production, 0); // 总产量
+
+// 计算参考线值：总金额 / 总产量
+            var referenceLineValue = totalProductionAll > 0
+                ? (totalAmountAll / totalProductionAll).toFixed(3)
                 : 0;
 
             console.log("参考线值:", referenceLineValue);
@@ -2149,7 +2151,7 @@
 
             var option = {
                 title: {
-                    text: `棒材及数控NC工艺成本图\n\n{small|(单个成本：${(referenceLineValue + totalUnitCost).toFixed(3)} 消耗金额：${(formattedTotalALL)}元)}`,
+                    text: `棒材工艺及数控NC成本图\n\n{small|(单个成本：${(referenceLineValue +totalUnitCost).toFixed(3)} 消耗金额：${(formattedTotalALL)}元)}`,
                     left: 'center',
                     top: 'top',
                     textStyle: {
