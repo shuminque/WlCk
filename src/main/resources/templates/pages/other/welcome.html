@@ -555,8 +555,8 @@
                 return;
             }
             var amountUrl = '/CategoryForYear/' + year + '/' + depositoryId;
-            var lineData = []; // 默认设置为一个空数组
-            var isLineDataEmpty = true; // 用于判断 lineData 是否为空
+            var lineData = []; // 默认设置为空数组
+            var isLineDataEmpty = true; // 判断是否有产量数据
 
             // 如果 categoryTitle 不为空，则增加到 URL 中
             if (categoryTitle) {
@@ -574,17 +574,25 @@
                 // 获取产量数据
                 const lineDataResponse = await $.get(lineNameUrl);
                 lineData = lineDataResponse.data;
+                console.log(lineNameUrl);
+                console.log(lineData);
                 if (Array.isArray(lineData) && lineData.length > 0) {
                     isLineDataEmpty = false;
-                } else {
-                    console.error("lineData is not an array or is empty: 不是数组或为空", lineData);
-                    lineData = []; // 如果不是数组或为空，设置为一个空数组
+                }  else {
+                    console.warn("No valid data received, resetting lineData to empty.");
+                    lineData = [];
+                    isLineDataEmpty = true;
                 }
             } catch (error) {
                 console.error("Error fetching line data:", error);
-                lineData = []; // 请求失败时，设置为一个空数组
+                lineData = []; // 确保发生错误时不会使用旧数据
+                isLineDataEmpty = true;
             }
-
+            console.log(isLineDataEmpty);
+            if (isLineDataEmpty) {
+                console.warn("当前分类无产量数据，将产量设置为全为零");
+                lineData = []; // 清空 lineData，确保不会使用之前的数据
+            }
             try {
                 // 获取金额数据
                 const amountData = await $.get(amountUrl);
