@@ -1726,6 +1726,14 @@
         var totalUnitCost;
         var OtherAllPrice;
         function initOtherCategoryBarChart(data, lineData) {
+            // 过滤出 craft 为 "棒材工艺" 的行
+            var filteredLineData = lineData.filter(item => item.craft === "棒材工艺");
+
+            // 统计 filteredLineData 中所有 production 的总和
+            var totalProductionForCraft = filteredLineData.reduce((acc, curr) => acc + curr.production, 0);
+
+            console.log(totalProductionForCraft);
+
             var otherCategories = data
                 .map(item => item.category)
                 .filter(category => !category.includes("线") && !category.endsWith("机"));
@@ -1753,8 +1761,14 @@
             var totalProduction = productions.reduce((acc, curr) => acc + curr, 0);
 
             // 计算单个成本
-            var otherUnitPrices = otherAmounts.map((amount) => {
-                return totalProductions > 0 ? parseFloat((amount / totalProductions).toFixed(3)) : 0;
+            var otherUnitPrices = otherAmounts.map((amount, index) => {
+                // 如果是"冲床"类别，使用 totalProductionForCraft，否则使用 totalProduction
+                var category = uniqueOtherCategories[index];
+                if (category === "冲床" && totalProductionForCraft > 0) {
+                    return parseFloat((amount / totalProductionForCraft).toFixed(3));
+                } else {
+                    return totalProduction > 0 ? parseFloat((amount / totalProduction).toFixed(3)) : 0;
+                }
             });
             var referenceLineValue = (otherAmounts.reduce((acc, curr) => acc + curr, 0) );
             OtherAllPrice=referenceLineValue;
@@ -1979,11 +1993,11 @@
         function initModelBarChart(data, lineData) {
             console.log(data);
             console.log(lineData);
-// 以 model 进行分类汇总
+            // 以 model 进行分类汇总
             var modelMap = {};
             var totalProductionMap = {};
 
-// 首先计算每个 lineName 的总生产量
+            // 首先计算每个 lineName 的总生产量
             lineData.forEach(item => {
                 var lineName = item.lineName;
                 if (!totalProductionMap[lineName]) {
