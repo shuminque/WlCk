@@ -61,7 +61,7 @@
     <select id="findTotalQuantityByCategoryAndEngin" parameterType="map" resultType="map">
         SELECT
             icm.engin,
-            icm.item_category,
+            icm.item_category as mname,
             (SELECT GROUP_CONCAT(DISTINCT at_id ORDER BY at_id ASC SEPARATOR ',')
              FROM item_category_mapping
              WHERE item_category = icm.item_category) AS at_id,
@@ -82,6 +82,7 @@
             SUBSTRING_INDEX(dr.apply_remark, '-', -1) AS engin, -- 提取最后一段
             dr.type_name as item_category,
             dr.mname,
+            dr.model,
             dr.at_id,
             SUM(dr.quantity) AS total_quantity
         FROM
@@ -96,7 +97,7 @@
             WHERE icm.at_id IS NULL
         )
         GROUP BY
-            engin,item_category,dr.mname, dr.at_id
+            engin,item_category,dr.mname, dr.model, dr.at_id
         ORDER BY
             engin, dr.at_id;
     </select>

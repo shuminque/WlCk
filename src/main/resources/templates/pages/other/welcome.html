@@ -982,8 +982,11 @@
 
                         Promise.all(lineDataRequests)
                             .then(allLineData => {
-                                // 合并所有月份的 lineData
-                                let mergedLineData = mergeLineData(allLineData);
+                                // 检查是否有任何一个月份没有数据
+                                let hasEmptyData = allLineData.some(data => data.count === 0);
+                                console.log("数据:",allLineData );
+                                // 如果有任何数据为空，将 mergedLineData 设为空
+                                let mergedLineData = hasEmptyData ? [] : mergeLineData(allLineData);
 
                                 // 初始化图表
                                 initCategoryBarChart(mergedData, mergedLineData);
