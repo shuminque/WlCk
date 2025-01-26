@@ -194,14 +194,18 @@ public class LineDataController {
                 lineDataList = lineDataService.findLineNameData(year, lineName);
 
 //                // 如果指定生产线的产量数据为空或没有数据，返回全年的产量数据
-//                if (lineDataList == null || lineDataList.isEmpty()) {
-//                    lineDataList = lineDataService.findYearlyProductionData(year);
-//                    return new RestResponse(0, "Line data not found, returning total production data.", lineDataList.size(), lineDataList);
-//                }
-                // 如果指定生产线的产量数据为空或没有数据，返回空数据
                 if (lineDataList == null || lineDataList.isEmpty()) {
-                    return new RestResponse(0, "No data found for the specified line.", 0, new ArrayList<>());
+                    if (lineName.contains("线")) {
+                        return new RestResponse(0, "No data found for the specified line.", 0, new ArrayList<>());
+                    }else {
+                        lineDataList = lineDataService.findYearlyProductionData(year);
+                        return new RestResponse(0, "Line data not found, returning total production data.", lineDataList.size(), lineDataList);
+                    }
                 }
+//                // 如果指定生产线的产量数据为空或没有数据，返回空数据
+//                if (lineDataList == null || lineDataList.isEmpty()) {
+//                        return new RestResponse(0, "No data found for the specified line.", 0, new ArrayList<>());
+//                }
             } else {
                 // 没有指定生产线时，直接返回全年的产量数据
                 lineDataList = lineDataService.findYearlyProductionData(year);
