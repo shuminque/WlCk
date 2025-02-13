@@ -596,6 +596,18 @@
             try {
                 // 获取金额数据
                 const amountData = await $.get(amountUrl);
+// 获取前一年金额数据的URL
+                let prevYearAmountUrl = '/CategoryForYear/' + (year - 1) + '/' + depositoryId;
+                if (categoryTitle) {
+                    prevYearAmountUrl += '/' + categoryTitle;
+                }
+
+                // 获取前一年金额数据
+                const prevYearData = await $.get(prevYearAmountUrl);
+
+                // 计算前一年的金额平均值
+                const prevYearTotalAmount = prevYearData.reduce((sum, item) => sum + item.amount, 0);
+                const prevYearAverageAmount = prevYearData.length > 0 ? (prevYearTotalAmount / prevYearData.length).toFixed(0) : 0;
 
                 // 计算每个月的单个成本
                 const costPerUnit = amountData.map(function(item) {
@@ -646,19 +658,21 @@
                             '单个成本': !isLineDataEmpty, // 如果 lineData 为空，则默认取消选择单个成本
                         }
                     },
-                    xAxis: { data: amountData.map(function(item) { return item.month; }) },
+                    xAxis: {
+                        data: ['前一年平均']
+                            .concat(amountData.map(function(item) { return item.month; })) // 合并当前年12个月的月份数据
+                    },
                     yAxis: [
                         { type: 'value', name: '金额', position: 'left' },
                         { type: 'value', name: '单个成本', position: 'right', splitLine: { show: false } },
                         { type: 'value', name: '', position: 'right', axisLabel: { show: false }, splitLine: { show: false } }
                     ],
                     series: [
-
                         {
                             name: '单个成本',
                             type: 'line',
                             yAxisIndex: 1,
-                            data: costPerUnit,
+                            data: [0].concat(costPerUnit),
                             label: {
                                 normal: {
                                     show: true,
@@ -715,16 +729,18 @@
                             name: '金额',
                             type: 'bar',
                             yAxisIndex: 0,
-                            data: amountData.map(function(item) { return item.amount; }),
+                            data: [prevYearAverageAmount].concat(amountData.map(function(item) { return item.amount; })),
                             label: {
                                 normal: {
                                     show: true,
                                     position: 'inside',
                                     formatter: function(params) {
-                                        const currentIndex = params.dataIndex;
+                                        const currentIndex = params.dataIndex +1;
+                                        console.log(currentIndex);
                                         const prevIndex = currentIndex - 1;
+                                        console.log(prevIndex);
                                         // 检查前后标签是否重叠，若重叠，则调整
-                                        if (currentIndex > 0 && Math.abs(params.data - amountData[prevIndex].amount) < 10) {
+                                        if (currentIndex < 0 && Math.abs(params.data - amountData[prevIndex].amount) < 10) {
                                             return '{a| ' + params.value + '}';
                                         }
                                         return params.value;
@@ -732,19 +748,20 @@
                                     rich: {
                                         a: {
                                             align: 'center',
-                                            padding: [-15, 0, 5, 0] // 调整位置
+                                            padding: [-15, 0, 5, 0],
+                                            color: '#ffffff'
                                         }
-                                    }
+                                    },
                                 }
                             },
-                            itemStyle: { normal: { color: colors[0] } },
+                            itemStyle: { normal: { color: colors[0] } }, // 保持柱形颜色为蓝色
                             barWidth: '50%' // 设置柱宽为原本宽度的一半
                         },
                         {
                             name: '产量',
                             type: 'line', // 改成折线
                             yAxisIndex: 2, // 依然绑定到第3个Y轴
-                            data: productionData, // 数据仍然传入
+                            data: [0].concat(productionData), // 数据仍然传入
                             lineStyle: { opacity: 0 }, // 隐藏线条
                             symbol: 'none', // 不显示拐点
                         }
