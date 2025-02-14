@@ -596,18 +596,54 @@
             try {
                 // 获取金额数据
                 const amountData = await $.get(amountUrl);
-// 获取前一年金额数据的URL
+                // 获取前一年金额数据的URL
                 let prevYearAmountUrl = '/CategoryForYear/' + (year - 1) + '/' + depositoryId;
                 if (categoryTitle) {
                     prevYearAmountUrl += '/' + categoryTitle;
                 }
-
                 // 获取前一年金额数据
                 const prevYearData = await $.get(prevYearAmountUrl);
-
+                // 获取前一年产量数据的URL
+                let prevYearLineNameUrl = '/lineData/data/' + (year - 1);
+                if (categoryTitle) {
+                    prevYearLineNameUrl += '/' + categoryTitle;
+                }
+                // 获取前一年产量数据
+                const prevYearLineData = await $.get(prevYearLineNameUrl);
+                // 筛选出有数据的月份的产量
+                // 确保先获取到数据数组
+                const validProductionData = prevYearLineData.data.filter(item => item.production != null && item.production > 0);
+                // 获取有效的月份（即有产量的月份）
+                const validMonths = validProductionData.map(item => {
+                    const month = new Date(item.date).toISOString().slice(0, 7); // 获取 "YYYY-MM" 格式的月份
+                    return month;
+                });
+                // 筛选出有效的金额数据（根据有产量的月份进行过滤）
+                const validAmountData = prevYearData.filter(item => {
+                    const month = item.month;
+                    return validMonths.includes(month);  // 只保留有对应产量数据的月份
+                });
+                const prevYearTotalAmount = validAmountData.reduce((sum, item) => sum + item.amount, 0);
+                // 计算有数据的月份个数
+                const validAmountMonthsCount = validAmountData.length;
                 // 计算前一年的金额平均值
-                const prevYearTotalAmount = prevYearData.reduce((sum, item) => sum + item.amount, 0);
-                const prevYearAverageAmount = prevYearData.length > 0 ? (prevYearTotalAmount / prevYearData.length).toFixed(0) : 0;
+                const prevYearAverageAmount = validAmountMonthsCount > 0
+                    ? (prevYearTotalAmount / validAmountMonthsCount).toFixed(0)  // 保留整数
+                    : 0;
+                console.log("前一年的金额平均值：", prevYearAverageAmount);
+                // 计算前一年产量总和
+                const prevYearTotalProduction = validProductionData.reduce((sum, item) => sum + item.production, 0)
+                // 计算有数据的月份个数
+                const validMonthsCount = validProductionData.length;
+                // 计算前一年的产量平均值
+                const prevYearAverageProduction = validMonthsCount > 0
+                    ? (prevYearTotalProduction / validMonthsCount).toFixed(0)  // 保留整数
+                    : 0;
+                console.log("前一年的产量平均值：", prevYearAverageProduction);
+                const prevYearcostPerUnit = prevYearAverageProduction > 0
+                    ? (prevYearAverageAmount / prevYearAverageProduction).toFixed(4)  // 保留整数
+                    : 0;
+                console.log("前一年的产量单个成本：", prevYearcostPerUnit);
 
                 // 计算每个月的单个成本
                 const costPerUnit = amountData.map(function(item) {
@@ -672,7 +708,7 @@
                             name: '单个成本',
                             type: 'line',
                             yAxisIndex: 1,
-                            data: [0].concat(costPerUnit),
+                            data: [prevYearcostPerUnit].concat(costPerUnit),
                             label: {
                                 normal: {
                                     show: true,
@@ -742,6 +778,7 @@
                                         // 检查前后标签是否重叠，若重叠，则调整
                                         if (currentIndex < 0 && Math.abs(params.data - amountData[prevIndex].amount) < 10) {
                                             return '{a| ' + params.value + '}';
+
                                         }
                                         return params.value;
                                     },
@@ -761,7 +798,7 @@
                             name: '产量',
                             type: 'line', // 改成折线
                             yAxisIndex: 2, // 依然绑定到第3个Y轴
-                            data: [0].concat(productionData), // 数据仍然传入
+                            data: [prevYearAverageProduction].concat(productionData), // 数据仍然传入
                             lineStyle: { opacity: 0 }, // 隐藏线条
                             symbol: 'none', // 不显示拐点
                         }
