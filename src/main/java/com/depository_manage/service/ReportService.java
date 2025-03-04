@@ -120,6 +120,7 @@ public class ReportService {
                         "    mt.tname as 分类,\n" +
                         "    m.at_id as AT号,\n" +
                         "    m.mname as 品名,\n" +
+                        "    me.ename as 工程,\n" +
                         "    COALESCE(LEFT(m.model, 30), 'N/A') AS 规格,\n" +
                         "    SUM(CASE WHEN dr.type = 1 AND dr.apply_remark NOT LIKE ('%领用退回%') THEN dr.quantity ELSE 0 END) AS 入库数量,\n" +
                         "    FORMAT(ROUND((SUM(CASE WHEN dr.type = 1 AND dr.apply_remark NOT LIKE ('%领用退回%') THEN dr.price * dr.quantity ELSE 0 END)),2), 2) AS 入库金额,\n" +
@@ -154,11 +155,14 @@ public class ReportService {
                         "LEFT JOIN\n" +
                         "    material_type mt\n" +
                         "    ON m.type_id = mt.id\n" +
+                        "LEFT JOIN\n" +
+                        "    material_engin me\n" +
+                        "    ON m.engin_id = me.id\n" +
                         "WHERE m.depository_id = ?\n" +
                         "  AND m.state_id != 6\n" +
                         "  AND m.type_id is not null \n" +
                         "GROUP BY\n" +
-                        "    mt.id, m.at_id, m.mname, m.model, m.quantity, m.price\n" +
+                        "    mt.id, m.at_id, m.mname, m.model, m.quantity, m.price,me.ename\n" +
                         "ORDER BY\n" +
                         "    CASE WHEN mt.id IS NULL THEN 1 ELSE 0 END,\n" +
                         "    mt.id, \n" +
