@@ -272,6 +272,9 @@
                                 return parseFloat(d.price).toFixed(2);  // 格式化为两位小数
                             }},
                         {field: 'applyRemark', title: '领用部门', width: '16%', templet: function(d){
+                                if (d.applyRemark === "ZAB领用工程-单能线FE-FH-JR线") {
+                                    return "ZAB领用工程-单能线-JR线";  // 直接指定返回值
+                                }
                                 return d.applyRemark ? d.applyRemark.replace(/[A-Z]-[A-Z]/g, '') : '';
                             }},
                         // {field: 'applyTime', width: 170, title: '申请时间', sort: true},
