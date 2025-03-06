@@ -90,7 +90,7 @@
                 production = #{production},
             </if>
             <if test="model != null">
-                model = #{model} <!-- 添加 model 字段的更新 -->
+                model = #{model},<!-- 添加 model 字段的更新 -->
             </if>
             <if test="craft != null">
                 craft = #{craft} <!-- 添加 craft 字段的更新 -->
