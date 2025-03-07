@@ -80,23 +80,13 @@
     <update id="updateLineData" parameterType="map">
         UPDATE line_data
         <set>
-            <if test="date != null">
-                date = #{date},
-            </if>
-            <if test="lineName != null">
-                lineName = #{lineName},
-            </if>
-            <if test="production != null">
-                production = #{production},
-            </if>
-            <if test="model != null">
-                model = #{model},<!-- 添加 model 字段的更新 -->
-            </if>
-            <if test="craft != null">
-                craft = #{craft} <!-- 添加 craft 字段的更新 -->
-            </if>
+            <if test="date != null"> date = #{date}, </if>
+            <if test="lineName != null"> lineName = #{lineName}, </if>
+            <if test="production != null"> production = #{production}, </if>
+            <if test="model != null"> model = #{model}, </if>
+            <if test="craft != null"> craft = #{craft} </if>
         </set>
-        WHERE id = #{id}
+        WHERE id = #{id};
     </update>
 
     <delete id="deleteLineDataById" parameterType="int">

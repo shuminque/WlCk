@@ -7,6 +7,7 @@ import com.depository_manage.service.LineDataService;
 import com.depository_manage.utils.ObjectFormatUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -34,9 +35,19 @@ public class LineDataServiceImpl implements LineDataService {
     }
 
     @Override
+    @Transactional  // 开启事务，确保两个更新要么都成功，要么都回滚
     public Integer updateLineData(Map<String, Object> map) {
-        return lineDataMapper.updateLineData(map);
+        // 更新 line_data 表
+        int updatedRows = lineDataMapper.updateLineData(map);
+
+        // 检查 craft 是否需要更新
+        if (map.get("craft") != null) {
+            lineDataMapper.updateCraft(map);
+        }
+
+        return updatedRows;
     }
+
 
     @Override
     public LineData findLineDataById(Integer id) {

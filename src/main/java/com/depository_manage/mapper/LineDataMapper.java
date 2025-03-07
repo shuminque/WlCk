@@ -3,6 +3,7 @@ package com.depository_manage.mapper;
 import com.depository_manage.entity.LineData;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Update;
 import org.springframework.stereotype.Repository;
 
 import java.util.Date;
@@ -37,4 +38,6 @@ public interface LineDataMapper {
     List<LineData> findYearlyProductionData(@Param("year") int year);
 
 
+    @Update("UPDATE craft SET craft = #{craft} WHERE lineName = (SELECT lineName FROM line_data WHERE id = #{id})")
+    void updateCraft(Map<String, Object> map);
 }
