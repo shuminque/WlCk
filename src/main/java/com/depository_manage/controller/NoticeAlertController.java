@@ -50,27 +50,31 @@ public class NoticeAlertController {
     @PostMapping("/import")
     public RestResponse importNoticeAlerts(@RequestParam("file") MultipartFile file) {
         try {
-            List<NoticeAlert> noticeAlerts = new ArrayList<>();
             Workbook workbook = WorkbookFactory.create(file.getInputStream());
             Sheet sheet = workbook.getSheetAt(0);
 
             for (Row row : sheet) {
                 if (row.getRowNum() == 0) continue; // 跳过标题行
 
-                NoticeAlert alert = new NoticeAlert();
-
                 Cell atIdCell = row.getCell(0);
-                if (atIdCell == null) continue;
-                alert.setAtId((int) atIdCell.getNumericCellValue());
-
                 Cell quantityCell = row.getCell(1);
-                if (quantityCell == null) continue;
-                alert.setAlertQuantity((int) quantityCell.getNumericCellValue());
+                if (atIdCell == null || quantityCell == null) continue;
 
-                // 你可以根据需求再解析品名、规格等字段
+                int atId = (int) atIdCell.getNumericCellValue();
+                int alertQuantity = (int) quantityCell.getNumericCellValue();
 
-//                noticeAlerts.add(alert);
-                noticeAlertService.insert(alert);
+                NoticeAlert existing = noticeAlertService.findByAtId(atId);
+                if (existing != null) {
+                    // 如果已存在，则更新
+                    existing.setAlertQuantity(alertQuantity);
+                    noticeAlertService.update(existing);
+                } else {
+                    // 如果不存在，则插入（由 XML insert 填充 mname 和 model）
+                    NoticeAlert alert = new NoticeAlert();
+                    alert.setAtId(atId);
+                    alert.setAlertQuantity(alertQuantity);
+                    noticeAlertService.insert(alert);
+                }
             }
 
             return new RestResponse("导入成功", 200, null);
@@ -78,6 +82,7 @@ public class NoticeAlertController {
             return new RestResponse("导入失败：" + e.getMessage(), 500, null);
         }
     }
+
 
     // 更新预警记录
     @PutMapping("/{id}")

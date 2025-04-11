@@ -20,8 +20,25 @@
 <body>
 <div class="container">
     <button id="addNoticeAlertBtn" class="layui-btn">添加预警</button>
+    <!-- 导入弹窗按钮 -->
     <button id="importExcelBtn" class="layui-btn layui-btn-normal">Excel导入</button>
-    <input type="file" id="excelFileInput" style="display: none;">
+
+    <!-- 弹出层内容 -->
+    <div id="excelImportForm" style="display: none;">
+        <form class="layui-form" lay-filter="excelImportForm" style="padding: 20px; max-width: 480px; margin: auto;">
+            <div class="layui-form-item">
+                <label class="layui-form-label">选择文件:</label>
+                <div class="layui-input-block">
+                    <input type="file" name="file" id="excelFileInput" accept=".xls,.xlsx" required lay-verify="required">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <div class="layui-input-block">
+                    <button type="submit" class="layui-btn" lay-submit lay-filter="importSubmitBtn">导入</button>
+                </div>
+            </div>
+        </form>
+    </div>
 
     <br>
     <table id="noticeAlertTable" lay-filter="noticeAlertTableFilter"></table>
@@ -123,15 +140,27 @@
                 area: ['500px', '250px']
             });
         });
-// 导入按钮点击时，触发文件选择框
+// 点击按钮打开弹窗
         $('#importExcelBtn').click(function () {
-            $('#excelFileInput').click();
+            layer.open({
+                type: 1,
+                title: 'Excel预警数据导入',
+                area: ['500px'],
+                content: $('#excelImportForm'),
+                success: function () {
+                    form.render(); // 渲染表单
+                }
+            });
         });
 
-// 文件选择后，发起上传请求
-        $('#excelFileInput').on('change', function () {
-            var file = this.files[0];
-            if (!file) return;
+// 表单提交监听
+        form.on('submit(importSubmitBtn)', function (data) {
+            var fileInput = document.getElementById('excelFileInput');
+            var file = fileInput.files[0];
+            if (!file) {
+                layer.msg('请选择文件', {icon: 2});
+                return false;
+            }
 
             var formData = new FormData();
             formData.append("file", file);
@@ -143,14 +172,23 @@
                 contentType: false,
                 processData: false,
                 success: function (res) {
-                    layer.msg(res.msg || '导入成功');
-                    layui.table.reload('noticeAlertTable');
+                    layer.msg(res.msg || '导入成功', {icon: 1, time: 1000}, function () {
+                        layui.table.reload('noticeAlertTable');
+                        layer.closeAll(); // ✅ 成功后关闭弹窗
+                    });
                 },
                 error: function (xhr) {
                     layer.msg('导入失败：' + (xhr.responseText || '请检查文件格式'), {icon: 2});
+                },
+                complete: function () {
+                    // ✅ 始终清空文件选择框
+                    $('#excelFileInput').val('');
                 }
             });
+
+            return false; // 阻止表单默认提交
         });
+
 
         // 提交添加表单
         form.on('submit(submitAddForm)', function(data) {
@@ -161,8 +199,9 @@
                 contentType: 'application/json',
                 data: JSON.stringify(formData),
                 success: function(response) {
-                    layer.msg('添加成功！', {icon: 1, time: 2000});
-                    table.reload('noticeAlertTable'); // 重新加载表格数据
+                    layer.msg('添加成功！', {icon: 1, time: 2000}, function () {
+                        table.reload('noticeAlertTable');
+                    });
                 },
                 error: function(xhr, status, error) {
                     layer.msg('添加失败！', {icon: 2, time: 2000});
