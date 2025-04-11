@@ -20,6 +20,9 @@
 <body>
 <div class="container">
     <button id="addNoticeAlertBtn" class="layui-btn">添加预警</button>
+    <button id="importExcelBtn" class="layui-btn layui-btn-normal">Excel导入</button>
+    <input type="file" id="excelFileInput" style="display: none;">
+
     <br>
     <table id="noticeAlertTable" lay-filter="noticeAlertTableFilter"></table>
 </div>
@@ -118,6 +121,34 @@
                 title: '添加预警',
                 content: $('#addNoticeAlertForm'),
                 area: ['500px', '250px']
+            });
+        });
+// 导入按钮点击时，触发文件选择框
+        $('#importExcelBtn').click(function () {
+            $('#excelFileInput').click();
+        });
+
+// 文件选择后，发起上传请求
+        $('#excelFileInput').on('change', function () {
+            var file = this.files[0];
+            if (!file) return;
+
+            var formData = new FormData();
+            formData.append("file", file);
+
+            $.ajax({
+                url: '/noticeAlerts/import',
+                type: 'POST',
+                data: formData,
+                contentType: false,
+                processData: false,
+                success: function (res) {
+                    layer.msg(res.msg || '导入成功');
+                    layui.table.reload('noticeAlertTable');
+                },
+                error: function (xhr) {
+                    layer.msg('导入失败：' + (xhr.responseText || '请检查文件格式'), {icon: 2});
+                }
             });
         });
 

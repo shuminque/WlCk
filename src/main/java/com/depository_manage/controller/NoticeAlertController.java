@@ -1,10 +1,14 @@
 package com.depository_manage.controller;
 
 import com.depository_manage.entity.NoticeAlert;
+import com.depository_manage.pojo.RestResponse;
 import com.depository_manage.service.NoticeAlertService;
+import org.apache.poi.ss.usermodel.*;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -42,6 +46,37 @@ public class NoticeAlertController {
     public ResponseEntity<Void> create(@RequestBody NoticeAlert noticeAlert) {
         noticeAlertService.insert(noticeAlert);
         return ResponseEntity.ok().build();
+    }
+    @PostMapping("/import")
+    public RestResponse importNoticeAlerts(@RequestParam("file") MultipartFile file) {
+        try {
+            List<NoticeAlert> noticeAlerts = new ArrayList<>();
+            Workbook workbook = WorkbookFactory.create(file.getInputStream());
+            Sheet sheet = workbook.getSheetAt(0);
+
+            for (Row row : sheet) {
+                if (row.getRowNum() == 0) continue; // 跳过标题行
+
+                NoticeAlert alert = new NoticeAlert();
+
+                Cell atIdCell = row.getCell(0);
+                if (atIdCell == null) continue;
+                alert.setAtId((int) atIdCell.getNumericCellValue());
+
+                Cell quantityCell = row.getCell(1);
+                if (quantityCell == null) continue;
+                alert.setAlertQuantity((int) quantityCell.getNumericCellValue());
+
+                // 你可以根据需求再解析品名、规格等字段
+
+//                noticeAlerts.add(alert);
+                noticeAlertService.insert(alert);
+            }
+
+            return new RestResponse("导入成功", 200, null);
+        } catch (Exception e) {
+            return new RestResponse("导入失败：" + e.getMessage(), 500, null);
+        }
     }
 
     // 更新预警记录
