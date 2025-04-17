@@ -193,5 +193,9 @@
             #{id}
         </foreach>
     </delete>
+    <select id="findNoticeByAtIdAndDepository" resultMap="noticeMap" parameterType="map">
+        SELECT * FROM notice
+        WHERE at_id = #{atId} AND depository_id = #{depositoryId}
+    </select>
 
 </mapper>

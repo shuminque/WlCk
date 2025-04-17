@@ -27,5 +27,11 @@ public interface NoticeMapper {
 
     Integer deleteNoticeById(Integer id);
 
+    /**
+     * 根据 atId 和 仓库 id 查询通知（判断是否已存在）
+     * @param map 包含 atId 和 depositoryId
+     * @return 通知列表（一般是 0 或 1 条）
+     */
+    List<Notice> findNoticeByAtIdAndDepository(Map<String, Object> map);
 
 }

@@ -1,23 +1,36 @@
 package com.depository_manage.controller;
 
+import com.depository_manage.entity.Material;
+import com.depository_manage.entity.Notice;
 import com.depository_manage.entity.NoticeAlert;
+import com.depository_manage.mapper.DepositoryRecordMapper;
+import com.depository_manage.mapper.MaterialMapper;
+import com.depository_manage.mapper.NoticeMapper;
 import com.depository_manage.pojo.RestResponse;
+import com.depository_manage.service.MaterialService;
 import com.depository_manage.service.NoticeAlertService;
+import com.depository_manage.service.NoticeService;
 import org.apache.poi.ss.usermodel.*;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @RestController
 @RequestMapping("/noticeAlerts")
 public class NoticeAlertController {
 
     private final NoticeAlertService noticeAlertService;
-
+    @Autowired
+    private MaterialMapper materialMapper;
+    @Autowired
+    private NoticeMapper noticeMapper;
+    @Autowired
+    private NoticeService noticeService;
+    @Autowired
+    private DepositoryRecordMapper depositoryRecordMapper;
     // 构造方法注入 NoticeAlertService
     public NoticeAlertController(NoticeAlertService noticeAlertService) {
         this.noticeAlertService = noticeAlertService;
@@ -63,6 +76,49 @@ public class NoticeAlertController {
                 int atId = (int) atIdCell.getNumericCellValue();
                 int alertQuantity = (int) quantityCell.getNumericCellValue();
 
+
+                // 查询当前库存信息
+                Map<String, Object> queryParam = new HashMap<>();
+                queryParam.put("atId", atId);
+                queryParam.put("depositoryId", 2);
+                List<Material> materials = materialMapper.findMaterialForOutbound(queryParam);
+
+                if (materials != null && !materials.isEmpty()) {
+                    Material material = materials.get(0); // 通常一个atId只有一个记录
+
+                    Double currentQuantity = material.getQuantity();
+                    String mname = material.getMname();
+                    String model = material.getModel();
+                    String typeName = String.valueOf(material.getTypeId());
+                    int did = material.getDepositoryId();
+
+                    // 如果库存不足，添加通知
+                    if (currentQuantity <= alertQuantity) {
+                        String notificationContent = "AT号:" + atId + ", 品名: " + mname +
+                                ", 分类: " + typeName + ", 型号: " + model + "，最后出库数:" + currentQuantity;
+
+                        Map<String, Object> notice = new HashMap<>();
+                        notice.put("title", (did == 1 ? "SAB：" : "ZAB") + "品名:" + mname + "，库存不足");
+                        notice.put("content", notificationContent);
+                        notice.put("atId", atId);
+                        notice.put("mname", mname);
+                        notice.put("depositoryId", did);
+                        notice.put("model", model);
+                        notice.put("typeName", typeName);
+                        notice.put("time", " ");
+                        Map<String, Object> checkParam = new HashMap<>();
+                        checkParam.put("atId", atId);
+                        checkParam.put("depositoryId", did);
+                        List<Notice> existingNotices = noticeMapper.findNoticeByAtIdAndDepository(checkParam);
+                        if (existingNotices == null || existingNotices.isEmpty()) {
+                            // 插入新通知
+                            noticeService.addNotice(notice);
+                        } else {
+                            // 已存在，跳过
+                            continue;
+                        }
+                    }
+                }
                 NoticeAlert existing = noticeAlertService.findByAtId(atId);
                 if (existing != null) {
                     // 如果已存在，则更新
