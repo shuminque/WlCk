@@ -411,6 +411,7 @@
                     pp = '/notices?depositoryId=' + userDepositoryId;
                 }
                 table.render({
+                    title:"安全库存警报",
                     elem: '#noticeTable',
                     url: pp, // 数据接口
                     height: "full-50",
@@ -423,7 +424,6 @@
                             "data": res.data // 解析数据列表
                         };
                     },
-
                     response: {
                         statusName: 'status', // 规定数据状态的字段名称，默认：code
                         statusCode: 200, // 规定成功的状态码，默认：0
@@ -431,6 +431,7 @@
                         countName: 'count', // 规定数据总数的字段名称，默认：count
                         dataName: 'data' // 规定数据列表的字段名称，默认：data
                     },
+                    toolbar: ['filter', 'exports', 'print'],
                     cols: [ [ // 表头
                         {field: 'title', title: '标题', hide: true},
 
@@ -442,13 +443,16 @@
                                 return formatDate(d.time);
                             }},
                     ]],
-                    done: function(res, curr, count){
-                        $('#noticeTable + div .layui-table-body tbody > tr').each(function(){
-                            var dataIndex = $(this).attr('data-index');
-                            var row = res.data[dataIndex];
-                            $(this).css('background-color', 'yellow');
-                        });
+                    done: function (res, curr, count) {
+                        setTimeout(function () {
+                            $('#noticeTable + div .layui-table-body tbody > tr').each(function () {
+                                var dataIndex = $(this).attr('data-index');
+                                var row = res.data[dataIndex];
+                                $(this).css('background-color', 'yellow');
+                            });
+                        }, 100);
                     }
+
                 });
 
                 function formatDate(dateStr) {
