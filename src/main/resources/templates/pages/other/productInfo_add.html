@@ -181,6 +181,9 @@
                 let pp;
                 var userDepositoryId = data.depositoryId;
                 var authority = data.authority;
+                if (authority === '仅查看') {
+                    $('#addProductInfoBtn').hide();
+                }
                 if (userDepositoryId === 0 || authority === '审核人') {
                     toolbarTemplate = `
                         <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>

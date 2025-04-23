@@ -271,6 +271,11 @@
                         {field: 'price', width: '8%', title: '单价', templet: function(d) {
                                 return parseFloat(d.price).toFixed(2);  // 格式化为两位小数
                             }},
+                        {field: 'amount', width: '10%', title: '金额', templet: function(d) {
+                                let quantity = parseFloat(d.quantity) || 0;
+                                let price = parseFloat(d.price) || 0;
+                                return (quantity * price).toFixed(2);
+                            }, totalRow: true},
                         {field: 'applyRemark', title: '领用部门', width: '16%', templet: function(d){
                                 if (d.applyRemark === "ZAB领用工程-单能线FE-FH-JR线") {
                                     return "ZAB领用工程-单能线-JR线";  // 直接指定返回值
@@ -318,9 +323,11 @@
                         var totalQuantity = res.data.reduce(function(sum, item) {
                             return sum + parseInt(item.quantity);
                         }, 0);
-                        var totalPrice = res.data.reduce(function(sum, item) {
-                            return sum + parseFloat(item.price); // 使用parseFloat
-                        }, 0).toFixed(2); // 保留两位小数
+                        var totalAmount = res.data.reduce(function(sum, item) {
+                            let quantity = parseFloat(item.quantity) || 0;
+                            let price = parseFloat(item.price) || 0;
+                            return sum + (quantity * price);
+                        }, 0).toFixed(2); // 两位小数
 
                         var totalRow = document.querySelector('.layui-table-total');
                         if (totalRow) {
@@ -328,9 +335,9 @@
                             if (totalCell) {
                                 totalCell.innerText = totalQuantity.toString();
                             }
-                            var totalBoxCountCell = totalRow.querySelector('td[data-field="price"] .layui-table-cell');
-                            if (totalBoxCountCell) {
-                                totalBoxCountCell.innerText = totalPrice.toString(); // 这里已经是两位小数了
+                            var amountCell = totalRow.querySelector('td[data-field="amount"] .layui-table-cell');
+                            if (amountCell) {
+                                amountCell.innerText = totalAmount.toString();
                             }
                         }
                     },
