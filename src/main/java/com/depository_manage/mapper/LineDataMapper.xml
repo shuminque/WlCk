@@ -135,6 +135,7 @@
         SELECT
             date,
             lineName,
+            craft,
             SUM(production) AS production
         FROM
             line_data
@@ -143,14 +144,20 @@
           AND lineName = #{lineName}
         GROUP BY
             date,
-            lineName
+            lineName,
+            craft
         ORDER BY
             date;
     </select>
     <select id="findYearlyProductionData" parameterType="map" resultType="com.depository_manage.entity.LineData">
         SELECT
             date,
-            SUM(production) as production
+            SUM(
+            CASE
+            WHEN craft IN ('专用工艺', '管材工艺') THEN production / 2
+            ELSE production
+            END
+            ) AS production
         FROM
             line_data
         WHERE

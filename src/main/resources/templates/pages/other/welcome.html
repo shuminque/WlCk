@@ -659,9 +659,16 @@
                         const normalizedMonth = `${date.getFullYear()}-${monthString}`;
                         return normalizedMonth === item.month;
                     });
-                    return productionData && productionData.production > 0
-                        ? (item.amount / productionData.production).toFixed(4)
-                        : 0;
+                    if (productionData && productionData.production > 0) {
+                        // 判断工艺类型
+                        const isSpecialCraft = ['管材工艺', '专用工艺'].includes(productionData.craft);
+                        const adjustedProduction = isSpecialCraft
+                            ? productionData.production / 2
+                            : productionData.production;
+                        return (item.amount / adjustedProduction).toFixed(4);
+                    } else {
+                        return 0;
+                    }
                 });
                 // 计算非零单个成本的总和和数量
                 const totalCost = costPerUnit.reduce((sum, cost) => {
@@ -682,8 +689,14 @@
                         const normalizedMonth = `${date.getFullYear()}-${monthString}`;
                         return normalizedMonth === item.month;
                     });
-                    return productionItem ? productionItem.production : 0;
+                    if (productionItem) {
+                        const isSpecialCraft = ['管材工艺', '专用工艺'].includes(productionItem.craft);
+                        return isSpecialCraft ? productionItem.production / 2 : productionItem.production;
+                    } else {
+                        return 0;
+                    }
                 });
+                console.log(productionData);
                 // 确保先获取到数据数组
                 const validProductionDataTwo = lineData.filter(item => item.production != null && item.production > 0);
                 // 获取有效的月份（即有产量的月份）
@@ -894,7 +907,6 @@
                         let day = date.getDate().toString().padStart(2, '0');
                         return `${year}-${month}-${day}`;
                     }
-
                     table.render({
                         elem: '#recordTable2',
                         height: "full-50",
@@ -931,7 +943,6 @@
                         data: records,
                     });
                 }
-
             } catch (error) {
                 console.error("Error fetching data:", error);
             }
@@ -1821,6 +1832,7 @@
             var categories = data
                 .map(item => item.category)
                 .filter(category => category.includes("线") || category.endsWith("机"));
+            console.log(categories);
 
             console.log(otherCategories);
 
@@ -1836,7 +1848,7 @@
                 var lineDataItem = lineData.find(item => item.lineName === category);
                 return lineDataItem ? lineDataItem.production : 0;
             });
-
+            console.log(productions);
             // 计算总产量
             var totalProduction = productions.reduce((acc, curr) => acc + curr, 0);
 
@@ -1844,7 +1856,7 @@
             var otherUnitPrices = otherAmounts.map((amount, index) => {
                 // 如果是"冲床"类别，使用 totalProductionForCraft，否则使用 totalProduction
                 var category = uniqueOtherCategories[index];
-                console.log(category,amount,totalProduction,parseFloat((amount / totalProduction).toFixed(4)));
+                console.log(category,amount,totalProductions,parseFloat((amount / totalProductions).toFixed(4)));
                 if (category === "冲床" && totalProductionForCraft > 0) {
                     return parseFloat((amount / totalProductionForCraft).toFixed(3));
                 } else {
