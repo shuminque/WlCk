@@ -1493,7 +1493,7 @@
 
             // 转换回数组
             var aggregatedLineDataArray = Object.values(aggregatedLineData);
-
+            console.log(aggregatedLineDataArray);
             // 获取所有金额数据中的类别
             var categoriesFromData = data
                 .map(item => item.category)
@@ -1545,8 +1545,14 @@
             // 重新计算有效类别的产量
             var validProductions = validCategories.map(category => {
                 var lineDataItem = aggregatedLineDataArray.find(item => item.lineName === category);
-                return lineDataItem ? lineDataItem.production : 0;
+                if (lineDataItem) {
+                    const isSpecialCraft = ['管材工艺', '专用工艺'].includes(lineDataItem.craft);
+                    return isSpecialCraft ? lineDataItem.production / 2 : lineDataItem.production;
+                } else {
+                    return 0;
+                }
             });
+
 
             var totalProduction = validProductions.reduce((acc, curr) => acc + curr, 0);
             var totalPrice = validAmounts.reduce((acc, curr) => acc + curr, 0);
