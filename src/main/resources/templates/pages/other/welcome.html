@@ -2488,7 +2488,7 @@
                 var finalCost = costA + costB; // A 和 B 的单个成本求和
 
                 // 如果有其他单位成本 (totalUnitCost)，可以将其加到最终单价上
-                finalCost = finalCost > 0 ? (finalCost + totalUnitCost) : finalCost;
+                finalCost = finalCost > 0 ? (finalCost*2 + totalUnitCost) : finalCost;
 
                 // 返回保留三位小数的最终单价
                 return parseFloat(finalCost.toFixed(3));
