@@ -679,7 +679,16 @@
 
                 // 计算参考线值（平均单个成本），并保留4位小数
                 const referenceLineValue = countNonZero > 0 ? (totalCost / countNonZero).toFixed(4) : 0; // 防止除零错误，并保留4位小数
-
+                const productionDataNormal = amountData.map(function(item) {
+                    var productionItem = lineData.find(lineItem => {
+                        const date = new Date(lineItem.date);
+                        const month = date.getMonth() + 1;
+                        const monthString = month < 10 ? '0' + month : month;
+                        const normalizedMonth = `${date.getFullYear()}-${monthString}`;
+                        return normalizedMonth === item.month;
+                    });
+                    return productionItem ? productionItem.productionNormal : 0;
+                });
                 // 提取产量数据
                 const productionData = amountData.map(function(item) {
                     var productionItem = lineData.find(lineItem => {
@@ -696,7 +705,6 @@
                         return 0;
                     }
                 });
-                console.log(productionData);
                 // 确保先获取到数据数组
                 const validProductionDataTwo = lineData.filter(item => item.production != null && item.production > 0);
                 // 获取有效的月份（即有产量的月份）
@@ -834,7 +842,7 @@
                             name: '产量',
                             type: 'line', // 改成折线
                             yAxisIndex: 2, // 依然绑定到第3个Y轴
-                            data: [prevYearAverageProduction].concat(productionData), // 数据仍然传入
+                            data: [prevYearAverageProduction].concat(productionDataNormal), // 数据仍然传入
                             lineStyle: { opacity: 0 }, // 隐藏线条
                             symbol: 'none', // 不显示拐点
                         }
@@ -1552,7 +1560,11 @@
                     return 0;
                 }
             });
-
+            // 新增逻辑：不管 craft，直接取原始产量
+            var validProductionsNormal = validCategories.map(category => {
+                var lineDataItem = aggregatedLineDataArray.find(item => item.lineName === category);
+                return lineDataItem ? lineDataItem.production : 0;
+            });
 
             var totalProduction = validProductions.reduce((acc, curr) => acc + curr, 0);
             var totalPrice = validAmounts.reduce((acc, curr) => acc + curr, 0);
@@ -1715,7 +1727,7 @@
                         name: '产量',
                         type: 'bar',
                         yAxisIndex: 2,
-                        data: validProductions,
+                        data: validProductionsNormal,
                         barWidth: '0%',
                         label: {
                             show: false
@@ -2140,7 +2152,10 @@
                         production: item.production || 0 // 在这里添加具体线路的 production
                     });
                 }
-                modelMap[modelKey].production += item.production || 0;
+                // modelMap[modelKey].production += item.production || 0;原来的计算：直接+，下面是修改后的专用/2
+                modelMap[modelKey].production += ['管材工艺', '专用工艺'].includes(item.craft)
+                    ? (item.production || 0) / 2
+                    : (item.production || 0);
             });
             console.log(modelMap);
 
@@ -2210,7 +2225,11 @@
                 // 计算总 amount 和总 production
                 filteredCategories.forEach((categoryData) => {
                     totalAmount += categoryData.amount || 0; // 累加 amount
-                    totalProduction += categoryData.production || 0; // 累加 production
+                    if (categoryData.craft === '专用工艺' || categoryData.craft === '管材工艺') {
+                        totalProduction += (categoryData.production || 0) / 2;
+                    } else {
+                        totalProduction += categoryData.production || 0;
+                    }
                 });
 
                 var finalCost = 0; // 用于保存最终的单价
@@ -2231,12 +2250,21 @@
 
                 var amount = filteredCategories.reduce((sum, categoryData) => sum + (categoryData.amount || 0), 0);
                 var production = filteredCategories.reduce((sum, categoryData) => sum + (categoryData.production || 0), 0);
+                var productionTwo = filteredCategories.reduce((sum, categoryData) => {
+                    console.log(categoryData);
+                    const production = categoryData.production || 0;
+                    if (categoryData.craft === '专用工艺') {
+                        return sum + production / 2;
+                    }
+                    return sum + production;
+                }, 0);
                 var unitPrice = unitPrices[index];
 
                 return {
                     model,
                     amount,
                     production,
+                    productionTwo,
                     unitPrice,
                     valid: amount !== 0 || production !== 0 // 标记有效条目
                 };
@@ -2247,12 +2275,9 @@
             var filteredAmounts = filteredData.map(item => item.amount);
             var filteredProductions = filteredData.map(item => item.production);
             var filteredUnitPrices = filteredData.map(item => item.unitPrice);
-
-
 // 计算参考线值
             var totalAmountAll = filteredData.reduce((sum, item) => sum + item.amount, 0); // 总金额
-            var totalProductionAll = filteredData.reduce((sum, item) => sum + item.production, 0); // 总产量
-
+            var totalProductionAll = filteredData.reduce((sum, item) => sum + item.productionTwo, 0); // 总产量
 // 计算参考线值：总金额 / 总产量
             var referenceLineValue = totalProductionAll > 0
                 ? (totalAmountAll / totalProductionAll).toFixed(3)

@@ -136,7 +136,8 @@
             date,
             lineName,
             craft,
-            SUM(production) AS production
+            SUM(production) AS production,
+            SUM(production) AS productionNormal
         FROM
             line_data
         WHERE
@@ -157,7 +158,9 @@
             WHEN craft IN ('专用工艺', '管材工艺') THEN production / 2
             ELSE production
             END
-            ) AS production
+            ) AS production, -- 原本处理后的产量
+
+            SUM(production) AS productionNormal -- 新增：未处理的原始产量
         FROM
             line_data
         WHERE
