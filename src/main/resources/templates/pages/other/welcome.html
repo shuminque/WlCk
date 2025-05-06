@@ -667,7 +667,8 @@
                         // 判断工艺类型
                         const isSpecialCraft = ['管材工艺', '专用工艺'].includes(productionData.craft);
                         const adjustedProduction = isSpecialCraft
-                            ? productionData.production / 2
+                           ? productionData.production
+                        // ? productionData.production / 2
                             : productionData.production;
                         return (item.amount / adjustedProduction).toFixed(4);
                     } else {
@@ -1588,7 +1589,7 @@
 
             // 计算每个类别的单价，并保留三位小数
             var unitPrices = validAmounts.map((amount, index) => {
-                return validProductions[index] > 0 ? parseFloat((amount / validProductions[index]).toFixed(3)) : 0;
+                return validProductionsNormal[index] > 0 ? parseFloat((amount / validProductionsNormal[index]).toFixed(3)) : 0;
             });
         var colors = ['#5470C6', '#91CC75', '#EE6666', '#E87C25', '#FFD85C', '#73C0DE', '#3BA272', '#FC8452', '#9A60B4', '#EA7CCC'];
 
