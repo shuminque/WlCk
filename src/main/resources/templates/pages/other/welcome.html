@@ -2164,16 +2164,17 @@
                         production: item.production || 0 // 在这里添加具体线路的 production
                     });
                 }
-                // modelMap[modelKey].production += item.production || 0;原来的计算：直接+，下面是修改后的专用/2
-                modelMap[modelKey].production += ['管材工艺', '专用工艺'].includes(item.craft)
-                    ? (item.production || 0) / 2
-                    : (item.production || 0);
+                modelMap[modelKey].production += item.production || 0;
+                // modelMap[modelKey].production += ['管材工艺', '专用工艺'].includes(item.craft)
+                //     ? (item.production || 0) / 2
+                //     : (item.production || 0);
             });
             console.log(modelMap);
 
             var categoriesFromData = data
                 .map(item => item.category)
-                .filter(category => category.includes("线") || category.endsWith("机"));
+                // .filter(category => category.includes("线"));
+            .filter(category => category.includes("线") || category.endsWith("机"));
 
             // 合并类别并去重
             var allCategories = [...new Set([...categoriesFromData])];
@@ -2189,7 +2190,7 @@
             // 筛选后的 amounts 和 productions
             var amounts = models.map(model => {
                 var categories = modelMap[model].categories; // 获取该型号的所有类别
-                var filteredCategories = categories.filter(categoryData => categoryData.craft !== "管材工艺"); // 筛选出 craft 不为 "管材工艺" 的类别
+                var filteredCategories = categories.filter(categoryData => categoryData.craft === "棒材工艺"); // 筛选出 craft 不为 "管材工艺" 的类别
 
                 // 计算筛选后的总 amount
                 return filteredCategories.reduce((sum, categoryData) => sum + (categoryData.amount || 0), 0);
@@ -2199,7 +2200,7 @@
 
             var productions = models.map(model => {
                 var categories = modelMap[model].categories; // 获取该型号的所有类别
-                var filteredCategories = categories.filter(categoryData => categoryData.craft !== "管材工艺"); // 筛选出 craft 不为 "管材工艺" 的类别
+                var filteredCategories = categories.filter(categoryData => categoryData.craft === "棒材工艺"); // 筛选出 craft 不为 "管材工艺" 的类别
 
                 // 计算筛选后的总 production
                 return filteredCategories.reduce((sum, categoryData) => sum + (categoryData.production || 0), 0);
@@ -2256,9 +2257,9 @@
                 return parseFloat(finalCost.toFixed(3));
             });
 // 过滤掉金额和产量均为 0 的条目
-            var filteredData = models.map((model, index) => {
+                var filteredData = models.map((model, index) => {
                 var categories = modelMap[model].categories;
-                var filteredCategories = categories.filter(categoryData => categoryData.craft !== "管材工艺");
+                var filteredCategories = categories.filter(categoryData => categoryData.craft === "棒材工艺");
 
                 var amount = filteredCategories.reduce((sum, categoryData) => sum + (categoryData.amount || 0), 0);
                 var production = filteredCategories.reduce((sum, categoryData) => sum + (categoryData.production || 0), 0);
@@ -2301,7 +2302,7 @@
 
             var option = {
                 title: {
-                    text: `棒材工艺及数控NC成本图\n\n{small|(单个成本：${(referenceLineValue +totalUnitCost).toFixed(3)} 消耗金额：${(formattedTotalALL)}元)}`,
+                    text: `棒材工艺成本图\n\n{small|(单套成本：${(referenceLineValue +totalUnitCost).toFixed(3)} 消耗金额：${(formattedTotalALL)}元)}`,
                     left: 'center',
                     top: 'top',
                     textStyle: {
@@ -2446,13 +2447,13 @@
             console.log(models);
             var amounts = models.map(model => {
                 var categories = modelMap[model].categories; // 获取该型号的所有类别
-                var filteredCategories = categories.filter(categoryData => categoryData.craft === "管材工艺"); // 筛选出 craft 不为 "管材工艺" 的类别
+                var filteredCategories = categories.filter(categoryData => categoryData.craft !== "棒材工艺"); // 筛选出 craft 不为 "管材工艺" 的类别
                 return filteredCategories.reduce((sum, categoryData) => sum + (categoryData.amount || 0), 0);
             });
             console.log(amounts);
             var productions = models.map(model => {
                 var categories = modelMap[model].categories; // 获取该型号的所有类别
-                var filteredCategories = categories.filter(categoryData => categoryData.craft === "管材工艺"); // 筛选出 craft 不为 "管材工艺" 的类别
+                var filteredCategories = categories.filter(categoryData => categoryData.craft !== "棒材工艺"); // 筛选出 craft 不为 "管材工艺" 的类别
                 return filteredCategories.reduce((sum, categoryData) => sum + (categoryData.production || 0), 0);
             });
             console.log(productions);
@@ -2473,7 +2474,7 @@
             var unitPrices = models.map((model) => {
                 var modelData = modelMap[model];
                 var categories = modelData.categories; // 获取该型号的所有类别
-                var filteredCategories = categories.filter(categoryData => categoryData.craft === "管材工艺"); // 筛选出 craft 为 "管材工艺" 的类别
+                var filteredCategories = categories.filter(categoryData => categoryData.craft !== "棒材工艺"); // 筛选出 craft 为 "管材工艺" 的类别
 
                 var totalProduction = 0; // 总产量
                 var amountA = 0; // category 带有 A 的总金额
@@ -2490,6 +2491,9 @@
                     } else if (categoryData.category.includes("B")) {
                         amountB += categoryData.amount || 0;
                         productionB += categoryData.production || 0;
+                    } else if (categoryData.category.includes("机")) {
+                        amountA += categoryData.amount || 0;
+                        productionA += categoryData.production || 0;
                     }
                 });
 
@@ -2508,7 +2512,7 @@
             // 过滤掉金额和产量均为 0 的条目
             var filteredData = models.map((model, index) => {
                 var categories = modelMap[model].categories;
-                var filteredCategories = categories.filter(categoryData => categoryData.craft === "管材工艺");
+                var filteredCategories = categories.filter(categoryData => categoryData.craft !== "棒材工艺");
 
                 var amount = filteredCategories.reduce((sum, categoryData) => sum + (categoryData.amount || 0), 0);
                 var production = filteredCategories.reduce((sum, categoryData) => sum + (categoryData.production || 0), 0);
@@ -2543,7 +2547,7 @@
 
             var option = {
                 title: {
-                    text: `管材工艺成本图\n\n{small|(单个成本：${(referenceLineValue).toFixed(3)} 消耗金额：${(formattedTotalALL)}元)}`,
+                    text: `管材及数控NC工艺成本图\n\n{small|(单个成本：${(referenceLineValue).toFixed(3)} 消耗金额：${(formattedTotalALL)}元)}`,
                     left: 'center',
                     top: 'top',
                     textStyle: {
