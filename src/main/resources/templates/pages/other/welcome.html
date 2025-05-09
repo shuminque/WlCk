@@ -2328,9 +2328,9 @@
                     bottom: '20%'
                 },
                 legend: {
-                    data: ['金额', '单个成本'],
+                    data: ['金额', '单套成本'],
                     left: 'right',
-                    selected: { '金额': true, '单个成本': true }
+                    selected: { '金额': true, '单套成本': true }
                 },
                 xAxis: {
                     type: 'category',
@@ -2342,7 +2342,7 @@
                 },
                 yAxis: [
                     { type: 'value', name: '金额', axisLabel: { formatter: '{value}' } },
-                    { type: 'value', name: '单个成本', axisTick: { show: false }, splitLine: { show: false }, axisLabel: { formatter: function(value) { return value.toFixed(3); }, } },
+                    { type: 'value', name: '单套成本', axisTick: { show: false }, splitLine: { show: false }, axisLabel: { formatter: function(value) { return value.toFixed(3); }, } },
                     { type: 'value', name: '', position: 'right', axisLabel: { show: false }, axisLine: { show: false }, axisTick: { show: false }, splitLine: { show: false } }
                 ],
                 series: [
@@ -2356,7 +2356,7 @@
                         itemStyle: { normal: { color: function(params) { return colors[params.dataIndex % colors.length]; } } }
                     },
                     {
-                        name: '单个成本',
+                        name: '单套成本',
                         type: 'line',
                         yAxisIndex: 1,
                         data: filteredUnitPrices,
