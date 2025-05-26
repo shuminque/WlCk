@@ -21,5 +21,6 @@ public interface CategoryMapper {
 
     Integer deleteCategory(Integer id);
     List<RecordDTO> getRecordsForCategory(@Param("categoryName") String categoryName, @Param("depositoryId") Integer depositoryId, @Param("year") String year, @Param("month") String month);
+    List<RecordDTO> getRecordsForType(@Param("categoryName") String categoryName, @Param("depositoryId") Integer depositoryId, @Param("year") String year, @Param("month") String month);
 
 }

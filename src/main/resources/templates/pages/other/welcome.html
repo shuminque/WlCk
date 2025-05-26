@@ -1319,96 +1319,96 @@
                 myChartCate4.off('click');
                 myChartCate4.setOption(option, true); // 使用新数据更新图表
                 // 添加点击事件
-                // myChartCate4.on('click', async function(params) {
-                //     var selectedMonth = params.name; // 获取点击的柱形下方的年月，例如 "2024-06"
-                //     // 分割字符串以提取年份和月份
-                //     var [year, month] = selectedMonth.split('-');
-                //     var categoryTitleInput = document.getElementById('applyRemarkInput-1').value;
-                //     var categoryTitle = categoryTitleInput ? encodeURIComponent(categoryTitleInput) : '';
-                //     const url =`/api/categories/category-records/${categoryTitle}/${depositoryId}/${year}/${month}`;
-                //     $.ajax({
-                //         url: url,
-                //         type: 'GET',
-                //         dataType: 'json',
-                //         success: function(records) {
-                //             var widthPercentage = 80;
-                //             var heightPercentage = 80;
-                //
-                //             var screenWidth = $(window).width();
-                //             var screenHeight = $(window).height();
-                //
-                //             var popupWidth = (widthPercentage / 100) * screenWidth;
-                //             var popupHeight = (heightPercentage / 100) * screenHeight;
-                //
-                //             var maxPopupWidth = 2800;
-                //             var maxPopupHeight = 2600;
-                //
-                //             popupWidth = Math.min(popupWidth, maxPopupWidth);
-                //             popupHeight = Math.min(popupHeight, maxPopupHeight);
-                //
-                //             layer.open({
-                //                 type: 1,
-                //                 title: selectedMonth, // 显示选择的年月
-                //                 content: $('#recordTableContainer2'),
-                //                 area: [popupWidth + 'px', popupHeight + 'px'],
-                //                 shadeClose: true, // 点击遮罩关闭
-                //                 closeBtn: 1, // 显示关闭按钮
-                //                 success: function(layero, index) {
-                //                 }
-                //             });
-                //             renderTable2(records);
-                //
-                //         },
-                //         error: function(error) {
-                //             console.log("Error fetching records for category", error);
-                //         }
-                //     });
-                // });
-                // function renderTable2(records) {
-                //     function formatDate(dateStr) {
-                //         if (!dateStr) return '';
-                //         let date = new Date(dateStr);
-                //         let year = date.getFullYear();
-                //         let month = (date.getMonth() + 1).toString().padStart(2, '0');
-                //         let day = date.getDate().toString().padStart(2, '0');
-                //         return `${year}-${month}-${day}`;
-                //     }
-                //     table.render({
-                //         elem: '#recordTable2',
-                //         height: "full-50",
-                //         cols: [ [
-                //             { field: 'sourceTable', title: '来源表',  hide: true},
-                //             { field: 'id', title: 'ID', hide: true},
-                //             {
-                //                 field: 'atId',
-                //                 title: 'AT',
-                //                 templet: function(d) {
-                //                     return d.atId ? d.atId : '一次性';
-                //                 }
-                //             },
-                //             { field: 'name', title: '名称' },
-                //             { field: 'model', title: '型号'},
-                //             { field: 'quantity', title: '数量'},
-                //             // { field: 'unitPrice', title: '单价' },
-                //             { field: 'totalAmount', title: '金额', templet: function(d) {
-                //                     return parseFloat(d.totalAmount).toFixed(2);
-                //                 }},
-                //             {
-                //                 field: 'recordDate',
-                //                 title: '记录日期',
-                //                 hide: true,
-                //                 flex:1,
-                //                 templet: function(d) {
-                //                     return formatDate(d.recordDate);
-                //                 }
-                //             },
-                //             { field: 'applyRemark', title: '备注' ,hide: true},
-                //             { field: 'categoryTitle', title: '分类标题' ,hide: true}
-                //         ]],
-                //         limit: records.length,
-                //         data: records,
-                //     });
-                // }
+                myChartCate4.on('click', async function(params) {
+                    var selectedMonth = params.name; // 获取点击的柱形下方的年月，例如 "2024-06"
+                    // 分割字符串以提取年份和月份
+                    var [year, month] = selectedMonth.split('-');
+                    var categoryTitleInput = document.getElementById('applyRemarkInput-4').value;
+                    var categoryTitle = categoryTitleInput ? encodeURIComponent(categoryTitleInput) : '';
+                    const url =`/api/categories/category-recordsType/${categoryTitle}/${depositoryId}/${year}/${month}`;
+                    $.ajax({
+                        url: url,
+                        type: 'GET',
+                        dataType: 'json',
+                        success: function(records) {
+                            var widthPercentage = 80;
+                            var heightPercentage = 80;
+
+                            var screenWidth = $(window).width();
+                            var screenHeight = $(window).height();
+
+                            var popupWidth = (widthPercentage / 100) * screenWidth;
+                            var popupHeight = (heightPercentage / 100) * screenHeight;
+
+                            var maxPopupWidth = 2800;
+                            var maxPopupHeight = 2600;
+
+                            popupWidth = Math.min(popupWidth, maxPopupWidth);
+                            popupHeight = Math.min(popupHeight, maxPopupHeight);
+
+                            layer.open({
+                                type: 1,
+                                title: selectedMonth, // 显示选择的年月
+                                content: $('#recordTableContainer2'),
+                                area: [popupWidth + 'px', popupHeight + 'px'],
+                                shadeClose: true, // 点击遮罩关闭
+                                closeBtn: 1, // 显示关闭按钮
+                                success: function(layero, index) {
+                                }
+                            });
+                            renderTable2(records);
+
+                        },
+                        error: function(error) {
+                            console.log("Error fetching records for category", error);
+                        }
+                    });
+                });
+                function renderTable2(records) {
+                    function formatDate(dateStr) {
+                        if (!dateStr) return '';
+                        let date = new Date(dateStr);
+                        let year = date.getFullYear();
+                        let month = (date.getMonth() + 1).toString().padStart(2, '0');
+                        let day = date.getDate().toString().padStart(2, '0');
+                        return `${year}-${month}-${day}`;
+                    }
+                    table.render({
+                        elem: '#recordTable2',
+                        height: "full-50",
+                        cols: [ [
+                            { field: 'sourceTable', title: '来源表',  hide: true},
+                            { field: 'id', title: 'ID', hide: true},
+                            {
+                                field: 'atId',
+                                title: 'AT',
+                                templet: function(d) {
+                                    return d.atId ? d.atId : '一次性';
+                                }
+                            },
+                            { field: 'name', title: '名称' },
+                            { field: 'model', title: '型号'},
+                            { field: 'quantity', title: '数量'},
+                            // { field: 'unitPrice', title: '单价' },
+                            { field: 'totalAmount', title: '金额', templet: function(d) {
+                                    return parseFloat(d.totalAmount).toFixed(2);
+                                }},
+                            {
+                                field: 'recordDate',
+                                title: '记录日期',
+                                hide: true,
+                                flex:1,
+                                templet: function(d) {
+                                    return formatDate(d.recordDate);
+                                }
+                            },
+                            { field: 'applyRemark', title: '备注' ,hide: true},
+                            { field: 'categoryTitle', title: '分类标题' ,hide: true}
+                        ]],
+                        limit: records.length,
+                        data: records,
+                    });
+                }
             } catch (error) {
                 console.error("Error fetching data:", error);
             }

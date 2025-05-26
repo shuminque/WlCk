@@ -82,5 +82,7 @@ public class CategoryService {
     public List<RecordDTO> getRecordsForCategory(String categoryName, Integer depositoryId, String year, String month) {
         return categoryMapper.getRecordsForCategory(categoryName, depositoryId, year, month);
     }
-
+    public List<RecordDTO> getRecordsForType(String categoryName, Integer depositoryId, String year, String month) {
+        return categoryMapper.getRecordsForType(categoryName, depositoryId, year, month);
+    }
 }
