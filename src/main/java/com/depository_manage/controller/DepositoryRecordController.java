@@ -220,10 +220,26 @@ public class DepositoryRecordController {
         } else {
             categoryOutbounds = depositoryRecordService.getCategoryOutboundsForYear(year, depositoryId, categoryTitle);
         }
-
         return ResponseEntity.ok(categoryOutbounds);
     }
+    @RequestMapping(value = {"/TypeForYear/{year}/{depositoryId}", "/TypeForYear/{year}/{depositoryId}/{categoryTitle}"})
+    public ResponseEntity<List<CategoryOutboundDTO>> getTypeOutboundsForYear(
+            @PathVariable String year,
+            @PathVariable Integer depositoryId,
+            @PathVariable(required = false) String categoryTitle) throws UnsupportedEncodingException {
+        if (categoryTitle != null && !categoryTitle.isEmpty()) {
+            categoryTitle = URLDecoder.decode(categoryTitle, StandardCharsets.UTF_8.name());
+        }
 
+        List<CategoryOutboundDTO> categoryOutbounds;
+
+        if (categoryTitle == null || categoryTitle.isEmpty()) {
+            categoryOutbounds = depositoryRecordService.getTotalCategoryOutboundsForYear(year, depositoryId);
+        } else {
+            categoryOutbounds = depositoryRecordService.getTypeOutboundsForYear(year, depositoryId, categoryTitle);
+        }
+        return ResponseEntity.ok(categoryOutbounds);
+    }
 
 
     @GetMapping("/type-amounts/{year}/{typeId}/{depositoryId}")

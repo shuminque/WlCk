@@ -708,6 +708,9 @@ public class DepositoryRecordServiceImpl implements DepositoryRecordService {
     public List<CategoryOutboundDTO> getCategoryOutboundsForYear(String year, Integer depositoryId, String categoryTitle) {
         return depositoryRecordMapper.getCategoryOutboundsForYear(year, depositoryId, categoryTitle);
     }
+    public List<CategoryOutboundDTO> getTypeOutboundsForYear(String year, Integer depositoryId, String categoryTitle) {
+        return depositoryRecordMapper.getTypeOutboundsForYear(year, depositoryId, categoryTitle);
+    }
     public List<CategoryOutboundDTO> getTotalCategoryOutboundsForYear(String year, Integer depositoryId) {
         return depositoryRecordMapper.getTotalCategoryOutboundsForYear(year, depositoryId);
     }

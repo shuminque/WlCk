@@ -112,6 +112,7 @@ public interface DepositoryRecordService {
     List<MonthlyAmountDTO> fetchMonthlyAmountsForYear(String year);
     List<CategoryOutboundDTO> fetchCategoryOutboundsForYearMonth(String year, String month, Integer depositoryId);
     List<CategoryOutboundDTO> getCategoryOutboundsForYear(String year, Integer depositoryId, String categoryTitle);
+    List<CategoryOutboundDTO> getTypeOutboundsForYear(String year, Integer depositoryId, String categoryTitle);
 
     List<CategoryOutboundDTO> getTotalCategoryOutboundsForYear(String year, Integer depositoryId);
     List<MonthlyAmountDTO> fetchMonthlyAmountByTypeAndYear(Integer typeId, String year, Integer depositoryId);

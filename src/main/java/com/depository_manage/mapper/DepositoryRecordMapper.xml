@@ -793,6 +793,74 @@
         ORDER BY
             a.month;
     </select>
+    <select id="getTypeOutboundsForYear" resultType="com.depository_manage.pojo.CategoryOutboundDTO" parameterType="java.util.Map">
+        WITH AllMonths AS (
+            SELECT CONCAT(#{year}, '-01') AS month
+        UNION ALL SELECT CONCAT(#{year}, '-02')
+                  UNION ALL SELECT CONCAT(#{year}, '-03')
+                  UNION ALL SELECT CONCAT(#{year}, '-04')
+                  UNION ALL SELECT CONCAT(#{year}, '-05')
+                  UNION ALL SELECT CONCAT(#{year}, '-06')
+                  UNION ALL SELECT CONCAT(#{year}, '-07')
+                  UNION ALL SELECT CONCAT(#{year}, '-08')
+                  UNION ALL SELECT CONCAT(#{year}, '-09')
+                  UNION ALL SELECT CONCAT(#{year}, '-10')
+                  UNION ALL SELECT CONCAT(#{year}, '-11')
+                  UNION ALL SELECT CONCAT(#{year}, '-12')
+                      ),
+combined_data AS (
+    -- 出库记录部分
+    SELECT
+        DATE_FORMAT(dr.apply_time, '%Y-%m') AS month,
+        mt.tname AS material_type,
+        SUM(IFNULL(dr.quantity, 0) * IFNULL(dr.price, 0)) AS total_amount
+    FROM
+        depository_record dr
+    JOIN
+        material_type mt ON dr.type_name = mt.tname
+    WHERE
+        dr.type = 0
+        AND DATE_FORMAT(dr.apply_time, '%Y') = #{year}
+                      AND dr.type_name = #{categoryTitle}
+                      AND dr.depository_id = #{depositoryId}
+                      GROUP BY
+                      DATE_FORMAT(dr.apply_time, '%Y-%m'),
+                      mt.tname
+
+                      UNION ALL
+
+                            -- 一次性领用部分
+                      SELECT
+                      DATE_FORMAT(off.time, '%Y-%m') AS month,
+                      mt.tname AS material_type,
+                      SUM(IFNULL(off.price, 0)) AS total_amount
+                      FROM
+                      once_fill off
+                      JOIN
+                      material_type mt ON off.type_id = mt.id
+                      WHERE
+                      DATE_FORMAT(off.time, '%Y') = #{year}
+                      AND mt.tname = #{categoryTitle}
+                      AND off.depositoryId = #{depositoryId}
+                      GROUP BY
+                      DATE_FORMAT(off.time, '%Y-%m'),
+                      mt.tname
+                      )
+
+        SELECT
+            am.month,
+            cd.material_type AS category,
+            ROUND(IFNULL(SUM(cd.total_amount), 0), 3) AS amount
+        FROM
+            AllMonths am
+                LEFT JOIN
+            combined_data cd ON am.month = cd.month
+        GROUP BY
+            am.month,
+            cd.material_type
+        ORDER BY
+            am.month ASC;
+    </select>
 
     <select id="fetchMonthlyAmountByTypeAndYear" resultType="com.depository_manage.pojo.MonthlyAmountDTO" parameterType="map">
         WITH MonthlyAmount AS (
