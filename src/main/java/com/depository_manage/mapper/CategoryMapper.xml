@@ -234,6 +234,7 @@
         WHERE
             mt.tname = #{categoryName}
                 AND d.depository_id = #{depositoryId}
+                AND d.type=0
                 AND YEAR(d.apply_time) = #{year}
           AND MONTH(d.apply_time) = #{month}
             ) AS combined
