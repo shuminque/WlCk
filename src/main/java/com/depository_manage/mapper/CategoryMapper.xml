@@ -192,7 +192,7 @@
             model,
             SUM(quantity) AS quantity,
             ROUND(SUM(totalAmount), 2) AS totalAmount,
-            apply_remark,
+--             apply_remark,
             material_type,
             at_id
         FROM (
@@ -241,7 +241,7 @@
             source_table,
             name,
             model,
-            apply_remark,
+--             apply_remark,
             material_type,
             at_id
         ORDER BY
