@@ -127,6 +127,10 @@ public class PageController {
     public String category_table() {
         return "pages/chart/category_table";
     }
+    @GetMapping("/price_review")
+    public String price_review() {
+        return "pages/chart/price_review";
+    }
     @GetMapping("/sluggish_table")
     public String sluggish_table() {
         return "pages/chart/sluggish_table";

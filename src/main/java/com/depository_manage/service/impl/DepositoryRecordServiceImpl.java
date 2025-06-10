@@ -720,5 +720,8 @@ public class DepositoryRecordServiceImpl implements DepositoryRecordService {
     public List<Map<String, Object>> getMonthlyReport(String year) {
         return depositoryRecordMapper.getMonthlyReport(year);
     }
-
+    @Override
+    public List<Map<String, Object>> viewPrice(Map<String, Object> params) {
+        return depositoryRecordMapper.viewPrice(params);
+    }
 }

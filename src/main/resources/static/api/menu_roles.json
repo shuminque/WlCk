@@ -259,9 +259,19 @@
                             "roles": [
                                 "SAB_cg", "SAB_sh", "ZAB_cg", "ZAB_sh", "ALL"
                             ]
+                        },
+                        {
+                            "title": "单价审核",
+                            "href": "/price_review",
+                            "icon": "layui-icon layui-icon-list",
+                            "target": "_self",
+                            "roles": [
+                                "ALL"
+                            ]
                         }
                     ]
                 },
+
                 {
                     "title": "任务审批",
                     "icon": "fa fa-tasks",

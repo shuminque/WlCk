@@ -110,4 +110,5 @@ public interface DepositoryRecordMapper {
 
     List<Map<String, Object>> getMonthlyReport(@Param("year") String year);
 
+    List<Map<String, Object>> viewPrice(Map<String, Object> params);
 }

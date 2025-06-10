@@ -1733,5 +1733,56 @@ UNION ALL
             mt.id, m.at_id
             ) AS subquery_12;
     </select>
-
+    <select id="viewPrice" parameterType="map" resultType="map">
+        WITH ordered AS (
+        SELECT
+        dr.*,
+        ROW_NUMBER() OVER (PARTITION BY at_id ORDER BY review_time) AS rn
+        FROM depository_record dr
+        WHERE type = 1
+        AND review_pass = 1
+        AND depository_id = 2
+        ),
+        pairs AS (
+        SELECT
+        curr.at_id,
+        curr.mname,
+        curr.price AS current_price,
+        curr.review_time AS current_review_time,
+        prev.price AS previous_price,
+        prev.review_time AS previous_review_time,
+        ROUND(
+        CASE
+        WHEN prev.price = 0 THEN NULL
+        ELSE (curr.price - prev.price) / prev.price * 100
+        END
+        , 2) AS price_change_percent
+        FROM ordered curr
+        LEFT JOIN ordered prev
+        ON curr.at_id = prev.at_id
+        AND prev.review_time &lt; curr.review_time
+                               AND prev.price &lt;> curr.price
+        WHERE curr.review_time >= #{startDate}
+        AND curr.review_time &lt; #{endDate}
+        AND prev.review_time = (
+        SELECT MAX(p2.review_time)
+        FROM ordered p2
+        WHERE p2.at_id = curr.at_id
+        AND p2.review_time &lt; curr.review_time
+                             AND p2.price &lt;> curr.price
+        )
+        ),
+        latest_per_atid AS (
+        SELECT *
+        FROM (
+        SELECT *,
+        ROW_NUMBER() OVER (PARTITION BY at_id ORDER BY current_review_time DESC) AS rn
+        FROM pairs
+        ) t
+        WHERE rn = 1
+        )
+        SELECT *
+        FROM latest_per_atid
+        ORDER BY current_review_time desc ;
+    </select>
 </mapper>

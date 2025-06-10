@@ -24,6 +24,9 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
+import java.time.temporal.TemporalAdjusters;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -276,7 +279,47 @@ public class DepositoryRecordController {
 
         return ResponseEntity.ok(response);
     }
+    @GetMapping("/viewPrice")
+    public ResponseEntity<?> viewPrice(
+            @RequestParam(required = false) String date) {
+        Map<String, Object> params = new HashMap<>();
+        System.out.println("接收到的日期参数: " + date);
+        if (date != null) {
+            String startDateStr;
+            String endDateStr;
 
+            if (date.contains(" - ")) {
+                // 如果是区间格式
+                String[] dates = date.split(" - ");
+                if (dates.length == 2) {
+                    startDateStr = dates[0] + " 00:00:00";
+                    endDateStr = dates[1] + " 23:59:59";
+                    params.put("startDate", startDateStr);
+                    params.put("endDate", endDateStr);
+                }
+            } else if (date.matches("\\d{4}-\\d{2}")) {
+                // 如果是 "2025-06" 格式
+                try {
+                    LocalDate firstDay = LocalDate.parse(date + "-01");
+                    LocalDate lastDay = firstDay.with(TemporalAdjusters.lastDayOfMonth());
+                    startDateStr = firstDay.atStartOfDay().toString().replace("T", " ");
+                    endDateStr = lastDay.atTime(23, 59, 59).toString().replace("T", " ");
+                    params.put("startDate", startDateStr);
+                    params.put("endDate", endDateStr);
+                } catch (DateTimeParseException e) {
+                    return ResponseEntity.badRequest().body("日期格式不正确");
+                }
+            }
+        }
+        // 调用服务层获取数据
+        List<Map<String, Object>> transferRecords = depositoryRecordService.viewPrice(params);
+        Map<String, Object> response = new HashMap<>();
+        response.put("code", 0);
+        response.put("msg", "");
+        response.put("count", transferRecords.size());
+        response.put("data", transferRecords);
+        return ResponseEntity.ok(response);
+    }
 
 
 
