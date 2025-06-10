@@ -378,6 +378,11 @@
                         req.startDate = dates[0];
                         req.endDate = dates[1];
                     }
+                    if (data.reviewTime!==''){
+                        var dates = data.reviewTime.split(' - ');
+                        req.startDate = dates[0];
+                        req.endDate = dates[1];
+                    }
                     //执行搜索重载
                     table.reload('currentTableId', {
                         url: pp,

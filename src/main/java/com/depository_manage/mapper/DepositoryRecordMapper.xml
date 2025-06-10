@@ -1737,7 +1737,7 @@ UNION ALL
         WITH ordered AS (
         SELECT
         dr.*,
-        ROW_NUMBER() OVER (PARTITION BY at_id ORDER BY review_time) AS rn
+        ROW_NUMBER() OVER (PARTITION BY at_id ORDER BY apply_time) AS rn
         FROM depository_record dr
         WHERE type = 1
         AND review_pass = 1
@@ -1748,9 +1748,9 @@ UNION ALL
         curr.at_id,
         curr.mname,
         curr.price AS current_price,
-        curr.review_time AS current_review_time,
+        curr.apply_time AS current_review_time,
         prev.price AS previous_price,
-        prev.review_time AS previous_review_time,
+        prev.apply_time AS previous_review_time,
         ROUND(
         CASE
         WHEN prev.price = 0 THEN NULL
@@ -1760,15 +1760,15 @@ UNION ALL
         FROM ordered curr
         LEFT JOIN ordered prev
         ON curr.at_id = prev.at_id
-        AND prev.review_time &lt; curr.review_time
+        AND prev.apply_time &lt; curr.apply_time
                                AND prev.price &lt;> curr.price
-        WHERE curr.review_time >= #{startDate}
-        AND curr.review_time &lt; #{endDate}
-        AND prev.review_time = (
-        SELECT MAX(p2.review_time)
+        WHERE curr.apply_time >= #{startDate}
+        AND curr.apply_time &lt; #{endDate}
+        AND prev.apply_time = (
+        SELECT MAX(p2.apply_time)
         FROM ordered p2
         WHERE p2.at_id = curr.at_id
-        AND p2.review_time &lt; curr.review_time
+        AND p2.apply_time &lt; curr.apply_time
                              AND p2.price &lt;> curr.price
         )
         ),
