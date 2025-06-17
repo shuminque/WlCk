@@ -1733,10 +1733,63 @@ UNION ALL
             mt.id, m.at_id
             ) AS subquery_12;
     </select>
+<!--    <select id="viewPrice" parameterType="map" resultType="map">-->
+<!--        WITH ordered AS (-->
+<!--        SELECT-->
+<!--        dr.*,-->
+<!--        ROW_NUMBER() OVER (PARTITION BY at_id ORDER BY apply_time) AS rn-->
+<!--        FROM depository_record dr-->
+<!--        WHERE type = 1-->
+<!--        AND review_pass = 1-->
+<!--        AND depository_id = 2-->
+<!--        ),-->
+<!--        pairs AS (-->
+<!--        SELECT-->
+<!--        curr.at_id,-->
+<!--        curr.mname,-->
+<!--        curr.price AS current_price,-->
+<!--        curr.apply_time AS current_review_time,-->
+<!--        prev.price AS previous_price,-->
+<!--        prev.apply_time AS previous_review_time,-->
+<!--        ROUND(-->
+<!--        CASE-->
+<!--        WHEN prev.price = 0 THEN NULL-->
+<!--        ELSE (curr.price - prev.price) / prev.price * 100-->
+<!--        END-->
+<!--        , 2) AS price_change_percent-->
+<!--        FROM ordered curr-->
+<!--        LEFT JOIN ordered prev-->
+<!--        ON curr.at_id = prev.at_id-->
+<!--        AND prev.apply_time &lt; curr.apply_time-->
+<!--                               AND prev.price &lt;> curr.price-->
+<!--        WHERE curr.apply_time >= #{startDate}-->
+<!--        AND curr.apply_time &lt; #{endDate}-->
+<!--        AND prev.apply_time = (-->
+<!--        SELECT MAX(p2.apply_time)-->
+<!--        FROM ordered p2-->
+<!--        WHERE p2.at_id = curr.at_id-->
+<!--        AND p2.apply_time &lt; curr.apply_time-->
+<!--                             AND p2.price &lt;> curr.price-->
+<!--        )-->
+<!--        ),-->
+<!--        latest_per_atid AS (-->
+<!--        SELECT *-->
+<!--        FROM (-->
+<!--        SELECT *,-->
+<!--        ROW_NUMBER() OVER (PARTITION BY at_id ORDER BY current_review_time DESC) AS rn-->
+<!--        FROM pairs-->
+<!--        ) t-->
+<!--        WHERE rn = 1-->
+<!--        )-->
+<!--        SELECT *-->
+<!--        FROM latest_per_atid-->
+<!--        ORDER BY current_review_time desc ;-->
+<!--    </select>-->
     <select id="viewPrice" parameterType="map" resultType="map">
         WITH ordered AS (
         SELECT
         dr.*,
+        DATE_FORMAT(apply_time, '%Y-%m') AS apply_month,
         ROW_NUMBER() OVER (PARTITION BY at_id ORDER BY apply_time) AS rn
         FROM depository_record dr
         WHERE type = 1
@@ -1749,8 +1802,10 @@ UNION ALL
         curr.mname,
         curr.price AS current_price,
         curr.apply_time AS current_review_time,
+        curr.apply_month AS current_month,
         prev.price AS previous_price,
         prev.apply_time AS previous_review_time,
+        prev.apply_month AS previous_month,
         ROUND(
         CASE
         WHEN prev.price = 0 THEN NULL
@@ -1761,7 +1816,7 @@ UNION ALL
         LEFT JOIN ordered prev
         ON curr.at_id = prev.at_id
         AND prev.apply_time &lt; curr.apply_time
-                               AND prev.price &lt;> curr.price
+                              AND prev.apply_month &lt;> curr.apply_month
         WHERE curr.apply_time >= #{startDate}
         AND curr.apply_time &lt; #{endDate}
         AND prev.apply_time = (
@@ -1769,7 +1824,7 @@ UNION ALL
         FROM ordered p2
         WHERE p2.at_id = curr.at_id
         AND p2.apply_time &lt; curr.apply_time
-                             AND p2.price &lt;> curr.price
+                            AND p2.apply_month &lt;> curr.apply_month
         )
         ),
         latest_per_atid AS (
@@ -1783,6 +1838,6 @@ UNION ALL
         )
         SELECT *
         FROM latest_per_atid
-        ORDER BY current_review_time desc ;
+        ORDER BY current_review_time DESC;
     </select>
 </mapper>
