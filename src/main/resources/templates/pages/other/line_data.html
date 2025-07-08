@@ -164,7 +164,21 @@
               <option value="专用工艺" >专用工艺</option>
             </select>
           </div>
-
+        </div>
+        <div class="layui-form-item">
+          <label class="layui-form-label">分类:</label> <!-- 新增的 model 字段 -->
+          <div class="layui-input-block">
+            <!--            <input type="text" placeholder="请填写工艺" name="craft" class="layui-input" >-->
+            <select name="diameter" xm-select="selectIdTWO" >
+              <option value="单玉小径" >单玉小径</option>
+              <option value="单玉中径" >单玉中径</option>
+              <option value="万向节" >万向节</option>
+              <option value="RJ" >RJ</option>
+              <option value="RAB" >RAB</option>
+              <option value="MCB" >MCB</option>
+              <option value="IKO" >IKO</option>
+            </select>
+          </div>
         </div>
         <div class="layui-form-item">
           <div class="layui-input-block">
@@ -303,6 +317,7 @@
           { field: 'production', title: '产量', sort: true },
           { field: 'model', title: '型号', sort: true },
           { field: 'craft', title: '工艺', sort: true },
+          { field: 'diameter', title: '分类', sort: true },
           { title: '操作', align: 'center', toolbar: '#operation-bar' }
         ]
       ]

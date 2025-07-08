@@ -10,11 +10,11 @@
         <result column="production" property="production" jdbcType="INTEGER" />
         <result column="model" property="model" jdbcType="VARCHAR" /> <!-- 新增的 model 字段 -->
         <result column="craft" property="craft" jdbcType="VARCHAR" />
-
+        <result column="diameter" property="diameter" jdbcType="VARCHAR" />
     </resultMap>
 
     <sql id="allColumns">
-        l.id, l.date, l.lineName, l.production, l.model, l.craft<!-- 添加 model 字段 -->
+        l.id, l.date, l.lineName, l.production, l.model, l.craft, l.diameter<!-- 添加 model 字段 -->
     </sql>
 
     <select id="findLineDataAll" resultMap="lineDataMap">
@@ -59,22 +59,42 @@
 
     <insert id="insertLineData" parameterType="map">
         INSERT INTO line_data (
-            date, lineName, production, model, craft
+            date, lineName, production, model, craft, diameter
         ) VALUES (
-                     #{date}, #{lineName}, #{production}, #{model},
-                     (SELECT c.craft FROM craft c WHERE c.lineName = #{lineName} LIMIT 1)
+                     #{date},
+                     #{lineName},
+                     #{production},
+                     #{model},
+                     (SELECT c.craft FROM craft c WHERE c.lineName = #{lineName} LIMIT 1),
+                 (SELECT s.diameter
+                         FROM series s
+                         WHERE #{model} LIKE CONCAT('%', s.seriesName, '%')
+                         ORDER BY LENGTH(s.seriesName) DESC
+                         LIMIT 1)
             )
     </insert>
 
-
     <insert id="batchInsert" parameterType="java.util.List">
-        INSERT INTO line_data (date, lineName, production, model, craft)
+        INSERT INTO line_data (
+        date, lineName, production, model, craft, diameter
+        )
         VALUES
         <foreach collection="list" item="item" separator=",">
-            (#{item.date}, #{item.lineName}, #{item.production}, #{item.model},
-            (SELECT c.craft FROM craft c WHERE c.lineName = #{item.lineName} LIMIT 1))
+            (
+            #{item.date},
+            #{item.lineName},
+            #{item.production},
+            #{item.model},
+            (SELECT c.craft FROM craft c WHERE c.lineName = #{item.lineName} LIMIT 1),
+            (SELECT s.diameter
+            FROM series s
+            WHERE #{item.model} LIKE CONCAT('%', s.seriesName, '%')
+            ORDER BY LENGTH(s.seriesName) DESC
+            LIMIT 1)
+            )
         </foreach>
     </insert>
+
 
 
     <update id="updateLineData" parameterType="map">
@@ -84,7 +104,8 @@
             <if test="lineName != null"> lineName = #{lineName}, </if>
             <if test="production != null"> production = #{production}, </if>
             <if test="model != null"> model = #{model}, </if>
-            <if test="craft != null"> craft = #{craft} </if>
+            <if test="craft != null"> craft = #{craft},</if>
+            <if test="diameter != null"> diameter = #{diameter} </if>
         </set>
         WHERE id = #{id};
     </update>
@@ -169,6 +190,27 @@
             date
         ORDER BY
             date;
+    </select>
+    <select id="findDiametersAll" resultType="string">
+        SELECT DISTINCT diameter FROM line_data WHERE diameter IS NOT NULL
+    </select>
+    <select id="findCategoryTitlesByDiameter" resultType="string">
+        SELECT DISTINCT lineName FROM line_data WHERE diameter =  #{diameter}
+    </select>
+    <select id="selectMonthlyLinesByDiameter" resultType="com.depository_manage.entity.LineData">
+        SELECT
+            DATE_FORMAT(date, '%Y-%m') AS month,
+            SUM(production) AS production,
+            GROUP_CONCAT(DISTINCT lineName ORDER BY lineName SEPARATOR ',') AS lineName
+        FROM
+            line_data
+        WHERE
+            YEAR(date) = #{year}
+          AND diameter = #{diameter}
+        GROUP BY
+            DATE_FORMAT(date, '%Y-%m')
+        ORDER BY
+            month
     </select>
 
 </mapper>

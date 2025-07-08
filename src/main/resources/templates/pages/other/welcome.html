@@ -288,6 +288,12 @@
                 <option value="2" selected>ZAB</option>
             </select>
             <input type="text" id="year-selector-three" placeholder="请选择年" autocomplete="off">
+            <select name="diameter" id="diameter">
+                <option value="">-- 请选择径类 --</option>
+                <th:block th:each="d : ${diameters}">
+                    <option th:value="${d}" th:text="${d}"></option>
+                </th:block>
+            </select>
             <button id="clear-category-btn" type="button">清空分类</button>
             <button class="layui-input custom-input" id="ID-dropdown-demo-complex-1" >请选择分类</button>
             <input type="hidden" name="applyRemark" id="applyRemarkInput-1" value="">
@@ -582,11 +588,107 @@
             var costSeriesName = (categoryTitleW.includes('线') || categoryTitleW.includes('机'))
                 ? '单个成本'
                 : '单套成本';
+            var diameter = document.getElementById('diameter').value;
+            console.log("选中的分类:", categoryTitleW);
+            console.log("选中的径类:", diameter);
 
             if (!depositoryId) {
                 alert("请确保已选择所有条件！");
                 return;
             }
+            let categoryTitles = [];
+            let monthLineMap = {}; // 用于存储每月参与的产线列表
+            let response2;
+            try {
+                // 获取该径类下的所有分类
+                const response = await $.get('/lineData/diameterCategoryTitles/' + encodeURIComponent(diameter));
+                // 获取该径类每月的产线组成及产量
+                response2 = await $.get(`/lineData/diameterMonthLines/${year}/${encodeURIComponent(diameter)}`);
+
+                categoryTitles = response || [];
+
+                console.log("包含的分类:", categoryTitles);
+                console.log("每月产线构成及产量:", response2);
+
+                // 构造每月的产线映射
+                for (let entry of response2) {
+                    if (entry.month && entry.lineName) {
+                        monthLineMap[entry.month] = entry.lineName.split(',').map(l => l.trim());
+                    }
+                }
+
+            } catch (err) {
+                console.error("获取径类下的分类或产线构成失败：", err);
+            }
+
+// 初始化每月数据
+            let monthlyProductionMap = {}; // 月产量
+            let monthlyAmountMap = {};     // 月金额
+            const months = [...Array(12).keys()].map(i => `${year}-${String(i + 1).padStart(2, '0')}`);
+
+            for (let m of months) {
+                monthlyProductionMap[m] = 0;
+                monthlyAmountMap[m] = 0;
+            }
+
+// 直接用 response2 赋值产量
+            for (let entry of (response2 || [])) {
+                if (entry.month && monthlyProductionMap.hasOwnProperty(entry.month)) {
+                    monthlyProductionMap[entry.month] = entry.production || 0;
+                }
+            }
+
+// 遍历所有分类，汇总金额
+            for (let title of categoryTitles) {
+                const encodedTitle = encodeURIComponent(title);
+                const amountDataUrl = `/CategoryForYear/${year}/${depositoryId}/${encodedTitle}`;
+
+                try {
+                    const amountRes = await $.get(amountDataUrl);
+
+                    // 处理金额（按月+产线过滤）
+                    if (Array.isArray(amountRes)) {
+                        for (let a of amountRes) {
+                            const m = a.month;
+                            const line = a.category;  // 用 category 字段代替 lineName
+                            const monthLines = monthLineMap[m] || [];
+
+                            if (!line || !monthLines.includes(line)) {
+                                // 不属于该月径类参与产线，跳过
+                                continue;
+                            }
+
+                            if (m && monthlyAmountMap.hasOwnProperty(m)) {
+                                monthlyAmountMap[m] += a.amount || 0;
+                            }
+                        }
+                    }
+
+                } catch (err) {
+                    console.warn(`获取分类 [${title}] 的金额数据失败：`, err);
+                }
+            }
+
+                console.log("各月产量：", monthlyProductionMap);
+                console.log("各月金额：", monthlyAmountMap);
+    // 1. 获取月份列表并排序（假设 key 都是类似 '2025-01' 的格式）
+                const monthKeys = Object.keys(monthlyProductionMap).sort();
+                const monthlyUnitCostMap = {};
+                monthKeys.forEach(month => {
+                    const production = monthlyProductionMap[month] || 0;
+                    const amount = monthlyAmountMap[month] || 0;
+                    monthlyUnitCostMap[month] = production === 0 ? 0 : (amount / production).toFixed(4);
+                });
+    // 转成数组，供图表使用
+                const monthlyUnitCostMapSZ = monthKeys.map(month => monthlyUnitCostMap[month]);
+    // 2. 转换为数组
+                const monthlyProductionMapSZ = monthKeys.map(month => monthlyProductionMap[month] || 0);
+                const monthlyAmountMapSZ = monthKeys.map(month => monthlyAmountMap[month] || 0);
+
+    // 3. 如果还要作为 x 轴的类目，也可以把 monthKeys 直接作为 categoryTitles：
+                const categoryMonth = monthKeys;
+
+
             var amountUrl = '/CategoryForYear/' + year + '/' + depositoryId;
             var lineData = []; // 默认设置为空数组
             var isLineDataEmpty = true; // 判断是否有产量数据
@@ -629,7 +731,7 @@
             try {
                 // 获取金额数据
                 const amountData = await $.get(amountUrl);
-
+                console.log(amountData);
                 // 获取前一年金额数据的URL
                 let prevYearAmountUrl = '/CategoryForYear/' + (year - 1) + '/' + depositoryId;
                 if (categoryTitle) {
@@ -740,8 +842,8 @@
                     } else {
                         return 0;
                     }
-
                 });
+                console.log(productionData);
                 // 确保先获取到数据数组
                 const validProductionDataTwo = lineData.filter(item => item.production != null && item.production > 0);
                 // 获取有效的月份（即有产量的月份）
@@ -762,6 +864,33 @@
                     : 0;
 
                 console.log("当前年参考线值（金额之和/产量之和）：", referenceLineValueTwo);
+                var defaultAmountData = [prevYearAverageAmount].concat(amountData.map(function(item) {
+                    return item.amount;
+                }));
+                var amountSeriesData = diameter ? monthlyAmountMapSZ : defaultAmountData;
+                var productionSeriesData = diameter
+                    ? monthlyProductionMapSZ
+                    : [prevYearAverageProduction].concat(productionData);
+                var xAxisData = diameter
+                    ? categoryMonth
+                    : [ (year - 1) + "年平均" ].concat(amountData.map(function(item) {
+                        return item.month;
+                    }));
+                var costPerUnitSeriesData = diameter
+                    ? monthlyUnitCostMapSZ
+                    : [prevYearcostPerUnit].concat(costPerUnit);
+                let totalAmountLine = 0;
+                let totalProductionLine = 0;
+
+                Object.keys(monthlyAmountMap).forEach(month => {
+                    const amount = monthlyAmountMap[month] || 0;
+                    const production = monthlyProductionMap[month] || 0;
+                    totalAmountLine += amount;
+                    totalProductionLine += production;
+                });
+                const Line = diameter
+                    ? (totalProductionLine === 0 ? 0 : totalAmountLine / totalProductionLine)
+                    : referenceLineValueTwo;
 
                 var colors = ['#5470C6', '#bf2222']; // 定义柱形图和折线图的颜色
                 var option = {
@@ -778,8 +907,9 @@
                         }
                     },
                     xAxis: {
-                        data: [year-1+"年平均"]
-                            .concat(amountData.map(function(item) { return item.month; })) // 合并当前年12个月的月份数据
+                        // data: [year-1+"年平均"]
+                        //     .concat(amountData.map(function(item) { return item.month; })) // 合并当前年12个月的月份数据
+                        data: xAxisData
                     },
                     yAxis: [
                         { type: 'value', name: '金额', position: 'left' },
@@ -791,7 +921,8 @@
                             name: costSeriesName,
                             type: 'line',
                             yAxisIndex: 1,
-                            data: [prevYearcostPerUnit].concat(costPerUnit),
+                            // data: [prevYearcostPerUnit].concat(costPerUnit),
+                            data: costPerUnitSeriesData,
                             label: {
                                 normal: {
                                     show: true,
@@ -800,7 +931,6 @@
                                         // 获取当前标签的坐标
                                         const currentIndex = params.dataIndex;
                                         const prevIndex = currentIndex - 1;
-
                                         // 检查前后标签是否重叠，若重叠，则调整
                                         if (currentIndex > 0 && Math.abs(params.data - costPerUnit[prevIndex]) < 10) {
                                             return '{a| ' + params.value + '}';
@@ -821,7 +951,7 @@
                                 data: [
                                     {
                                         name: '平均',
-                                        yAxis: referenceLineValueTwo,
+                                        yAxis: Line,
                                         yAxisIndex: 1,
                                         label: {
                                             show: true,
@@ -848,7 +978,8 @@
                             name: '金额',
                             type: 'bar',
                             yAxisIndex: 0,
-                            data: [prevYearAverageAmount].concat(amountData.map(function(item) { return item.amount; })),
+                            // data: [prevYearAverageAmount].concat(amountData.map(function(item) { return item.amount; })),
+                            data: amountSeriesData, // 数据仍然传入
                             label: {
                                 normal: {
                                     show: true,
@@ -879,7 +1010,8 @@
                             name: '产量',
                             type: 'line', // 改成折线
                             yAxisIndex: 2, // 依然绑定到第3个Y轴
-                            data: [prevYearAverageProduction].concat(productionData), // 数据仍然传入
+                // data: [prevYearAverageProduction].concat(productionData), // 数据仍然传入
+                            data: productionSeriesData , // 数据仍然传入
                             lineStyle: { opacity: 0 }, // 隐藏线条
                             symbol: 'none', // 不显示拐点
                         }

@@ -24,7 +24,6 @@ public interface LineDataMapper {
 
     LineData findLineDataById(Integer id);
 
-    // 以下方法可以根据实际需求添加或删除
     List<LineData> findLineDataByDate(Date date);
 
     List<LineData> findLineDataByCondition(Map<String, Object> map);
@@ -40,4 +39,11 @@ public interface LineDataMapper {
 
     @Update("UPDATE craft SET craft = #{craft} WHERE lineName = (SELECT lineName FROM line_data WHERE id = #{id})")
     void updateCraft(Map<String, Object> map);
+
+    List<String> findDiametersAll();
+
+    List<String> findCategoryTitlesByDiameter(String diameter);
+
+    List<LineData> selectMonthlyLinesByDiameter(@Param("year") int year, @Param("diameter") String diameter);
+
 }

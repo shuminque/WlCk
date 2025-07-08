@@ -1,6 +1,7 @@
 package com.depository_manage.service;
 
 import com.depository_manage.entity.LineData;
+import com.depository_manage.entity.MaterialType;
 import com.depository_manage.pojo.LineDataP;
 
 import java.util.Date;
@@ -29,4 +30,10 @@ public interface LineDataService {
     List<LineData> findLineDataByMonth(int year, int month);
     List<LineData> findLineNameData(int year, String lineName);
     List<LineData> findYearlyProductionData(int year);
+
+    List<String>  findDiametersAll();
+
+    List<String> findCategoryTitlesByDiameter(String diameter);
+
+    List<LineData> selectMonthlyLinesByDiameter(int year, String diameter);
 }

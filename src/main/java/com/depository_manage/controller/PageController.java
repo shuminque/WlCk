@@ -39,6 +39,8 @@ public class PageController {
     @Autowired
     private MaterialStateService materialStateService;
     @Autowired
+    private LineDataService  lineDataService;
+    @Autowired
     private CategoryService categoryService;
     @GetMapping("/login")
     public String login() {
@@ -86,6 +88,7 @@ public class PageController {
         mv.addObject("depositories", depositoryService.findDepositoryAll());
         mv.addObject("materials", materialService.findMaterialAll());
         mv.addObject("materialTypes", materialTypeService.findMaterialTypeAll());
+        mv.addObject("diameters", lineDataService.findDiametersAll());
 //        mv.addObject("SABpriceSum", materialService.findSABpriceSum());
 //        mv.addObject("ZABpriceSum", materialService.findZABpriceSum());
         DecimalFormat df = new DecimalFormat("#,##0"); // 这会格式化数字为千分位格式，并且始终有两位小数

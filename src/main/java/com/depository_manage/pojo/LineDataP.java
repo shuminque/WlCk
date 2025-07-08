@@ -12,15 +12,17 @@ public class LineDataP {
     private Integer production;
     private String model; // 新增的 model 字段
     private String craft; // 新增的 model 字段
+    private String diameter;
 
     // 更新后的构造函数
-    public LineDataP(Integer id, Date date, String lineName, Integer production, String model) {
+    public LineDataP(Integer id, Date date, String lineName, Integer production, String model, String craft, String diameter) {
         this.id = id;
         this.date = date;
         this.lineName = lineName;
         this.production = production;
         this.model = model;
         this.craft = craft;
+        this.diameter = diameter;
     }
 
     // 更新基于 LineData 对象的构造函数
@@ -31,5 +33,6 @@ public class LineDataP {
         this.production = lineData.getProduction();
         this.model = lineData.getModel(); // 从 LineData 对象中获取 model 字段
         this.craft = lineData.getCraft();
+        this.diameter = lineData.getDiameter();
     }
 }

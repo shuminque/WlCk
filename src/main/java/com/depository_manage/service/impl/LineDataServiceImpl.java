@@ -105,6 +105,21 @@ public class LineDataServiceImpl implements LineDataService {
         return lineDataMapper.findYearlyProductionData(year);
     }
 
+    @Override
+    public List<String> findDiametersAll() {
+        return lineDataMapper.findDiametersAll();
+    }
+
+    @Override
+    public List<String> findCategoryTitlesByDiameter(String diameter) {
+        return lineDataMapper.findCategoryTitlesByDiameter(diameter);
+    }
+    @Override
+    public List<LineData> selectMonthlyLinesByDiameter(int year, String diameter) {
+        return lineDataMapper.selectMonthlyLinesByDiameter(year, diameter);
+    }
+
+
     private List<LineDataP> pack(List<LineData> list) {
         List<LineDataP> result = new ArrayList<>(list.size());
         for (LineData lineData : list) {
