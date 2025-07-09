@@ -51,6 +51,12 @@ public class MaterialTypeServiceImpl implements MaterialTypeService {
         return materialTypeMapper.deleteMaterialTypeById(id);
     }
 
+    @Override
+    public Integer updateMaterialType(Map<String, Object> map) {
+        return materialTypeMapper.updateMaterialType(map);
+
+    }
+
     private List<MaterialTypeP> pack(List<MaterialType> list){
         List<MaterialTypeP> result=new ArrayList<>(list.size());
         for (MaterialType materialType: list){

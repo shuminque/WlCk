@@ -32,4 +32,10 @@ public class MaterialTypeController {
         int result = materialTypeService.deleteMaterialType(id);
         return CrudUtil.deleteHandle(result,1);
     }
+    @PutMapping("/materialType/{id}")
+    public RestResponse updateMaterialType(@PathVariable int id, @RequestBody Map<String, Object> map) {
+        map.put("id", id); // 确保ID被包含在数据中
+        int result = materialTypeService.updateMaterialType(map);
+        return CrudUtil.putHandle(result,1);
+    }
 }

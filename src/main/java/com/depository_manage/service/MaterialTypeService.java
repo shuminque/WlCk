@@ -13,4 +13,6 @@ public interface MaterialTypeService {
     List<MaterialTypeP> findMaterialTypePByCondition(Map<String, Object> map);
 
     Integer deleteMaterialType(int id);
+
+    Integer updateMaterialType(Map<String, Object> map);
 }
