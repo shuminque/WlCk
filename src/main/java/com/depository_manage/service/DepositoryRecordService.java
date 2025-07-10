@@ -118,6 +118,7 @@ public interface DepositoryRecordService {
     List<MonthlyAmountDTO> fetchMonthlyAmountByTypeAndYear(Integer typeId, String year, Integer depositoryId);
     List<Map<String, Object>> getMonthlyReport(String year);
     List<Map<String, Object>> viewPrice(Map<String, Object> params);
+    List<CategoryOutboundDTO> getScoreForYear(String year, Integer depositoryId);
 
 
 }

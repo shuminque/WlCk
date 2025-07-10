@@ -320,7 +320,14 @@ public class DepositoryRecordController {
         response.put("data", transferRecords);
         return ResponseEntity.ok(response);
     }
-
+    @RequestMapping(value = {"/ScoreForYear/{year}/{depositoryId}"})
+    public ResponseEntity<List<CategoryOutboundDTO>> getScoreForYear(
+            @PathVariable String year,
+            @PathVariable Integer depositoryId )  {
+        List<CategoryOutboundDTO> categoryOutbounds;
+            categoryOutbounds = depositoryRecordService.getScoreForYear(year, depositoryId);
+        return ResponseEntity.ok(categoryOutbounds);
+    }
 
 
 }

@@ -12,6 +12,7 @@ import com.depository_manage.service.NotificationService;
 import com.depository_manage.pojo.DepositoryRecordP;
 import com.depository_manage.pojo.SimpleDepositoryRecordP;
 import com.depository_manage.utils.ObjectFormatUtil;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -723,5 +724,8 @@ public class DepositoryRecordServiceImpl implements DepositoryRecordService {
     @Override
     public List<Map<String, Object>> viewPrice(Map<String, Object> params) {
         return depositoryRecordMapper.viewPrice(params);
+    }
+    public List<CategoryOutboundDTO> getScoreForYear(String year, Integer depositoryId) {
+        return depositoryRecordMapper.getScoreForYear(year, depositoryId);
     }
 }

@@ -200,8 +200,15 @@
     <select id="selectMonthlyLinesByDiameter" resultType="com.depository_manage.entity.LineData">
         SELECT
             DATE_FORMAT(date, '%Y-%m') AS month,
-            SUM(production) AS production,
-            GROUP_CONCAT(DISTINCT lineName ORDER BY lineName SEPARATOR ',') AS lineName
+        SUM(
+            CASE
+                WHEN diameter IN ('单玉小径', '单玉中径')
+                     AND craft IN ('管材工艺', '专用工艺')
+                THEN production / 2
+                ELSE production
+            END
+        ) AS production,
+        GROUP_CONCAT(DISTINCT lineName ORDER BY lineName SEPARATOR ',') AS lineName
         FROM
             line_data
         WHERE

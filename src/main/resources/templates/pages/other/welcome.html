@@ -289,13 +289,13 @@
             </select>
             <input type="text" id="year-selector-three" placeholder="请选择年" autocomplete="off">
             <select name="diameter" id="diameter">
-                <option value="">-- 请选择径类 --</option>
+                <option value="">-- 请选择分类 --</option>
                 <th:block th:each="d : ${diameters}">
                     <option th:value="${d}" th:text="${d}"></option>
                 </th:block>
             </select>
             <button id="clear-category-btn" type="button">重置</button>
-            <button class="layui-input custom-input" id="ID-dropdown-demo-complex-1" >请选择分类</button>
+            <button class="layui-input custom-input" id="ID-dropdown-demo-complex-1" >请选择工程</button>
             <input type="hidden" name="applyRemark" id="applyRemarkInput-1" value="">
             <div class="layui-row">
                 <div class="layui-col-md12">
@@ -575,7 +575,7 @@
 
         document.getElementById('clear-category-btn').addEventListener('click', function() {
             document.getElementById('applyRemarkInput-1').value = ''; // 清空分类输入框
-            document.getElementById('ID-dropdown-demo-complex-1').textContent = '请选择分类'; // 重置按钮文本
+            document.getElementById('ID-dropdown-demo-complex-1').textContent = '请选择工程'; // 重置按钮文本
             fetchCateChart(); // 调用 fetchCateChart 函数
         });
 
@@ -585,10 +585,16 @@
             var depositoryId = document.getElementById('depository-selector-three').value;
             var categoryTitle = encodeURIComponent(document.getElementById('applyRemarkInput-1').value);
             var categoryTitleW = decodeURIComponent(categoryTitle);
-            var costSeriesName = (categoryTitleW.includes('线') || categoryTitleW.includes('机'))
-                ? '单个成本'
-                : '单套成本';
             var diameter = document.getElementById('diameter').value;
+            var costSeriesName;
+            if (diameter && diameter !== '单玉小径' && diameter !== '单玉中径') {
+                costSeriesName = '单个成本';
+            } else {
+                // 否则按 categoryTitleW 的内容判断
+                costSeriesName = (categoryTitleW.includes('线') || categoryTitleW.includes('机'))
+                    ? '单个成本'
+                    : '单套成本';
+            }
             console.log("选中的分类:", categoryTitleW);
             console.log("选中的径类:", diameter);
 
@@ -673,21 +679,9 @@
                 console.log("各月金额：", monthlyAmountMap);
     // 1. 获取月份列表并排序（假设 key 都是类似 '2025-01' 的格式）
                 const monthKeys = Object.keys(monthlyProductionMap).sort();
-                const monthlyUnitCostMap = {};
-                monthKeys.forEach(month => {
-                    const production = monthlyProductionMap[month] || 0;
-                    const amount = monthlyAmountMap[month] || 0;
-                    monthlyUnitCostMap[month] = production === 0 ? 0 : (amount / production).toFixed(4);
-                });
-    // 转成数组，供图表使用
-                const monthlyUnitCostMapSZ = monthKeys.map(month => monthlyUnitCostMap[month]);
-    // 2. 转换为数组
-                const monthlyProductionMapSZ = monthKeys.map(month => monthlyProductionMap[month] || 0);
-                const monthlyAmountMapSZ = monthKeys.map(month => monthlyAmountMap[month] || 0);
 
     // 3. 如果还要作为 x 轴的类目，也可以把 monthKeys 直接作为 categoryTitles：
                 const categoryMonth = monthKeys;
-
 
             var amountUrl = '/CategoryForYear/' + year + '/' + depositoryId;
             var lineData = []; // 默认设置为空数组
@@ -704,7 +698,18 @@
             if (categoryTitle) {
                 lineNameUrl += '/' + categoryTitle;
             }
+            const ScoreUrl = '/ScoreForYear/' + year + '/' + depositoryId;
+            let scoreData = [];
+            try {
+                const scoreResponse = await $.get(ScoreUrl);
+                scoreData = scoreResponse || [];
 
+                console.log("ScoreUrl:", ScoreUrl);
+                console.log("Score data:", scoreData);
+            } catch (error) {
+                console.error("Error fetching score data:", error);
+                scoreData = [];
+            }
             try {
                 // 获取产量数据
                 const lineDataResponse = await $.get(lineNameUrl);
@@ -728,6 +733,30 @@
                 console.warn("当前分类无产量数据，将产量设置为全为零");
                 lineData = []; // 清空 lineData，确保不会使用之前的数据
             }
+            // 第二步：构造 lineData => month 产量 Map
+            const ScoreProductionMap = new Map();
+            lineData.forEach(item => {
+                if (item.date && item.production != null) {
+                    const monthStr = item.date.substring(0, 7); // 提取 "2025-01"
+                    ScoreProductionMap.set(monthStr, item.production);
+                }
+            });
+// 第三步：合并数据并计算单价
+            const ScoreUnitPrices = scoreData.map(item => {
+                const production = ScoreProductionMap.get(item.month) || 0;
+                const unitPrice = production > 0
+                    ? (item.amount / production).toFixed(6)
+                    : null;
+
+                return {
+                    month: item.month,
+                    amount: item.amount,
+                    production: production,
+                    unitPrice: unitPrice
+                };
+            });
+// 第四步：打印或使用结果
+            console.log("Unit price by month:", ScoreUnitPrices);
             try {
                 // 获取金额数据
                 const amountData = await $.get(amountUrl);
@@ -864,6 +893,42 @@
                     : 0;
 
                 console.log("当前年参考线值（金额之和/产量之和）：", referenceLineValueTwo);
+                const isNeedDivide = diameter !== '单玉小径' && diameter !== '单玉中径';
+                const unitPriceMap = {};
+                ScoreUnitPrices.forEach(item => {
+                    unitPriceMap[item.month] = item.unitPrice != null ? parseFloat(item.unitPrice) : null;
+                });
+                const monthlyScoreAmountMap = {};
+                monthKeys.forEach(month => {
+                    const unitPrice = unitPriceMap[month];
+                    let production = monthlyProductionMap[month] || 0;
+                    if (isNeedDivide) {
+                        production = production / 2;
+                    }
+                    monthlyScoreAmountMap[month] =
+                        unitPrice != null && production > 0
+                            ? parseFloat((unitPrice * production).toFixed(2))
+                            : 0;
+                });
+                const totalAmountMap = {};
+                monthKeys.forEach(month => {
+                    const originalAmount = monthlyAmountMap[month] || 0;
+                    const scoreAmount = monthlyScoreAmountMap[month] || 0;
+                    totalAmountMap[month] = originalAmount + scoreAmount;
+                });
+                const monthlyUnitCostMap = {};
+                monthKeys.forEach(month => {
+                    const production = monthlyProductionMap[month] || 0;
+                    const totalAmount = totalAmountMap[month];
+                    monthlyUnitCostMap[month] = production === 0
+                        ? 0
+                        : (totalAmount / production).toFixed(4);
+                });
+                const monthlyUnitCostMapSZ = monthKeys.map(month => monthlyUnitCostMap[month]);
+                const monthlyProductionMapSZ = monthKeys.map(month => monthlyProductionMap[month] || 0);
+                const monthlyAmountMapSZ = monthKeys.map(month =>
+                    Math.round(totalAmountMap[month] || 0)
+                );                //
                 var defaultAmountData = [prevYearAverageAmount].concat(amountData.map(function(item) {
                     return item.amount;
                 }));
