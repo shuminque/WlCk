@@ -192,8 +192,23 @@
             date;
     </select>
     <select id="findDiametersAll" resultType="string">
-        SELECT DISTINCT diameter FROM line_data WHERE diameter IS NOT NULL
+        SELECT DISTINCT diameter
+        FROM line_data
+        WHERE diameter IS NOT NULL
+        ORDER BY
+            CASE diameter
+                WHEN '单玉小径' THEN 1
+                WHEN '单玉中径' THEN 2
+                WHEN '万向节' THEN 3
+                WHEN 'MCB' THEN 4
+                WHEN 'IKO' THEN 5
+                WHEN 'RAB' THEN 6
+                WHEN 'RJ' THEN 7
+                ELSE 999
+                END,
+            diameter
     </select>
+
     <select id="findCategoryTitlesByDiameter" resultType="string">
         SELECT DISTINCT lineName FROM line_data WHERE diameter =  #{diameter}
     </select>
