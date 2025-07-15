@@ -570,7 +570,7 @@
         });
 
         laydate.render({ elem: '#year-selector', type: 'year' });
-        laydate.render({ elem: '#year-selector-three', type: 'year', done: fetchCateChart });
+        laydate.render({ elem: '#year-selector-three', type: 'year' });
         laydate.render({ elem: '#year-selector-four', type: 'year', done: fetchCateChartfour });
 
         document.getElementById('clear-category-btn').addEventListener('click', function() {
@@ -602,85 +602,94 @@
                 alert("请确保已选择所有条件！");
                 return;
             }
-            let categoryTitles = [];
-            let monthLineMap = {}; // 用于存储每月参与的产线列表
-            let response2;
-            try {
-                // 获取该径类下的所有分类
-                const response = await $.get('/lineData/diameterCategoryTitles/' + encodeURIComponent(diameter));
-                // 获取该径类每月的产线组成及产量
-                response2 = await $.get(`/lineData/diameterMonthLines/${year}/${encodeURIComponent(diameter)}`);
-
-                categoryTitles = response || [];
-
-                console.log("包含的分类:", categoryTitles);
-                console.log("每月产线构成及产量:", response2);
-
-                // 构造每月的产线映射
-                for (let entry of response2) {
-                    if (entry.month && entry.lineName) {
-                        monthLineMap[entry.month] = entry.lineName.split(',').map(l => l.trim());
-                    }
-                }
-
-            } catch (err) {
-                console.error("获取径类下的分类或产线构成失败：", err);
-            }
-
-// 初始化每月数据
-            let monthlyProductionMap = {}; // 月产量
-            let monthlyAmountMap = {};     // 月金额
-            const months = [...Array(12).keys()].map(i => `${year}-${String(i + 1).padStart(2, '0')}`);
-
-            for (let m of months) {
-                monthlyProductionMap[m] = 0;
-                monthlyAmountMap[m] = 0;
-            }
-
-// 直接用 response2 赋值产量
-            for (let entry of (response2 || [])) {
-                if (entry.month && monthlyProductionMap.hasOwnProperty(entry.month)) {
-                    monthlyProductionMap[entry.month] = entry.production || 0;
-                }
-            }
-
-// 遍历所有分类，汇总金额
-            for (let title of categoryTitles) {
-                const encodedTitle = encodeURIComponent(title);
-                const amountDataUrl = `/CategoryForYear/${year}/${depositoryId}/${encodedTitle}`;
+            async function fetchYearlyData(targetYear) {
+                let categoryTitles = [];
+                let monthLineMap = {}; // 用于存储每月参与的产线列表
+                let response2;
 
                 try {
-                    const amountRes = await $.get(amountDataUrl);
+                    // 获取该径类下的所有分类
+                    const response = await $.get('/lineData/diameterCategoryTitles/' + encodeURIComponent(diameter));
+                    // 获取该径类每月的产线组成及产量
+                    response2 = await $.get(`/lineData/diameterMonthLines/${targetYear}/${encodeURIComponent(diameter)}`);
 
-                    // 处理金额（按月+产线过滤）
-                    if (Array.isArray(amountRes)) {
-                        for (let a of amountRes) {
-                            const m = a.month;
-                            const line = a.category;  // 用 category 字段代替 lineName
-                            const monthLines = monthLineMap[m] || [];
+                    categoryTitles = response || [];
 
-                            if (!line || !monthLines.includes(line)) {
-                                // 不属于该月径类参与产线，跳过
-                                continue;
-                            }
+                    console.log(`【${targetYear}】包含的分类:`, categoryTitles);
+                    console.log(`【${targetYear}】每月产线构成及产量:`, response2);
 
-                            if (m && monthlyAmountMap.hasOwnProperty(m)) {
-                                monthlyAmountMap[m] += a.amount || 0;
-                            }
+                    // 构造每月的产线映射
+                    for (let entry of response2) {
+                        if (entry.month && entry.lineName) {
+                            monthLineMap[entry.month] = entry.lineName.split(',').map(l => l.trim());
                         }
                     }
 
                 } catch (err) {
-                    console.warn(`获取分类 [${title}] 的金额数据失败：`, err);
+                    console.error(`获取 ${targetYear} 年径类下的分类或产线构成失败：`, err);
                 }
+
+                // 初始化每月数据
+                let monthlyProductionMap = {}; // 月产量
+                let monthlyAmountMap = {};     // 月金额
+                const months = [...Array(12).keys()].map(i => `${targetYear}-${String(i + 1).padStart(2, '0')}`);
+
+                for (let m of months) {
+                    monthlyProductionMap[m] = 0;
+                    monthlyAmountMap[m] = 0;
+                }
+
+                // 用 response2 赋值产量
+                for (let entry of (response2 || [])) {
+                    if (entry.month && monthlyProductionMap.hasOwnProperty(entry.month)) {
+                        monthlyProductionMap[entry.month] = entry.production || 0;
+                    }
+                }
+
+                // 遍历所有分类，汇总金额
+                for (let title of categoryTitles) {
+                    const encodedTitle = encodeURIComponent(title);
+                    const amountDataUrl = `/CategoryForYear/${targetYear}/${depositoryId}/${encodedTitle}`;
+
+                    try {
+                        const amountRes = await $.get(amountDataUrl);
+
+                        if (Array.isArray(amountRes)) {
+                            for (let a of amountRes) {
+                                const m = a.month;
+                                const line = a.category;  // 用 category 字段代替 lineName
+                                const monthLines = monthLineMap[m] || [];
+
+                                if (!line || !monthLines.includes(line)) {
+                                    continue;
+                                }
+
+                                if (m && monthlyAmountMap.hasOwnProperty(m)) {
+                                    monthlyAmountMap[m] += a.amount || 0;
+                                }
+                            }
+                        }
+
+                    } catch (err) {
+                        console.warn(`获取分类 [${title}] 的金额数据失败：`, err);
+                    }
+                }
+
+                console.log(`【${targetYear}】各月产量：`, monthlyProductionMap);
+                console.log(`【${targetYear}】各月金额：`, monthlyAmountMap);
+                return {
+                    year: targetYear,
+                    monthlyProductionMap: monthlyProductionMap,
+                    monthlyAmountMap: monthlyAmountMap
+                };
             }
+            const currentYearData = await fetchYearlyData(year);
+            const lastYearData = await fetchYearlyData(year - 1);
+            // 1. 获取月份列表并排序（假设 key 都是类似 '2025-01' 的格式）
+                const monthKeys = Object.keys(currentYearData.monthlyProductionMap).sort();
+            const monthKeysLastYear = [...Array(12).keys()].map(i => `${year - 1}-${String(i + 1).padStart(2, '0')}`);
 
-                console.log("各月产量：", monthlyProductionMap);
-                console.log("各月金额：", monthlyAmountMap);
-    // 1. 获取月份列表并排序（假设 key 都是类似 '2025-01' 的格式）
-                const monthKeys = Object.keys(monthlyProductionMap).sort();
-
-    // 3. 如果还要作为 x 轴的类目，也可以把 monthKeys 直接作为 categoryTitles：
+            // 3. 如果还要作为 x 轴的类目，也可以把 monthKeys 直接作为 categoryTitles：
                 const categoryMonth = monthKeys;
 
             var amountUrl = '/CategoryForYear/' + year + '/' + depositoryId;
@@ -698,18 +707,28 @@
             if (categoryTitle) {
                 lineNameUrl += '/' + categoryTitle;
             }
-            const ScoreUrl = '/ScoreForYear/' + year + '/' + depositoryId;
-            let scoreData = [];
-            try {
-                const scoreResponse = await $.get(ScoreUrl);
-                scoreData = scoreResponse || [];
+            // 封装函数：获取指定年份评分数据
+            async function fetchScoreData(targetYear, depositoryId) {
+                const url = `/ScoreForYear/${targetYear}/${depositoryId}`;
+                let scoreData = [];
 
-                console.log("ScoreUrl:", ScoreUrl);
-                console.log("Score data:", scoreData);
-            } catch (error) {
-                console.error("Error fetching score data:", error);
-                scoreData = [];
+                try {
+                    const response = await $.get(url);
+                    scoreData = response || [];
+
+                    console.log(`ScoreUrl (${targetYear}):`, url);
+                    console.log(`Score data (${targetYear}):`, scoreData);
+                } catch (error) {
+                    console.error(`Error fetching score data for year ${targetYear}:`, error);
+                }
+
+                return scoreData;
             }
+
+            // 调用当前年与上一年的评分数据
+            const scoreData = await fetchScoreData(year, depositoryId);
+            const lastScoreData = await fetchScoreData(year - 1, depositoryId);
+
             try {
                 // 获取产量数据
                 const lineDataResponse = await $.get(lineNameUrl);
@@ -733,30 +752,32 @@
                 console.warn("当前分类无产量数据，将产量设置为全为零");
                 lineData = []; // 清空 lineData，确保不会使用之前的数据
             }
-            // 第二步：构造 lineData => month 产量 Map
-            const ScoreProductionMap = new Map();
-            lineData.forEach(item => {
-                if (item.date && item.production != null) {
-                    const monthStr = item.date.substring(0, 7); // 提取 "2025-01"
-                    ScoreProductionMap.set(monthStr, item.production);
-                }
-            });
-// 第三步：合并数据并计算单价
-            const ScoreUnitPrices = scoreData.map(item => {
-                const production = ScoreProductionMap.get(item.month) || 0;
-                const unitPrice = production > 0
-                    ? (item.amount / production).toFixed(6)
-                    : null;
+            function extractProductionMap(lineData) {
+                const map = new Map();
+                lineData.forEach(item => {
+                    if (item.date && item.production != null) {
+                        const monthStr = item.date.substring(0, 7); // 取 "2024-01"
+                        map.set(monthStr, item.production);
+                    }
+                });
+                return map;
+            }
+            function calculateUnitPrices(scoreData, productionMap) {
+                return scoreData.map(item => {
+                    const production = productionMap.get(item.month) || 0;
+                    const unitPrice = production > 0
+                        ? (item.amount / production).toFixed(6)
+                        : null;
 
-                return {
-                    month: item.month,
-                    amount: item.amount,
-                    production: production,
-                    unitPrice: unitPrice
-                };
-            });
-// 第四步：打印或使用结果
-            console.log("Unit price by month:", ScoreUnitPrices);
+                    return {
+                        month: item.month,
+                        amount: item.amount,
+                        production: production,
+                        unitPrice: unitPrice
+                    };
+                });
+            }
+
             try {
                 // 获取金额数据
                 const amountData = await $.get(amountUrl);
@@ -775,7 +796,20 @@
                 }
                 // 获取前一年产量数据
                 const prevYearLineData = await $.get(prevYearLineNameUrl);
-                // 筛选出有数据的月份的产量
+
+                // 当前年
+                const lineDataResponse = await $.get(lineNameUrl);
+                const lineData = lineDataResponse.data || [];
+                const ScoreProductionMap = extractProductionMap(lineData);
+                const ScoreUnitPrices = calculateUnitPrices(scoreData, ScoreProductionMap);
+                console.log("【当前年】单价明细:", ScoreUnitPrices);
+
+                const prevYearLineDataResponse = await $.get(prevYearLineNameUrl);
+                const LastPrevYearLineData = prevYearLineDataResponse.data || [];
+                const LastScoreProductionMap = extractProductionMap(LastPrevYearLineData);
+                const LastScoreUnitPrices = calculateUnitPrices(lastScoreData, LastScoreProductionMap);
+                console.log("【上一年】单价明细:", LastScoreUnitPrices);
+
                 // 确保先获取到数据数组
                 const validProductionData = prevYearLineData.data.filter(item => item.production != null && item.production > 0);
                 // 获取有效的月份（即有产量的月份）
@@ -894,41 +928,101 @@
 
                 console.log("当前年参考线值（金额之和/产量之和）：", referenceLineValueTwo);
                 const isNeedDivide = diameter !== '单玉小径' && diameter !== '单玉中径';
-                const unitPriceMap = {};
-                ScoreUnitPrices.forEach(item => {
-                    unitPriceMap[item.month] = item.unitPrice != null ? parseFloat(item.unitPrice) : null;
-                });
-                const monthlyScoreAmountMap = {};
-                monthKeys.forEach(month => {
-                    const unitPrice = unitPriceMap[month];
-                    let production = monthlyProductionMap[month] || 0;
-                    if (isNeedDivide) {
-                        production = production / 2;
-                    }
-                    monthlyScoreAmountMap[month] =
-                        unitPrice != null && production > 0
-                            ? parseFloat((unitPrice * production).toFixed(2))
-                            : 0;
-                });
-                const totalAmountMap = {};
-                monthKeys.forEach(month => {
-                    const originalAmount = monthlyAmountMap[month] || 0;
-                    const scoreAmount = monthlyScoreAmountMap[month] || 0;
-                    totalAmountMap[month] = originalAmount + scoreAmount;
-                });
-                const monthlyUnitCostMap = {};
-                monthKeys.forEach(month => {
-                    const production = monthlyProductionMap[month] || 0;
-                    const totalAmount = totalAmountMap[month];
-                    monthlyUnitCostMap[month] = production === 0
-                        ? 0
-                        : (totalAmount / production).toFixed(4);
-                });
-                const monthlyUnitCostMapSZ = monthKeys.map(month => monthlyUnitCostMap[month]);
-                const monthlyProductionMapSZ = monthKeys.map(month => monthlyProductionMap[month] || 0);
-                const monthlyAmountMapSZ = monthKeys.map(month =>
-                    Math.round(totalAmountMap[month] || 0)
-                );                //
+                function calculateYearlyTotals(data, scoreUnitPrices, monthKeys, isNeedDivide) {
+                    const unitPriceMap = {};
+                    scoreUnitPrices.forEach(item => {
+                        unitPriceMap[item.month] = item.unitPrice != null ? parseFloat(item.unitPrice) : null;
+                    });
+
+                    const monthlyScoreAmountMap = {};
+                    monthKeys.forEach(month => {
+                        const unitPrice = unitPriceMap[month];
+                        let production = data.monthlyProductionMap[month] || 0;
+                        if (isNeedDivide) {
+                            production = production / 2;
+                        }
+                        monthlyScoreAmountMap[month] =
+                            unitPrice != null && production > 0
+                                ? parseFloat((unitPrice * production).toFixed(2))
+                                : 0;
+                    });
+
+                    const totalAmountMap = {};
+                    monthKeys.forEach(month => {
+                        const originalAmount = data.monthlyAmountMap[month] || 0;
+                        const scoreAmount = monthlyScoreAmountMap[month] || 0;
+                        totalAmountMap[month] = originalAmount + scoreAmount;
+                    });
+
+                    const monthlyUnitCostMap = {};
+                    monthKeys.forEach(month => {
+                        const production = data.monthlyProductionMap[month] || 0;
+                        const totalAmount = totalAmountMap[month];
+                        monthlyUnitCostMap[month] = production === 0
+                            ? 0
+                            : (totalAmount / production).toFixed(4);
+                    });
+
+                    let totalAmountLine = 0;
+                    let totalProductionLine = 0;
+                    monthKeys.forEach(month => {
+                        const amount = totalAmountMap[month] || 0;
+                        const production = data.monthlyProductionMap[month] || 0;
+                        totalAmountLine += amount;
+                        totalProductionLine += production;
+                    });
+
+                    const totalUnitCost = totalProductionLine > 0
+                        ? parseFloat((totalAmountLine / totalProductionLine).toFixed(4))
+                        : 0;
+
+                    return {
+                        monthlyScoreAmountMap,
+                        totalAmountMap,
+                        monthlyUnitCostMap,
+                        totalAmountLine,
+                        totalProductionLine,
+                        totalUnitCost
+                    };
+                }
+                const currentCostData = calculateYearlyTotals(
+                    currentYearData,
+                    ScoreUnitPrices,
+                    monthKeys,
+                    isNeedDivide
+                );
+                const lastCostData = calculateYearlyTotals(
+                    lastYearData,
+                    LastScoreUnitPrices,
+                    monthKeysLastYear,
+                    isNeedDivide
+                );
+                function getAverage(total, values) {
+                    const validValues = values.filter(val => val != null && val !== 0);
+                    return validValues.length > 0 ? parseFloat((total / validValues.length).toFixed(2)) : 0;
+                }
+
+                const prevYearAverageAmountTwo = getAverage(
+                    lastCostData.totalAmountLine,
+                    Object.values(lastCostData.totalAmountMap)
+                );
+
+                const prevYearAverageProductionTwo = getAverage(
+                    lastCostData.totalProductionLine,
+                    Object.values(lastYearData.monthlyProductionMap)
+                );
+
+                const prevYearCostPerUnit = lastCostData.totalUnitCost; // 已是平均，不需再处理
+
+                const monthlyUnitCostMapSZ = [prevYearCostPerUnit].concat(
+                    monthKeys.map(month => currentCostData.monthlyUnitCostMap[month])
+                );
+                const monthlyProductionMapSZ = [prevYearAverageProductionTwo].concat(
+                    monthKeys.map(month => currentYearData.monthlyProductionMap[month] || 0)
+                );
+                const monthlyAmountMapSZ = [prevYearAverageAmountTwo].concat(
+                    monthKeys.map(month => Math.round(currentCostData.totalAmountMap[month] || 0))
+                );             //
                 var defaultAmountData = [prevYearAverageAmount].concat(amountData.map(function(item) {
                     return item.amount;
                 }));
@@ -936,25 +1030,16 @@
                 var productionSeriesData = diameter
                     ? monthlyProductionMapSZ
                     : [prevYearAverageProduction].concat(productionData);
-                var xAxisData = diameter
-                    ? categoryMonth
-                    : [ (year - 1) + "年平均" ].concat(amountData.map(function(item) {
+
+                var xAxisData =  [ (year - 1) + "年平均" ].concat(amountData.map(function(item) {
                         return item.month;
                     }));
                 var costPerUnitSeriesData = diameter
                     ? monthlyUnitCostMapSZ
                     : [prevYearcostPerUnit].concat(costPerUnit);
-                let totalAmountLine = 0;
-                let totalProductionLine = 0;
 
-                monthKeys.forEach(month => {
-                    const amount = totalAmountMap[month] || 0;
-                    const production = monthlyProductionMap[month] || 0;
-                    totalAmountLine += amount;
-                    totalProductionLine += production;
-                });
                 const Line = diameter
-                    ? (totalProductionLine === 0 ? 0 : parseFloat((totalAmountLine / totalProductionLine).toFixed(4)))
+                    ? (currentCostData.totalProductionLine === 0 ? 0 : parseFloat((currentCostData.totalAmountLine / currentCostData.totalProductionLine).toFixed(4)))
                     : parseFloat(referenceLineValueTwo);  // 强制转换为数字
                 var colors = ['#5470C6', '#bf2222']; // 定义柱形图和折线图的颜色
                 var option = {
@@ -2472,41 +2557,64 @@
                     let day = date.getDate().toString().padStart(2, '0');
                     return `${year}-${month}-${day}`;
                 }
-                records.sort((a, b) => parseFloat(b.totalAmount) - parseFloat(a.totalAmount));
+
+                // 合并相同 atId 的记录
+                const mergedMap = {};
+                records.forEach(record => {
+                    const key = record.atId || '一次性';
+                    if (!mergedMap[key]) {
+                        mergedMap[key] = {
+                            ...record,
+                            atId: record.atId || '一次性',
+                            quantity: Number(record.quantity) || 0,
+                            totalAmount: parseFloat(record.totalAmount) || 0
+                        };
+                    } else {
+                        mergedMap[key].quantity += Number(record.quantity) || 0;
+                        mergedMap[key].totalAmount += parseFloat(record.totalAmount) || 0;
+                    }
+                });
+
+                // 转成数组并按金额排序
+                const mergedRecords = Object.values(mergedMap).sort((a, b) => b.totalAmount - a.totalAmount);
+
                 table.render({
                     elem: '#recordTable',
                     height: "full-50",
                     cols: [ [
-                        { field: 'sourceTable', title: '来源表',  hide: true},
-                        { field: 'id', title: 'ID', hide: true},
+                        { field: 'sourceTable', title: '来源表', hide: true },
+                        { field: 'id', title: 'ID', hide: true },
                         {
                             field: 'atId',
                             title: 'AT',
-                            templet: function(d) {
-                                return d.atId ? d.atId : '一次性';
+                            templet: function (d) {
+                                return d.atId;
                             }
                         },
                         { field: 'name', title: '名称' },
-                        { field: 'model', title: '型号'},
-                        { field: 'quantity', title: '数量'},
-                        // { field: 'unitPrice', title: '单价' },
-                        { field: 'totalAmount', title: '金额', templet: function(d) {
+                        { field: 'model', title: '型号' },
+                        { field: 'quantity', title: '数量' },
+                        {
+                            field: 'totalAmount',
+                            title: '金额',
+                            templet: function (d) {
                                 return parseFloat(d.totalAmount).toFixed(2);
-                            }},
+                            }
+                        },
                         {
                             field: 'recordDate',
                             title: '记录日期',
                             hide: true,
-                            flex:1,
-                            templet: function(d) {
+                            flex: 1,
+                            templet: function (d) {
                                 return formatDate(d.recordDate);
                             }
                         },
-                        { field: 'applyRemark', title: '备注' ,hide: true},
-                        { field: 'categoryTitle', title: '分类标题' ,hide: true}
+                        { field: 'applyRemark', title: '备注', hide: true },
+                        { field: 'categoryTitle', title: '分类标题', hide: true }
                     ]],
-                    limit: records.length,
-                    data: records,
+                    limit: mergedRecords.length,
+                    data: mergedRecords,
                 });
             }
         }
@@ -2758,41 +2866,65 @@
                     let day = date.getDate().toString().padStart(2, '0');
                     return `${year}-${month}-${day}`;
                 }
-                records.sort((a, b) => parseFloat(b.totalAmount) - parseFloat(a.totalAmount));
+
+                // 合并相同 atId 的记录（合并数量和金额）
+                const mergedMap = {};
+                records.forEach(record => {
+                    const key = record.atId || '一次性';
+                    if (!mergedMap[key]) {
+                        mergedMap[key] = {
+                            ...record,
+                            atId: key,
+                            quantity: Number(record.quantity) || 0,
+                            totalAmount: parseFloat(record.totalAmount) || 0
+                        };
+                    } else {
+                        mergedMap[key].quantity += Number(record.quantity) || 0;
+                        mergedMap[key].totalAmount += parseFloat(record.totalAmount) || 0;
+                    }
+                });
+
+                // 转为数组并按金额降序排序
+                const mergedRecords = Object.values(mergedMap).sort((a, b) => b.totalAmount - a.totalAmount);
+
+                // 渲染表格
                 table.render({
                     elem: '#recordTable',
                     height: "full-50",
                     cols: [ [
-                        { field: 'sourceTable', title: '来源表',  hide: true},
-                        { field: 'id', title: 'ID', hide: true},
+                        { field: 'sourceTable', title: '来源表', hide: true },
+                        { field: 'id', title: 'ID', hide: true },
                         {
                             field: 'atId',
                             title: 'AT',
-                            templet: function(d) {
-                                return d.atId ? d.atId : '一次性';
+                            templet: function (d) {
+                                return d.atId;
                             }
                         },
                         { field: 'name', title: '名称' },
-                        { field: 'model', title: '型号'},
-                        { field: 'quantity', title: '数量'},
-                        // { field: 'unitPrice', title: '单价' },
-                        { field: 'totalAmount', title: '金额', templet: function(d) {
+                        { field: 'model', title: '型号' },
+                        { field: 'quantity', title: '数量' },
+                        {
+                            field: 'totalAmount',
+                            title: '金额',
+                            templet: function (d) {
                                 return parseFloat(d.totalAmount).toFixed(2);
-                            }},
+                            }
+                        },
                         {
                             field: 'recordDate',
                             title: '记录日期',
                             hide: true,
-                            flex:1,
-                            templet: function(d) {
+                            flex: 1,
+                            templet: function (d) {
                                 return formatDate(d.recordDate);
                             }
                         },
-                        { field: 'applyRemark', title: '备注' ,hide: true},
-                        { field: 'categoryTitle', title: '分类标题' ,hide: true}
+                        { field: 'applyRemark', title: '备注', hide: true },
+                        { field: 'categoryTitle', title: '分类标题', hide: true }
                     ]],
-                    limit: records.length,
-                    data: records,
+                    limit: mergedRecords.length,
+                    data: mergedRecords,
                 });
             }
         }
