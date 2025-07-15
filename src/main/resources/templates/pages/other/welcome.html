@@ -947,16 +947,15 @@
                 let totalAmountLine = 0;
                 let totalProductionLine = 0;
 
-                Object.keys(monthlyAmountMap).forEach(month => {
-                    const amount = monthlyAmountMap[month] || 0;
+                monthKeys.forEach(month => {
+                    const amount = totalAmountMap[month] || 0;
                     const production = monthlyProductionMap[month] || 0;
                     totalAmountLine += amount;
                     totalProductionLine += production;
                 });
                 const Line = diameter
-                    ? (totalProductionLine === 0 ? 0 : totalAmountLine / totalProductionLine)
-                    : referenceLineValueTwo;
-
+                    ? (totalProductionLine === 0 ? 0 : parseFloat((totalAmountLine / totalProductionLine).toFixed(4)))
+                    : parseFloat(referenceLineValueTwo);  // 强制转换为数字
                 var colors = ['#5470C6', '#bf2222']; // 定义柱形图和折线图的颜色
                 var option = {
                     tooltip: {
@@ -1020,15 +1019,14 @@
                                         yAxisIndex: 1,
                                         label: {
                                             show: true,
-                                            formatter: '{c}',
+                                            formatter: () => `{a|${Line.toFixed(4)}}`,  // 直接用外部变量
                                             position: 'end',
                                             rich: {
                                                 a: {
-                                                    align: 'center' ,
-                                                    padding: [40, 10, 0, -45] // 左侧内边距负值，使其左移
+                                                    align: 'center',
+                                                    padding: [40, 10, 0, -45]
                                                 }
-                                            },
-                                            formatter: (params) => `{a|${params.value}}`
+                                            }
                                         },
                                         lineStyle: {
                                             type: 'solid',
@@ -2411,30 +2409,45 @@
             chart2.setOption(option2);
             chart2.on('click', function (params) {
                 var selectedDepositoryId = document.getElementById('depository-selector').value;
-                var selectedMonth = document.getElementById('month-selector').value;
-                var parts = selectedMonth.split('-');
-                var year = parts[0];
-                var month = parts[1];
+                var selectedMonth = document.getElementById('month-selector').value.trim();
                 var encodedCategoryName = encodeURIComponent(params.name);
-                $.ajax({
-                    url: '/api/categories/category-records/' + encodedCategoryName + '/' + selectedDepositoryId + '/' + year + '/' + month,
-                    type: 'GET',
-                    dataType: 'json',
-                    success: function(records) {
+
+                console.log("选中月份范围:", selectedMonth);
+
+                var [startMonth, endMonth] = selectedMonth.split(' - ').map(s => s.trim());
+                var start = new Date(startMonth + "-01");
+                var end = new Date(endMonth + "-01");
+
+                var monthList = [];
+                while (start <= end) {
+                    let year = start.getFullYear();
+                    let month = (start.getMonth() + 1).toString().padStart(2, '0');
+                    monthList.push({ year, month });
+
+                    start.setMonth(start.getMonth() + 1);
+                }
+
+                // 多月并发请求
+                let promises = monthList.map(item => {
+                    return $.ajax({
+                        url: `/api/categories/category-records/${encodedCategoryName}/${selectedDepositoryId}/${item.year}/${item.month}`,
+                        type: 'GET',
+                        dataType: 'json'
+                    });
+                });
+
+                Promise.all(promises)
+                    .then(results => {
+                        let allRecords = results.flat();
+
                         var widthPercentage = 80;
                         var heightPercentage = 80;
 
                         var screenWidth = $(window).width();
                         var screenHeight = $(window).height();
 
-                        var popupWidth = (widthPercentage / 100) * screenWidth;
-                        var popupHeight = (heightPercentage / 100) * screenHeight;
-
-                        var maxPopupWidth = 2800;
-                        var maxPopupHeight = 2600   ;
-
-                        popupWidth = Math.min(popupWidth, maxPopupWidth);
-                        popupHeight = Math.min(popupHeight, maxPopupHeight);
+                        var popupWidth = Math.min((widthPercentage / 100) * screenWidth, 2800);
+                        var popupHeight = Math.min((heightPercentage / 100) * screenHeight, 2600);
 
                         layer.open({
                             type: 1,
@@ -2444,12 +2457,11 @@
                             shadeClose: true
                         });
 
-                        renderTable(records);
-                    },
-                    error: function(error) {
-                        console.log("Error fetching records for category", error);
-                    }
-                });
+                        renderTable(allRecords); // 如果你要按金额排序，可以在这里排序
+                    })
+                    .catch(error => {
+                        console.error("Error fetching records for category:", error);
+                    });
             });
             function renderTable(records) {
                 function formatDate(dateStr) {
@@ -2460,7 +2472,7 @@
                     let day = date.getDate().toString().padStart(2, '0');
                     return `${year}-${month}-${day}`;
                 }
-
+                records.sort((a, b) => parseFloat(b.totalAmount) - parseFloat(a.totalAmount));
                 table.render({
                     elem: '#recordTable',
                     height: "full-50",
@@ -2680,30 +2692,48 @@
             chart1.setOption(option1);
             chart1.on('click', function (params) {
                 var selectedDepositoryId = document.getElementById('depository-selector').value;
-                var selectedMonth = document.getElementById('month-selector').value;
-                var parts = selectedMonth.split('-');
-                var year = parts[0];
-                var month = parts[1];
+                var selectedMonth = document.getElementById('month-selector').value.trim();
                 var encodedCategoryName = encodeURIComponent(params.name);
-                $.ajax({
-                    url: '/api/categories/category-records/' + encodedCategoryName + '/' + selectedDepositoryId + '/' + year + '/' + month,
-                    type: 'GET',
-                    dataType: 'json',
-                    success: function(records) {
+
+                console.log("选中月份范围:", selectedMonth);
+
+                var [startMonth, endMonth] = selectedMonth.split(' - ').map(s => s.trim());
+
+                // 将字符串转换为 Date 对象
+                var start = new Date(startMonth + "-01");
+                var end = new Date(endMonth + "-01");
+
+                var monthList = [];
+                while (start <= end) {
+                    let year = start.getFullYear();
+                    let month = (start.getMonth() + 1).toString().padStart(2, '0');
+                    monthList.push({ year, month });
+
+                    // 加一个月
+                    start.setMonth(start.getMonth() + 1);
+                }
+
+                // 用 Promise.all 并发请求所有月份的数据
+                let promises = monthList.map(item => {
+                    return $.ajax({
+                        url: `/api/categories/category-records/${encodedCategoryName}/${selectedDepositoryId}/${item.year}/${item.month}`,
+                        type: 'GET',
+                        dataType: 'json'
+                    });
+                });
+
+                Promise.all(promises)
+                    .then(results => {
+                        // 合并所有返回记录
+                        let records = results.flat(); // 如果每个结果是数组的话
                         var widthPercentage = 80;
                         var heightPercentage = 80;
 
                         var screenWidth = $(window).width();
                         var screenHeight = $(window).height();
 
-                        var popupWidth = (widthPercentage / 100) * screenWidth;
-                        var popupHeight = (heightPercentage / 100) * screenHeight;
-
-                        var maxPopupWidth = 2800;
-                        var maxPopupHeight = 2600;
-
-                        popupWidth = Math.min(popupWidth, maxPopupWidth);
-                        popupHeight = Math.min(popupHeight, maxPopupHeight);
+                        var popupWidth = Math.min((widthPercentage / 100) * screenWidth, 2800);
+                        var popupHeight = Math.min((heightPercentage / 100) * screenHeight, 2600);
 
                         layer.open({
                             type: 1,
@@ -2714,11 +2744,10 @@
                         });
 
                         renderTable(records);
-                    },
-                    error: function(error) {
-                        console.log("Error fetching records for category", error);
-                    }
-                });
+                    })
+                    .catch(error => {
+                        console.error("Error fetching records for category:", error);
+                    });
             });
             function renderTable(records) {
                 function formatDate(dateStr) {
@@ -2729,7 +2758,7 @@
                     let day = date.getDate().toString().padStart(2, '0');
                     return `${year}-${month}-${day}`;
                 }
-
+                records.sort((a, b) => parseFloat(b.totalAmount) - parseFloat(a.totalAmount));
                 table.render({
                     elem: '#recordTable',
                     height: "full-50",

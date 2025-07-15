@@ -122,7 +122,10 @@
                 <div class="layui-form-item">
                     <label class="layui-form-label">领用部门</label>
                     <div class="layui-input-block">
-                        <input type="text" name="applyRemark" placeholder="请输入领用部门" autocomplete="off" class="layui-input">
+<!--                        <input type="text" name="applyRemark" placeholder="请输入领用部门" autocomplete="off" class="layui-input">-->
+                        <div name="applyRemark" class="layui-input custom-input" id="ID-dropdown-demo-complex" style="cursor: pointer;">
+                        </div>
+                        <input type="hidden" name="applyRemark" id="applyRemarkInput" value="" lay-verify="required">
                     </div>
                 </div>
                 <div class="layui-form-item">
@@ -152,11 +155,28 @@
 <script type="text/javascript" src="/static/js/formSelects-v4.js" charset="utf-8"></script>
 <script>
     var data;
+    let dropDataSAB = [];
+    let dropDataZAB = [];
+    function formatData(apiData) {
+        let formattedData = apiData.map(item => {
+            let formattedItem = {
+                title: item.bracketContent
+                    ? `${item.title}(${item.bracketContent})`
+                    : item.title
+            };
+            if (item.children && item.children.length > 0) {
+                formattedItem.child = formatData(item.children); // 递归处理子项目
+            }
+            return formattedItem;
+        });
+        return formattedData;
+    }
     layui.use(['form', 'table','layer','laydate'], function () {
         var $ = layui.jquery,
             form = layui.form,
             table =  layui.table,
             layer = layui.layer,
+            dropdown = layui.dropdown,
             laydate=layui.laydate;
         laydate.render({
             elem: '#date',
@@ -232,6 +252,67 @@
                     pp = '/api/onceFill/list';
                 } else {
                     pp = '/api/onceFill/list?depositoryId='+userDepositoryId;
+                }
+
+                function resetOutTypeDropdown() {
+                    // 清除旧的出库类型下拉列表
+                    document.getElementById('ID-dropdown-demo-complex').innerHTML = '';
+                }
+                function loadCategoryData(category, callback) {
+                    $.get('/api/categories/' + category, function(response) {
+                        if (response.code === 0) {
+                            callback(formatData(response.data));
+                        } else {
+                            layer.msg(`无法加载${category.toUpperCase()}的分类数据`);
+                        }
+                    }).fail(function() {
+                        layer.msg(`无法加载${category.toUpperCase()}的分类数据`);
+                    });
+                }
+
+                function loadOutTypeDropdown(depositoryId) {
+                    if (depositoryId === '1') {
+                        loadCategoryData('sab', function(data) {
+                            dropDataSAB = data;
+                            setParentForChild(dropDataSAB);
+                            loadDepositoryData(dropDataSAB);
+                        });
+                    } else  {
+                        loadCategoryData('zab', function(data) {
+                            dropDataZAB = data;
+                            setParentForChild(dropDataZAB);
+                            loadDepositoryData(dropDataZAB);
+                        });
+                    }
+                }
+                function setParentForChild(data) {
+                    for (let i = 0; i < data.length; i++) {
+                        if (data[i].child) {
+                            for (let j = 0; j < data[i].child.length; j++) {
+                                data[i].child[j].parent = data[i];
+                            }
+                            setParentForChild(data[i].child);
+                        }
+                    }
+                }
+                function loadDepositoryData(dropdownData) {
+                    setParentForChild(dropdownData);
+                    dropdown.render({
+                        elem: '#ID-dropdown-demo-complex',
+                        data: dropdownData,
+                        click: function(item) {
+                            let path = item.title;
+                            let currentItem = item;
+                            while (currentItem.parent) {
+                                path = currentItem.parent.title + "-" + path;
+                                currentItem = currentItem.parent;
+                            }
+                            let dropdownElem = document.getElementById('ID-dropdown-demo-complex');
+                            let inputElem = document.getElementById('applyRemarkInput');
+                            if(dropdownElem) dropdownElem.innerText = path;
+                            if(inputElem) inputElem.value = path;
+                        }
+                    });
                 }
                 table.render({
                     elem: "#currentTableId",
@@ -386,6 +467,7 @@
                                 type: 'date',
                                 value: data.time
                             });
+                            loadOutTypeDropdown(2);  // 或用 data.depositoryId 动态判断
 
                             // 监听提交按钮
                             form.on('submit(editSubmitBtnFilter)', function(formData) {

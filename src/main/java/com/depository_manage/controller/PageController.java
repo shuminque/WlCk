@@ -109,11 +109,14 @@ public class PageController {
         return "pages/other/depository_add";
     }
 
+    @GetMapping("/series_add")
+    public String series_add() {
+        return "pages/other/series_add";
+    }
     @GetMapping("/materialType_add")
     public String materialType_add() {
         return "pages/other/materialType_add";
     }
-
     @GetMapping("/materialEngin_add")
     public String materialEngin_add() {
         return "pages/other/materialEngin_add";

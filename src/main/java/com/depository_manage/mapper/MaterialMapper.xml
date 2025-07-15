@@ -219,44 +219,42 @@
         SELECT id FROM material_state WHERE sname = #{stateName}
     </select>
     <!-- 修改数据 -->
+    <!-- 同时更新 material 与 depository_record -->
     <update id="updateMaterial" parameterType="map">
         UPDATE material
         <set>
-            <if test="atId != null">
-                at_id = #{atId},
-            </if>
-            <if test="depositoryId != null">
-                depository_id = #{depositoryId},
-            </if>
-            <if test="mname != null">
-                mname = #{mname},
-            </if>
-            <if test="model != null">
-                model = #{model},
-            </if>
-            <if test="quantity != null">
-                quantity = #{quantity},
-            </if>
-            <if test="price != null">
-                price = #{price},
-            </if>
-            <if test="unitPrice != null">
-                unit_price = #{unitPrice},
-            </if>
+            <if test="atId != null">          at_id          = #{atId},        </if>
+            <if test="depositoryId != null">  depository_id   = #{depositoryId},</if>
+            <if test="mname != null">         mname           = #{mname},       </if>
+            <if test="model != null">         model           = #{model},       </if>
+            <if test="quantity != null">      quantity        = #{quantity},    </if>
+            <if test="price != null">         price           = #{price},       </if>
+            <if test="unitPrice != null">     unit_price      = #{unitPrice},   </if>
+            <if test="typeId != null">        type_id         = #{typeId},      </if>
+            <if test="picNum != null">        picNum          = #{picNum},      </if>
+            <if test="stateId != null">       state_id        = #{stateId},     </if>
+            <if test="enginId != null">       engin_id        = #{enginId},     </if>
+        </set>
+        WHERE id = #{id};
+        UPDATE depository_record
+        <set>
+            <if test="mname != null">    mname      = #{mname},                       </if>
+            <if test="model != null">    model      = #{model},                       </if>
             <if test="typeId != null">
-                type_id = #{typeId},
-            </if>
-            <if test="picNum != null">
-                picNum = #{picNum},
-            </if>
-            <if test="stateId != null">
-                state_id = #{stateId},
+                type_name = (
+                SELECT t.tname FROM material_type t WHERE t.id = #{typeId}
+                ),
             </if>
             <if test="enginId != null">
-                engin_id = #{enginId},
+                engin_name = (
+                SELECT e.ename FROM material_engin e WHERE e.id = #{enginId}
+                ),
             </if>
         </set>
-        WHERE id = #{id}
+        WHERE at_id = #{atId}
+        <if test="depositoryId != null">
+            AND depository_id = #{depositoryId}
+        </if>;
     </update>
 
     <!-- 根据仓库id和材料名称改变材料的数量 -->
