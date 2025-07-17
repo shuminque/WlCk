@@ -928,10 +928,31 @@
                     ? (prevYearTotalProduction / validMonthsCount).toFixed(0)  // 保留整数
                     : 0;
                 console.log("前一年的产量平均值：", prevYearAverageProduction);
-                const prevYearcostPerUnit = prevYearAverageProduction > 0
-                    ? (prevYearAverageAmount / prevYearAverageProduction).toFixed(4)  // 保留整数
+                // const prevYearcostPerUnit = prevYearAverageProduction > 0
+                //     ? (prevYearAverageAmount / prevYearAverageProduction).toFixed(4)  // 保留整数
+                //     : 0;
+                // console.log("前一年的产量单个成本：", prevYearcostPerUnit);
+                let prevYearUnitCostSum = 0;
+                for (let i = 0; i < validAmountData.length; i++) {
+                    const amountItem = validAmountData[i];
+                    const productionItem = validProductionData[i];
+
+                    const amount = parseFloat(amountItem.amount);
+                    const production = parseFloat(productionItem.production);
+
+                    console.log(`第${i + 1}月：金额=${amount}，产量=${production}`);
+
+                    if (!isNaN(amount) && !isNaN(production) && production > 0) {
+                        const unitCost = amount / production;
+                        prevYearUnitCostSum += unitCost;
+                        console.log(`单个成本=${unitCost.toFixed(4)}，累计=${prevYearUnitCostSum.toFixed(4)}`);
+                    }
+                }
+                const prevYearcostPerUnit = validMonthsCount > 0
+                    ? (prevYearUnitCostSum / validMonthsCount).toFixed(4)
                     : 0;
-                console.log("前一年的产量单个成本：", prevYearcostPerUnit);
+
+                console.log("前一年的产量单个成本（单价平均法）：", prevYearcostPerUnit);
 
                 // 计算每个月的单个成本
                 const costPerUnit = amountData.map(function(item) {
@@ -1015,7 +1036,7 @@
                     ? (totalAmountForCurrentYear / totalProductionForCurrentYear).toFixed(4)  // 保留4位小数
                     : 0;
 
-                console.log("当前年参考线值（金额之和/产量之和）：", referenceLineValueTwo);
+                console.log("当前年参考线值（金额之和/产量之和）：", referenceLineValue);
                 const isNeedDivide = diameter !== '单玉小径' && diameter !== '单玉中径';
                 function calculateYearlyTotals(data, scoreUnitPrices, monthKeys, isNeedDivide) {
                     const unitPriceMap = {};
@@ -1095,7 +1116,6 @@
                     monthKeysLastYear,
                     isNeedDivide
                 );
-                console.log("151515",lastCostData);
                 function getAverage(total, values) {
                     const validValues = values.filter(val => val != null && val !== 0);
                     return validValues.length > 0 ? parseFloat((total / validValues.length).toFixed(0)) : 0;
@@ -1139,7 +1159,7 @@
 
                 const Line = diameter
                     ? (currentCostData.totalProductionLine === 0 ? 0 : parseFloat((currentCostData.avgMonthlyUnitCost).toFixed(4)))
-                    : parseFloat(referenceLineValueTwo);  // 强制转换为数字
+                    : parseFloat(referenceLineValue);  // 强制转换为数字
                 var colors = ['#5470C6', '#bf2222']; // 定义柱形图和折线图的颜色
                 var option = {
                     tooltip: {
