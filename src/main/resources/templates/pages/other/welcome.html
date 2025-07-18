@@ -1674,7 +1674,7 @@
                                     formatter: function(params) {
                                         const currentIndex = params.dataIndex + 1;
                                         const prevIndex = currentIndex - 1;
-                                        const value = parseFloat(params.value).toFixed(3); // 保留三位小数
+                                        const value = parseFloat(params.value).toFixed(0); // 保留三位小数
 
                                         // 检查前后标签是否重叠（你的逻辑）
                                         if (currentIndex < 0 && Math.abs(params.data - amountData[prevIndex].amount) < 10) {
