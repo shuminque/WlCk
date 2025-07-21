@@ -68,8 +68,8 @@ public class ExcelExportController {
         createCellWithStyle(headerRow, 1, "AT号", style);
         createCellWithStyle(headerRow, 2, "品名", style);
         createCellWithStyle(headerRow, 3, "规格", style);
-        createCellWithStyle(headerRow, 4, "内置入库数量", style);
-        createCellWithStyle(headerRow, 5, "内置入库金额", style);
+        createCellWithStyle(headerRow, 4, "内制入库数量", style);
+        createCellWithStyle(headerRow, 5, "内制入库金额", style);
         createCellWithStyle(headerRow, 6, "入库数量", style);
         createCellWithStyle(headerRow, 7, "入库金额", style);
         createCellWithStyle(headerRow, 8, "出库数量", style);
@@ -107,8 +107,8 @@ public class ExcelExportController {
         XSSFRow subtotalHeaderRow = subtotalSheet.createRow(1);
         createCellWithStyle(subtotalHeaderRow, 0, "分类", style);
 
-        createCellWithStyle(subtotalHeaderRow, 1, "内置入库数量", style);
-        createCellWithStyle(subtotalHeaderRow, 2, "内置入库金额", style);
+        createCellWithStyle(subtotalHeaderRow, 1, "内制入库数量", style);
+        createCellWithStyle(subtotalHeaderRow, 2, "内制入库金额", style);
 
         createCellWithStyle(subtotalHeaderRow, 3, "入库数量", style);
         createCellWithStyle(subtotalHeaderRow, 4, "入库金额", style);
@@ -176,8 +176,8 @@ public class ExcelExportController {
             createCellWithStyle(row, 2, (String) getOrDefault(record, "品名", ""), style);
             createCellWithStyle(row, 3, (String) getOrDefault(record, "规格", ""), style);
 
-            createCellWithStyle(row, 4, ((Double) getOrDefault(record, "内置入库数量", 0.0)).doubleValue(), style);
-            createCellWithStyle(row, 5, Double.parseDouble(((String) getOrDefault(record, "内置入库金额", "0.00")).replace(",", "")), style);
+            createCellWithStyle(row, 4, ((Double) getOrDefault(record, "内制入库数量", 0.0)).doubleValue(), style);
+            createCellWithStyle(row, 5, Double.parseDouble(((String) getOrDefault(record, "内制入库金额", "0.00")).replace(",", "")), style);
 
             createCellWithStyle(row, 6, ((Double) getOrDefault(record, "入库数量", 0.0)).doubleValue(), style);
             createCellWithStyle(row, 7, Double.parseDouble(((String) getOrDefault(record, "入库金额", "0.00")).replace(",", "")), style);
@@ -210,8 +210,8 @@ public class ExcelExportController {
             totalSalesQty += parseToDouble(getOrDefault(record, "销售数量", "0.0").toString());
             totalSalesAmount += parseToDouble(getOrDefault(record, "销售金额", "0.0").toString());
 
-            totalInnerInQty += parseToDouble(getOrDefault(record, "内置入库数量", "0.0").toString());
-            totalInnerInAmount += parseToDouble(getOrDefault(record, "内置入库金额", "0.0").toString());
+            totalInnerInQty += parseToDouble(getOrDefault(record, "内制入库数量", "0.0").toString());
+            totalInnerInAmount += parseToDouble(getOrDefault(record, "内制入库金额", "0.0").toString());
 
             totalNewKnifeQty += parseToDouble(getOrDefault(record, "制作室出库数量", "0.0").toString());
             totalNewKnifeAmount += parseToDouble(getOrDefault(record, "制作室出库金额", "0.0").toString());
