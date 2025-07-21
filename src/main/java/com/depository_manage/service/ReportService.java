@@ -70,16 +70,20 @@ public class ReportService {
                         "    m.at_id as AT号,\n" +
                         "    m.mname as 品名,\n" +
                         "    COALESCE(LEFT(m.model, 30), 'N/A') AS 规格,\n" +
-                        "    SUM(CASE WHEN dr.type = 1 AND dr.apply_remark NOT LIKE ('%领用退回%')THEN dr.quantity ELSE 0 END) AS 入库数量,\n" +
-                        "    FORMAT(ROUND((SUM(CASE WHEN dr.type = 1 AND dr.apply_remark NOT LIKE ('%领用退回%') THEN dr.price * dr.quantity ELSE 0 END)),2), 2) AS 入库金额,\n" +
-                        "    SUM(CASE WHEN dr.type = 0 AND dr.apply_remark NOT IN ('SAB转入ZAB','ZAB转入SAB') AND dr.apply_remark NOT LIKE ('%销售出库%') THEN dr.quantity ELSE 0 END)" +
+                        "    SUM(CASE WHEN dr.type = 1 AND dr.apply_remark LIKE '%内置入库%' THEN dr.quantity ELSE 0 END) AS 内制入库数量,\n" +
+                        "    FORMAT(ROUND(SUM(CASE WHEN dr.type = 1 AND dr.apply_remark LIKE '%内置入库%' THEN dr.price * dr.quantity ELSE 0 END), 2), 2) AS 内制入库金额,\n" +
+                        "    SUM(CASE WHEN dr.type = 1 AND dr.apply_remark NOT LIKE '%领用退回%' AND dr.apply_remark NOT LIKE '%内置入库%' THEN dr.quantity ELSE 0 END) AS 入库数量,\n" +
+                        "    FORMAT(ROUND(SUM(CASE WHEN dr.type = 1 AND dr.apply_remark NOT LIKE '%领用退回%' AND dr.apply_remark NOT LIKE '%内置入库%' THEN dr.price * dr.quantity ELSE 0 END), 2), 2) AS 入库金额,\n" +
+                        "    SUM(CASE WHEN dr.type = 0 AND dr.apply_remark NOT IN ('SAB转入ZAB','ZAB转入SAB') AND dr.apply_remark NOT LIKE ('%销售出库%') AND dr.apply_remark NOT LIKE '%新刀制作室%' THEN dr.quantity ELSE 0 END)" +
                         "   -SUM(CASE WHEN dr.type = 1 AND dr.apply_remark LIKE ('%领用退回%') THEN dr.quantity ELSE 0 END) AS 出库数量,\n" +
-                        "    FORMAT(ROUND((SUM(CASE WHEN dr.type = 0 AND dr.apply_remark NOT IN ('SAB转入ZAB','ZAB转入SAB') AND dr.apply_remark NOT LIKE ('%销售出库%') THEN dr.price * dr.quantity ELSE 0 END))-" +
-                        "                 (SUM(CASE WHEN dr.type = 1 AND dr.apply_remark LIKE ('%领用退回%') THEN dr.price * dr.quantity ELSE 0 END)),2), 2) AS 出库金额,\n" +
+                        "    FORMAT(ROUND((SUM(CASE WHEN dr.type = 0 AND dr.apply_remark NOT IN ('SAB转入ZAB','ZAB转入SAB') AND dr.apply_remark NOT LIKE ('%销售出库%') AND dr.apply_remark NOT LIKE '%新刀制作室%' THEN dr.price * dr.quantity ELSE 0 END))" +
+                        "                -(SUM(CASE WHEN dr.type = 1 AND dr.apply_remark LIKE ('%领用退回%') THEN dr.price * dr.quantity ELSE 0 END)),2), 2) AS 出库金额,\n" +
                         "    SUM(CASE WHEN dr.type = 0 AND dr.apply_remark IN ('SAB转入ZAB','ZAB转入SAB') THEN dr.quantity ELSE 0 END) AS 转移数量,\n" +
                         "    FORMAT(ROUND((SUM(CASE WHEN dr.type = 0 AND dr.apply_remark IN ('SAB转入ZAB','ZAB转入SAB') THEN dr.price * dr.quantity ELSE 0 END)),2), 2) AS 转移金额,\n" +
                         "    SUM(CASE WHEN dr.type = 0 AND dr.apply_remark LIKE ('%销售出库%') THEN dr.quantity ELSE 0 END) AS 销售数量,\n" +
                         "    FORMAT(ROUND((SUM(CASE WHEN dr.type = 0 AND dr.apply_remark LIKE ('%销售出库%') THEN dr.price * dr.quantity ELSE 0 END)),2), 2) AS 销售金额,\n" +
+                        "    SUM(CASE WHEN dr.type = 0 AND dr.apply_remark LIKE '%新刀制作室%' THEN dr.quantity ELSE 0 END) AS 制作室出库数量,\n" +
+                        "    FORMAT(ROUND(SUM(CASE WHEN dr.type = 0 AND dr.apply_remark LIKE '%新刀制作室%' THEN dr.price * dr.quantity ELSE 0 END), 2), 2) AS 制作室出库金额,\n" +
                         "    m.quantity - COALESCE((SELECT SUM(CASE WHEN dr_after.type = 1 THEN dr_after.quantity ELSE -dr_after.quantity END)\n" +
                         "                          FROM depository_record dr_after\n" +
                         "                          WHERE dr_after.at_id = m.at_id\n" +
@@ -122,16 +126,20 @@ public class ReportService {
                         "    m.mname as 品名,\n" +
                         "    me.ename as 工程,\n" +
                         "    COALESCE(LEFT(m.model, 30), 'N/A') AS 规格,\n" +
-                        "    SUM(CASE WHEN dr.type = 1 AND dr.apply_remark NOT LIKE ('%领用退回%') THEN dr.quantity ELSE 0 END) AS 入库数量,\n" +
-                        "    FORMAT(ROUND((SUM(CASE WHEN dr.type = 1 AND dr.apply_remark NOT LIKE ('%领用退回%') THEN dr.price * dr.quantity ELSE 0 END)),2), 2) AS 入库金额,\n" +
-                        "    SUM(CASE WHEN dr.type = 0 AND dr.apply_remark NOT IN ('SAB转入ZAB','ZAB转入SAB') AND dr.apply_remark NOT LIKE ('%销售出库%') THEN dr.quantity ELSE 0 END)" +
+                        "    SUM(CASE WHEN dr.type = 1 AND dr.apply_remark LIKE '%内置入库%' THEN dr.quantity ELSE 0 END) AS 内制入库数量,\n" +
+                        "    FORMAT(ROUND(SUM(CASE WHEN dr.type = 1 AND dr.apply_remark LIKE '%内置入库%' THEN dr.price * dr.quantity ELSE 0 END), 2), 2) AS 内制入库金额,\n" +
+                        "    SUM(CASE WHEN dr.type = 1 AND dr.apply_remark NOT LIKE '%领用退回%' AND dr.apply_remark NOT LIKE '%内置入库%' THEN dr.quantity ELSE 0 END) AS 入库数量,\n" +
+                        "    FORMAT(ROUND(SUM(CASE WHEN dr.type = 1 AND dr.apply_remark NOT LIKE '%领用退回%' AND dr.apply_remark NOT LIKE '%内置入库%' THEN dr.price * dr.quantity ELSE 0 END), 2), 2) AS 入库金额,\n" +
+                        "    SUM(CASE WHEN dr.type = 0 AND dr.apply_remark NOT IN ('SAB转入ZAB','ZAB转入SAB') AND dr.apply_remark NOT LIKE ('%销售出库%') AND dr.apply_remark NOT LIKE '%新刀制作室%' THEN dr.quantity ELSE 0 END)" +
                         "   -SUM(CASE WHEN dr.type = 1 AND dr.apply_remark LIKE ('%领用退回%') THEN dr.quantity ELSE 0 END) AS 出库数量,\n" +
-                        "    FORMAT(ROUND((SUM(CASE WHEN dr.type = 0 AND dr.apply_remark NOT IN ('SAB转入ZAB','ZAB转入SAB') AND dr.apply_remark NOT LIKE ('%销售出库%') THEN dr.price * dr.quantity ELSE 0 END))" +
+                        "    FORMAT(ROUND((SUM(CASE WHEN dr.type = 0 AND dr.apply_remark NOT IN ('SAB转入ZAB','ZAB转入SAB') AND dr.apply_remark NOT LIKE ('%销售出库%') AND dr.apply_remark NOT LIKE '%新刀制作室%' THEN dr.price * dr.quantity ELSE 0 END))" +
                         "                -(SUM(CASE WHEN dr.type = 1 AND dr.apply_remark LIKE ('%领用退回%') THEN dr.price * dr.quantity ELSE 0 END)),2), 2) AS 出库金额,\n" +
                         "    SUM(CASE WHEN dr.type = 0 AND dr.apply_remark IN ('SAB转入ZAB','ZAB转入SAB') THEN dr.quantity ELSE 0 END) AS 转移数量,\n" +
                         "    FORMAT(ROUND((SUM(CASE WHEN dr.type = 0 AND dr.apply_remark IN ('SAB转入ZAB','ZAB转入SAB') THEN dr.price * dr.quantity ELSE 0 END)),2), 2) AS 转移金额,\n" +
                         "    SUM(CASE WHEN dr.type = 0 AND dr.apply_remark LIKE ('%销售出库%') THEN dr.quantity ELSE 0 END) AS 销售数量,\n" +
                         "    FORMAT(ROUND((SUM(CASE WHEN dr.type = 0 AND dr.apply_remark LIKE ('%销售出库%') THEN dr.price * dr.quantity ELSE 0 END)),2), 2) AS 销售金额,\n" +
+                        "    SUM(CASE WHEN dr.type = 0 AND dr.apply_remark LIKE '%新刀制作室%' THEN dr.quantity ELSE 0 END) AS 制作室出库数量,\n" +
+                        "    FORMAT(ROUND(SUM(CASE WHEN dr.type = 0 AND dr.apply_remark LIKE '%新刀制作室%' THEN dr.price * dr.quantity ELSE 0 END), 2), 2) AS 制作室出库金额,\n" +
                         "    m.quantity - COALESCE((SELECT SUM(CASE WHEN dr_after.type = 1 THEN dr_after.quantity ELSE -dr_after.quantity END)\n" +
                         "                          FROM depository_record dr_after\n" +
                         "                          WHERE dr_after.at_id = m.at_id\n" +
