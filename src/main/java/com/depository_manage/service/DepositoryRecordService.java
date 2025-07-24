@@ -121,4 +121,5 @@ public interface DepositoryRecordService {
     List<CategoryOutboundDTO> getScoreForYear(String year, Integer depositoryId);
 
 
+    int updateCheckPass(Integer id, String checkPass);
 }

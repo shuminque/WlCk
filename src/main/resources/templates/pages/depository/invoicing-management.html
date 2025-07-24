@@ -25,6 +25,14 @@
                             </div>
                         </div>
                         <div class="layui-inline" >
+                            <div class="layui-input-inline">
+                                <select id="checkPass" name="checkPass">
+                                    <option value="" selected>请选择结算状态</option>
+                                    <option value="已结算" >已结算</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="layui-inline" >
                             <label class="layui-form-label">供应商</label>
                             <div class="layui-input-inline">
                                 <select name="checkRemark" id="checkRemarkF" lay-search>
@@ -241,14 +249,14 @@
                     height: "full-50", // 设置表格高度并固定表头
                     cols: [ [
                         // {type: "checkbox", width: 50},
-                        // {field: 'id', width: 60, title: '序号'},
+                        {field: 'id', width: 60, title: 'ID',hide:true},
                         // {field: 'depositoryName', width: 60, title: '厂区'},
-                        {field: 'atId', width: '5%', title: 'AT'},
-                        {field: 'mname',width: '12%', title: '品名'},
-                        {field: 'model', width: '10%', title: '规格'},
+                        {field: 'atId', width: '5%', title: 'AT', sort: true},
+                        {field: 'mname',width: '12%', title: '品名', sort: true},
+                        {field: 'model', width: '10%', title: '规格', sort: true},
                         // {field: 'typeName',width: '18%', title: '分类'},
                         // {field: 'enginName', width:'10%', title: '工程'},
-                        {field: 'quantity',  width: '5%', title: '数量'},
+                        {field: 'quantity',  width: '5%', title: '数量', sort: true},
                         {field: 'price', title: '单价', width: '8%', templet: function(d) {
                                 return parseFloat(d.price).toFixed(2);  // 格式化为两位小数
                             }},
@@ -256,7 +264,7 @@
                                 let quantity = parseFloat(d.quantity) || 0;
                                 let price = parseFloat(d.price) || 0;
                                 return (quantity * price).toFixed(2);
-                            }, totalRow: true},
+                            }, totalRow: true, sort: true},
                         // {field: 'applyRemark', title: '类型', width: '10%'},
                         {field: 'state', width:'6%', title: '流程'},
                         // {field: 'applicantName', width:'8%', title: '申请人'},
@@ -264,38 +272,14 @@
                         {field: 'applyTime',title: '日期', width:'10%', sort: true, templet: function(d){
                                 return formatDate(d.applyTime);
                             }},
+                        {field: 'checkPass', width: 170, title: '结算状态', sort: true},
                         {
                             title: '操作',
                             minWidth: 200,
                             align: "center",
                             templet: function (row) {
                                 // 初始化按钮字符串
-                                let buttons = '<a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="detail">详情</a>';
-
-                                // 获取当前日期
-                                const today = new Date();
-                                const currentMonth = today.getMonth() + 1; // JavaScript中，月份是从0开始的
-                                const currentYear = today.getFullYear();
-
-                                // 获取数据的日期
-                                const [year, month] = (typeof row.applyTime === 'string' && row.applyTime.includes('-')) ?
-                                    row.applyTime.split('-').map(Number) : [null, null];
-
-                                // 根据userAuthority和其他条件判断是否添加修改和删除按钮
-                                if (userAuthority === '仓管员') {
-                                    if (row.state === '待审核' ) {
-                                        buttons += '<a class="layui-btn layui-btn-xs" lay-event="edit">修改</a>';
-                                        if(row.state !== '审核未通过') {
-                                            buttons += '<a class="layui-btn layui-btn-xs layui-btn-danger" lay-event="delete">删除</a>';
-                                        }
-                                    }
-                                } else if (userAuthority === '审核人' && year === currentYear && month === currentMonth) {
-                                    buttons += '<a class="layui-btn layui-btn-xs" lay-event="edit">修改</a>';
-                                    buttons += '<a class="layui-btn layui-btn-xs layui-btn-danger" lay-event="delete">删除</a>';
-                                } else if (userAuthority === '系统管理员') {
-                                    buttons += '<a class="layui-btn layui-btn-xs" lay-event="edit">修改</a>';
-                                    buttons += '<a class="layui-btn layui-btn-xs layui-btn-danger" lay-event="delete">删除</a>';
-                                }
+                                let buttons = '<a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="edit">修改结算状态</a>';
                                 return buttons;
                             }
                         }
@@ -366,6 +350,9 @@
                     }
                     if (data.checkRemark!==''){
                         req.checkRemark=data.checkRemark;
+                    }
+                    if (data.checkPass!==''){
+                        req.checkPass=data.checkPass;
                     }
                     if (data.applyTime!==''){
                         var dates = data.applyTime.split(' - ');
@@ -458,73 +445,50 @@
 
         table.on('tool(currentTableFilter)', function (obj) {
             let data = obj.data;
-            if (obj.event === 'detail') {
-                var index = layer.open({
-                    title: '入库信息详情',
-                    type: 2,
-                    shade: 0.2,
-                    maxmin: true,
-                    shadeClose: true,
-                    area: ['100%', '100%'],
-                    content: '/form_step_look?id='+data.id,
-                });
-                $(window).on("resize", function () {
-                    layer.full(index);
-                });
-                return false;
-            } else if (obj.event === 'delete') {
-                var req={};
-                req.id=data.id;
-                layer.confirm('确认删除', {icon: 2, title: '提示'}, function (index) {
-                    $.ajax({
-                        url: '/depositoryRecord',
-                        type: 'delete',
-                        dataType:'json',
-                        contentType: "application/json;charset=utf-8",
-                        data:JSON.stringify(req),
-                        beforeSend:function () {
-                            this.layerIndex = layer.load(0, { shade: [0.5, '#393D49'] });
-                        },
-                        success:function(data){
-                            layer.close(this.layerIndex);
-                            if(data.status >= 300){
-                                layer.msg(data.statusInfo.message);//失败的表情
+            if (obj.event === 'edit') {
+                layer.open({
+                    type: 1,
+                    title: '修改结算状态',
+                    area: ['300px', '200px'],
+                    content: `
+                <div style="padding:20px;">
+                    <select id="checkPassSelect" class="layui-input">
+                        <option value="">请选择结算状态</option>
+                        <option value="已结算">已结算</option>
+                    </select>
+                    <br/>
+                    <button id="confirmBtn" class="layui-btn layui-btn-sm">确认</button>
+                </div>
+            `,
+                    success: function (layero, index) {
+                        $("#confirmBtn").on("click", function () {
+                            let selectedStatus = $("#checkPassSelect").val();
+                            if (!selectedStatus) {
+                                layer.msg("请选择结算状态");
                                 return;
-                            }else{
-                                obj.del();
-                                layer.msg("删除成功", {
-                                    icon: 6,//成功的表情
-                                    time: 500 //1秒关闭（如果不配置，默认是3秒）
-                                });
                             }
-                        }
-                    })
+
+                            $.ajax({
+                                url: "/depository/updateCheckPass",
+                                type: "POST",
+                                contentType: "application/json",
+                                data: JSON.stringify({
+                                    id: data.id,
+                                    checkPass: selectedStatus
+                                }),
+                                success: function (res) {
+                                    if (res.status === 200) {
+                                        layer.msg("修改成功");
+                                        layer.close(index);
+                                        table.reload("currentTableId"); // 重新加载表格
+                                    } else {
+                                        layer.msg("修改失败：" + res.message);
+                                    }
+                                }
+                            });
+                        });
+                    }
                 });
-            } else if (obj.event === 'edit') {
-                // 检查流程状态是否为待审核
-                if (userReviewGroupId !== '') {
-                    var index = layer.open({
-                        title: '入库信息编辑',
-                        type: 2,
-                        shade: 0.2,
-                        maxmin: true,
-                        shadeClose: true,
-                        area: ['100%', '100%'],
-                        content: '/application_in?id=' + data.id + '&action=edit', // 添加一个 action 参数，表示这是一个编辑操作
-                        end: function() {
-                            // 弹窗关闭后刷新当前页面
-                            location.reload();
-                        }
-                    });
-                    $(window).on("resize", function () {
-                        layer.full(index);
-                    });
-                    // 重定向到提交申请页面，并通过查询参数传递记录的ID
-                    // window.location.href = '/application_in?id=' + data.id;
-                } else {
-                    layer.alert('请求出错', {icon: 5});
-                }
-                return false;
             }
         });
     });

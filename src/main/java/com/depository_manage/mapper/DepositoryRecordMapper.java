@@ -122,4 +122,6 @@ public interface DepositoryRecordMapper {
     String selectLatestCheckRemark(@Param("atId") Integer atId, @Param("depositoryId") Integer depositoryId);
 
 
+    int updateCheckPass(@Param("id") Integer id, @Param("checkPass") String checkPass);
+
 }

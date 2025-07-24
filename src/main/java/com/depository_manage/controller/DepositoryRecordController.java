@@ -335,6 +335,32 @@ public class DepositoryRecordController {
         String remark = depositoryRecordMapper.selectLatestCheckRemark(atId, depositoryId);
         return ResponseEntity.ok(remark);
     }
+    @PostMapping("/depository/updateCheckPass")
+    public ResponseEntity<?> updateCheckPass(@RequestBody Map<String, Object> map) {
+        Integer id = (Integer) map.get("id");
+        String checkPass = (String) map.get("checkPass");
+
+        if (id == null || checkPass == null) {
+            Map<String, Object> error = new HashMap<>();
+            error.put("status", 400);
+            error.put("message", "参数不完整");
+            return ResponseEntity.badRequest().body(error);
+        }
+
+        int updated = depositoryRecordService.updateCheckPass(id, checkPass);
+        Map<String, Object> result = new HashMap<>();
+        if (updated > 0) {
+            result.put("status", 200);
+            result.put("message", "更新成功");
+            return ResponseEntity.ok(result);
+        } else {
+            result.put("status", 500);
+            result.put("message", "更新失败");
+            return ResponseEntity.status(500).body(result);
+        }
+    }
+
+
 
 
 }

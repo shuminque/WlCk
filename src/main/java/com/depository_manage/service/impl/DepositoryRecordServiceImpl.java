@@ -742,4 +742,10 @@ public class DepositoryRecordServiceImpl implements DepositoryRecordService {
     public List<CategoryOutboundDTO> getScoreForYear(String year, Integer depositoryId) {
         return depositoryRecordMapper.getScoreForYear(year, depositoryId);
     }
+
+    @Override
+    public int updateCheckPass(Integer id, String checkPass) {
+        return depositoryRecordMapper.updateCheckPass(id, checkPass);
+    }
+
 }

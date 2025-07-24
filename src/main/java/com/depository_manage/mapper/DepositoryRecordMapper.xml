@@ -1950,5 +1950,10 @@ UNION ALL
         ORDER BY review_time DESC
             LIMIT 1
     </select>
+    <update id="updateCheckPass">
+        UPDATE depository_record
+        SET check_pass = #{checkPass}
+        WHERE id = #{id}
+    </update>
 
 </mapper>
