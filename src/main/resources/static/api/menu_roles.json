@@ -210,6 +210,13 @@
                             "icon": "layui-icon layui-icon-chart",
                             "target": "_self",
                             "roles": ["SAB_cg","SAB_sh","ZAB_cg","ZAB_sh","ALL"]
+                        },
+                        {
+                            "title": "供应商信息",
+                            "href": "/supplier_add",
+                            "icon": "layui-icon layui-icon-chart",
+                            "target": "_self",
+                            "roles": ["SAB_cg","SAB_sh","ZAB_cg","ZAB_sh","ALL"]
                         }
                     ]
                 },
@@ -277,12 +284,20 @@
                         }
                     ]
                 },
-
                 {
                     "title": "任务审批",
                     "icon": "fa fa-tasks",
                     "target": "_self",
                     "href": "/my_task",
+                    "roles": [
+                        "SAB_sh", "ZAB_sh", "ALL"
+                    ]
+                },
+                {
+                    "title": "开票管理",
+                    "icon": "fa fa-tasks",
+                    "target": "_self",
+                    "href": "/invoicing-management",
                     "roles": [
                         "SAB_sh", "ZAB_sh", "ALL"
                     ]

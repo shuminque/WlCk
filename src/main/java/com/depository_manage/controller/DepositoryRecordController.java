@@ -329,5 +329,12 @@ public class DepositoryRecordController {
         return ResponseEntity.ok(categoryOutbounds);
     }
 
+    @GetMapping("/depository/latestCheckRemark")
+    public ResponseEntity<String> getLatestCheckRemark(@RequestParam Integer atId,
+                                                       @RequestParam Integer depositoryId) {
+        String remark = depositoryRecordMapper.selectLatestCheckRemark(atId, depositoryId);
+        return ResponseEntity.ok(remark);
+    }
+
 
 }

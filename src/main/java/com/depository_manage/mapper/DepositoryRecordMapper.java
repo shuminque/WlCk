@@ -113,4 +113,13 @@ public interface DepositoryRecordMapper {
     List<Map<String, Object>> viewPrice(Map<String, Object> params);
     List<CategoryOutboundDTO> getScoreForYear(@Param("year") String year,
                                                                @Param("depositoryId") Integer depositoryId);
+
+    // DepositoryRecordMapper.java
+    int countCheckRemarkExists(@Param("atId") Integer atId, @Param("depositoryId") Integer depositoryId);
+
+    int updateCheckRemarkForGroup(@Param("atId") Integer atId, @Param("depositoryId") Integer depositoryId, @Param("checkRemark") String checkRemark);
+
+    String selectLatestCheckRemark(@Param("atId") Integer atId, @Param("depositoryId") Integer depositoryId);
+
+
 }

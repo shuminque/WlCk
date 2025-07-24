@@ -401,6 +401,8 @@
             var urlParams = new URLSearchParams(window.location.search);
             var id = urlParams.get('id');
             if (id) {
+                $('#price').removeAttr('readonly');
+
                 $.get('/get_record?id=' + id, function(data) {
                     console.log(data); // 检查返回的数据
                     // 填充表单
@@ -420,6 +422,9 @@
                     // 重新渲染表单
                     layui.form.render();
                 });
+            } else {
+                // 非编辑模式，加上readonly
+                $('#price').attr('readonly', 'readonly');
             }
         });
     })

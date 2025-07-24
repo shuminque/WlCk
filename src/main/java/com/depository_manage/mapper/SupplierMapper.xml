@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.depository_manage.mapper.SupplierMapper">
+
+    <!-- 字段映射 -->
+    <resultMap id="supplierMap" type="com.depository_manage.entity.Supplier">
+        <id column="id" property="id" jdbcType="INTEGER"/>
+        <result column="supplierName" property="supplierName" jdbcType="VARCHAR"/>
+        <result column="contact" property="contact" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <!-- 所有列 -->
+    <sql id="allColumns">
+        s.id, s.supplierName, s.contact
+    </sql>
+
+    <!-- 查询所有 -->
+    <select id="findSupplierAll" resultMap="supplierMap">
+        SELECT <include refid="allColumns"/> FROM supplier s
+    </select>
+
+    <!-- 条件查询 -->
+    <select id="findSupplierByCondition" resultMap="supplierMap" parameterType="map">
+        SELECT <include refid="allColumns"/> FROM supplier s
+        WHERE 1 = 1
+        <if test="supplierName != null and supplierName != ''">
+            AND s.supplierName LIKE CONCAT('%', #{supplierName}, '%')
+        </if>
+        <if test="contact != null and contact != ''">
+            AND s.contact LIKE CONCAT('%', #{contact}, '%')
+        </if>
+        <if test="begin != null and size != null">
+            LIMIT #{begin}, #{size}
+        </if>
+    </select>
+
+    <!-- 插入 -->
+    <insert id="insertSupplier" parameterType="map">
+        INSERT INTO supplier (id, supplierName, contact)
+        VALUES (#{id}, #{supplierName}, #{contact})
+    </insert>
+
+    <!-- 更新 -->
+    <update id="updateSupplier" parameterType="map">
+        UPDATE supplier
+        <set>
+            <if test="supplierName != null">supplierName = #{supplierName},</if>
+            <if test="contact != null">contact = #{contact}</if>
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    <!-- 删除 -->
+    <delete id="deleteSupplierById" parameterType="int">
+        DELETE FROM supplier WHERE id = #{id}
+    </delete>
+
+    <!-- 条数统计 -->
+    <select id="findCountByCondition" parameterType="map" resultType="int">
+        SELECT COUNT(*) FROM supplier s
+        WHERE 1 = 1
+        <if test="supplierName != null and supplierName != ''">
+            AND s.supplierName LIKE CONCAT('%', #{supplierName}, '%')
+        </if>
+        <if test="contact != null and contact != ''">
+            AND s.contact LIKE CONCAT('%', #{contact}, '%')
+        </if>
+    </select>
+
+</mapper>

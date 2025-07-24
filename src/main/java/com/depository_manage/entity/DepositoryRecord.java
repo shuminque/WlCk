@@ -76,5 +76,5 @@ public class DepositoryRecord {
     /**
      * 是否验收通过
      */
-    private Integer checkPass;
+    private String checkPass;
 }

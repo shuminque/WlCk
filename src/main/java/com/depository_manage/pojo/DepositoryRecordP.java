@@ -133,7 +133,7 @@ public class DepositoryRecordP {
     /**
      * 是否验收通过
      */
-    private Integer checkPass;
+    private String checkPass;
 
     public DepositoryRecordP(DepositoryRecord dr ) {
         this.id = dr.getId();

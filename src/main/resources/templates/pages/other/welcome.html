@@ -983,7 +983,9 @@
                 const countNonZero = costPerUnit.filter(cost => cost > 0).length;
 
                 // 计算参考线值（平均单个成本），并保留4位小数
-                const referenceLineValue = countNonZero > 0 ? (totalCost / countNonZero).toFixed(4) : 0; // 防止除零错误，并保留4位小数
+                const referenceLineValue = countNonZero > 0
+                    ? totalCost / countNonZero
+                    : 0;
                 const productionDataNormal = amountData.map(function(item) {
                     var productionItem = lineData.find(lineItem => {
                         const date = new Date(lineItem.date);
@@ -1158,8 +1160,22 @@
                     : [prevYearcostPerUnit].concat(costPerUnit);
 
                 const Line = diameter
-                    ? (currentCostData.totalProductionLine === 0 ? 0 : parseFloat((currentCostData.avgMonthlyUnitCost).toFixed(4)))
-                    : parseFloat(referenceLineValue);  // 强制转换为数字
+                    ? (currentCostData.totalProductionLine === 0 ? 0 : parseFloat(currentCostData.avgMonthlyUnitCost.toFixed(4)))
+                    : parseFloat(referenceLineValue.toFixed(4));
+
+                // 从 costPerUnitSeriesData 中排除掉前一年那个值
+//                 const currentYearUnitCostValues = costPerUnitSeriesData.slice(1); // 当前年12个月数据
+//
+// // 转换成浮点数并过滤掉无效项
+//                 const validUnitCosts = currentYearUnitCostValues
+//                     .map(x => parseFloat(x))
+//                     .filter(x => !isNaN(x) && x > 0);
+//
+// // 计算平均线值 Line
+//                 const Line = validUnitCosts.length > 0
+//                     ? parseFloat((validUnitCosts.reduce((a, b) => a + b, 0) / validUnitCosts.length).toFixed(4))
+//                     : 0;
+
                 var colors = ['#5470C6', '#bf2222']; // 定义柱形图和折线图的颜色
                 var option = {
                     tooltip: {
@@ -1824,7 +1840,13 @@
                     dropDataSAB = data;
                     loadDepositoryDataForElem('#ID-dropdown-demo-complex-1', dropDataSAB);
                 } else {
-                    dropDataZAB = data;
+                    const excludeTitles = ['新刀制作室'];
+                    dropDataZAB = data.map(group => {
+                        return {
+                            ...group,
+                            child: group.child.filter(item => !excludeTitles.includes(item.title))
+                        };
+                    });
                     loadDepositoryDataForElem('#ID-dropdown-demo-complex-1', dropDataZAB);
                 }
                 // 重新加载数据后调用fetchCateChart以确保图表更新

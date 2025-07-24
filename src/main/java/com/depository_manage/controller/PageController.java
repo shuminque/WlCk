@@ -42,6 +42,8 @@ public class PageController {
     private LineDataService  lineDataService;
     @Autowired
     private CategoryService categoryService;
+    @Autowired
+    private SupplierService supplierService;
     @GetMapping("/login")
     public String login() {
         return "pages/user/login";
@@ -112,6 +114,10 @@ public class PageController {
     @GetMapping("/series_add")
     public String series_add() {
         return "pages/other/series_add";
+    }
+    @GetMapping("/supplier_add")
+    public String supplier_add() {
+        return "pages/other/supplier_add";
     }
     @GetMapping("/materialType_add")
     public String materialType_add() {
@@ -237,7 +243,15 @@ public class PageController {
         mv.addObject("materialTypes", materialTypeService.findMaterialTypeAll());
         return mv;
     }
-
+    @GetMapping("/invoicing-management")
+    public ModelAndView invoicingManagement() {
+        ModelAndView mv = new ModelAndView();
+        mv.setViewName("pages/depository/invoicing-management");
+        mv.addObject("depositories", depositoryService.findDepositoryAll());
+        mv.addObject("suppliers", supplierService.findSupplierAll());
+        mv.addObject("materialTypes", materialTypeService.findMaterialTypeAll());
+        return mv;
+    }
     @GetMapping("/table_out")
     public ModelAndView table_out(HttpServletRequest request) {
         ModelAndView mv = new ModelAndView();
@@ -356,6 +370,7 @@ public class PageController {
         mv.setViewName("pages/application/application-review");
         DepositoryRecordP recordP = depositoryRecordService.findDepositoryRecordById(id);
         mv.addObject("record", recordP);
+        mv.addObject("suppliers", supplierService.findSupplierAll());
         mv.addObject("checkers", userService.findUsersByDepositoryId(recordP.getDepositoryId()));
         return mv;
     }

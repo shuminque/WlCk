@@ -394,7 +394,6 @@ public class DepositoryRecordServiceImpl implements DepositoryRecordService {
             DepositoryRecord record;
             if (reviewPass == 1) {
                 record = depositoryRecordMapper.findDepositoryRecordById(ObjectFormatUtil.toInteger(map.get("id")));
-
                 // 创建一个新的查询条件map
                 Map<String, Object> queryMap = new HashMap<>();
                 queryMap.put("depositoryId", record.getDepositoryId());
@@ -505,7 +504,22 @@ public class DepositoryRecordServiceImpl implements DepositoryRecordService {
                 notificationService.insertNotification(notification);
             }
         }
-            return depositoryRecordMapper.updateDepositoryRecord(map);
+            System.out.println(map);
+            // 获取传入参数
+        Integer atId = map.get("atId") != null ? Integer.valueOf(map.get("atId").toString()) : null;
+        Integer depositoryId = map.get("depositoryId") != null ? Integer.valueOf(map.get("depositoryId").toString()) : null;
+        String checkRemark = map.get("checkRemark") != null ? map.get("checkRemark").toString() : null;
+
+        if (atId != null && depositoryId != null && checkRemark != null) {
+                String trimmedRemark = checkRemark.trim();
+                if (!trimmedRemark.isEmpty()) {
+                    int count = depositoryRecordMapper.countCheckRemarkExists(atId, depositoryId);
+                    if (count == 0) {
+                        depositoryRecordMapper.updateCheckRemarkForGroup(atId, depositoryId, trimmedRemark);
+                    }
+                }
+            }
+        return depositoryRecordMapper.updateDepositoryRecord(map);
     }
 
     @Override

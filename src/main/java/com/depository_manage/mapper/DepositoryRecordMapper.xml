@@ -43,7 +43,7 @@
         <result column="checker_id" property="checkerId" jdbcType="INTEGER" />
         <result column="check_remark" property="checkRemark" jdbcType="VARCHAR" />
         <result column="check_time" property="checkTime" jdbcType="TIMESTAMP" />
-        <result column="check_pass" property="checkPass" jdbcType="INTEGER" />
+        <result column="check_pass" property="checkPass" jdbcType="VARCHAR" />
     </resultMap>
 
 
@@ -1922,6 +1922,33 @@ UNION ALL
             a.month
         ORDER BY
             a.month;
+    </select>
+
+    <!-- DepositoryRecordMapper.xml -->
+    <select id="countCheckRemarkExists" resultType="int">
+        SELECT COUNT(*)
+        FROM depository_record
+        WHERE at_id = #{atId}
+          AND depository_id = #{depositoryId}
+          AND check_remark IS NOT NULL
+          AND check_remark != ''
+    </select>
+
+    <update id="updateCheckRemarkForGroup">
+        UPDATE depository_record
+        SET check_remark = #{checkRemark}
+        WHERE at_id = #{atId}
+          AND depository_id = #{depositoryId}
+        AND type=1
+    </update>
+    <select id="selectLatestCheckRemark" resultType="java.lang.String">
+        SELECT check_remark
+        FROM depository_record
+        WHERE at_id = #{atId}
+          AND depository_id = #{depositoryId}
+          AND check_remark IS NOT NULL AND check_remark != ''
+        ORDER BY review_time DESC
+            LIMIT 1
     </select>
 
 </mapper>

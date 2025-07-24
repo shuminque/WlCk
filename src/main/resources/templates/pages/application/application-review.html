@@ -33,20 +33,31 @@
                                 </colgroup>
                                 <div id="review">
                                     <div class="layui-form" style="margin: 0 auto;max-width: 900px;padding-right: 150px;">
-                                        <!--                            <div class=" layui-inline" >-->
-                                        <!--                                <label class="layui-form-label">选择验收人:</label>-->
-                                        <!--                                <div class="layui-inline" style="margin-bottom: 10px">-->
-                                        <!--                                    <select id="checkerIdF" name="checkerId" class="layui-input-inline" lay-verify="">-->
-                                        <!--                                        <option th:each="checker,iterStar:${checkers}" th:value="${checker.getId()}" th:text="${checker.getUname()}">张三</option>-->
-                                        <!--                                    </select>-->
-                                        <!--                                </div>-->
-                                        <!--                            </div>-->
-                                        <!--                            <div class="layui-form-item">-->
-                                        <!--                                <label class="layui-form-label">审核备注:</label>-->
-                                        <!--                                <div class="layui-input-block">-->
-                                        <!--                                    <textarea id="reviewRemarkF"  name="reviewRemark" placeholder="如需填写相关原因及申请原因" value="" class="layui-textarea"></textarea>-->
-                                        <!--                                </div>-->
-                                        <!--                            </div>-->
+<!--                                                                    <div class=" layui-inline" >-->
+<!--                                                                        <label class="layui-form-label">选择验收人:</label>-->
+<!--                                                                        <div class="layui-inline" style="margin-bottom: 10px">-->
+<!--                                                                            <select id="checkerIdF" name="checkerId" class="layui-input-inline" lay-verify="">-->
+<!--                                                                                <option th:each="checker,iterStar:${checkers}" th:value="${checker.getId()}" th:text="${checker.getUname()}">张三</option>-->
+<!--                                                                            </select>-->
+<!--                                                                        </div>-->
+<!--                                                                    </div>-->
+<!--                                                                    <div class="layui-form-item">-->
+<!--                                                                        <label class="layui-form-label">审核备注:</label>-->
+<!--                                                                        <div class="layui-input-block">-->
+<!--                                                                            <textarea id="reviewRemarkF"  name="reviewRemark" placeholder="如需填写相关原因及申请原因" value="" class="layui-textarea"></textarea>-->
+<!--                                                                        </div>-->
+<!--                                                                    </div>-->
+                                        <div class="layui-form-item">
+                                            <label class="layui-form-label">供应商</label>
+                                            <div class="layui-input-block">
+                                                <select name="checkRemark" id="checkRemarkF" lay-search>
+                                                    <option value="">请选择供应商</option>
+                                                    <th:block th:each="supplier : ${suppliers}">
+                                                        <option th:value="${supplier.supplierName}" th:text="${supplier.supplierName}"></option>
+                                                    </th:block>
+                                                </select>
+                                            </div>
+                                        </div>
                                         <div class="layui-form-item review-buttons">
                                             <div class="layui-input-block">
                                                 <button id="reviewPass1" class="layui-btn" onclick="review(1)">
@@ -57,6 +68,7 @@
                                                 </button>
                                             </div>
                                         </div>
+
                                     </div>
                                 </div>
                                 <tbody>
@@ -72,6 +84,10 @@
                                 <tr>
                                     <td>厂区</td>
                                     <td id="depositoryName" th:text="${record.getDepositoryName()}">外芯仓库</td>
+                                </tr>
+                                <tr style="display: none">
+                                    <td>厂区ID</td>
+                                    <td id="depositoryId" th:text="${record.getDepositoryId()}">外芯仓库</td>
                                 </tr>
                                 <tr>
                                     <td>品名</td>
@@ -168,6 +184,7 @@
 <script src="/static/js/lay-config.js?v=1.0.4" charset="utf-8"></script>
 <script>
     // function check(){}
+    let form; // 提升作用域
     function review(){}
     layui.use(['form', 'step'], function () {
         var $ = layui.$,
@@ -184,6 +201,7 @@
             position = 2;
             states = [{title: "提交申请"}, {title: "审核通过"}, {title: state}];
         }
+
         step.render({
             elem: '#stepForm',
             filter: 'stepForm',
@@ -215,7 +233,35 @@
             // data.checkPass=1;
             // data.id=$("#id").text();
             // console.log(JSON.stringify(data));
+
+        const atId = $("#atId").text().trim();
+        const depositoryId = $("#depositoryId").text().trim();
+
+        $.ajax({
+            url: "/depository/latestCheckRemark",
+            type: "GET",
+            data: {
+                atId: atId,
+                depositoryId: depositoryId
+            },
+            success: function(res) {
+                if (res) {
+                    $("#checkRemarkF").val(res);
+                    layui.form.render("select");
+                }
+                console.log("接口返回结果：", res);
+            }
+        });
+
+
         review=function (pass) {
+            if (pass) {
+                const supplier = $("#checkRemarkF").val();
+                if (!supplier) {
+                    layer.msg("请选择供应商！");
+                    return;
+                }
+            }
             let data={};
             data.id=$("#id").text();
             if (pass){
@@ -224,7 +270,10 @@
             }else {
                 data.reviewPass=0;
             }
+            data.atId=$("#atId").text();
+            data.depositoryId=$("#depositoryId").text();
             data.reviewRemark=$("#reviewRemarkF").val();
+            data.checkRemark=$("#checkRemarkF").val();
             send(data);
         }
         check=function(pass) {
