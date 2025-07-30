@@ -124,4 +124,7 @@ public interface DepositoryRecordMapper {
 
     int updateCheckPass(@Param("id") Integer id, @Param("checkPass") String checkPass);
 
+    int batchUpdateReviewRemark(@Param("ids") List<Integer> ids, @Param("invoiceNumber") String invoiceNumber);
+    List<String> findReviewRemarkAll();
+
 }

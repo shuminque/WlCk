@@ -122,4 +122,10 @@ public interface DepositoryRecordService {
 
 
     int updateCheckPass(Integer id, String checkPass);
+
+    int batchUpdateReviewRemark(List<Integer> ids, String invoiceNumber);
+
+    List<String> findReviewRemarkAll();
+
+
 }

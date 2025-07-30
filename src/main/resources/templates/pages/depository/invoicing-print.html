@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <title>layui</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="stylesheet" href="/static/lib/layui-v2.8.17/css/layui.css" media="all">
+    <link rel="stylesheet" href="/static/css/public.css" media="all">
+</head><link rel="stylesheet" type="text/css" href="/static/css/formSelects-v4.css"/>
+<body>
+<div class="layuimini-container">
+    <div class="layuimini-main">
+        <fieldset class="table-search-fieldset">
+            <legend>搜索信息</legend>
+            <div style="margin: 10px 10px 10px 10px">
+                <form class="layui-form layui-form-pane" action="">
+                    <div class="layui-form-item">
+
+                        <div class="layui-inline" style="display: none">
+                            <label class="layui-form-label">日期</label>
+                            <div class="layui-input-block">
+                                <input type="text" name="applyTime" id="date"  placeholder="请选择起止日期"
+                                       autocomplete="off" class="layui-input">
+                            </div>
+                        </div>
+                        <div class="layui-inline" style="display: none">
+                            <div class="layui-input-inline" style="width: 120px;">
+                                <select name="depositoryId" id="depositorySelect" lay-search>
+                                    <!-- 初始值，稍后会根据用户信息进行更新 -->
+                                </select>
+                            </div>
+                        </div>
+                        <div class="layui-inline" >
+                            <label class="layui-form-label">供应商</label>
+                            <div class="layui-input-inline">
+                                <select name="checkRemark" id="checkRemarkF" lay-search>
+                                    <option value="">请选择供应商</option>
+                                    <th:block th:each="supplier : ${suppliers}">
+                                        <option th:value="${supplier.supplierName}" th:text="${supplier.supplierName}"></option>
+                                    </th:block>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="layui-inline" style="display: none">
+                            <div class="layui-input-inline">
+                                <input type="text" name="atId" autocomplete="off" class="layui-input" placeholder="搜索AT号">
+                            </div>
+                        </div>
+                        <div class="layui-inline" style="display: none">
+                            <div class="layui-input-inline">
+                                <input type="text" name="mname" autocomplete="off" class="layui-input" placeholder="搜索品名">
+                            </div>
+                        </div>
+                        <div class="layui-inline" style="display: none">
+                            <div class="layui-input-inline">
+                                <input type="text" name="model" autocomplete="off" class="layui-input" placeholder="搜索规格">
+                            </div>
+                        </div>
+                        <div class="layui-inline">
+                            <label class="layui-form-label">入库单号</label>
+                            <div class="layui-input-inline">
+                                <select name="reviewRemark" lay-search>
+                                    <option value="">全部</option>
+                                    <th:block th:each="item : ${ReviewRemarks}">
+                                        <option th:value="${item}" th:text="${item}"></option>
+                                    </th:block>
+                                </select>
+                            </div>
+                        </div>
+
+
+                        <div class="layui-inline">
+                            <button type="submit" class="layui-btn layui-btn-primary" lay-submit lay-filter="data-search-btn">
+                                <i class="layui-icon"></i> 搜 索
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </fieldset>
+        <div class="layui-hide" id="currentTableId" style="display: none;" lay-filter="currentTableFilter"></div>
+    </div>
+</div>
+<script src="/static/lib/layui-v2.8.17/layui.js" charset="utf-8"></script>
+<script type="text/javascript" src="/static/js/formSelects-v4.js" charset="utf-8"></script>
+<script type="text/javascript" src="/static/js/http_ajax.googleapis.com_ajax_libs_jquery_3.5.1_jquery.js" charset="utf-8"></script>
+
+
+<script>
+    var data;
+    layui.use(['form', 'table','laydate'], function () {
+        var $ = layui.jquery,
+            form = layui.form,
+            table = layui.table,
+            laydate=layui.laydate;
+        //日期
+        laydate.render({
+            elem: '#date',
+            range: true,
+            rangeLinked: true,
+        });
+        var userReviewGroupId;
+        var userAuthority;
+        //用户区分
+        $.ajax({
+            url: '/get_user_depository',
+            type: 'GET',
+            dataType: 'json',
+            success: function(data) {
+                let pp;
+                var userDepositoryId = data.depositoryId;
+                var toolbarTemplate;
+                var globalToolbarTemplate;
+                userAuthority = data.authority;
+                userReviewGroupId = data.review_group_id;
+                let selectElem = document.getElementById('depositorySelect');
+                if (userDepositoryId ===0 || userAuthority === '仅查看'){
+                    selectElem.innerHTML =
+                        '<option value="" selected>请选择厂区</option>'+
+                        '<option value="1">SAB</option>' +
+                        '<option value="2">ZAB</option>'
+                }else if (userDepositoryId === 2) {
+                    selectElem.innerHTML = '<option value="2">ZAB</option>';
+                } else if (userDepositoryId === 1) {
+                    selectElem.innerHTML = '<option value="1">SAB</option>';
+                }
+                layui.form.render('select');
+                // 如果depositoryId为0，则允许访问两个厂区
+                if (userDepositoryId === 0 || userAuthority === '仅查看') {
+                    pp = '/depositoryRecord';
+                } else {
+                    pp = '/depositoryRecord?depositoryId=' + userDepositoryId;
+                }
+                // 监听搜索操作
+                form.on('submit(data-search-btn)', function (data) {
+                    var req={};
+                    data=data.field;
+                    req.type=1;
+                    if (data.atId!==''){
+                        req.atId=data.atId;
+                    }
+                    if (data.mname!==''){
+                        req.mname=data.mname;
+                    }
+                    if (data.state!==''){
+                        req.state=data.state;
+                    }
+                    if (data.depositoryId!==''){
+                        req.depositoryId=data.depositoryId;
+                    }
+                    if (data.model!==''){
+                        req.model=data.model;
+                    }
+                    if (data.applyRemark!==''){
+                        req.applyRemark=data.applyRemark;
+                    }
+                    if (data.typeName && data.typeName !== ''){
+                        req.typeName = data.typeName.split(',');
+                    }
+                    if (data.checkRemark!==''){
+                        req.checkRemark=data.checkRemark;
+                    }
+                    if (data.checkPass){
+                        req.checkPass=data.checkPass;
+                    }
+                    if (data.applyTime!==''){
+                        var dates = data.applyTime.split(' - ');
+                        req.startDate = dates[0];
+                        req.endDate = dates[1];
+                    }
+                    if (data.reviewRemark!==''){
+                        req.reviewRemark=data.reviewRemark;
+                    }
+                    table.render({
+                        elem: "#currentTableId",
+                        url: pp,
+                        parseData: function (res) { //res 即为原始返回的数据
+                            return {
+                                "status": res.status, //解析接口状态
+                                "message": res.statusInfo.message, //解析提示文本
+                                "count": res.count, //解析数据长度
+                                "data": res.data //解析数据列表
+                            };
+                        },
+                        request: {
+                            pageName: 'page', //页码的参数名称，默认：page
+                            limitName: 'size' //每页数据量的参数名，默认：limit
+                        },
+                        where: req,
+                        response: {
+                            statusName: 'status' //规定数据状态的字段名称，默认：code
+                            ,statusCode: 200 //规定成功的状态码，默认：0
+                            ,msgName: 'message' //规定状态信息的字段名称，默认：msg
+                            ,countName: 'count' //规定数据总数的字段名称，默认：count
+                            ,dataName: 'data' //规定数据列表的字段名称，默认：data
+                        },
+                        toolbar: '#toolbarDemo',
+                        defaultToolbar: ['filter', 'exports', 'print'],
+                        // defaultToolbar: [{
+                        //     title: '打印',
+                        //     layEvent: 'customPrint',
+                        //     icon: 'layui-icon-print'
+                        // }],
+                        height: 650,
+                        //这里layui和thymeleaf冲突了，要加个空格
+                        cols: [ [
+                            // {type: "checkbox", width: 50},
+                            {field: 'id', width: 60, title: 'ID',hide:true},
+                            // {field: 'depositoryName', width: 60, title: '厂区'},
+                            {field: 'atId', width: '5%', title: 'AT', sort: true},
+                            {field: 'applyTime',title: '入库时间', width:'6%', sort: true, templet: function(d){
+                                    return formatDate(d.applyTime);
+                                }},
+                            {field: 'mname', title: '品名', sort: true,totalRowText: '制单：' },
+                            {field: 'model', title: '规格', sort: true},
+                            // {field: 'typeName',width: '18%', title: '分类'},
+                            // {field: 'enginName', width:'10%', title: '工程'},
+                            {field: 'price', title: '单价',totalRowText: '合计：',  templet: function(d) {
+                                    return parseFloat(d.price).toFixed(2);  // 格式化为两位小数
+                                }},
+                            {field: 'quantity',  width: '5%', title: '数量', sort: true},
+
+                            {field: 'amount', title: '金额',  templet: function(d) {
+                                    let quantity = parseFloat(d.quantity) || 0;
+                                    let price = parseFloat(d.price) || 0;
+                                    return (quantity * price).toFixed(2);
+                                }, totalRow: true, sort: true},
+                            // {field: 'applyRemark', title: '类型', width: '10%'},
+                            {field: 'checkRemark', title: '供应商', sort: true, totalRowText: '入库确认：'},
+                            {field: 'checkPass', width: 170, title: '结算状态', hide:true},
+                            {field: 'reviewRemark', width:'8%', title: '入库单号'},
+                        ]],
+                        done: function(res, curr, count) {
+                            var totalQuantity = res.data.reduce(function(sum, item) {
+                                return sum + (parseFloat(item.quantity) || 0);
+                            }, 0);
+                            var totalAmount = res.data.reduce(function(sum, item) {
+                                let quantity = parseFloat(item.quantity) || 0;
+                                let price = parseFloat(item.price) || 0;
+                                return sum + (quantity * price);
+                            }, 0).toFixed(2);
+                            var totalRow = document.querySelector('.layui-table-total');
+                            if (totalRow) {
+                                var quantityCell = totalRow.querySelector('td[data-field="quantity"] .layui-table-cell');
+                                if (quantityCell) {
+                                    quantityCell.innerText = totalQuantity.toString();
+                                }
+                                var amountCell = totalRow.querySelector('td[data-field="amount"] .layui-table-cell');
+                                if (amountCell) {
+                                    amountCell.innerText = totalAmount.toString();
+                                }
+                            }
+                            addCustomPrintButton(); // 添加自定义按钮
+
+                        },
+                        limits: [ 25, 100, 1000, 100000],
+                        limit: 25,
+                        page: true,
+                        totalRow: true,
+                        skin: 'line'
+                    });
+                    return false;
+                });
+            },
+            error: function() {
+                // 处理错误，例如显示一个消息
+                layer.msg('无法获取用户的厂区信息');
+            }
+        });
+        function formatDate(dateStr) {
+            if (!dateStr) return '';
+            let date = new Date(dateStr);
+            let year = date.getFullYear();
+            let month = (date.getMonth() + 1).toString().padStart(2, '0');
+            let day = date.getDate().toString().padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
+
+        function addCustomPrintButton() {
+            if ($('#customPrintButton').length === 0) {
+                var customPrintButton = $('<button class="layui-btn layui-btn-primary layui-btn-sm" id="customPrintButton" style="display: flex; align-items: center;"><i class="layui-icon layui-icon-print" style="margin-right: 5px;"></i> 打印pdf</button>');
+                $('.layui-table-tool-temp').prepend(customPrintButton);
+
+                // 绑定自定义打印按钮点击事件
+                $('#customPrintButton').on('click', function() {
+                    printSelectedRows();
+                });
+            }
+        }
+        function printSelectedRows() {
+            // 获取表格中当前页全部数据（而不是选中项）
+            var tableData = layui.table.cache['currentTableId'];
+            if (!tableData || tableData.length === 0) {
+                layer.msg('当前表格无数据');
+                return;
+            }
+            var data = tableData; // 用整个表格数据替代选中数据
+
+            // 计算总数量和总金额
+            var totalQuantity = 0;
+            var totalAmount = 0;
+            data.forEach(function(item) {
+                totalQuantity += parseFloat(item.quantity) || 0;
+                let price = parseFloat(item.price) || 0;
+                totalAmount += (parseFloat(item.quantity) || 0) * price;
+            });
+
+            var firstSupplier = data[0].checkRemark || '';
+            var firstInvoice = data[0].reviewRemark || '';
+            var leftPositions = ['10%', '30%', '50%', '70%', '90%'];
+            var positions = ['10%', '20%', '30%', '40%', '50%'];
+            var printContent = `
+        <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+            <div><strong>供应商：</strong>${firstSupplier}</div>
+            <div><strong>NO:</strong>${firstInvoice}</div>
+        </div>
+        <h1 style="
+          text-align: center;
+          font-size: 24px;
+          font-weight: bold;
+          margin-bottom: 20px;
+        ">
+          物资入库单
+        </h1>
+    `;
+            for (var i = 0; i < 5; i++) {
+                var topPosition = positions[i];
+                var leftPosition = leftPositions[i]; // 使用固定的 left 位置
+                printContent += `
+      <div style="
+        position: absolute;
+        top: ${topPosition};
+        left: ${leftPosition};
+        width: 60px;
+        height: 60px;
+        background-image: url(/static/images/xuri-logo.ico);
+        background-repeat: no-repeat;
+        background-position: center;
+        background-size: 60px;
+        opacity: 0.3;
+      "></div>
+    `;
+            }
+            printContent += `
+        <table class="layui-table" style="border: 1px solid black;">
+          <thead>
+            <tr>
+              <th style="border: 1px solid black;">AT</th>
+              <th style="border: 1px solid black;">入库时间</th>
+              <th style="border: 1px solid black;">品名</th>
+              <th style="border: 1px solid black;">规格</th>
+              <th style="border: 1px solid black;">单价</th>
+              <th style="border: 1px solid black;">数量</th>
+              <th style="border: 1px solid black;">金额</th>
+            </tr>
+          </thead>
+          <tbody>
+    `;
+
+            data.forEach(function(item) {
+                let price = parseFloat(item.price) || 0;
+                let quantity = parseFloat(item.quantity) || 0;
+                let amount = (quantity * price).toFixed(2);
+                let applyTime = formatDate(item.applyTime) || '';
+                printContent += `
+            <tr>
+              <td style="border: 1px solid black;">${item.atId || ''}</td>
+              <td style="border: 1px solid black;">${applyTime}</td>
+              <td style="border: 1px solid black;">${item.mname || ''}</td>
+              <td style="border: 1px solid black;">${item.model || ''}</td>
+              <td style="border: 1px solid black;">${price.toFixed(2)}</td>
+              <td style="border: 1px solid black;">${quantity}</td>
+              <td style="border: 1px solid black;">${amount}</td>
+            </tr>
+        `;
+            });
+
+            printContent += `
+      </tbody>
+    </table>
+
+    <div style="margin-top: 20px; font-size: 16px; display: flex; justify-content: space-between;">
+      <div>制单：</div>
+      <div>入库确认：</div>
+      <div>总计数量：${totalQuantity.toFixed(0)}</div>
+      <div>总计金额：${totalAmount.toFixed(2)}</div>
+    </div>
+`;
+
+
+            // 打印内容
+            var printWindow = window.open('', '', 'height=800,width=1000');
+            printWindow.document.write('<html><head><title>打印</title>');
+            printWindow.document.write('<link rel="stylesheet" href="/static/lib/layui-v2.8.17/css/layui.css" media="all">');
+            printWindow.document.write('</head><body>');
+            printWindow.document.write(printContent);
+            printWindow.document.write('</body></html>');
+            printWindow.document.close();
+            printWindow.print();
+        }
+
+        //监听表格复选框选择
+        table.on('checkbox(currentTableFilter)', function (obj) {
+            console.log(obj)
+        });
+    });
+</script>
+
+</body>
+</html>

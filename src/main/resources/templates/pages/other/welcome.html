@@ -1035,10 +1035,13 @@
                 const totalProductionForCurrentYear = validProductionDataTwo.reduce((sum, item) => sum + item.production, 0);
 
                 const referenceLineValueTwo = totalProductionForCurrentYear > 0
-                    ? (totalAmountForCurrentYear / totalProductionForCurrentYear).toFixed(4)  // 保留4位小数
+                    ? totalAmountForCurrentYear / totalProductionForCurrentYear
                     : 0;
 
-                console.log("当前年参考线值（金额之和/产量之和）：", referenceLineValue);
+
+                console.log("referenceLineValue当前年参考线值（金额之和/产量之和）：", referenceLineValue);
+                console.log("referenceLineValueTwo当前年参考线值（金额之和/产量之和）：", referenceLineValueTwo);
+
                 const isNeedDivide = diameter !== '单玉小径' && diameter !== '单玉中径';
                 function calculateYearlyTotals(data, scoreUnitPrices, monthKeys, isNeedDivide) {
                     const unitPriceMap = {};
@@ -1161,7 +1164,7 @@
 
                 const Line = diameter
                     ? (currentCostData.totalProductionLine === 0 ? 0 : parseFloat(currentCostData.avgMonthlyUnitCost.toFixed(4)))
-                    : parseFloat(referenceLineValue.toFixed(4));
+                    : referenceLineValue;
 
                 // 从 costPerUnitSeriesData 中排除掉前一年那个值
 //                 const currentYearUnitCostValues = costPerUnitSeriesData.slice(1); // 当前年12个月数据
@@ -1235,7 +1238,7 @@
                                 data: [
                                     {
                                         name: '平均',
-                                        yAxis: Line,
+                                        yAxis: Line.toFixed(4),
                                         yAxisIndex: 1,
                                         label: {
                                             show: true,

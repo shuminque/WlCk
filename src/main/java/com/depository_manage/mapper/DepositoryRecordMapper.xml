@@ -134,8 +134,8 @@
         <if test="reviewerId != null">
             AND dr.reviewer_id = #{reviewerId}
         </if>
-        <if test="reviewRemark != null and reviewRemark != ''">
-            AND dr.review_remark LIKE CONCAT('%', #{reviewRemark}, '%')
+        <if test="reviewRemark != null ">
+            AND dr.review_remark = #{reviewRemark}
         </if>
         <if test="reviewTime != null">
             AND dr.review_time = #{reviewTime}
@@ -258,8 +258,8 @@
         <if test="reviewerId != null">
             AND dr.reviewer_id = #{reviewerId}
         </if>
-        <if test="reviewRemark != null and reviewRemark != ''">
-            AND dr.review_remark LIKE CONCAT('%', #{reviewRemark}, '%')
+        <if test="reviewRemark != null ">
+            AND dr.review_remark = #{reviewRemark}
         </if>
         <if test="reviewTime != null">
             AND dr.review_time = #{reviewTime}
@@ -276,9 +276,17 @@
         <if test="checkTime != null">
             AND dr.check_time = #{checkTime}
         </if>
-        <if test="checkPass != null">
-            AND dr.check_pass = #{checkPass}
+        <if test="checkPass != null and checkPass != ''">
+            <choose>
+                <when test="checkPass == '未核对开票'">
+                    AND (dr.check_pass IS NULL OR dr.check_pass = '')
+                </when>
+                <otherwise>
+                    AND dr.check_pass = #{checkPass}
+                </otherwise>
+            </choose>
         </if>
+
         ORDER BY dr.id DESC
         <if test="begin != null and size != null">
             LIMIT #{begin},#{size}
@@ -1955,5 +1963,21 @@ UNION ALL
         SET check_pass = #{checkPass}
         WHERE id = #{id}
     </update>
+    <update id="batchUpdateReviewRemark">
+        UPDATE depository_record
+        SET review_remark = #{invoiceNumber}
+        WHERE id IN
+        <foreach collection="ids" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+        AND check_pass = '已核对开票'
+        AND (review_remark IS NULL OR review_remark = '')
+    </update>
+
+    <select id="findReviewRemarkAll" resultType="java.lang.String">
+        select distinct review_remark from depository_record order by review_remark desc
+    </select>
+
+
 
 </mapper>

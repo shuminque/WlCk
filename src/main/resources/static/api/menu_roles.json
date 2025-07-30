@@ -297,9 +297,28 @@
                     "title": "开票管理",
                     "icon": "fa fa-tasks",
                     "target": "_self",
-                    "href": "/invoicing-management",
                     "roles": [
-                        "SAB_sh", "ZAB_sh", "ALL"
+                        "SAB_cg", "SAB_sh", "ZAB_cg", "ZAB_sh", "ALL"
+                    ],
+                    "child": [
+                        {
+                            "title": "开票核对",
+                            "href": "/invoicing-management",
+                            "icon": "fa fa-tasks",
+                            "target": "_self",
+                            "roles": [
+                                "SAB_sh", "ZAB_sh", "ALL"
+                            ]
+                        },
+                        {
+                            "title": "开票打印",
+                            "href": "/invoicing-print",
+                            "icon": "fa fa-tasks",
+                            "target": "_self",
+                            "roles": [
+                                "SAB_cg", "SAB_sh", "ZAB_cg", "ZAB_sh", "ALL"
+                            ]
+                        }
                     ]
                 },
                 {

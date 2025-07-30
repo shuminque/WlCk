@@ -348,6 +348,19 @@ public class DepositoryRecordController {
         }
 
         int updated = depositoryRecordService.updateCheckPass(id, checkPass);
+        Integer atId = map.get("atId") != null ? Integer.valueOf(map.get("atId").toString()) : null;
+        Integer depositoryId = map.get("depositoryId") != null ? Integer.valueOf(map.get("depositoryId").toString()) : null;
+        String checkRemark = map.get("checkRemark") != null ? map.get("checkRemark").toString() : null;
+
+        if (atId != null && depositoryId != null && checkRemark != null) {
+            String trimmedRemark = checkRemark.trim();
+            if (!trimmedRemark.isEmpty()) {
+                int count = depositoryRecordMapper.countCheckRemarkExists(atId, depositoryId);
+                if (count == 0) {
+                    depositoryRecordMapper.updateCheckRemarkForGroup(atId, depositoryId, trimmedRemark);
+                }
+            }
+        }
         Map<String, Object> result = new HashMap<>();
         if (updated > 0) {
             result.put("status", 200);
@@ -359,8 +372,28 @@ public class DepositoryRecordController {
             return ResponseEntity.status(500).body(result);
         }
     }
+    @PostMapping("/depository/batchUpdateReviewRemark")
+    public ResponseEntity<?> batchUpdateReviewRemark(@RequestBody Map<String, Object> map) {
+        List<Integer> ids = (List<Integer>) map.get("ids");
+        String invoiceNumber = (String) map.get("invoiceNumber");
 
-
-
+        if (ids == null || ids.isEmpty() || invoiceNumber == null) {
+            Map<String, Object> error = new HashMap<>();
+            error.put("status", 400);
+            error.put("message", "参数不完整");
+            return ResponseEntity.badRequest().body(error);
+        }
+        int updated = depositoryRecordService.batchUpdateReviewRemark(ids, invoiceNumber);
+        Map<String, Object> result = new HashMap<>();
+        if (updated > 0) {
+            result.put("status", 200);
+            result.put("message", "批量更新成功");
+            return ResponseEntity.ok(result);
+        } else {
+            result.put("status", 500);
+            result.put("message", "批量更新失败");
+            return ResponseEntity.status(500).body(result);
+        }
+    }
 
 }

@@ -518,7 +518,7 @@ public class DepositoryRecordServiceImpl implements DepositoryRecordService {
                         depositoryRecordMapper.updateCheckRemarkForGroup(atId, depositoryId, trimmedRemark);
                     }
                 }
-            }
+        }
         return depositoryRecordMapper.updateDepositoryRecord(map);
     }
 
@@ -575,6 +575,7 @@ public class DepositoryRecordServiceImpl implements DepositoryRecordService {
             }
         }
         // 使用mapper更新DepositoryRecord的数据
+
         return depositoryRecordMapper.updateDepositoryRecord(map);
     }
     private double getDoubleFromMap(Map<String, Object> map, String key) {
@@ -745,7 +746,16 @@ public class DepositoryRecordServiceImpl implements DepositoryRecordService {
 
     @Override
     public int updateCheckPass(Integer id, String checkPass) {
+
         return depositoryRecordMapper.updateCheckPass(id, checkPass);
+    }
+    @Override
+    public int batchUpdateReviewRemark(List<Integer> ids, String invoiceNumber) {
+        return depositoryRecordMapper.batchUpdateReviewRemark(ids, invoiceNumber);
+    }
+    @Override
+    public List<String> findReviewRemarkAll() {
+        return depositoryRecordMapper.findReviewRemarkAll();
     }
 
 }

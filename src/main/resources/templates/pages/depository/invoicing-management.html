@@ -25,13 +25,22 @@
                             </div>
                         </div>
                         <div class="layui-inline" >
-                            <div class="layui-input-inline">
-                                <select id="checkPass" name="checkPass">
-                                    <option value="" selected>请选择结算状态</option>
-                                    <option value="已结算" >已结算</option>
+                            <div class="layui-input-inline" style="width: 120px;">
+                                <select name="depositoryId" id="depositorySelect" lay-search>
+                                    <!-- 初始值，稍后会根据用户信息进行更新 -->
                                 </select>
                             </div>
                         </div>
+                        <div class="layui-inline">
+                            <div class="layui-input-inline">
+                                <select id="checkPass" name="checkPass">
+                                    <option value="" selected>请选择结算状态</option>
+                                    <option value="已核对开票">已核对开票</option>
+                                    <option value="未核对开票">未核对开票</option> <!-- 新增 -->
+                                </select>
+                            </div>
+                        </div>
+
                         <div class="layui-inline" >
                             <label class="layui-form-label">供应商</label>
                             <div class="layui-input-inline">
@@ -68,13 +77,18 @@
                                 </select>
                             </div>
                         </div>
-                        <div class="layui-inline" >
-                            <div class="layui-input-inline" style="width: 120px;">
-                                <select name="depositoryId" id="depositorySelect" lay-search>
-                                    <!-- 初始值，稍后会根据用户信息进行更新 -->
+                        <div class="layui-inline">
+                            <label class="layui-form-label">入库单号</label>
+                            <div class="layui-input-inline">
+                                <select name="reviewRemark" lay-search>
+                                    <option value="">全部</option>
+                                    <th:block th:each="item : ${ReviewRemarks}">
+                                        <option th:value="${item}" th:text="${item}"></option>
+                                    </th:block>
                                 </select>
                             </div>
                         </div>
+
                         <div class="layui-inline" style="display: none">
                             <label class="layui-form-label">入库类型</label>
                             <div class="layui-input-inline">
@@ -86,19 +100,21 @@
                                 </select>
                             </div>
                         </div>
-
                         <div style="width: 57%;display: none" >
                             <label class="layui-form-label">分类选择</label>
                             <select name="typeName" xm-select="selecttypeId">
                                 <option th:each="material_type : ${materialTypes}" th:value="${material_type.getTname()}" th:text="${material_type.tname}" ></option>
                             </select>
                         </div>
-
                         <div class="layui-inline">
                             <button type="submit" class="layui-btn layui-btn-primary" lay-submit lay-filter="data-search-btn">
                                 <i class="layui-icon"></i> 搜 索
                             </button>
+                            <button type="button" class="layui-btn layui-btn-normal" id="batchUpdateBtn">
+                                <i class="layui-icon">&#xe63c;</i> 生成入库单号
+                            </button>
                         </div>
+
 
                     </div>
                 </form>
@@ -250,6 +266,7 @@
                     cols: [ [
                         // {type: "checkbox", width: 50},
                         {field: 'id', width: 60, title: 'ID',hide:true},
+                        {field: 'depositoryId', title: '厂区ID', hide: true},
                         // {field: 'depositoryName', width: 60, title: '厂区'},
                         {field: 'atId', width: '5%', title: 'AT', sort: true},
                         {field: 'mname',width: '12%', title: '品名', sort: true},
@@ -257,32 +274,39 @@
                         // {field: 'typeName',width: '18%', title: '分类'},
                         // {field: 'enginName', width:'10%', title: '工程'},
                         {field: 'quantity',  width: '5%', title: '数量', sort: true},
-                        {field: 'price', title: '单价', width: '8%', templet: function(d) {
+                        {field: 'price', title: '单价', width: '6%', templet: function(d) {
                                 return parseFloat(d.price).toFixed(2);  // 格式化为两位小数
                             }},
-                        {field: 'amount', title: '金额', width: '10%', templet: function(d) {
+                        {field: 'amount', title: '金额', width: '8%', templet: function(d) {
                                 let quantity = parseFloat(d.quantity) || 0;
                                 let price = parseFloat(d.price) || 0;
                                 return (quantity * price).toFixed(2);
                             }, totalRow: true, sort: true},
                         // {field: 'applyRemark', title: '类型', width: '10%'},
-                        {field: 'state', width:'6%', title: '流程'},
-                        // {field: 'applicantName', width:'8%', title: '申请人'},
+                        {field: 'state', width:'5%', title: '流程'},
                         {field: 'checkRemark', width: 170, title: '供应商', sort: true},
-                        {field: 'applyTime',title: '日期', width:'10%', sort: true, templet: function(d){
+                        {field: 'applyTime',title: '日期', width:'6%', sort: true, templet: function(d){
                                 return formatDate(d.applyTime);
                             }},
                         {field: 'checkPass', width: 170, title: '结算状态', sort: true},
+                        {field: 'reviewRemark', width:'8%', title: '入库单号'},
                         {
                             title: '操作',
                             minWidth: 200,
                             align: "center",
                             templet: function (row) {
-                                // 初始化按钮字符串
-                                let buttons = '<a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="edit">修改结算状态</a>';
+                                // 如果该行已有入库单号，隐藏操作按钮
+                                if (row.reviewRemark) {
+                                    return ''; // 不渲染任何按钮
+                                }
+
+                                let buttons = '';
+                                buttons += '<a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="edit">设为已核对</a>';
+                                buttons += '<a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="clear">清空结算</a>';
                                 return buttons;
                             }
                         }
+
                     ]],
                     done: function(res, curr, count) {
                         var totalQuantity = res.data.reduce(function(sum, item) {
@@ -351,13 +375,16 @@
                     if (data.checkRemark!==''){
                         req.checkRemark=data.checkRemark;
                     }
-                    if (data.checkPass!==''){
+                    if (data.checkPass){
                         req.checkPass=data.checkPass;
                     }
                     if (data.applyTime!==''){
                         var dates = data.applyTime.split(' - ');
                         req.startDate = dates[0];
                         req.endDate = dates[1];
+                    }
+                    if (data.reviewRemark!==''){
+                        req.reviewRemark=data.reviewRemark;
                     }
 
                     //执行搜索重载
@@ -377,6 +404,48 @@
             }
         });
 
+        $('#batchUpdateBtn').on('click', function () {
+            const now = new Date();
+            const yyyyMM = now.getFullYear().toString() + (now.getMonth() + 1).toString().padStart(2, '0');
+
+            // 1. 先查当前序号，仅用于展示
+            $.get('/invoice/getCurrentSequence?month=' + yyyyMM, function (currentSeq) {
+                const previewInvoice = yyyyMM + '-' + (currentSeq + 1);
+                layer.confirm(`将核对的项目生成 入库单号【${previewInvoice}】？`, { icon: 3, title: '提示' }, function (index) {
+
+                    const invoiceNumber = previewInvoice; // 使用展示值，先作为试探性赋值
+                    const allData = layui.table.cache["currentTableId"] || [];
+                    const idList = allData.map(row => row.id);
+
+                    // 2. 先批量更新
+                    $.ajax({
+                        url: "/depository/batchUpdateReviewRemark",
+                        type: "POST",
+                        contentType: "application/json",
+                        data: JSON.stringify({
+                            invoiceNumber: invoiceNumber,
+                            ids: idList
+                        }),
+                        success: function (res2) {
+                            if (res2.status === 200) {
+                                // 3. 更新成功后才去真正+1保存序号
+                                $.post('/invoice/getNextSequence', { month: yyyyMM }, function () {
+                                    layer.msg("设置成功");
+                                    layui.table.reload("currentTableId");
+                                });
+                            } else {
+                                layer.msg("更新失败：" + res2.message);
+                            }
+                        },
+                        error: function () {
+                            layer.msg("网络错误，更新失败");
+                        }
+                    });
+
+                    layer.close(index);
+                });
+            });
+        });
 
         /**
          * toolbar监听事件
@@ -395,7 +464,8 @@
                 $(window).on("resize", function () {
                     layer.full(index);
                 });
-            } else if (obj.event === 'delete') {  // 监听删除操作
+            }
+            else if (obj.event === 'delete') {  // 监听删除操作
                 var checkStatus = table.checkStatus('currentTableId')
                     , data = checkStatus.data;
                 var req={};
@@ -446,51 +516,80 @@
         table.on('tool(currentTableFilter)', function (obj) {
             let data = obj.data;
             if (obj.event === 'edit') {
-                layer.open({
-                    type: 1,
-                    title: '修改结算状态',
-                    area: ['300px', '200px'],
-                    content: `
-                <div style="padding:20px;">
-                    <select id="checkPassSelect" class="layui-input">
-                        <option value="">请选择结算状态</option>
-                        <option value="已结算">已结算</option>
-                    </select>
-                    <br/>
-                    <button id="confirmBtn" class="layui-btn layui-btn-sm">确认</button>
-                </div>
-            `,
-                    success: function (layero, index) {
-                        $("#confirmBtn").on("click", function () {
-                            let selectedStatus = $("#checkPassSelect").val();
-                            if (!selectedStatus) {
-                                layer.msg("请选择结算状态");
+                if (!data.checkRemark || data.checkRemark.trim() === '') {
+                    // 缺少供应商信息，弹出选择框
+                    layer.open({
+                        type: 1,
+                        title: '请选择供应商',
+                        area: ['400px', '200px'],
+                        btn: ['确认', '取消'],
+                        content: '<div style="padding: 20px;">' +
+                            '<select id="supplierSelect" class="layui-select">' +
+                            document.getElementById('checkRemarkF').innerHTML +
+                            '</select>' +
+                            '</div>',
+                        yes: function(index) {
+                            let selectedSupplier = document.querySelector('#supplierSelect').value;
+                            if (!selectedSupplier || selectedSupplier.trim() === '') {
+                                layer.msg('请选择供应商');
                                 return;
                             }
-
-                            $.ajax({
-                                url: "/depository/updateCheckPass",
-                                type: "POST",
-                                contentType: "application/json",
-                                data: JSON.stringify({
-                                    id: data.id,
-                                    checkPass: selectedStatus
-                                }),
-                                success: function (res) {
-                                    if (res.status === 200) {
-                                        layer.msg("修改成功");
-                                        layer.close(index);
-                                        table.reload("currentTableId"); // 重新加载表格
-                                    } else {
-                                        layer.msg("修改失败：" + res.message);
-                                    }
-                                }
-                            });
-                        });
-                    }
+                            sendUpdateCheckPass(data, selectedSupplier);
+                            layer.close(index);
+                        }
+                    });
+                } else {
+                    layer.confirm("确认将该记录设为【已核对开票】？", {icon: 3, title: '提示'}, function(index){
+                        sendUpdateCheckPass(data, data.checkRemark);
+                        layer.close(index);
+                    });
+                }
+            }
+            else if (obj.event === 'clear') {
+                layer.confirm("确认清空该记录的结算状态？", {icon: 3, title: '提示'}, function(index){
+                    $.ajax({
+                        url: "/depository/updateCheckPass",
+                        type: "POST",
+                        contentType: "application/json",
+                        data: JSON.stringify({
+                            id: data.id,
+                            checkPass: ""
+                        }),
+                        success: function (res) {
+                            if (res.status === 200) {
+                                layer.msg("清空成功");
+                                table.reload("currentTableId"); // 重新加载表格
+                            } else {
+                                layer.msg("清空失败：" + res.message);
+                            }
+                        }
+                    });
+                    layer.close(index);
                 });
             }
         });
+        function sendUpdateCheckPass(row, selectedCheckRemark) {
+            $.ajax({
+                url: "/depository/updateCheckPass",
+                type: "POST",
+                contentType: "application/json",
+                data: JSON.stringify({
+                    id: row.id,
+                    checkPass: "已核对开票",
+                    atId: row.atId,
+                    depositoryId: row.depositoryId,
+                    checkRemark: selectedCheckRemark
+                }),
+                success: function (res) {
+                    if (res.status === 200) {
+                        layer.msg("设置成功");
+                        table.reload("currentTableId");
+                    } else {
+                        layer.msg("设置失败：" + res.message);
+                    }
+                }
+            });
+        }
     });
 </script>
 

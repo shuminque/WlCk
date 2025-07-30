@@ -250,6 +250,20 @@ public class PageController {
         mv.addObject("depositories", depositoryService.findDepositoryAll());
         mv.addObject("suppliers", supplierService.findSupplierAll());
         mv.addObject("materialTypes", materialTypeService.findMaterialTypeAll());
+        mv.addObject("ReviewRemarks", depositoryRecordService.findReviewRemarkAll());
+        List<String> reviewRemarks = depositoryRecordService.findReviewRemarkAll();
+        mv.addObject("ReviewRemarks", reviewRemarks);
+        return mv;
+    }
+    @GetMapping("/invoicing-print")
+    public ModelAndView invoicingPrint() {
+        ModelAndView mv = new ModelAndView();
+        mv.setViewName("pages/depository/invoicing-print");
+        mv.addObject("depositories", depositoryService.findDepositoryAll());
+        mv.addObject("suppliers", supplierService.findSupplierAll());
+        mv.addObject("materialTypes", materialTypeService.findMaterialTypeAll());
+        List<String> reviewRemarks = depositoryRecordService.findReviewRemarkAll();
+        mv.addObject("ReviewRemarks", reviewRemarks);
         return mv;
     }
     @GetMapping("/table_out")
