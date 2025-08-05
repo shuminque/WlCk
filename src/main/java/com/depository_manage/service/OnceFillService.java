@@ -26,4 +26,6 @@ public interface OnceFillService {
     void saveAll(List<OnceFill> records, Integer depositoryId);
 
     Integer findCountByCondition(Map<String,Object> map);
+
+    int batchUpdateReviewRemark(List<Integer> ids, String invoiceNumber);
 }

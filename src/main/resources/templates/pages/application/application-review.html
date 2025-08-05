@@ -257,7 +257,8 @@
         review=function (pass) {
             if (pass) {
                 const supplier = $("#checkRemarkF").val();
-                if (!supplier) {
+                const applyType = $("#applyRemarks").text().trim();
+                if (!supplier && !applyType.includes("领用退回")) {
                     layer.msg("请选择供应商！");
                     return;
                 }

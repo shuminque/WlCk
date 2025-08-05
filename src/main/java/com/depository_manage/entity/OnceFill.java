@@ -18,5 +18,7 @@ public class OnceFill {
     private Date time;
     private String applyRemark;
     private String introduce;
-
+    private String reviewRemark;
+    private String checkRemark;
+    private String checkPass;
 }

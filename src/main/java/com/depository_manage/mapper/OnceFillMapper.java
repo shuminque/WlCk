@@ -2,6 +2,7 @@ package com.depository_manage.mapper;
 
 import com.depository_manage.entity.OnceFill;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -73,4 +74,6 @@ public interface OnceFillMapper {
     Integer findCountByCondition(Map<String, Object> map);
 
     void insertBatch(List<OnceFill> records);
+    int batchUpdateReviewRemark(@Param("ids") List<Integer> ids, @Param("invoiceNumber") String invoiceNumber);
+
 }

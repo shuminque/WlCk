@@ -757,5 +757,14 @@ public class DepositoryRecordServiceImpl implements DepositoryRecordService {
     public List<String> findReviewRemarkAll() {
         return depositoryRecordMapper.findReviewRemarkAll();
     }
+    @Override
+    public List<Map<String, Object>> getMergedDepositoryData(Map<String, Object> params) {
+        return depositoryRecordMapper.findMergedDepositoryData(params);
+    }
+
+    @Override
+    public int getMergedDepositoryCount(Map<String, Object> params) {
+        return depositoryRecordMapper.getMergedDepositoryCount(params);
+    }
 
 }

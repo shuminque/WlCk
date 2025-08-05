@@ -126,6 +126,8 @@ public interface DepositoryRecordService {
     int batchUpdateReviewRemark(List<Integer> ids, String invoiceNumber);
 
     List<String> findReviewRemarkAll();
+    List<Map<String, Object>> getMergedDepositoryData(Map<String, Object> params);
 
 
+    int getMergedDepositoryCount(Map<String, Object> params);
 }

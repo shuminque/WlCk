@@ -96,7 +96,7 @@
                                     <option value="" selected>请选择</option>
                                     <option value="采购入库">采购入库</option>
                                     <option value="领用退回">领用退回</option>
-                                    <option value="内制入库">内制入库</option>
+                                    <option value="刀具内制入库">刀具内制入库</option>
                                 </select>
                             </div>
                         </div>
@@ -202,6 +202,8 @@
         });
         var userReviewGroupId;
         var userAuthority;
+        var combined;
+
         //用户区分
         $.ajax({
             url: '/get_user_depository',
@@ -226,15 +228,48 @@
                     selectElem.innerHTML = '<option value="1">SAB</option>';
                 }
                 layui.form.render('select');
-                // 如果depositoryId为0，则允许访问两个厂区
-                if (userDepositoryId === 0 || userAuthority === '仅查看') {
-                    pp = '/depositoryRecord';
-                } else {
-                    pp = '/depositoryRecord?depositoryId=' + userDepositoryId;
-                }
+
+                Promise.all([
+                    fetch('/depositoryRecord?' + new URLSearchParams({
+                        type: "1",
+                        state: "已入库",
+                        applyRemark: "采购入库"
+                    })).then(res => res.json()),
+                    fetch('/api/onceFill/list').then(res => res.json())
+                ]).then(([res1, res2]) => {
+                    let list1 = res1.data || [];
+                    let list2 = res2.data || [];
+
+                    // 统一一次性补录字段为入库记录格式
+                    let mappedList2 = list2.map(item => ({
+                        atId: '一次性',
+                        id: item.id,
+                        mname: item.name,
+                        model: item.model,
+                        price: item.unitPrice,
+                        quantity: item.quantity,
+                        applyTime: item.time,
+                        applyRemark: item.applyRemark,
+                        typeName: item.typeName,
+                        depositoryId: item.depositoryId,
+                        reviewerName: null,
+                        reviewerId: null,
+                        state: '已入库',
+                        _source: '一次性补录'
+                    }));
+
+                    let mappedList1 = list1.map(item => ({
+                        ...item,
+                        _source: '入库记录'
+                    }));
+
+                     combined = mappedList1.concat(mappedList2);
+                        console.log(combined);
+
+                });
                 table.render({
                     elem: "#currentTableId",
-                    url: pp,
+                    url: '/mergedDepository', // 直接调用后端分页接口
                     parseData: function (res) { //res 即为原始返回的数据
                         return {
                             "status": res.status, //解析接口状态
@@ -246,11 +281,6 @@
                     request: {
                         pageName: 'page', //页码的参数名称，默认：page
                         limitName: 'size' //每页数据量的参数名，默认：limit
-                    },
-                    where: {
-                        type:"1",
-                        state:"已入库",
-                        applyRemark:"采购入库",
                     },
                     response: {
                         statusName: 'status' //规定数据状态的字段名称，默认：code
@@ -299,14 +329,12 @@
                                 if (row.reviewRemark) {
                                     return ''; // 不渲染任何按钮
                                 }
-
                                 let buttons = '';
                                 buttons += '<a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="edit">设为已核对</a>';
                                 buttons += '<a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="clear">清空结算</a>';
                                 return buttons;
                             }
                         }
-
                     ]],
                     done: function(res, curr, count) {
                         var totalQuantity = res.data.reduce(function(sum, item) {
@@ -338,6 +366,7 @@
                     totalRow: true,
                     skin: 'line'
                 });
+
                 function formatDate(dateStr) {
                     if (!dateStr) return '';
                     let date = new Date(dateStr);
@@ -356,9 +385,6 @@
                     }
                     if (data.mname!==''){
                         req.mname=data.mname;
-                    }
-                    if (data.state!==''){
-                        req.state=data.state;
                     }
                     if (data.depositoryId!==''){
                         req.depositoryId=data.depositoryId;
@@ -386,10 +412,9 @@
                     if (data.reviewRemark!==''){
                         req.reviewRemark=data.reviewRemark;
                     }
-
                     //执行搜索重载
                     table.reload('currentTableId', {
-                        url: pp,
+                        url: '/mergedDepository', // 直接调用后端分页接口
                         page: {
                             curr: 1
                         },
@@ -408,40 +433,87 @@
             const now = new Date();
             const yyyyMM = now.getFullYear().toString() + (now.getMonth() + 1).toString().padStart(2, '0');
 
-            // 1. 先查当前序号，仅用于展示
             $.get('/invoice/getCurrentSequence?month=' + yyyyMM, function (currentSeq) {
                 const previewInvoice = yyyyMM + '-' + (currentSeq + 1);
+
                 layer.confirm(`将核对的项目生成 入库单号【${previewInvoice}】？`, { icon: 3, title: '提示' }, function (index) {
-
-                    const invoiceNumber = previewInvoice; // 使用展示值，先作为试探性赋值
+                    const invoiceNumber = previewInvoice;
                     const allData = layui.table.cache["currentTableId"] || [];
-                    const idList = allData.map(row => row.id);
 
-                    // 2. 先批量更新
-                    $.ajax({
-                        url: "/depository/batchUpdateReviewRemark",
-                        type: "POST",
-                        contentType: "application/json",
-                        data: JSON.stringify({
-                            invoiceNumber: invoiceNumber,
-                            ids: idList
-                        }),
-                        success: function (res2) {
-                            if (res2.status === 200) {
-                                // 3. 更新成功后才去真正+1保存序号
-                                $.post('/invoice/getNextSequence', { month: yyyyMM }, function () {
-                                    layer.msg("设置成功");
-                                    layui.table.reload("currentTableId");
-                                });
-                            } else {
-                                layer.msg("更新失败：" + res2.message);
-                            }
-                        },
-                        error: function () {
-                            layer.msg("网络错误，更新失败");
+                    const normalIds = [];
+                    const onceFillIds = [];
+
+                    allData.forEach(row => {
+                        if (row.atId === '一次性') {
+                            onceFillIds.push(row.id);
+                        } else {
+                            normalIds.push(row.id);
                         }
                     });
 
+                    const requests = [];
+
+                    if (normalIds.length > 0) {
+                        requests.push(
+                            $.ajax({
+                                url: "/depository/batchUpdateReviewRemark",
+                                type: "POST",
+                                contentType: "application/json",
+                                data: JSON.stringify({
+                                    invoiceNumber: invoiceNumber,
+                                    ids: normalIds
+                                })
+                            })
+                        );
+                    }
+
+                    if (onceFillIds.length > 0) {
+                        requests.push(
+                            $.ajax({
+                                url: "/api/onceFill/OnceBatchUpdateReviewRemark",
+                                type: "POST",
+                                contentType: "application/json",
+                                data: JSON.stringify({
+                                    invoiceNumber: invoiceNumber,
+                                    ids: onceFillIds
+                                })
+                            })
+                        );
+                    }
+
+                    Promise.allSettled(requests).then(results => {
+                        console.log(results);
+                        let anySuccess = false;
+                        let allFailed = true;
+
+                        results.forEach(res => {
+                            if (res.status === "fulfilled") {
+                                const status = res.value?.status;
+                                console.log("后端返回状态：", status);
+
+                                if (status === 200) {
+                                    anySuccess = true;
+                                    allFailed = false;
+                                } else if (status === 300) {
+                                    // 无更新，也不算失败
+                                    allFailed = false;
+                                }
+                            }
+                        });
+
+                        if (anySuccess) {
+                            $.post('/invoice/getNextSequence', { month: yyyyMM }, function () {
+                                layer.msg("设置成功");
+                                layui.table.reload("currentTableId");
+                            });
+                        } else if (!allFailed) {
+                            layer.msg("无需更新");
+                        } else {
+                            layer.msg("全部更新失败，请检查");
+                        }
+                    }).catch(() => {
+                        layer.msg("网络错误，更新失败");
+                    });
                     layer.close(index);
                 });
             });
@@ -515,6 +587,7 @@
 
         table.on('tool(currentTableFilter)', function (obj) {
             let data = obj.data;
+
             if (obj.event === 'edit') {
                 if (!data.checkRemark || data.checkRemark.trim() === '') {
                     // 缺少供应商信息，弹出选择框
@@ -545,10 +618,14 @@
                     });
                 }
             }
+
             else if (obj.event === 'clear') {
                 layer.confirm("确认清空该记录的结算状态？", {icon: 3, title: '提示'}, function(index){
+                    let isOnceFill = data.atId === "一次性";
+                    let url = isOnceFill ? "/api/onceFill/updateCheckPass" : "/depository/updateCheckPass";
+
                     $.ajax({
-                        url: "/depository/updateCheckPass",
+                        url: url,
                         type: "POST",
                         contentType: "application/json",
                         data: JSON.stringify({
@@ -558,28 +635,39 @@
                         success: function (res) {
                             if (res.status === 200) {
                                 layer.msg("清空成功");
-                                table.reload("currentTableId"); // 重新加载表格
+                                table.reload("currentTableId");
                             } else {
                                 layer.msg("清空失败：" + res.message);
                             }
                         }
                     });
+
                     layer.close(index);
                 });
             }
         });
-        function sendUpdateCheckPass(row, selectedCheckRemark) {
+
+        function sendUpdateCheckPass(row, selectedCheckRemark, reviewRemark = "") {
+            let isOnceFill = row.atId === "一次性";
+            let url = isOnceFill ? "/api/onceFill/updateCheckPass" : "/depository/updateCheckPass";
+
+            let payload = {
+                id: row.id,
+                checkPass: "已核对开票",
+                atId: row.atId,
+                depositoryId: row.depositoryId,
+                checkRemark: selectedCheckRemark?.trim()
+            };
+
+            if (reviewRemark && reviewRemark.trim() !== "") {
+                payload.reviewRemark = reviewRemark.trim();
+            }
+
             $.ajax({
-                url: "/depository/updateCheckPass",
+                url: url,
                 type: "POST",
                 contentType: "application/json",
-                data: JSON.stringify({
-                    id: row.id,
-                    checkPass: "已核对开票",
-                    atId: row.atId,
-                    depositoryId: row.depositoryId,
-                    checkRemark: selectedCheckRemark
-                }),
+                data: JSON.stringify(payload),
                 success: function (res) {
                     if (res.status === 200) {
                         layer.msg("设置成功");
@@ -590,6 +678,8 @@
                 }
             });
         }
+
+
     });
 </script>
 

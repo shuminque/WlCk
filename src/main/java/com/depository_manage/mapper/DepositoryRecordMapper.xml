@@ -1975,9 +1975,194 @@ UNION ALL
     </update>
 
     <select id="findReviewRemarkAll" resultType="java.lang.String">
-        select distinct review_remark from depository_record order by review_remark desc
+        SELECT DISTINCT review_remark
+        FROM (
+                 SELECT review_remark FROM depository_record
+                 UNION
+                 SELECT review_remark FROM once_fill
+             ) AS combined
+        ORDER BY review_remark DESC;
     </select>
 
+    <select id="findMergedDepositoryData" resultType="map" parameterType="map">
+        SELECT
+        dr.id AS id,
+        dr.at_id AS atId,
+        dr.mname AS mname,
+        dr.model,
+        dr.type_name AS typeName,
+        dr.quantity,
+        dr.price,
+        dr.apply_time AS applyTime,
+        dr.apply_remark AS applyRemark,
+        dr.depository_id AS depositoryId,
+        dr.review_remark AS reviewRemark,
+        dr.check_remark AS checkRemark,
+        dr.check_pass AS checkPass,
+        'AT记录' AS source
+        FROM depository_record dr
+        WHERE dr.type = 1
+        AND dr.state = '已入库'
+        AND dr.apply_remark = '采购入库'
+        <if test="atId != null">
+            AND dr.at_id = #{atId}
+        </if>
+        <if test="mname != null and mname != ''">
+            AND dr.mname LIKE CONCAT('%', #{mname}, '%')
+        </if>
+        <if test="model != null and model != ''">
+            AND dr.model LIKE CONCAT('%', #{model}, '%')
+        </if>
+        <if test="state != null and state != ''">
+            AND dr.state = #{state}
+        </if>
+        <if test="applyRemark != null and applyRemark != ''">
+            AND dr.apply_remark LIKE CONCAT('%', #{applyRemark}, '%')
+        </if>
+        <if test="checkRemark != null and checkRemark != ''">
+            AND dr.check_remark LIKE CONCAT('%', #{checkRemark}, '%')
+        </if>
+        <if test="reviewRemark != null ">
+            AND dr.review_remark = #{reviewRemark}
+        </if>
+        <if test="checkPass != null and checkPass != ''">
+            <choose>
+                <when test="checkPass == '未核对开票'">
+                    AND (dr.check_pass IS NULL OR dr.check_pass = '')
+                </when>
+                <otherwise>
+                    AND dr.check_pass = #{checkPass}
+                </otherwise>
+            </choose>
+        </if>
+        <if test="startDate != null and endDate != null">
+            AND DATE(dr.apply_time) BETWEEN #{startDate} AND #{endDate}
+        </if>
+
+        UNION ALL
+
+        SELECT
+        ofill.id AS id,
+        '一次性' AS atId,
+        ofill.name AS mname,
+        ofill.model AS model,
+        NULL AS typeName,
+        ofill.quantity,
+        ofill.unit_price AS price,
+        ofill.time AS applyTime,
+        ofill.apply_remark AS applyRemark,
+        ofill.depositoryId,
+        ofill.review_remark AS reviewRemark,
+        ofill.check_remark AS checkRemark,
+        ofill.check_pass AS checkPass,
+        '一次性' AS source
+        FROM once_fill ofill
+        WHERE 1 = 1
+        <if test="mname != null and mname != ''">
+            AND ofill.name LIKE CONCAT('%', #{mname}, '%')
+        </if>
+        <if test="model != null and model != ''">
+            AND ofill.model LIKE CONCAT('%', #{model}, '%')
+        </if>
+        <if test="applyRemark != null and applyRemark != ''">
+            AND ofill.apply_remark LIKE CONCAT('%', #{applyRemark}, '%')
+        </if>
+        <if test="checkRemark != null and checkRemark != ''">
+            AND ofill.check_remark LIKE CONCAT('%', #{checkRemark}, '%')
+        </if>
+        <if test="reviewRemark != null ">
+            AND ofill.review_remark = #{reviewRemark}
+        </if>
+        <if test="checkPass != null and checkPass != ''">
+            <choose>
+                <when test="checkPass == '未核对开票'">
+                    AND (ofill.check_pass IS NULL OR ofill.check_pass = '')
+                </when>
+                <otherwise>
+                    AND ofill.check_pass = #{checkPass}
+                </otherwise>
+            </choose>
+        </if>
+        <if test="startDate != null and endDate != null">
+            AND DATE(ofill.time) BETWEEN #{startDate} AND #{endDate}
+        </if>
+
+        ORDER BY applyTime DESC
+        <if test="begin != null and size != null">
+            LIMIT #{begin}, #{size}
+        </if>
+    </select>
+    <select id="getMergedDepositoryCount" resultType="int" parameterType="map">
+        SELECT COUNT(*) FROM (
+        SELECT dr.id
+        FROM depository_record dr
+        WHERE dr.type = 1
+        AND dr.state = '已入库'
+        AND dr.apply_remark = '采购入库'
+        <if test="atId != null">
+            AND dr.at_id = #{atId}
+        </if>
+        <if test="mname != null and mname != ''">
+            AND dr.mname LIKE CONCAT('%', #{mname}, '%')
+        </if>
+        <if test="model != null and model != ''">
+            AND dr.model LIKE CONCAT('%', #{model}, '%')
+        </if>
+        <if test="state != null and state != ''">
+            AND dr.state = #{state}
+        </if>
+        <if test="applyRemark != null and applyRemark != ''">
+            AND dr.apply_remark LIKE CONCAT('%', #{applyRemark}, '%')
+        </if>
+        <if test="checkRemark != null and checkRemark != ''">
+            AND dr.check_remark LIKE CONCAT('%', #{checkRemark}, '%')
+        </if>
+        <if test="checkPass != null and checkPass != ''">
+            <choose>
+                <when test="checkPass == '未核对开票'">
+                    AND (dr.check_pass IS NULL OR dr.check_pass = '')
+                </when>
+                <otherwise>
+                    AND dr.check_pass = #{checkPass}
+                </otherwise>
+            </choose>
+        </if>
+        <if test="startDate != null and endDate != null">
+            AND DATE(dr.apply_time) BETWEEN #{startDate} AND #{endDate}
+        </if>
+
+        UNION ALL
+
+        SELECT ofill.id
+        FROM once_fill ofill
+        WHERE 1 = 1
+        <if test="mname != null and mname != ''">
+            AND ofill.name LIKE CONCAT('%', #{mname}, '%')
+        </if>
+        <if test="model != null and model != ''">
+            AND ofill.model LIKE CONCAT('%', #{model}, '%')
+        </if>
+        <if test="applyRemark != null and applyRemark != ''">
+            AND ofill.apply_remark LIKE CONCAT('%', #{applyRemark}, '%')
+        </if>
+        <if test="checkRemark != null and checkRemark != ''">
+            AND ofill.check_remark LIKE CONCAT('%', #{checkRemark}, '%')
+        </if>
+        <if test="checkPass != null and checkPass != ''">
+            <choose>
+                <when test="checkPass == '未核对开票'">
+                    AND (ofill.check_pass IS NULL OR ofill.check_pass = '')
+                </when>
+                <otherwise>
+                    AND ofill.check_pass = #{checkPass}
+                </otherwise>
+            </choose>
+        </if>
+        <if test="startDate != null and endDate != null">
+            AND DATE(ofill.time) BETWEEN #{startDate} AND #{endDate}
+        </if>
+        ) temp
+    </select>
 
 
 </mapper>

@@ -175,7 +175,7 @@
                     }
                     table.render({
                         elem: "#currentTableId",
-                        url: pp,
+                        url: '/mergedDepository', // 直接调用后端分页接口
                         parseData: function (res) { //res 即为原始返回的数据
                             return {
                                 "status": res.status, //解析接口状态

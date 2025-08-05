@@ -14,6 +14,9 @@
         <result column="time" property="time" jdbcType="TIMESTAMP"/>
         <result column="apply_remark" property="applyRemark" jdbcType="VARCHAR"/>
         <result column="introduce" property="introduce" jdbcType="VARCHAR"/>
+        <result column="review_remark" property="reviewRemark" jdbcType="VARCHAR" />
+        <result column="check_remark" property="checkRemark" jdbcType="VARCHAR" />
+        <result column="check_pass" property="checkPass" jdbcType="VARCHAR" />
     </resultMap>
 
     <!-- Insert operation -->
@@ -33,7 +36,7 @@
         UPDATE once_fill
         <set>
             <if test="depositoryId != null">
-                depository_id = #{depositoryId},
+                depositoryId = #{depositoryId},
             </if>
             <if test="name != null">
                 name = #{name},
@@ -62,6 +65,9 @@
             <if test="introduce != null">
                 introduce = #{introduce},
             </if>
+            <if test="checkPass != null">check_pass = #{checkPass},</if>
+            <if test="checkRemark != null">check_remark = #{checkRemark},</if>
+            <if test="reviewRemark != null">review_remark = #{reviewRemark},</if>
         </set>
         WHERE id = #{id}
     </update>
@@ -176,4 +182,15 @@
             count(*)
         FROM once_fill
     </select>
+    <update id="batchUpdateReviewRemark">
+        update once_fill
+        set review_remark = #{invoiceNumber}
+        where id in
+        <foreach collection="ids" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+        AND check_pass = '已核对开票'
+        AND (review_remark IS NULL OR review_remark = '')
+    </update>
+
 </mapper>

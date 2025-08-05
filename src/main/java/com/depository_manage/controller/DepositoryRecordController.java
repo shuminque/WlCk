@@ -377,23 +377,50 @@ public class DepositoryRecordController {
         List<Integer> ids = (List<Integer>) map.get("ids");
         String invoiceNumber = (String) map.get("invoiceNumber");
 
-        if (ids == null || ids.isEmpty() || invoiceNumber == null) {
-            Map<String, Object> error = new HashMap<>();
-            error.put("status", 400);
-            error.put("message", "参数不完整");
-            return ResponseEntity.badRequest().body(error);
-        }
-        int updated = depositoryRecordService.batchUpdateReviewRemark(ids, invoiceNumber);
         Map<String, Object> result = new HashMap<>();
+
+        if (ids == null || ids.isEmpty() || invoiceNumber == null) {
+            result.put("status", 400);
+            result.put("message", "参数不完整");
+            return ResponseEntity.ok(result); // 仍然返回200，前端再判断status
+        }
+
+        int updated = depositoryRecordService.batchUpdateReviewRemark(ids, invoiceNumber);
+
         if (updated > 0) {
             result.put("status", 200);
             result.put("message", "批量更新成功");
-            return ResponseEntity.ok(result);
         } else {
-            result.put("status", 500);
-            result.put("message", "批量更新失败");
-            return ResponseEntity.status(500).body(result);
+            result.put("status", 300); // 自定义业务状态，表示没有更新
+            result.put("message", "未更新任何记录");
         }
+
+        return ResponseEntity.ok(result);
+    }
+
+    @GetMapping("/mergedDepository")
+    public RestResponse findMergedDepositoryByCondition(@RequestParam Map<String,Object> map,
+                                                        @RequestParam(name = "applyRemark[]", required = false) List<String> applyRemarks) {
+
+        // 处理 applyTime 日期范围
+        String dateRange = (String) map.get("applyTime");
+        if (dateRange != null && dateRange.contains(" - ")) {
+            String[] dates = dateRange.split(" - ");
+            map.put("startDate", dates[0] + " 00:00:00");
+            map.put("endDate", dates[1] + " 23:59:59");
+        }
+
+        int page = map.get("page") != null ? Integer.parseInt(map.get("page").toString()) : 1;
+        int size = map.get("size") != null ? Integer.parseInt(map.get("size").toString()) : 10;
+        map.put("begin", (page - 1) * size);
+        map.put("size", size);
+
+
+        // 获取数据和总数
+        List<Map<String, Object>> list = depositoryRecordService.getMergedDepositoryData(map);
+        int total = depositoryRecordService.getMergedDepositoryCount(map);
+
+        return new RestResponse(list, total, 200);
     }
 
 }
