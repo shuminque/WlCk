@@ -65,6 +65,15 @@
                             ]
                         },
                         {
+                          "title": "退回申请",
+                          "href": "/application_bounced",
+                          "icon": "fa fa-arrow-up",
+                          "target": "_self",
+                          "roles": [
+                            "SAB_cg", "SAB_sh", "ZAB_cg", "ZAB_sh", "ALL"
+                          ]
+                        },
+                        {
                             "title": "库存转移申请",
                             "href": "application_transfer",
                             "icon": "fa fa-exchange",

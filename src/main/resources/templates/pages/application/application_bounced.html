@@ -21,14 +21,14 @@
                         <div carousel-item>
                             <div>
                                 <form class="layui-form" style="margin: 0 auto;max-width: 460px;padding-top: 20px;">
-<!--                                    <div class="layui-form-item" >-->
-<!--                                        <label class="layui-form-label">厂区:</label>-->
-<!--                                        <div class="layui-input-block">-->
-<!--                                            <select name="depositoryId" lay-verify="required" id="depositorySelect">-->
-<!--                                                <option th:each="depository,iterStar:${depositories}" th:value="${depository?.getId()}" th:text="${depository?.getDname()}" ></option>-->
-<!--                                            </select>-->
-<!--                                        </div>-->
-<!--                                    </div>-->
+                                    <!--                                    <div class="layui-form-item" >-->
+                                    <!--                                        <label class="layui-form-label">厂区:</label>-->
+                                    <!--                                        <div class="layui-input-block">-->
+                                    <!--                                            <select name="depositoryId" lay-verify="required" id="depositorySelect">-->
+                                    <!--                                                <option th:each="depository,iterStar:${depositories}" th:value="${depository?.getId()}" th:text="${depository?.getDname()}" ></option>-->
+                                    <!--                                            </select>-->
+                                    <!--                                        </div>-->
+                                    <!--                                    </div>-->
                                     <div class="layui-form-item" style="position: relative;">
                                         <!-- AT号输入框 -->
                                         <label class="layui-form-label">AT号:</label>
@@ -36,31 +36,18 @@
                                             <input name="atId" type="text" id="atIdSelect" placeholder="输入AT" readonly class="layui-input" lay-verify="required"/>
                                         </div>
 
-                                        <!-- 供应商退货提示框 -->
-                                        <div style="position: absolute; left: -260px; top: 0; width: 240px; padding: 10px; border-right: 1px solid #ddd; background: #f9f9f9;">
+                                        <!-- 员工退回提示框 -->
+                                        <div style="position: absolute; left: -260px; top: 200px; width: 240px; padding: 10px; border-right: 1px solid #ddd; background: #f9f9f9;">
                                             <p style="font-size: 14px; color: #555; margin-bottom: 5px;">
-                                                当供应商退货时，操作要求：
+                                                当员工领用退回仓库时，操作要求：
                                             </p>
                                             <ul style="font-size: 14px; color: #555; line-height: 1.5;">
-                                                <li>数量栏里输入的退货数需用 <strong>负数</strong> 表示;</li>
-                                                <li>入库类型：选择 <strong>采购入库</strong>;</li>
-                                                <li>单价栏里输入采购时的单价;</li>
+                                                <li>数量栏里输入退回数量；</li>
+                                                <li>申请退回部门：<strong>选择退回部门;</strong>;</li>
+                                                <li>单价栏里确认领用时的单价；</li>
                                                 <li>提交！</li>
                                             </ul>
                                         </div>
-
-<!--                                        &lt;!&ndash; 员工退回提示框 &ndash;&gt;-->
-<!--                                        <div style="position: absolute; left: -260px; top: 200px; width: 240px; padding: 10px; border-right: 1px solid #ddd; background: #f9f9f9;">-->
-<!--                                            <p style="font-size: 14px; color: #555; margin-bottom: 5px;">-->
-<!--                                                当员工领用退回仓库时，操作要求：-->
-<!--                                            </p>-->
-<!--                                            <ul style="font-size: 14px; color: #555; line-height: 1.5;">-->
-<!--                                                <li>数量栏里输入退回数量；</li>-->
-<!--                                                <li>入库类型：选择 <strong>领用退回</strong>;</li>-->
-<!--                                                <li>单价栏里输入领用时的单价；</li>-->
-<!--                                                <li>提交！</li>-->
-<!--                                            </ul>-->
-<!--                                        </div>-->
                                     </div>
                                     <div class="layui-form-item">
                                         <label class="layui-form-label">品名:</label>
@@ -83,25 +70,33 @@
                                             <input name="quantity"  placeholder="请填写数量" value="" class="layui-input" lay-verify="number" required autocomplete="off">
                                         </div>
                                     </div>
-                                    <div class="layui-form-item">
-                                        <label class="layui-form-label">入库类型:</label>
-                                        <div class="layui-input-block">
-                                            <select name="applyRemark" class="layui-select" lay-filter="applyRemark">
-                                                <option value="采购入库">采购入库</option>
+<!--                                    <div class="layui-form-item" readonly="true">-->
+<!--                                        <label class="layui-form-label">入库类型:</label>-->
+<!--                                        <div class="layui-input-block">-->
+<!--                                            <select name="applyRemarkss" class="layui-select" lay-filter="applyRemarkss">-->
 <!--                                                <option value="领用退回">领用退回</option>-->
-                                                <option value="刀具内制入库">刀具内制入库</option>
-                                            </select>
+<!--                                            </select>-->
+<!--                                        </div>-->
+<!--                                    </div>-->
+                                    <div class="layui-form-item">
+                                        <label class="layui-form-label">退回部门:</label>
+                                        <div class="layui-input-block">
+                                            <div name="applyRemark" class="layui-input custom-input" id="ID-dropdown-demo-complex" style="cursor: pointer;">
+                                                请选择退回部门
+                                            </div>
+                                            <input type="hidden" name="applyRemark" id="applyRemarkInput" value="" lay-verify="required">
                                         </div>
                                     </div>
                                     <div class="layui-form-item">
                                         <label class="layui-form-label">货币类型:</label>
                                         <div class="layui-input-block">
-                                            <select name="currency" class="layui-select" lay-filter="currencyFilter">
-                                                <option value="CNY">人民币</option>
+                                            <select name="currency" class="layui-select" lay-filter="currencyFilter" disabled>
+                                                <option value="CNY" selected>人民币</option>
                                                 <option value="JPY">日元</option>
                                             </select>
                                         </div>
                                     </div>
+
                                     <div class="layui-form-item">
                                         <label class="layui-form-label" id="priceLabel">入库单价:</label>
                                         <div class="layui-input-block">
@@ -174,11 +169,25 @@
         'SAB': 1,
         'ZAB': 2,
     };
+    let dropDataSAB = [];
+    let dropDataZAB = [];
+    let dropdownCount = 2;
+    function formatData(apiData) {
+        let formattedData = apiData.map(item => {
+            let formattedItem = { title: item.title };
+            if (item.children && item.children.length > 0) {
+                formattedItem.child = formatData(item.children); // 递归处理子项目
+            }
+            return formattedItem;
+        });
+        return formattedData;
+    }
     layui.use([ 'form', 'step', 'tableSelect', 'laydate'], function () {
         var $ = layui.$,
             form = layui.form,
             step = layui.step,
             tableSelect = layui.tableSelect,
+            dropdown = layui.dropdown,
             laydate = layui.laydate;
 
         laydate.render({
@@ -364,7 +373,38 @@
                 if (userDepositoryId === 0) {
                     pp = '/material';
                 } else {
-                     pp = '/material?depositoryId=' + userDepositoryId;
+                    pp = '/material?depositoryId=' + userDepositoryId;
+                }
+                function resetOutTypeDropdown() {
+                    // 清除旧的出库类型下拉列表
+                    document.getElementById('ID-dropdown-demo-complex').innerHTML = '';
+                }
+                function loadCategoryData(category, callback) {
+                    $.get('/api/categories/' + category, function(response) {
+                        if (response.code === 0) {
+                            const filteredData = response.data.filter(item => item.title !== "销售出库");
+                            callback(formatData(filteredData));
+                        } else {
+                            layer.msg(`无法加载${category.toUpperCase()}的分类数据`);
+                        }
+                    }).fail(function() {
+                        layer.msg(`无法加载${category.toUpperCase()}的分类数据`);
+                    });
+                }
+                function loadOutTypeDropdown(depositoryId) {
+                    if (depositoryId === '1') {
+                        loadCategoryData('sab', function(data) {
+                            dropDataSAB = data;
+                            setParentForChild(dropDataSAB);
+                            loadDepositoryData(dropDataSAB);
+                        });
+                    } else if (depositoryId === '2') {
+                        loadCategoryData('zab', function(data) {
+                            dropDataZAB = data;
+                            setParentForChild(dropDataZAB);
+                            loadDepositoryData(dropDataZAB);
+                        });
+                    }
                 }
                 tableSelect.render({
                     elem: '#atIdSelect', // 定义输入框input对象
@@ -443,6 +483,9 @@
                         // });
                         // 重新渲染表单
                         layui.form.render('select');
+                        var selectedDepositoryId = $('#depositorySelect').val();
+                        resetOutTypeDropdown();
+                        loadOutTypeDropdown(selectedDepositoryId);
                         $("input[name='quantity']").focus();
                     }
                 });
@@ -469,11 +512,12 @@
                 layer.msg('无法获取用户的厂区信息');
             }
         });
-        form.on('select(applyRemark)', function (data) {
-            if (data.value === '领用退回') {
+        form.on('select(applyRemarkss)', function (data) {
+            if (data.value.includes('领用退回')) {
                 $('#unitPriceSelect').val(usePrice);
             }
         });
+
         form.on('submit(formStep2)', function (data) {
             step.next('#stepForm');
             return false;
@@ -485,6 +529,40 @@
         $('.next').click(function () {
             step.next('#stepForm');
         });
+        function setParentForChild(data) {
+            for (let i = 0; i < data.length; i++) {
+                if (data[i].child) {
+                    for (let j = 0; j < data[i].child.length; j++) {
+                        data[i].child[j].parent = data[i];
+                    }
+                    setParentForChild(data[i].child);
+                }
+            }
+        }
+        function loadDepositoryData(dropdownData) {
+            setParentForChild(dropdownData);
+            dropdown.render({
+                elem: '#ID-dropdown-demo-complex',
+                data: dropdownData,
+                click: function(item) {
+                    let path = item.title;
+                    let currentItem = item;
+                    while (currentItem.parent) {
+                        path = currentItem.parent.title + "-" + path;
+                        currentItem = currentItem.parent;
+                    }
+                    path = "领用退回-" + path;
+                    let dropdownElem = document.getElementById('ID-dropdown-demo-complex');
+                    let inputElem = document.getElementById('applyRemarkInput');
+                    if(dropdownElem) dropdownElem.innerText = path;
+                    if(inputElem) inputElem.value = path;
+                    if (path.includes('领用退回')) {
+                        $('#unitPriceSelect').val(usePrice);
+                    }
+                    $("input[name='quantity']").focus();
+                }
+            });
+        }
         $(document).ready(function() {
             // 获取URL中的查询参数
             var urlParams = new URLSearchParams(window.location.search);

@@ -217,6 +217,14 @@ public class PageController {
         return mv;
     }
 
+    @GetMapping("/application_bounced")
+    public ModelAndView application_bounced() {
+        ModelAndView mv = new ModelAndView();
+        mv.setViewName("pages/application/application_bounced");
+        mv.addObject("depositories", depositoryService.findDepositoryAll());
+        mv.addObject("reviewers", userService.findReviewers());
+        return mv;
+    }
     @GetMapping("/application_out")
     public ModelAndView application_out() {
         ModelAndView mv = new ModelAndView();

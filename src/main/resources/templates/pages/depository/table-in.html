@@ -257,6 +257,9 @@
                         // {type: "checkbox", width: 50},
                         // {field: 'id', width: 60, title: '序号'},
                         // {field: 'depositoryName', width: 60, title: '厂区'},
+                        {field: 'applyTime',title: '日期', width:'10%', sort: true, templet: function(d){
+                                return formatDate(d.applyTime);
+                            }},
                         {field: 'atId', width: '5%', title: 'AT'},
                         {field: 'mname',width: '12%', title: '品名'},
                         {field: 'model', width: '10%', title: '规格'},
@@ -275,9 +278,7 @@
                         {field: 'state', width:'6%', title: '流程'},
                         {field: 'applicantName', width:'8%', title: '申请人'},
                         // {field: 'applyTime', width: 170, title: '申请时间', sort: true},
-                        {field: 'applyTime',title: '日期', width:'10%', sort: true, templet: function(d){
-                                return formatDate(d.applyTime);
-                            }},
+
                         {
                             title: '操作',
                             minWidth: 200,
