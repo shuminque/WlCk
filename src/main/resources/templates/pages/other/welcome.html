@@ -1511,11 +1511,31 @@
                     ? (prevYearTotalProduction / validMonthsCount).toFixed(0)  // 保留整数
                     : 0;
                 console.log("前一年的产量平均值：", prevYearAverageProduction);
-                const prevYearcostPerUnit = prevYearAverageProduction > 0
-                    ? (prevYearAverageAmount / prevYearAverageProduction).toFixed(4)  // 保留整数
-                    : 0;
-                console.log("前一年的产量单个成本：", prevYearcostPerUnit);
+                // const prevYearcostPerUnit = prevYearAverageProduction > 0
+                //     ? (prevYearAverageAmount / prevYearAverageProduction).toFixed(4)  // 保留整数
+                //     : 0;
+                // console.log("前一年的产量单个成本：", prevYearcostPerUnit);
+                let prevYearUnitCostSum = 0;
+                for (let i = 0; i < validAmountData.length; i++) {
+                    const amountItem = validAmountData[i];
+                    const productionItem = validProductionData[i];
 
+                    const amount = parseFloat(amountItem.amount);
+                    const production = parseFloat(productionItem.production);
+
+                    console.log(`第${i + 1}月：金额=${amount}，产量=${production}`);
+
+                    if (!isNaN(amount) && !isNaN(production) && production > 0) {
+                        const unitCost = amount / production;
+                        prevYearUnitCostSum += unitCost;
+                        console.log(`单个成本=${unitCost.toFixed(4)}，累计=${prevYearUnitCostSum.toFixed(4)}`);
+                    }
+                }
+                const prevYearcostPerUnit = validMonthsCount > 0
+                    ? (prevYearUnitCostSum / validMonthsCount).toFixed(4)
+                    : 0;
+
+                console.log("前一年的产量单个成本（单价平均法）：", prevYearcostPerUnit);
                 // 计算每个月的单个成本
                 const costPerUnit = amountData.map(function(item) {
                     var productionData = lineData.find(lineItem => {
@@ -1658,7 +1678,7 @@
                                 data: [
                                     {
                                         name: '平均',
-                                        yAxis: referenceLineValueTwo,
+                                        yAxis: referenceLineValue,
                                         yAxisIndex: 1,
                                         label: {
                                             show: true,
@@ -1853,7 +1873,6 @@
                     loadDepositoryDataForElem('#ID-dropdown-demo-complex-1', dropDataZAB);
                 }
                 // 重新加载数据后调用fetchCateChart以确保图表更新
-                fetchCateChart();
             });
         }
         function handleDepositoryChange4() {

@@ -64,6 +64,8 @@
                                     <option value="采购入库">采购入库</option>
                                     <option value="领用退回">领用退回</option>
                                     <option value="刀具内制入库">刀具内制入库</option>
+                                    <option value="SAB转入ZAB">SAB转入ZAB</option>
+                                    <option value="ZAB转入SAB">ZAB转入SAB</option>
                                 </select>
                             </div>
                         </div>
@@ -240,7 +242,8 @@
                         limitName: 'size' //每页数据量的参数名，默认：limit
                     },
                     where: {
-                        type:"1"
+                        type:"1",
+                        excludeApplyRemark: ["领用退回"]
                     },
                     response: {
                         statusName: 'status' //规定数据状态的字段名称，默认：code
@@ -361,6 +364,8 @@
                     var req={};
                     data=data.field;
                     req.type=1;
+                    req.excludeApplyRemark = ["领用退回"];
+
                     if (data.atId!==''){
                         req.atId=data.atId;
                     }

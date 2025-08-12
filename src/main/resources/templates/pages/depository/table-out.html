@@ -73,8 +73,8 @@
                             <div>
                                 <label class="layui-form-label">领用部门</label>
                                 <select name="applyRemark" xm-select="selectId" >
-                                    <option value="SAB转入ZAB" >SAB转入ZAB</option>
-                                    <option value="ZAB转入SAB" >ZAB转入SAB</option>
+<!--                                    <option value="SAB转入ZAB" >SAB转入ZAB</option>-->
+<!--                                    <option value="ZAB转入SAB" >ZAB转入SAB</option>-->
                                     <option th:each="categories : ${cas}" th:value="${categories.title}" th:text="${categories.title}" ></option>
                                 </select>
                             </div>
@@ -248,7 +248,7 @@
                         limitName: 'size' //每页数据量的参数名，默认：limit
                     },
                     where: {
-                        type:"0"
+                        excludeApplyRemark: ["采购入库"]
                     },
                     response: {
                         statusName: 'status' //规定数据状态的字段名称，默认：code
@@ -273,14 +273,24 @@
                         {field: 'model', width: '12%', title: '规格'},
                         {field: 'typeName', width: '16%', title: '分类'},
                         {field: 'enginName', width: '10%', title: '工程',totalRowText: '合计'},
-                        {field: 'quantity', width: '5%', title: '数量'},
+                        {field: 'quantity', width: '5%', title: '数量', templet: function(d) {
+                                // 如果 applyRemark 含“领用退回”，数量显示负数
+                                if (d.applyRemark && d.applyRemark.includes("领用退回")) {
+                                    return -Math.abs(d.quantity);
+                                }
+                                return d.quantity;
+                            }},
                         {field: 'price', width: '8%', title: '单价', templet: function(d) {
                                 return parseFloat(d.price).toFixed(2);  // 格式化为两位小数
                             }},
                         {field: 'amount', width: '10%', title: '金额', templet: function(d) {
                                 let quantity = parseFloat(d.quantity) || 0;
                                 let price = parseFloat(d.price) || 0;
-                                return (quantity * price).toFixed(2);
+                                let amount = quantity * price;
+                                if (d.applyRemark && d.applyRemark.includes("领用退回")) {
+                                    amount = -Math.abs(amount);
+                                }
+                                return amount.toFixed(2);
                             }, totalRow: true},
                         {field: 'applyRemark', title: '领用部门', width: '16%', templet: function(d){
                                 if (d.applyRemark === "ZAB领用工程-单能线FE-FH-JR线") {
@@ -325,13 +335,22 @@
                     ]],
                     done: function(res, curr, count) {
                         var totalQuantity = res.data.reduce(function(sum, item) {
-                            return sum + parseInt(item.quantity);
+                            let qty = parseInt(item.quantity);
+                            if (item.applyRemark && item.applyRemark.includes("领用退回")) {
+                                qty = -Math.abs(qty);
+                            }
+                            return sum + qty;
                         }, 0);
+
                         var totalAmount = res.data.reduce(function(sum, item) {
                             let quantity = parseFloat(item.quantity) || 0;
                             let price = parseFloat(item.price) || 0;
-                            return sum + (quantity * price);
-                        }, 0).toFixed(2); // 两位小数
+                            let amt = quantity * price;
+                            if (item.applyRemark && item.applyRemark.includes("领用退回")) {
+                                amt = -Math.abs(amt);
+                            }
+                            return sum + amt;
+                        }, 0).toFixed(2);
 
                         var totalRow = document.querySelector('.layui-table-total');
                         if (totalRow) {
@@ -366,7 +385,8 @@
                     console.log(data);
                     var req={};
                     data=data.field;
-                    req.type=0;
+                    // req.type=0;
+                    req.excludeApplyRemark = ["采购入库"];
                     if (data.atId!==''){
                         req.atId=data.atId;
                     }
