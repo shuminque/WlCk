@@ -127,63 +127,88 @@
             name,
             model,
             SUM(quantity) AS quantity,
---             unitPrice,
             SUM(totalAmount) AS totalAmount,
             apply_remark,
             category_title,
             at_id
         FROM (
+                 -- 一次性领用
                  SELECT
                      'once_fill' AS source_table,
-                     o.name as name,
+                     o.name AS name,
                      o.model,
                      o.quantity,
---                      o.unit_price as unitPrice,
-                     o.quantity * o.unit_price as totalAmount,
+                     o.quantity * o.unit_price AS totalAmount,
                      o.apply_remark,
                      c.title AS category_title,
-                     NULL AS at_id  -- 显示at_id为空
+                     NULL AS at_id
                  FROM
                      once_fill AS o
-                         JOIN categories c ON RIGHT(SUBSTRING_INDEX(o.apply_remark, '-', -1), LENGTH(c.title)) = c.title
-                 WHERE
-                             c.title = #{categoryName}
-                         AND c.depository_id = #{depositoryId}
-                         AND o.depositoryId = #{depositoryId}
-                         AND YEAR(o.time) = #{year}
-                         AND introduce !='立项'
-            AND MONTH(o.time) = #{month}
+                         JOIN
+                     categories c ON RIGHT(SUBSTRING_INDEX(o.apply_remark, '-', -1), LENGTH(c.title)) = c.title
+        WHERE
+            c.title = #{categoryName}
+          AND c.depository_id = #{depositoryId}
+          AND o.depositoryId = #{depositoryId}
+          AND YEAR(o.time) = #{year}
+          AND MONTH(o.time) = #{month}
+          AND o.introduce != '立项'
 
         UNION ALL
 
-        -- 从 depository_record 表中获取记录
+        -- 出库记录
         SELECT
             'depository_record' AS source_table,
             d.mname AS name,
             d.model,
             d.quantity,
---             d.price as unitPrice,
-            d.quantity * d.price as totalAmount,
+            d.quantity * d.price AS totalAmount,
             d.apply_remark,
             c.title AS category_title,
             d.at_id
         FROM
             depository_record AS d
-                JOIN categories c ON RIGHT(SUBSTRING_INDEX(d.apply_remark, '-', -1), LENGTH(c.title)) = c.title
+                JOIN
+            categories c ON RIGHT(SUBSTRING_INDEX(d.apply_remark, '-', -1), LENGTH(c.title)) = c.title
         WHERE
-                    c.title = #{categoryName}
-                AND c.depository_id = #{depositoryId}
-                AND d.depository_id = #{depositoryId}
-                AND YEAR(d.apply_time) = #{year}
+            c.title = #{categoryName}
+          AND c.depository_id = #{depositoryId}
+          AND d.depository_id = #{depositoryId}
+          AND YEAR(d.apply_time) = #{year}
           AND MONTH(d.apply_time) = #{month}
+          AND d.type = 0
+          AND d.review_pass = 1
+
+        UNION ALL
+
+        -- 领用退回（冲销）
+        SELECT
+            'depository_record_return' AS source_table,
+            d.mname AS name,
+            d.model,
+            -d.quantity AS quantity,
+            -(d.quantity * d.price) AS totalAmount,
+            d.apply_remark,
+            c.title AS category_title,
+            d.at_id
+        FROM
+            depository_record AS d
+                JOIN
+            categories c ON RIGHT(SUBSTRING_INDEX(d.apply_remark, '-', -1), LENGTH(c.title)) = c.title
+        WHERE
+            c.title = #{categoryName}
+          AND c.depository_id = #{depositoryId}
+          AND d.depository_id = #{depositoryId}
+          AND YEAR(d.apply_time) = #{year}
+          AND MONTH(d.apply_time) = #{month}
+          AND d.type = 1
+          AND d.review_pass = 1
+          AND d.apply_remark LIKE '领用退回%'
             ) AS combined
         GROUP BY
-            source_table, name, model,
---             unitPrice,
-            apply_remark, category_title, at_id
+            source_table, name, model, apply_remark, category_title, at_id
         ORDER BY
---             CASE WHEN at_id IS NULL THEN 1 ELSE 0 END, -- 首先根据at_id是否为NULL进行排序
-        totalAmount DESC  -- 然后以at_id升序排列
+            totalAmount DESC;
     </select>
     <select id="getRecordsForType" resultType="com.depository_manage.pojo.RecordDTO" parameterType="java.util.Map">
         SELECT
@@ -192,10 +217,10 @@
             model,
             SUM(quantity) AS quantity,
             ROUND(SUM(totalAmount), 2) AS totalAmount,
---             apply_remark,
             material_type,
             at_id
         FROM (
+                 -- 一次性领用
                  SELECT
                      'once_fill' AS source_table,
                      o.name,
@@ -218,6 +243,7 @@
 
         UNION ALL
 
+        -- 正常出库
         SELECT
             'depository_record' AS source_table,
             d.mname AS name,
@@ -234,19 +260,40 @@
         WHERE
             mt.tname = #{categoryName}
                 AND d.depository_id = #{depositoryId}
-                AND d.type=0
+                AND d.type = 0
+                AND d.review_pass = 1
+                AND YEAR(d.apply_time) = #{year}
+          AND MONTH(d.apply_time) = #{month}
+
+        UNION ALL
+
+        -- 领用退回（冲销，负数）
+        SELECT
+            'depository_record_return' AS source_table,
+            d.mname AS name,
+            d.model,
+            -d.quantity AS quantity,
+            -(d.quantity * d.price) AS totalAmount,
+            d.apply_remark,
+            mt.tname AS material_type,
+            d.at_id
+        FROM
+            depository_record d
+                JOIN
+            material_type mt ON d.type_name = mt.tname
+        WHERE
+            mt.tname = #{categoryName}
+                AND d.depository_id = #{depositoryId}
+                AND d.type = 1
+                AND d.review_pass = 1
+                AND d.apply_remark LIKE '领用退回%'
                 AND YEAR(d.apply_time) = #{year}
           AND MONTH(d.apply_time) = #{month}
             ) AS combined
         GROUP BY
-            source_table,
-            name,
-            model,
---             apply_remark,
-            material_type,
-            at_id
+            source_table, name, model, material_type, at_id
         ORDER BY
-            totalAmount DESC
+            totalAmount DESC;
     </select>
 
 </mapper>

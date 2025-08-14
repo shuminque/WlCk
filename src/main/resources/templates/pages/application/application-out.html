@@ -161,7 +161,19 @@
             util = layui.util;
         laydate.render({
             elem: '#storageDate',
+            max: 0, // 最大日期：今天
+            min: getMinDate(30) // 最小日期：当前时间前 30 天
         });
+
+// 工具方法：获取当前日期的前 N 天（yyyy-MM-dd 格式）
+        function getMinDate(days) {
+            var date = new Date();
+            date.setDate(date.getDate() - days);
+            var y = date.getFullYear();
+            var m = ('0' + (date.getMonth() + 1)).slice(-2);
+            var d = ('0' + date.getDate()).slice(-2);
+            return y + '-' + m + '-' + d;
+        }
         step.render({
             elem: '#stepForm',
             filter: 'stepForm',

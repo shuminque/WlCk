@@ -248,7 +248,8 @@
                         limitName: 'size' //每页数据量的参数名，默认：limit
                     },
                     where: {
-                        excludeApplyRemark: ["采购入库"]
+                        excludeApplyRemark: ["采购入库"],
+                        reviewPass:1
                     },
                     response: {
                         statusName: 'status' //规定数据状态的字段名称，默认：code
@@ -387,6 +388,7 @@
                     data=data.field;
                     // req.type=0;
                     req.excludeApplyRemark = ["采购入库"];
+                    req.reviewPass=1;
                     if (data.atId!==''){
                         req.atId=data.atId;
                     }
