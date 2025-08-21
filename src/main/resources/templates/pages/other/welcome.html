@@ -1383,6 +1383,7 @@
                     const mergedRecords = Object.values(mergedMap).filter(item => {
                         return !(item.quantity === 0 && item.totalAmount === 0);
                     });
+                    mergedRecords.sort((a, b) => b.totalAmount - a.totalAmount);
 
                     function formatDate(dateStr) {
                         if (!dateStr) return '';
