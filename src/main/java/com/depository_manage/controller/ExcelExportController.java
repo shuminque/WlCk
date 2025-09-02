@@ -182,7 +182,12 @@ public class ExcelExportController {
             createCellWithStyle(row, 6, ((Double) getOrDefault(record, "入库数量", 0.0)).doubleValue(), style);
             createCellWithStyle(row, 7, Double.parseDouble(((String) getOrDefault(record, "入库金额", "0.00")).replace(",", "")), style);
 
-            createCellWithStyle(row, 8, ((Double) getOrDefault(record, "出库数量", 0.0)).doubleValue(), style);
+            createCellWithStyle(row, 8,
+                    Double.parseDouble(
+                            String.valueOf(getOrDefault(record, "出库数量", "0.00")).replace(",", "")
+                    ),
+                    style
+            );
             createCellWithStyle(row, 9, Double.parseDouble(((String) getOrDefault(record, "出库金额", "0.00")).replace(",", "")), style);
 
             createCellWithStyle(row, 10, ((Double) getOrDefault(record, "转移数量", 0.0)).doubleValue(), style);
@@ -194,7 +199,9 @@ public class ExcelExportController {
             createCellWithStyle(row, 14, ((Double) getOrDefault(record, "制作室出库数量", 0.0)).doubleValue(), style);
             createCellWithStyle(row, 15, Double.parseDouble(((String) getOrDefault(record, "制作室出库金额", "0.00")).replace(",", "")), style);
 
-            createCellWithStyle(row, 16, ((Double) getOrDefault(record, "库存数量", 0.0)).doubleValue(), style);
+            createCellWithStyle(row, 16, Double.parseDouble(
+                            String.valueOf(getOrDefault(record, "库存数量", "0.00")).replace(",", ""))
+                    , style);
             createCellWithStyle(row, 17, Double.parseDouble(((String) getOrDefault(record, "在库金额", "0.00")).replace(",", "")), style);
 
 
