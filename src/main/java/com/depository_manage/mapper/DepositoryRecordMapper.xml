@@ -808,7 +808,7 @@ CategoryOutbounds AS (
     -- from once_fill 表（正常出库）
     SELECT
         DATE_FORMAT(time, '%Y-%m') AS month,
-        SUM(o.unit_price * o.quantity) AS amount
+        SUM(IFNULL(o.price, 0)) AS amount
     FROM
         once_fill o
         JOIN categories c ON
@@ -833,8 +833,8 @@ CategoryOutbounds AS (
                             -- from depository_record 表（正常出库）
                       SELECT
                       DATE_FORMAT(apply_time, '%Y-%m') AS month,
-                      SUM(d.price * d.quantity) AS amount
-                      FROM
+                      SUM(IFNULL(d.quantity, 0) * IFNULL(d.price, 0)) AS amount
+                              FROM
                       depository_record d
                       JOIN categories c ON
                       CASE
@@ -859,7 +859,7 @@ CategoryOutbounds AS (
                             -- from depository_record 表（领用退回，冲销出库）
                       SELECT
                       DATE_FORMAT(apply_time, '%Y-%m') AS month,
-                      -SUM(d.price * d.quantity) AS amount
+                      -SUM(IFNULL(d.quantity, 0) * IFNULL(d.price, 0)) AS amount
                       FROM
                       depository_record d
                       JOIN categories c ON
@@ -885,7 +885,8 @@ CategoryOutbounds AS (
 -- 最终查询：每月总出库金额（已冲销）
         SELECT
             a.month,
-            COALESCE(ROUND(SUM(co.amount)), 0) AS amount
+            ROUND(IFNULL(SUM(co.amount), 0), 3) AS amount
+
         FROM
             AllMonths a
                 LEFT JOIN CategoryOutbounds co ON a.month = co.month
@@ -984,6 +985,86 @@ CategoryOutbounds AS (
         ORDER BY
             am.month ASC;
     </select>
+    <select id="getTypeOutboundsForYearList"
+            resultType="com.depository_manage.pojo.CategoryOutboundDTO"
+            parameterType="java.util.Map">
+        WITH AllMonths AS (
+        SELECT CONCAT(#{year}, '-01') AS month
+        UNION ALL SELECT CONCAT(#{year}, '-02')
+        UNION ALL SELECT CONCAT(#{year}, '-03')
+        UNION ALL SELECT CONCAT(#{year}, '-04')
+        UNION ALL SELECT CONCAT(#{year}, '-05')
+        UNION ALL SELECT CONCAT(#{year}, '-06')
+        UNION ALL SELECT CONCAT(#{year}, '-07')
+        UNION ALL SELECT CONCAT(#{year}, '-08')
+        UNION ALL SELECT CONCAT(#{year}, '-09')
+        UNION ALL SELECT CONCAT(#{year}, '-10')
+        UNION ALL SELECT CONCAT(#{year}, '-11')
+        UNION ALL SELECT CONCAT(#{year}, '-12')
+        ),
+        combined_data AS (
+        -- 出库记录部分
+        SELECT
+        DATE_FORMAT(dr.apply_time, '%Y-%m') AS month,
+        SUM(IFNULL(dr.quantity, 0) * IFNULL(dr.price, 0)) AS total_amount
+        FROM depository_record dr
+        JOIN material_type mt ON dr.type_name = mt.tname
+        WHERE dr.type = 0
+        AND dr.review_pass = 1
+        AND dr.apply_remark NOT LIKE '%销售出库%'
+        AND DATE_FORMAT(dr.apply_time, '%Y') = #{year}
+        AND dr.type_name IN
+        <foreach item="item" collection="categoryTitles" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+        AND dr.depository_id = #{depositoryId}
+        GROUP BY DATE_FORMAT(dr.apply_time, '%Y-%m')
+
+        UNION ALL
+
+        -- 一次性领用部分
+        SELECT
+        DATE_FORMAT(off.time, '%Y-%m') AS month,
+        SUM(IFNULL(off.price, 0)) AS total_amount
+        FROM once_fill off
+        JOIN material_type mt ON off.type_id = mt.id
+        WHERE DATE_FORMAT(off.time, '%Y') = #{year}
+        AND mt.tname IN
+        <foreach item="item" collection="categoryTitles" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+        AND off.depositoryId = #{depositoryId}
+        AND off.introduce != '立项'
+        AND off.apply_remark NOT LIKE '%销售出库%'
+        GROUP BY DATE_FORMAT(off.time, '%Y-%m')
+
+        UNION ALL
+
+        -- 领用退回部分（冲销出库）
+        SELECT
+        DATE_FORMAT(dr.apply_time, '%Y-%m') AS month,
+        -SUM(IFNULL(dr.quantity, 0) * IFNULL(dr.price, 0)) AS total_amount
+        FROM depository_record dr
+        JOIN material_type mt ON dr.type_name = mt.tname
+        WHERE dr.type = 1
+        AND dr.review_pass = 1
+        AND dr.apply_remark LIKE '领用退回%'
+        AND DATE_FORMAT(dr.apply_time, '%Y') = #{year}
+        AND dr.type_name IN
+        <foreach item="item" collection="categoryTitles" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+        AND dr.depository_id = #{depositoryId}
+        GROUP BY DATE_FORMAT(dr.apply_time, '%Y-%m')
+        )
+        SELECT
+        am.month,
+        ROUND(IFNULL(SUM(cd.total_amount), 0), 3) AS amount
+        FROM AllMonths am
+        LEFT JOIN combined_data cd ON am.month = cd.month
+        GROUP BY am.month
+        ORDER BY am.month ASC
+    </select>
 
     <select id="fetchMonthlyAmountByTypeAndYear" resultType="com.depository_manage.pojo.MonthlyAmountDTO" parameterType="map">
         WITH MonthlyAmount AS (
@@ -992,7 +1073,7 @@ CategoryOutbounds AS (
             ROUND(SUM(combined.total_price), 2) AS monthly_amount
         FROM (
             -- 从 depository_record 表查询金额
-            SELECT
+            SELECTl
             dr.type_name AS type_name,
             dr.apply_time AS date,
             dr.quantity * dr.price AS total_price
@@ -2056,7 +2137,11 @@ UNION ALL
           AND check_remark IS NOT NULL
           AND check_remark != ''
     </select>
-
+    <update id="updateCheckRemark">
+        UPDATE depository_record
+        SET check_remark = #{checkRemark}
+        WHERE id = #{id}
+    </update>
     <update id="updateCheckRemarkForGroup">
         UPDATE depository_record
         SET check_remark = #{checkRemark}

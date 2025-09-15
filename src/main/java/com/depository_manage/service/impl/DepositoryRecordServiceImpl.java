@@ -755,6 +755,12 @@ public class DepositoryRecordServiceImpl implements DepositoryRecordService {
     public List<CategoryOutboundDTO> getTypeOutboundsForYear(String year, Integer depositoryId, String categoryTitle) {
         return depositoryRecordMapper.getTypeOutboundsForYear(year, depositoryId, categoryTitle);
     }
+
+    @Override
+    public List<CategoryOutboundDTO> getTypeOutboundsForYear(String year, Integer depositoryId, List<String> categoryTitles) {
+        return depositoryRecordMapper.getTypeOutboundsForYearList(year, depositoryId, categoryTitles);
+    }
+
     public List<CategoryOutboundDTO> getTotalCategoryOutboundsForYear(String year, Integer depositoryId) {
         return depositoryRecordMapper.getTotalCategoryOutboundsForYear(year, depositoryId);
     }
@@ -793,6 +799,11 @@ public class DepositoryRecordServiceImpl implements DepositoryRecordService {
     @Override
     public int getMergedDepositoryCount(Map<String, Object> params) {
         return depositoryRecordMapper.getMergedDepositoryCount(params);
+    }
+
+    @Override
+    public int updateCheckRemark(Integer id, String checkRemark) {
+        return depositoryRecordMapper.updateCheckRemark(id, checkRemark);
     }
 
 }

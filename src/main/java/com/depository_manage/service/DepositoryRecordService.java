@@ -113,6 +113,7 @@ public interface DepositoryRecordService {
     List<CategoryOutboundDTO> fetchCategoryOutboundsForYearMonth(String year, String month, Integer depositoryId);
     List<CategoryOutboundDTO> getCategoryOutboundsForYear(String year, Integer depositoryId, String categoryTitle);
     List<CategoryOutboundDTO> getTypeOutboundsForYear(String year, Integer depositoryId, String categoryTitle);
+    List<CategoryOutboundDTO> getTypeOutboundsForYear(String year, Integer depositoryId, List<String> categoryTitles);
 
     List<CategoryOutboundDTO> getTotalCategoryOutboundsForYear(String year, Integer depositoryId);
     List<MonthlyAmountDTO> fetchMonthlyAmountByTypeAndYear(Integer typeId, String year, Integer depositoryId);
@@ -130,4 +131,6 @@ public interface DepositoryRecordService {
 
 
     int getMergedDepositoryCount(Map<String, Object> params);
+
+    int updateCheckRemark(Integer id, String checkRemark);
 }

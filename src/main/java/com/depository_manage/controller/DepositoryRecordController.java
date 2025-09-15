@@ -232,24 +232,24 @@ public class DepositoryRecordController {
         }
         return ResponseEntity.ok(categoryOutbounds);
     }
-    @RequestMapping(value = {"/TypeForYear/{year}/{depositoryId}", "/TypeForYear/{year}/{depositoryId}/{categoryTitle}"})
+    @RequestMapping("/TypeForYear/{year}/{depositoryId}")
     public ResponseEntity<List<CategoryOutboundDTO>> getTypeOutboundsForYear(
             @PathVariable String year,
             @PathVariable Integer depositoryId,
-            @PathVariable(required = false) String categoryTitle) throws UnsupportedEncodingException {
-        if (categoryTitle != null && !categoryTitle.isEmpty()) {
-            categoryTitle = URLDecoder.decode(categoryTitle, StandardCharsets.UTF_8.name());
-        }
+            @RequestParam(required = false) List<String> categoryTitles) throws UnsupportedEncodingException {
 
         List<CategoryOutboundDTO> categoryOutbounds;
 
-        if (categoryTitle == null || categoryTitle.isEmpty()) {
+        if (categoryTitles == null || categoryTitles.isEmpty()) {
+            // 不传分类 → 查全部
             categoryOutbounds = depositoryRecordService.getTotalCategoryOutboundsForYear(year, depositoryId);
         } else {
-            categoryOutbounds = depositoryRecordService.getTypeOutboundsForYear(year, depositoryId, categoryTitle);
+            // 传1个或多个分类 → 都走同一个方法
+            categoryOutbounds = depositoryRecordService.getTypeOutboundsForYear(year, depositoryId, categoryTitles);
         }
         return ResponseEntity.ok(categoryOutbounds);
     }
+
 
 
     @GetMapping("/type-amounts/{year}/{typeId}/{depositoryId}")
@@ -379,6 +379,36 @@ public class DepositoryRecordController {
             return ResponseEntity.status(500).body(result);
         }
     }
+
+    @PostMapping("/depository/updateCheckRemark")
+    public ResponseEntity<?> updateCheckRemark(@RequestBody Map<String, Object> map) {
+        Integer id = map.get("id") != null ? Integer.valueOf(map.get("id").toString()) : null;
+        String checkRemark = map.get("checkRemark") != null ? map.get("checkRemark").toString().trim() : null;
+        Integer atId = map.get("atId") != null ? Integer.valueOf(map.get("atId").toString()) : null;
+        Integer depositoryId = map.get("depositoryId") != null ? Integer.valueOf(map.get("depositoryId").toString()) : null;
+
+        if (id == null || checkRemark == null || checkRemark.isEmpty()) {
+            Map<String, Object> error = new HashMap<>();
+            error.put("status", 400);
+            error.put("message", "参数不完整");
+            return ResponseEntity.badRequest().body(error);
+        }
+
+        // 修改当前记录的供应商
+        int updated = depositoryRecordService.updateCheckRemark(id, checkRemark);
+
+        Map<String, Object> result = new HashMap<>();
+        if (updated > 0) {
+            result.put("status", 200);
+            result.put("message", "供应商更新成功");
+            return ResponseEntity.ok(result);
+        } else {
+            result.put("status", 500);
+            result.put("message", "供应商更新失败");
+            return ResponseEntity.status(500).body(result);
+        }
+    }
+
     @PostMapping("/depository/batchUpdateReviewRemark")
     public ResponseEntity<?> batchUpdateReviewRemark(@RequestBody Map<String, Object> map) {
         List<Integer> ids = (List<Integer>) map.get("ids");

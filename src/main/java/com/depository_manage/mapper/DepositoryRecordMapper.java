@@ -104,6 +104,9 @@ public interface DepositoryRecordMapper {
     List<CategoryOutboundDTO> getTypeOutboundsForYear(@Param("year") String year,
                                                           @Param("depositoryId") Integer depositoryId,
                                                           @Param("categoryTitle") String categoryTitle);
+    List<CategoryOutboundDTO> getTypeOutboundsForYearList(@Param("year") String year,
+                                                          @Param("depositoryId") Integer depositoryId,
+                                                          @Param("categoryTitles") List<String> categoryTitles);
     List<CategoryOutboundDTO> getTotalCategoryOutboundsForYear(@Param("year") String year,
                                                           @Param("depositoryId") Integer depositoryId);
     List<MonthlyAmountDTO> fetchMonthlyAmountByTypeAndYear(@Param("typeId") Integer typeId, @Param("year") String year, @Param("depositoryId") Integer depositoryId);
@@ -129,4 +132,7 @@ public interface DepositoryRecordMapper {
     List<Map<String, Object>> findMergedDepositoryData(Map<String, Object> params);
 
     int getMergedDepositoryCount(Map<String, Object> params);
+
+    int updateCheckRemark(@Param("id") Integer id,
+                          @Param("checkRemark") String checkRemark);
 }

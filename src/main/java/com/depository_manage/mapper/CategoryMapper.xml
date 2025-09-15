@@ -295,5 +295,91 @@
         ORDER BY
             totalAmount DESC;
     </select>
+    <select id="getRecordsForTypeList"
+            resultType="com.depository_manage.pojo.RecordDTO"
+            parameterType="java.util.Map">
+
+        SELECT
+        source_table,
+        name,
+        model,
+        SUM(quantity) AS quantity,
+        ROUND(SUM(totalAmount), 2) AS totalAmount,
+        material_type,
+        at_id
+        FROM (
+        -- 一次性领用
+        SELECT
+        'once_fill' AS source_table,
+        o.name,
+        o.model,
+        o.quantity,
+        o.quantity * o.unit_price AS totalAmount,
+        o.apply_remark,
+        mt.tname AS material_type,
+        NULL AS at_id
+        FROM once_fill o
+        JOIN material_type mt ON o.type_id = mt.id
+        WHERE mt.tname IN
+        <foreach item="item" collection="categoryTitles" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+        AND o.depositoryId = #{depositoryId}
+        AND YEAR(o.time) = #{year}
+        AND MONTH(o.time) = #{month}
+        AND o.introduce != '立项'
+
+        UNION ALL
+
+        -- 正常出库
+        SELECT
+        'depository_record' AS source_table,
+        d.mname AS name,
+        d.model,
+        d.quantity,
+        d.quantity * d.price AS totalAmount,
+        d.apply_remark,
+        mt.tname AS material_type,
+        d.at_id
+        FROM depository_record d
+        JOIN material_type mt ON d.type_name = mt.tname
+        WHERE mt.tname IN
+        <foreach item="item" collection="categoryTitles" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+        AND d.depository_id = #{depositoryId}
+        AND d.type = 0
+        AND d.review_pass = 1
+        AND YEAR(d.apply_time) = #{year}
+        AND MONTH(d.apply_time) = #{month}
+
+        UNION ALL
+
+        -- 领用退回（冲销，负数）
+        SELECT
+        'depository_record_return' AS source_table,
+        d.mname AS name,
+        d.model,
+        -d.quantity AS quantity,
+        -(d.quantity * d.price) AS totalAmount,
+        d.apply_remark,
+        mt.tname AS material_type,
+        d.at_id
+        FROM depository_record d
+        JOIN material_type mt ON d.type_name = mt.tname
+        WHERE mt.tname IN
+        <foreach item="item" collection="categoryTitles" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+        AND d.depository_id = #{depositoryId}
+        AND d.type = 1
+        AND d.review_pass = 1
+        AND d.apply_remark LIKE '领用退回%'
+        AND YEAR(d.apply_time) = #{year}
+        AND MONTH(d.apply_time) = #{month}
+        ) AS combined
+        GROUP BY source_table, name, model, material_type, at_id
+        ORDER BY totalAmount DESC;
+    </select>
 
 </mapper>

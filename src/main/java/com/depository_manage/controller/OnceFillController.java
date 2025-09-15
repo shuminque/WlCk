@@ -139,6 +139,46 @@ public class OnceFillController {
             return ResponseEntity.status(500).body(result);
         }
     }
+    @PostMapping("/updateCheckRemark")
+    public ResponseEntity<?> updateCheckRemark(@RequestBody Map<String, Object> map) {
+        Object idObj = map.get("id");
+        Object checkRemarkObj = map.get("checkRemark");
+
+        if (idObj == null || checkRemarkObj == null) {
+            Map<String, Object> error = new HashMap<>();
+            error.put("status", 400);
+            error.put("message", "参数不完整");
+            return ResponseEntity.badRequest().body(error);
+        }
+        Integer id;
+        try {
+            id = Integer.parseInt(idObj.toString());
+        } catch (NumberFormatException e) {
+            Map<String, Object> error = new HashMap<>();
+            error.put("status", 400);
+            error.put("message", "id 参数格式错误");
+            return ResponseEntity.badRequest().body(error);
+        }
+
+        String checkRemark = checkRemarkObj.toString().trim();
+        map.put("id", id);
+        map.put("checkRemark", checkRemark);
+
+        int updated = onceFillService.updateOnceFill(map);
+
+        Map<String, Object> result = new HashMap<>();
+        if (updated > 0) {
+            result.put("status", 200);
+            result.put("message", "供应商更新成功");
+            return ResponseEntity.ok(result);
+        } else {
+            result.put("status", 500);
+            result.put("message", "供应商更新失败");
+            return ResponseEntity.status(500).body(result);
+        }
+    }
+
+
     @PostMapping("/OnceBatchUpdateReviewRemark")
     public ResponseEntity<?> batchUpdateReviewRemarkForOnceFill(@RequestBody Map<String, Object> map) {
         List<Integer> ids = (List<Integer>) map.get("ids");

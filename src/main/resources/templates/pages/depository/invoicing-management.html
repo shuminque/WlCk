@@ -52,7 +52,7 @@
                                 </select>
                             </div>
                         </div>
-                        <div class="layui-inline" style="display: none">
+                        <div class="layui-inline" >
                             <div class="layui-input-inline">
                                 <input type="text" name="atId" autocomplete="off" class="layui-input" placeholder="搜索AT号">
                             </div>
@@ -313,7 +313,7 @@
                                 return (quantity * price).toFixed(2);
                             }, totalRow: true, sort: true},
                         // {field: 'applyRemark', title: '类型', width: '10%'},
-                        {field: 'state', width:'5%', title: '流程'},
+                        {field: 'state', width:'5%', title: '流程',hide:true},
                         {field: 'checkRemark', width: 170, title: '供应商', sort: true},
                         {field: 'applyTime',title: '日期', width:'6%', sort: true, templet: function(d){
                                 return formatDate(d.applyTime);
@@ -332,6 +332,7 @@
                                 let buttons = '';
                                 buttons += '<a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="edit">设为已核对</a>';
                                 buttons += '<a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="clear">清空结算</a>';
+                                // buttons += '<a class="layui-btn layui-btn-warm  layui-btn-  xs" lay-event="update">修改供应商</a>';
                                 return buttons;
                             }
                         }
@@ -618,6 +619,34 @@
                     });
                 }
             }
+            else if (obj.event === 'update') {
+                layer.open({
+                    type: 1,
+                    title: '修改供应商',
+                    area: ['400px', '200px'],
+                    btn: ['确认', '取消'],
+                    content: '<div style="padding: 20px;">' +
+                        '<select id="supplierSelect" class="layui-select">' +
+                        document.getElementById('checkRemarkF').innerHTML +
+                        '</select>' +
+                        '</div>',
+                    success: function(layero, index) {
+                        // 设置默认选中当前供应商
+                        if (data.checkRemark) {
+                            document.querySelector('#supplierSelect').value = data.checkRemark;
+                        }
+                    },
+                    yes: function(index) {
+                        let selectedSupplier = document.querySelector('#supplierSelect').value;
+                        if (!selectedSupplier || selectedSupplier.trim() === '') {
+                            layer.msg('请选择供应商');
+                            return;
+                        }
+                        sendUpdateCheckRemark(data, selectedSupplier);
+                        layer.close(index);
+                    }
+                });
+            }
 
             else if (obj.event === 'clear') {
                 layer.confirm("确认清空该记录的结算状态？", {icon: 3, title: '提示'}, function(index){
@@ -646,6 +675,32 @@
                 });
             }
         });
+        function sendUpdateCheckRemark(row, selectedCheckRemark) {
+            let isOnceFill = row.atId === "一次性";
+            let url = isOnceFill ? "/api/onceFill/updateCheckRemark" : "/depository/updateCheckRemark";
+
+            let payload = {
+                id: row.id,
+                atId: row.atId,
+                depositoryId: row.depositoryId,
+                checkRemark: selectedCheckRemark?.trim()
+            };
+
+            $.ajax({
+                url: url,
+                type: "POST",
+                contentType: "application/json",
+                data: JSON.stringify(payload),
+                success: function (res) {
+                    if (res.status === 200) {
+                        layer.msg("供应商修改成功");
+                        table.reload("currentTableId");
+                    } else {
+                        layer.msg("修改失败：" + res.message);
+                    }
+                }
+            });
+        }
 
         function sendUpdateCheckPass(row, selectedCheckRemark, reviewRemark = "") {
             let isOnceFill = row.atId === "一次性";
