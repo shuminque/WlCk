@@ -151,6 +151,17 @@
         });
         return formattedData;
     }
+    function loadCategoryData(category, callback) {
+        $.get('/api/categories/' + category, function(response) {
+            if (response.code === 0) {
+                callback(formatData(response.data));
+            } else {
+                layer.msg(`无法加载${category.toUpperCase()}的分类数据`);
+            }
+        }).fail(function() {
+            layer.msg(`无法加载${category.toUpperCase()}的分类数据`);
+        });
+    }
     layui.use([ 'form', 'step', 'tableSelect', 'laydate'], function () {
         var $ = layui.$,
             form = layui.form,
@@ -253,21 +264,7 @@
                 } else {
                     pp = '/material?depositoryId=' + userDepositoryId;
                 }
-                function resetOutTypeDropdown() {
-                    // 清除旧的出库类型下拉列表
-                    document.getElementById('ID-dropdown-demo-complex').innerHTML = '';
-                }
-                function loadCategoryData(category, callback) {
-                    $.get('/api/categories/' + category, function(response) {
-                        if (response.code === 0) {
-                            callback(formatData(response.data));
-                        } else {
-                            layer.msg(`无法加载${category.toUpperCase()}的分类数据`);
-                        }
-                    }).fail(function() {
-                        layer.msg(`无法加载${category.toUpperCase()}的分类数据`);
-                    });
-                }
+
                 function loadOutTypeDropdown(depositoryId) {
                     if (depositoryId === '1') {
                         loadCategoryData('sab', function(data) {
@@ -283,6 +280,8 @@
                         });
                     }
                 }
+                var urlParams = new URLSearchParams(window.location.search);
+                var id = urlParams.get('id');
             tableSelect.render({
                 elem: '#atIdSelect', // 定义输入框input对象
                 checkedKey: 'id', // 表格的唯一建值
@@ -314,12 +313,12 @@
                     },
                     cols: [ [
                         {type: 'radio'},
-                        {field: 'depositoryName',  title: '厂区', sort: true, hide:true},
+                        {field: 'depositoryName',  title: '厂区'},
                         {field: 'atId', title: 'AT'},
                         {field: 'mname',  title: '品名'},
                         {field: 'model', title: '规格'},
                         {field: 'typeName',  title: '分类'},
-                        {field: 'enginName',title: '工程',  sort: true },
+                        {field: 'enginName',title: '工程',},
                         {field: 'unitPrice',title: '单价', templet: function(d) {
                                 return parseFloat(d.unitPrice).toFixed(2);  // 格式化为两位小数
                             }},
@@ -328,10 +327,14 @@
                 done: function (elem, data) {
                     // 获取选中的数据
                     var selectedData = data.data[0];
+                    console.log(id);
+                    console.log(selectedData);
                     // 设置品名输入框的值
                     $('#materialSelect').val(selectedData.mname);
                     $('#atIdSelect').val(selectedData.atId);
-                    $('#price').val(selectedData.unitPrice);
+                    if (!id) {
+                        $('#price').val(selectedData.unitPrice);
+                    }
                     $('#modelSelect').val(selectedData.model);
                     $('#enginSelect').val(selectedData.enginName);
                     $('#typeSelect').val(selectedData.typeName);
@@ -370,6 +373,10 @@
             step.next('#stepForm');
             return false;
         });
+        function resetOutTypeDropdown() {
+            // 清除旧的出库类型下拉列表
+            document.getElementById('ID-dropdown-demo-complex').innerHTML = '';
+        }
         function setParentForChild(data) {
             for (let i = 0; i < data.length; i++) {
                 if (data[i].child) {
@@ -400,7 +407,21 @@
                 }
             });
         }
-
+        function loadOutTypeDropdown(depositoryId) {
+            if (depositoryId === '1') {
+                loadCategoryData('sab', function(data) {
+                    dropDataSAB = data;
+                    setParentForChild(dropDataSAB);
+                    loadDepositoryData(dropDataSAB);
+                });
+            } else if (depositoryId === '2') {
+                loadCategoryData('zab', function(data) {
+                    dropDataZAB = data;
+                    setParentForChild(dropDataZAB);
+                    loadDepositoryData(dropDataZAB);
+                });
+            }
+        }
         $('.pre').click(function () {
             step.pre('#stepForm');
         });
@@ -417,6 +438,7 @@
 
                 $.get('/get_record?id=' + id, function(data) {
                     console.log(data); // 检查返回的数据
+                    var selectedDepositoryId = data.depositoryId;
                     // 填充表单
                     $('input[name="depositoryId"]').val(data.depositoryId);
                     $('input[name="atId"]').val(data.atId);
@@ -424,15 +446,19 @@
                     $('input[name="quantity"]').val(data.quantity);
                     $('select[name="currency"]').val(data.currency);
                     $('input[name="price"]').val(data.price);
-                    $('#applyRemarkInput').val(data.applyRemark);
-                    $('button[name="applyRemark"]').text(data.applyRemark);
+                    // $('#applyRemarkInput').val(data.applyRemark);
+                    // $('button[name="applyRemark"]').text(data.applyRemark);
                     $('select[name="reviewerId"]').val(data.reviewerId);
                     $('input[name="model"]').val(data.model);
                     $('input[name="enginName"]').val(data.enginName);
                     $('input[name="typeName"]').val(data.typeName);
                     $('input[name="applyTime"]').val(data.applyTime);
-                    // 重新渲染表单
-                    layui.form.render();
+                    layui.form.render('');
+
+                    if (data.applyRemark) {
+                        $('#applyRemarkInput').val(data.applyRemark);
+                        $('#ID-dropdown-demo-complex').text(data.applyRemark);
+                    }
                 });
             } else {
                 // 非编辑模式，加上readonly
