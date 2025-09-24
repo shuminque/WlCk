@@ -343,7 +343,9 @@
                     // 重新渲染表单
                     layui.form.render('select');
                     var selectedDepositoryId = $('#depositorySelect').val();
-                    resetOutTypeDropdown();
+                    if (!id) {
+                        resetOutTypeDropdown();
+                    }
                     loadOutTypeDropdown(selectedDepositoryId);
                     $("input[name='quantity']").focus();
                 }

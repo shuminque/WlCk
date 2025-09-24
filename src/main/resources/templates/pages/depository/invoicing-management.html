@@ -203,7 +203,14 @@
         var userReviewGroupId;
         var userAuthority;
         var combined;
-
+        function formatDate(dateStr) {
+            if (!dateStr) return '';
+            let date = new Date(dateStr);
+            let year = date.getFullYear();
+            let month = (date.getMonth() + 1).toString().padStart(2, '0');
+            let day = date.getDate().toString().padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
         //用户区分
         $.ajax({
             url: '/get_user_depository',
@@ -368,14 +375,7 @@
                     skin: 'line'
                 });
 
-                function formatDate(dateStr) {
-                    if (!dateStr) return '';
-                    let date = new Date(dateStr);
-                    let year = date.getFullYear();
-                    let month = (date.getMonth() + 1).toString().padStart(2, '0');
-                    let day = date.getDate().toString().padStart(2, '0');
-                    return `${year}-${month}-${day}`;
-                }
+
                 // 监听搜索操作
                 form.on('submit(data-search-btn)', function (data) {
                     var req={};
@@ -437,88 +437,146 @@
             $.get('/invoice/getCurrentSequence?month=' + yyyyMM, function (currentSeq) {
                 const previewInvoice = yyyyMM + '-' + (currentSeq + 1);
 
-                layer.confirm(`将核对的项目生成 入库单号【${previewInvoice}】？`, { icon: 3, title: '提示' }, function (index) {
-                    const invoiceNumber = previewInvoice;
-                    const allData = layui.table.cache["currentTableId"] || [];
+                const allData = layui.table.cache["currentTableId"] || [];
 
-                    const normalIds = [];
-                    const onceFillIds = [];
+                // 筛选出结算状态 = 已核对开票 && 入库单号为空的数据
+                const filteredData = allData.filter(row => row.checkPass === '已核对开票' && !row.reviewRemark);
+                const dataWithAmount = filteredData.map(item => ({
+                    ...item,
+                    amount: (parseFloat(item.quantity) || 0) * (parseFloat(item.price) || 0)
+                }));
+                if (filteredData.length === 0) {
+                    layer.msg("没有符合条件的数据");
+                    return;
+                }
 
-                    allData.forEach(row => {
-                        if (row.atId === '一次性') {
-                            onceFillIds.push(row.id);
-                        } else {
-                            normalIds.push(row.id);
-                        }
-                    });
+                // 弹出 layer.open 展示表格
+                const contentHtml = `
+            <table class="layui-table" id="confirmTable"></table>
+            <div style="text-align:right; padding:10px;">
+                <button class="layui-btn layui-btn-normal" id="confirmBtn">确认</button>
+                <button class="layui-btn layui-btn-primary" id="cancelBtn">取消</button>
+            </div>
+        `;
 
-                    const requests = [];
-
-                    if (normalIds.length > 0) {
-                        requests.push(
-                            $.ajax({
-                                url: "/depository/batchUpdateReviewRemark",
-                                type: "POST",
-                                contentType: "application/json",
-                                data: JSON.stringify({
-                                    invoiceNumber: invoiceNumber,
-                                    ids: normalIds
-                                })
-                            })
-                        );
-                    }
-
-                    if (onceFillIds.length > 0) {
-                        requests.push(
-                            $.ajax({
-                                url: "/api/onceFill/OnceBatchUpdateReviewRemark",
-                                type: "POST",
-                                contentType: "application/json",
-                                data: JSON.stringify({
-                                    invoiceNumber: invoiceNumber,
-                                    ids: onceFillIds
-                                })
-                            })
-                        );
-                    }
-
-                    Promise.allSettled(requests).then(results => {
-                        console.log(results);
-                        let anySuccess = false;
-                        let allFailed = true;
-
-                        results.forEach(res => {
-                            if (res.status === "fulfilled") {
-                                const status = res.value?.status;
-                                console.log("后端返回状态：", status);
-
-                                if (status === 200) {
-                                    anySuccess = true;
-                                    allFailed = false;
-                                } else if (status === 300) {
-                                    // 无更新，也不算失败
-                                    allFailed = false;
-                                }
-                            }
+                layer.open({
+                    type: 1,
+                    title: `将生成 入库单号【${previewInvoice}】`,
+                    area: ['1080px', '600px'],
+                    content: contentHtml,
+                    success: function(layero, index) {
+                        // 渲染临时表格
+                        layui.table.render({
+                            elem: '#confirmTable',
+                            data: dataWithAmount,
+                            totalRow: true,   // 开启合计行
+                            cols: [ [
+                                {field: 'id', title: 'ID', hide:true},
+                                {field: 'atId', title: 'AT', width: '15%',sort:true},
+                                {field: 'mname', title: '品名', width: '15%'},
+                                {field: 'model', title: '规格', width: '15%'},
+                                {field: 'quantity', title: '数量', width: '8%', totalRow: true},
+                                {field: 'price', title: '单价', width: '10%', templet: d => parseFloat(d.price).toFixed(2)},
+                                {field: 'amount', title: '金额', width: '15%', totalRow: true},
+                                {field: 'checkRemark', title: '供应商', width: '15%',hide:true},
+                                {field: 'applyTime', title: '日期', width: '12%', templet: d => formatDate(d.applyTime)},
+                                {field: 'checkPass', title: '结算状态', width: '10%'}
+                            ]],
                         });
 
-                        if (anySuccess) {
-                            $.post('/invoice/getNextSequence', { month: yyyyMM }, function () {
-                                layer.msg("设置成功");
-                                layui.table.reload("currentTableId");
-                            });
-                        } else if (!allFailed) {
-                            layer.msg("无需更新");
-                        } else {
-                            layer.msg("全部更新失败，请检查");
-                        }
-                    }).catch(() => {
-                        layer.msg("网络错误，更新失败");
-                    });
-                    layer.close(index);
+
+                        // 确认按钮
+                        $('#confirmBtn').on('click', function() {
+                            layer.close(index);
+                            doBatchUpdate(previewInvoice, yyyyMM, filteredData);
+                        });
+
+                        // 取消按钮
+                        $('#cancelBtn').on('click', function() {
+                            layer.close(index);
+                        });
+                    }
                 });
             });
         });
+
+// === 封装批量更新逻辑 ===
+        function doBatchUpdate(invoiceNumber, yyyyMM, selectedData) {
+            const normalIds = [];
+            const onceFillIds = [];
+
+            selectedData.forEach(row => {
+                if (row.atId === '一次性') {
+                    onceFillIds.push(row.id);
+                } else {
+                    normalIds.push(row.id);
+                }
+            });
+
+            const requests = [];
+
+            if (normalIds.length > 0) {
+                requests.push(
+                    $.ajax({
+                        url: "/depository/batchUpdateReviewRemark",
+                        type: "POST",
+                        contentType: "application/json",
+                        data: JSON.stringify({
+                            invoiceNumber: invoiceNumber,
+                            ids: normalIds
+                        })
+                    })
+                );
+            }
+
+            if (onceFillIds.length > 0) {
+                requests.push(
+                    $.ajax({
+                        url: "/api/onceFill/OnceBatchUpdateReviewRemark",
+                        type: "POST",
+                        contentType: "application/json",
+                        data: JSON.stringify({
+                            invoiceNumber: invoiceNumber,
+                            ids: onceFillIds
+                        })
+                    })
+                );
+            }
+
+            Promise.allSettled(requests).then(results => {
+                console.log(results);
+                let anySuccess = false;
+                let allFailed = true;
+
+                results.forEach(res => {
+                    if (res.status === "fulfilled") {
+                        const status = res.value?.status;
+                        console.log("后端返回状态：", status);
+
+                        if (status === 200) {
+                            anySuccess = true;
+                            allFailed = false;
+                        } else if (status === 300) {
+                            // 无更新，也不算失败
+                            allFailed = false;
+                        }
+                    }
+                });
+
+                if (anySuccess) {
+                    $.post('/invoice/getNextSequence', { month: yyyyMM }, function () {
+                        layer.msg("设置成功");
+                        layui.table.reload("currentTableId");
+                    });
+                } else if (!allFailed) {
+                    layer.msg("无需更新");
+                } else {
+                    layer.msg("全部更新失败，请检查");
+                }
+            }).catch(() => {
+                layer.msg("网络错误，更新失败");
+            });
+        }
 
         /**
          * toolbar监听事件
