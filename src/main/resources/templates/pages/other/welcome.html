@@ -577,7 +577,15 @@
                 }
             }
         });
-
+        laydate.render({
+            elem: '#year-selector0',
+            type: 'year',
+            done: function(value, date, endDate){
+                // 当选择年份后，调用 fetchData 函数
+                // fetchData(value);
+                fetchVlure(value);
+            }
+        });
         laydate.render({ elem: '#year-selector', type: 'year' });
         laydate.render({ elem: '#year-selector-three', type: 'year' });
         laydate.render({ elem: '#year-selector-four', type: 'year', done: fetchCateChartfour });
@@ -2171,15 +2179,7 @@
         /**
          * 图功能
          */
-        laydate.render({
-            elem: '#year-selector0',
-            type: 'year',
-            done: function(value, date, endDate){
-                // 当选择年份后，调用 fetchData 函数
-                // fetchData(value);
-                fetchVlure(value);
-            }
-        });
+
         // 根据年份加载库存数据
         function fetchVlure(year) {
             if (year) {
