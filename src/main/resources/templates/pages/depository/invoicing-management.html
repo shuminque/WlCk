@@ -443,7 +443,9 @@
                 const filteredData = allData.filter(row => row.checkPass === '已核对开票' && !row.reviewRemark);
                 const dataWithAmount = filteredData.map(item => ({
                     ...item,
-                    amount: (parseFloat(item.quantity) || 0) * (parseFloat(item.price) || 0)
+                    amount: parseFloat(
+                        ((parseFloat(item.quantity) || 0) * (parseFloat(item.price) || 0)).toFixed(2)
+                    )
                 }));
                 if (filteredData.length === 0) {
                     layer.msg("没有符合条件的数据");
