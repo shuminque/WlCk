@@ -1140,6 +1140,23 @@
                     monthKeysLastYear,
                     isNeedDivide
                 );
+                console.log('=== 各月金额组成明细 ===');
+                monthKeys.forEach(month => {
+                    const original = currentYearData.monthlyAmountMap[month] || 0;
+                    const score = currentCostData.monthlyScoreAmountMap[month] || 0;
+                    const total = currentCostData.totalAmountMap[month] || 0;
+                    const production = currentYearData.monthlyProductionMap[month] || 0;
+                    const unitPrice = ScoreUnitPrices.find(p => p.month == month)?.unitPrice || 0;
+                    console.log(
+                        `${month}月 -> 原始金额: ${original}, ` +
+                        `积分单价: ${unitPrice}, ` +
+                        `产量: ${production}${isNeedDivide ? '（÷2后参与计算）' : ''}, ` +
+                        `积分金额: ${score}, 合计金额: ${total}`
+                    );
+                });
+
+                console.log('=== 汇总信息 ===');
+
                 function getAverage(total, values) {
                     const validValues = values.filter(val => val != null && val !== 0);
                     return validValues.length > 0 ? parseFloat((total / validValues.length).toFixed(0)) : 0;
@@ -1170,6 +1187,11 @@
                     return item.amount;
                 }));
                 var amountSeriesData = diameter ? monthlyAmountMapSZ : defaultAmountData;
+                console.log('amountSeriesData 组成:', {
+                    来源: diameter ? 'monthlyAmountMapSZ' : 'defaultAmountData',
+                    prevYearAverageAmount: diameter ? prevYearAverageAmountTwo : prevYearAverageAmount,
+                    数据: amountSeriesData
+                });
                 var productionSeriesData = diameter
                     ? monthlyProductionMapSZ
                     : [prevYearAverageProduction].concat(productionData);

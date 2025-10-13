@@ -2063,7 +2063,7 @@ UNION ALL
                   UNION ALL SELECT CONCAT(#{year}, '-12')
                       ),
     CategoryOutbounds AS (
-        -- 从 once_fill 表查询
+        -- 从 once_fill 表查询（正常出库）
         SELECT
             DATE_FORMAT(time, '%Y-%m') AS month,
             SUM(o.unit_price * o.quantity) AS amount
@@ -2082,14 +2082,16 @@ UNION ALL
             DATE_FORMAT(time, '%Y') = #{year}
                       AND o.depositoryId = #{depositoryId}
                       AND c.depository_id = #{depositoryId}
-                      AND o.introduce !='立项'
-                              AND o.apply_remark NOT LIKE '%单能线%'
-                              AND o.apply_remark NOT LIKE '%#机%'
-                              AND o.apply_remark NOT LIKE '%新刀制作室%'
+                      AND o.introduce != '立项'
+                      AND o.apply_remark NOT LIKE '%单能线%'
+                      AND o.apply_remark NOT LIKE '%#机%'
+                      AND o.apply_remark NOT LIKE '%新刀制作室%'
                       GROUP BY
                       DATE_FORMAT(time, '%Y-%m')
+
                       UNION ALL
-                            -- 从 depository_record 表查询
+
+                            -- 从 depository_record 表查询（正常出库）
                       SELECT
                       DATE_FORMAT(apply_time, '%Y-%m') AS month,
                       SUM(d.price * d.quantity) AS amount
@@ -2109,16 +2111,48 @@ UNION ALL
                       AND d.review_pass = 1
                       AND d.depository_id = #{depositoryId}
                       AND c.depository_id = #{depositoryId}
-                              AND d.apply_remark NOT LIKE '%单能线%'
-                              AND d.apply_remark NOT LIKE '%#机%'
-                              AND d.apply_remark NOT LIKE '%新刀制作室%'
+                      AND d.apply_remark NOT LIKE '%单能线%'
+                      AND d.apply_remark NOT LIKE '%#机%'
+                      AND d.apply_remark NOT LIKE '%新刀制作室%'
                       AND DATE_FORMAT(apply_time, '%Y') = #{year}
                       GROUP BY
                       DATE_FORMAT(apply_time, '%Y-%m')
+
+                      UNION ALL
+
+                            -- 从 depository_record 表查询（领用退回，冲销出库）
+                      SELECT
+                      DATE_FORMAT(apply_time, '%Y-%m') AS month,
+                      -SUM(IFNULL(d.price, 0) * IFNULL(d.quantity, 0)) AS amount
+                      FROM
+                      depository_record d
+                      JOIN categories c ON
+                      CASE
+                      WHEN LOCATE('-', d.apply_remark) > 0 THEN
+                      RIGHT(SUBSTRING_INDEX(d.apply_remark, '-', -1), LENGTH(c.title)) = c.title
+                      ELSE
+                      d.apply_remark LIKE CONCAT('%', c.title, '%')
+                      END
+                      AND c.id NOT IN (SELECT parent_id FROM categories WHERE parent_id IS NOT NULL)
+                      AND c.parent_id NOT IN (SELECT id FROM categories WHERE title = '销售出库')
+                      WHERE
+                      d.type = 1
+                      AND d.review_pass = 1
+                      AND d.depository_id = #{depositoryId}
+                      AND c.depository_id = #{depositoryId}
+                      AND DATE_FORMAT(apply_time, '%Y') = #{year}
+                      AND d.apply_remark LIKE '领用退回%'  -- 只对退回记录冲销
+                      AND d.apply_remark NOT LIKE '%单能线%'
+                      AND d.apply_remark NOT LIKE '%#机%'
+                      AND d.apply_remark NOT LIKE '%新刀制作室%'
+                      GROUP BY
+                      DATE_FORMAT(apply_time, '%Y-%m')
                       )
+
+        -- 最终查询：每月总出库金额（已冲销）
         SELECT
             a.month,
-            COALESCE(ROUND(SUM(co.amount)), 0) AS amount
+            COALESCE(ROUND(SUM(co.amount), 0), 0) AS amount
         FROM
             AllMonths a
                 LEFT JOIN CategoryOutbounds co ON a.month = co.month
@@ -2127,6 +2161,7 @@ UNION ALL
         ORDER BY
             a.month;
     </select>
+
 
     <!-- DepositoryRecordMapper.xml -->
     <select id="countCheckRemarkExists" resultType="int">
