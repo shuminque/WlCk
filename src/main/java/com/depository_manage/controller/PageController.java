@@ -183,6 +183,7 @@ public class PageController {
         ModelAndView mv = new ModelAndView();
         mv.setViewName("pages/other/once_add");
         mv.addObject("depositories", depositoryService.findDepositoryAll());
+        mv.addObject("suppliers", supplierService.findSupplierAll());
         mv.addObject("materialTypes", materialTypeService.findMaterialTypeAll());
         mv.addObject("materialEngins", materialEnginService.findMaterialEnginAll());
         return mv;
@@ -192,6 +193,7 @@ public class PageController {
         ModelAndView mv = new ModelAndView();
         mv.setViewName("pages/chart/once_table");
         mv.addObject("depositories", depositoryService.findDepositoryAll());
+        mv.addObject("suppliers", supplierService.findSupplierAll());
         mv.addObject("materialTypes", materialTypeService.findMaterialTypeAll());
         mv.addObject("materialEngins", materialEnginService.findMaterialEnginAll());
         return mv;

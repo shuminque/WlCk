@@ -52,6 +52,16 @@
                                 </select>
                             </div>
                         </div>
+                        <div class="layui-inline" >
+                            <div class="layui-input-inline">
+                                <select name="checkRemark"  lay-search>
+                                    <option value="">请选择供应商</option>
+                                    <th:block th:each="supplier : ${suppliers}">
+                                        <option th:value="${supplier.supplierName}" th:text="${supplier.supplierName}"></option>
+                                    </th:block>
+                                </select>
+                            </div>
+                        </div>
 <!--                        <div class="layui-inline" style="width: 57%;">-->
 <!--                                <select name="typeId" xm-select="selectId" >-->
 <!--                                    <option value="">请选择分类</option>-->
@@ -356,6 +366,7 @@
                                 return d.applyRemark ? d.applyRemark.replace(/[A-Z]-[A-Z](-\d)?/g, '') : '';
                             }},
                         {field: 'introduce', title: '备注'},
+                        {field: 'checkRemark', title: '供应商', hide: true },
                         // {field: 'depositoryId', width: '6%', title: '厂区'}
                         {
                             title: '操作',
@@ -421,6 +432,9 @@
                     }
                     if (data.applyRemark!==''){
                         req.applyRemark=data.applyRemark;
+                    }
+                    if (data.checkRemark!==''){
+                        req.checkRemark=data.checkRemark;
                     }
                     if (data.time!==''){
                         var dates = data.time.split(' - ');

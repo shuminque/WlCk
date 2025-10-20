@@ -19,9 +19,12 @@ public class OnceFillP {
     private Date time;
     private String applyRemark;
     private String introduce;
-
+    private String reviewRemark;
+    private String checkRemark;
+    private String checkPass;
     public OnceFillP(Integer id,  String name, String model, Integer quantity, Double price, Double unitPrice,Integer typeId, String typeName,
-                     Integer depositoryId, String applyRemark, Date time, String introduce) {
+                     Integer depositoryId, String applyRemark, Date time, String introduce
+            , String reviewRemark, String checkRemark, String checkPass) {
         this.id = id;
         this.name = name;
         this.model =model;
@@ -34,6 +37,9 @@ public class OnceFillP {
         this.applyRemark = applyRemark;
         this.time =time;
         this.introduce = introduce;
+        this.reviewRemark = reviewRemark;
+        this.checkRemark = checkRemark;
+        this.checkPass = checkPass;
     }
     public OnceFillP(OnceFill onceFill) {
         this.id = onceFill.getId();
@@ -47,5 +53,8 @@ public class OnceFillP {
         this.applyRemark = onceFill.getApplyRemark();
         this.time =onceFill.getTime();
         this.introduce = onceFill.getIntroduce();
+        this.reviewRemark = onceFill.getReviewRemark();
+        this.checkRemark = onceFill.getCheckRemark();
+        this.checkPass = onceFill.getCheckPass();
     }
 }

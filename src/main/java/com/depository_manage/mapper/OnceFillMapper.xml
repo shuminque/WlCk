@@ -21,14 +21,14 @@
 
     <!-- Insert operation -->
     <insert id="insertOnceFill">
-        INSERT INTO once_fill (depositoryId, name, model, unit_price, quantity, price, time, apply_remark, type_id, introduce)
-        VALUES (#{depositoryId}, #{name}, #{model}, #{unitPrice}, #{quantity}, #{price}, #{time}, #{applyRemark}, #{typeId}, #{introduce})
+        INSERT INTO once_fill (depositoryId, name, model, unit_price, quantity, price, time, apply_remark, type_id, introduce, check_remark)
+        VALUES (#{depositoryId}, #{name}, #{model}, #{unitPrice}, #{quantity}, #{price}, #{time}, #{applyRemark}, #{typeId}, #{introduce}, #{checkRemark})
     </insert>
     <insert id="insertBatch" parameterType="java.util.List">
-        INSERT INTO once_fill (depositoryId, name, model, type_id, unit_price, quantity, price, time, apply_remark, introduce)
+        INSERT INTO once_fill (depositoryId, name, model, type_id, unit_price, quantity, price, time, apply_remark, introduce, check_remark)
         VALUES
         <foreach collection="list" item="record" separator=",">
-            (#{record.depositoryId}, #{record.name}, #{record.model}, #{record.typeId}, #{record.unitPrice}, #{record.quantity}, #{record.price}, #{record.time}, #{record.applyRemark}, #{record.introduce})
+            (#{record.depositoryId}, #{record.name}, #{record.model}, #{record.typeId}, #{record.unitPrice}, #{record.quantity}, #{record.price}, #{record.time}, #{record.applyRemark}, #{record.introduce}, #{record.checkRemark})
         </foreach>
     </insert>
     <!-- Update operation -->
@@ -117,6 +117,10 @@
         <if test="startDate != null and endDate != null">
             AND DATE(time) BETWEEN #{startDate} AND #{endDate}
         </if>
+        <if test="checkRemark != null">
+            AND check_remark LIKE CONCAT('%', #{checkRemark}, '%')
+        </if>
+
         ORDER BY id DESC
         <if test="begin != null and size != null">
             LIMIT #{begin},#{size}
@@ -159,6 +163,9 @@
         </if>
         <if test="introduce != null and introduce != ''">
             AND introduce LIKE CONCAT('%', #{introduce}, '%')
+        </if>
+        <if test="checkRemark != null">
+            AND check_remark LIKE CONCAT('%', #{checkRemark}, '%')
         </if>
         <if test="startDate != null and endDate != null">
             AND DATE(m.time) BETWEEN #{startDate} AND #{endDate}
