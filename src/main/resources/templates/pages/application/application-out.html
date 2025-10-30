@@ -170,11 +170,6 @@
             laydate = layui.laydate,
             dropdown = layui.dropdown,
             util = layui.util;
-        laydate.render({
-            elem: '#storageDate',
-            max: 0, // 最大日期：今天
-            min: getMinDate(30) // 最小日期：当前时间前 30 天
-        });
 
 // 工具方法：获取当前日期的前 N 天（yyyy-MM-dd 格式）
         function getMinDate(days) {
@@ -260,8 +255,16 @@
                 var userDepositoryId = data.depositoryId;
                 // 如果depositoryId为0，则允许访问两个厂区
                 if (userDepositoryId === 0) {
+                    laydate.render({
+                        elem: '#storageDate'
+                    });
                     pp = '/material';
                 } else {
+                    laydate.render({
+                        elem: '#storageDate',
+                        max: 0, // 最大日期：今天
+                        min: getMinDate(30) // 最小日期：当前时间前 30 天
+                    });
                     pp = '/material?depositoryId=' + userDepositoryId;
                 }
 
