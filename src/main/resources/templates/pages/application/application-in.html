@@ -232,6 +232,11 @@
         });
         var taxRate;
         form.on('submit(formStep)', function (data) {
+            let $btn = $('button[lay-filter="formStep"]');
+            $btn.prop('disabled', true).addClass('layui-btn-disabled');
+            setTimeout(() => {
+                $btn.prop('disabled', false).removeClass('layui-btn-disabled');
+            }, 2000);
             data=data.field;
             data.type=1;
             // 获取日期
