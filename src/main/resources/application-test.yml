@@ -20,10 +20,11 @@ spring:
     default-encoding: utf-8
   datasource:
     username: root
-#    password: xuriroot!@Xuri
-#    url: jdbc:mysql://localhost:3306/bp_depository?serverTimezone=Asia/Shanghai&zeroDateTimeBehavior=convertToNull
-    password: 123456
-    url: jdbc:mysql://localhost:3308/depository?serverTimezone=Asia/Shanghai&zeroDateTimeBehavior=convertToNull
+    password: xuriroot!@Xuri
+    url: jdbc:mysql://localhost:3306/bp_depository?serverTimezone=Asia/Shanghai&zeroDateTimeBehavior=convertToNull
+#    password: 123456
+#    url: jdbc:mysql://localhost:3308/depository?serverTimezone=Asia/Shanghai&zeroDateTimeBehavior=convertToNull&allowMultiQueries=true
+#
     driver-class-name: com.mysql.cj.jdbc.Driver
     type: com.alibaba.druid.pool.DruidDataSource
     initialSize: 5
