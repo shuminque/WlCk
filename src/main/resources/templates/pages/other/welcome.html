@@ -2882,10 +2882,10 @@
         function initOtherCategoryBarChart(data, lineData) {
             // 过滤出 craft 为 "棒材工艺" 的行
             var filteredLineData = lineData.filter(item => item.craft === "棒材工艺");
-            var shengyanTotal = lineData
-                .filter(item => item.lineName === "生研完成品")
-                .reduce((sum, item) => sum + (item.production || 0), 0);
-            totalProductions += shengyanTotal;
+            // var shengyanTotal = lineData
+            //     .filter(item => item.lineName === "生研完成品")
+            //     .reduce((sum, item) => sum + (item.production || 0), 0);
+            // totalProductions += shengyanTotal;
             // 统计 filteredLineData 中所有 production 的总和
             var totalProductionForCraft = filteredLineData.reduce((acc, curr) => acc + curr.production, 0);
 
