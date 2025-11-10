@@ -17,12 +17,18 @@ import org.springframework.web.bind.annotation.ResponseBody;
 public class CustomExceptionHandler {
 
     @ResponseBody
-    @ExceptionHandler(value = Exception.class)
-    public RestResponse errorHandler(MyException e) {
-
-        return new RestResponse(null,e.getCode(),new StatusInfo(e.getMsg(),e.getMsg()));
+    @ExceptionHandler(MyException.class)
+    public RestResponse handleMyException(MyException e) {
+        return new RestResponse(null, e.getCode(), new StatusInfo(e.getMsg(), e.getMsg()));
     }
 
+    @ResponseBody
+    @ExceptionHandler(Exception.class)
+    public RestResponse handleException(Exception e) {
+        log.error("系统异常", e);
+        return new RestResponse(null, 500, new StatusInfo("系统异常", e.getMessage()));
+    }
 }
+
 
 
