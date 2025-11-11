@@ -94,6 +94,17 @@
                 var userDepositoryId = data.depositoryId;
                 var authority = data.authority; // 假设authority也在返回的数据中
                 // 如果depositoryId为0，则允许访问两个厂区
+                // 设置厂区下拉框
+                if (userDepositoryId === 0 || userDepositoryId === 2) {
+                    // 强制选中 value=2
+                    $("select[name='depositoryId']").val("2");
+
+                    // 如果你希望同时把文字也替换成选中项的文本（确保显示一致）
+                    let selectedText = $("select[name='depositoryId'] option[value='2']").text();
+                    $("select[name='depositoryId'] option:selected").text(selectedText);
+                    form.render('select');
+                }
+
                 if (userDepositoryId != null) {
                     pp = '/material';
                 } else {
