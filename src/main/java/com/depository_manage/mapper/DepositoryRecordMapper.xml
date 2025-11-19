@@ -2216,7 +2216,9 @@ UNION ALL
                  UNION
                  SELECT review_remark FROM once_fill
              ) AS combined
-        ORDER BY review_remark DESC;
+        ORDER BY
+            CAST(LEFT(review_remark, 6) AS UNSIGNED) DESC,
+            CAST(SUBSTRING_INDEX(review_remark, '-', -1) AS UNSIGNED) DESC;
     </select>
 
     <select id="findMergedDepositoryData" resultType="map" parameterType="map">
