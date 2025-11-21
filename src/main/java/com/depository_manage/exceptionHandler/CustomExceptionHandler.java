@@ -9,23 +9,22 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 
-/**
- * 全局异常捕捉处理
- */
 @ControllerAdvice
 @Slf4j
 public class CustomExceptionHandler {
 
+    // 处理自定义异常
     @ResponseBody
     @ExceptionHandler(MyException.class)
     public RestResponse handleMyException(MyException e) {
         return new RestResponse(null, e.getCode(), new StatusInfo(e.getMsg(), e.getMsg()));
     }
 
+    // 处理所有未知异常
     @ResponseBody
     @ExceptionHandler(Exception.class)
     public RestResponse handleException(Exception e) {
-        log.error("系统异常", e);
+        log.error("系统异常：", e);
         return new RestResponse(null, 500, new StatusInfo("系统异常", e.getMessage()));
     }
 }

@@ -216,14 +216,17 @@ public class LineDataController {
             return new RestResponse(500, "Failed to fetch line data: " + e.getMessage(), 0, null);
         }
     }
-    @GetMapping("/diameterCategoryTitles/{diameter}")
-    public List<String> getCategoryTitlesByDiameter(@PathVariable String diameter) {
+    @GetMapping("/diameterCategoryTitles")
+    public List<String> getCategoryTitlesByDiameter(@RequestParam(required = false) String diameter) {
         return lineDataService.findCategoryTitlesByDiameter(diameter);
     }
-    @GetMapping("/diameterMonthLines/{year}/{diameter}")
-    public List<LineData> getMonthLinesWithTotalProduction(@PathVariable int year,
-                                                           @PathVariable String diameter) {
+
+    @GetMapping("/diameterMonthLines")
+    public List<LineData> getMonthLinesWithTotalProduction(
+            @RequestParam int year,
+            @RequestParam(required = false) String diameter) {
         return lineDataService.selectMonthlyLinesByDiameter(year, diameter);
     }
+
 
 }

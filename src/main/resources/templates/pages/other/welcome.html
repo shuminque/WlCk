@@ -709,9 +709,12 @@
 
                 try {
                     // 获取该径类下的所有分类
-                    const response = await $.get('/lineData/diameterCategoryTitles/' + encodeURIComponent(diameter));
+                    const response = await $.get('/lineData/diameterCategoryTitles', { diameter });
                     // 获取该径类每月的产线组成及产量
-                    response2 = await $.get(`/lineData/diameterMonthLines/${targetYear}/${encodeURIComponent(diameter)}`);
+                    response2 = await $.get('/lineData/diameterMonthLines', {
+                        year: targetYear,
+                        diameter: diameter
+                    });
 
                     categoryTitles = response || [];
 
