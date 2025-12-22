@@ -825,6 +825,7 @@ CategoryOutbounds AS (
                       AND o.depositoryId = #{depositoryId}
                       AND c.depository_id = #{depositoryId}
                       AND o.introduce != '立项'
+                      AND o.apply_remark NOT LIKE '%新刀制作室%'
                       GROUP BY
                       DATE_FORMAT(time, '%Y-%m')
 
@@ -850,6 +851,7 @@ CategoryOutbounds AS (
                       AND d.review_pass = 1
                       AND d.depository_id = #{depositoryId}
                       AND c.depository_id = #{depositoryId}
+                      AND d.apply_remark NOT LIKE '%新刀制作室%'
                       AND DATE_FORMAT(apply_time, '%Y') = #{year}
                       GROUP BY
                       DATE_FORMAT(apply_time, '%Y-%m')
