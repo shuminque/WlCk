@@ -7,6 +7,7 @@ import com.depository_manage.pojo.MonthlyAmountDTO;
 import com.depository_manage.pojo.SimpleDepositoryRecordP;
 import org.apache.ibatis.annotations.Param;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
@@ -133,4 +134,6 @@ public interface DepositoryRecordService {
     int getMergedDepositoryCount(Map<String, Object> params);
 
     int updateCheckRemark(Integer id, String checkRemark);
+
+    BigDecimal getLatestPurchasePrice(Integer atId, Integer depositoryId);
 }

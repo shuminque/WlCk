@@ -806,4 +806,10 @@ public class DepositoryRecordServiceImpl implements DepositoryRecordService {
         return depositoryRecordMapper.updateCheckRemark(id, checkRemark);
     }
 
+    @Override
+    public BigDecimal getLatestPurchasePrice(Integer atId, Integer depositoryId) {
+        return depositoryRecordMapper
+                .selectLatestPurchasePrice(atId, depositoryId);
+    }
+
 }

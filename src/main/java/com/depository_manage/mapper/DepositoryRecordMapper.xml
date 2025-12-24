@@ -2402,6 +2402,16 @@ UNION ALL
         </if>
         ) temp
     </select>
+    <select id="selectLatestPurchasePrice" resultType="java.math.BigDecimal">
+        SELECT price
+        FROM depository_record
+        WHERE at_id = #{atId}
+          AND depository_id = #{depositoryId}
+          AND apply_remark = '采购入库'
+          AND review_pass = 1
+        ORDER BY review_time DESC
+            LIMIT 1
+    </select>
 
 
 </mapper>

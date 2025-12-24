@@ -8,6 +8,7 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
@@ -135,4 +136,9 @@ public interface DepositoryRecordMapper {
 
     int updateCheckRemark(@Param("id") Integer id,
                           @Param("checkRemark") String checkRemark);
+
+    BigDecimal selectLatestPurchasePrice(
+            @Param("atId") Integer atId,
+            @Param("depositoryId") Integer depositoryId
+    );
 }

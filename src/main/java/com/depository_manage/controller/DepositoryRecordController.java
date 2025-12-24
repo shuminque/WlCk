@@ -460,4 +460,14 @@ public class DepositoryRecordController {
         return new RestResponse(list, total, 200);
     }
 
+    @GetMapping("/depositoryRecord/latestPurchasePrice")
+    public ResponseEntity<BigDecimal> latestPurchasePrice(
+            @RequestParam Integer atId,
+            @RequestParam Integer depositoryId) {
+
+        BigDecimal price = depositoryRecordService
+                .getLatestPurchasePrice(atId, depositoryId);
+
+        return ResponseEntity.ok(price);
+    }
 }

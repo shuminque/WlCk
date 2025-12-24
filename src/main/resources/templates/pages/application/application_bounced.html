@@ -438,6 +438,7 @@
                         },
                         cols: [ [
                             {type: 'radio'},
+                            {field: 'depositoryId', width:'10%', title: '厂区ID',hide:true},
                             {field: 'depositoryName', width:'10%', title: '厂区'},
                             {field: 'atId', width:'8%', title: 'AT'},
                             {field: 'mname', width:'15%', title: '品名'},
@@ -454,7 +455,16 @@
                         // 获取选中的数据
                         var selectedData = data.data[0];
                         usePrice = selectedData.unitPrice;
-                        console.log(usePrice);
+                        var atId = selectedData.atId;
+                        var depositoryId = depositoryMapping[selectedData.depositoryName];
+                        $.get('/depositoryRecord/latestPurchasePrice', {
+                            atId: atId,
+                            depositoryId: depositoryId
+                        }, function (price) {
+                            usePrice = price;
+                            console.log(price);
+                        });
+
                         // 检查物品状态
                         if (selectedData.stateId === 6) {
                             // 如果stateId为6，显示提示信息并禁用提交按钮
@@ -470,7 +480,6 @@
                         $('#enginSelect').val(selectedData.enginName);
                         $('#typeSelect').val(selectedData.typeName);
                         // $('#unitPriceSelect').val(selectedData.unitPrice);
-                        var depositoryId = depositoryMapping[selectedData.depositoryName];
                         $('#depositorySelect').val(depositoryId);
                         // // 获取物品的厂区名称
                         // var depositoryName = selectedData.depositoryName; // 请确保这是正确的属性名
