@@ -43,38 +43,12 @@ public class DepositoryRecordServiceImpl implements DepositoryRecordService {
     private NoticeService noticeService;
     @Autowired
     private NoticeAlertService noticeAlertService;
-//    @Autowired
-//    private DepositoryRecordService self; // 注入接口代理
-//    @Override
-//    public Integer apply(Map<String, Object> map) {
-//        // 如果map中没有applyTime，则使用当前时间
-//        if (map.get("applyTime") == null || ((String) map.get("applyTime")).trim().isEmpty()) {
-//            map.put("applyTime", new Date());
-//        }
-//
-//        map.put("state", "待审核");
-//        if (!map.containsKey("review_group_id")) {
-//            throw new IllegalArgumentException("审核组信息缺失");
-//        }
-//
-//        // 先插入记录
-//        int result = depositoryRecordMapper.insertDepositoryRecord(map);
-//
-//        // 自动审核逻辑
-//        String applyRemark = (String) map.get("applyRemark");
-//        if (applyRemark != null && applyRemark.startsWith("领用退回")) {
-//            Map<String, Object> reviewMap = new HashMap<>();
-//            reviewMap.put("id", map.get("id"));
-//            reviewMap.put("reviewPass", 1);
-//            self.review(reviewMap, (Integer) map.get("applicantId")); // 通过代理调用
-//        }
-//
-//        return result;
-//    }
+    @Autowired
+    private DepositoryRecordService self; // 注入接口代理
     @Override
     public Integer apply(Map<String, Object> map) {
         // 如果map中没有applyTime，则使用当前时间
-        if (map.get("applyTime") == null || ((String)map.get("applyTime")).trim().isEmpty()) {
+        if (map.get("applyTime") == null || ((String) map.get("applyTime")).trim().isEmpty()) {
             map.put("applyTime", new Date());
         }
 
@@ -82,8 +56,34 @@ public class DepositoryRecordServiceImpl implements DepositoryRecordService {
         if (!map.containsKey("review_group_id")) {
             throw new IllegalArgumentException("审核组信息缺失");
         }
-        return depositoryRecordMapper.insertDepositoryRecord(map);
+
+        // 先插入记录
+        int result = depositoryRecordMapper.insertDepositoryRecord(map);
+
+        // 自动审核逻辑
+        String applyRemark = (String) map.get("applyRemark");
+        if (applyRemark != null && applyRemark.startsWith("领用退回")) {
+            Map<String, Object> reviewMap = new HashMap<>();
+            reviewMap.put("id", map.get("id"));
+            reviewMap.put("reviewPass", 1);
+            self.review(reviewMap, (Integer) map.get("applicantId")); // 通过代理调用
+        }
+
+        return result;
     }
+//    @Override
+//    public Integer apply(Map<String, Object> map) {
+//        // 如果map中没有applyTime，则使用当前时间
+//        if (map.get("applyTime") == null || ((String)map.get("applyTime")).trim().isEmpty()) {
+//            map.put("applyTime", new Date());
+//        }
+//
+//        map.put("state", "待审核");
+//        if (!map.containsKey("review_group_id")) {
+//            throw new IllegalArgumentException("审核组信息缺失");
+//        }
+//        return depositoryRecordMapper.insertDepositoryRecord(map);
+//    }
 
     public Integer applyDirectOutbound(Map<String, Object> map) {
         // 设置为已审核状态
