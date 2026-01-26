@@ -249,6 +249,7 @@
                     },
                     where: {
                         excludeApplyRemark: ["采购入库"],
+                        excludeTypeTransferIn: true,
                         reviewPass:1
                     },
                     response: {
@@ -388,7 +389,8 @@
                     data=data.field;
                     // req.type=0;
                     req.excludeApplyRemark = ["采购入库"];
-                    req.reviewPass=1;
+                    req.excludeTypeTransferIn=true;
+                        req.reviewPass=1;
                     if (data.atId!==''){
                         req.atId=data.atId;
                     }

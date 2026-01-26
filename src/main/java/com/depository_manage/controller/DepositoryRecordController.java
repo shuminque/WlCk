@@ -52,7 +52,9 @@ public class DepositoryRecordController {
             @RequestParam Map<String,Object> map,
             @RequestParam(name = "typeName[]", required = false) List<String> typeNames,
             @RequestParam(name = "applyRemark[]", required = false) List<String> applyRemarks,
-            @RequestParam(name = "excludeApplyRemark[]", required = false) List<String> excludeApplyRemarks) {
+            @RequestParam(name = "excludeApplyRemark[]", required = false) List<String> excludeApplyRemarks,
+            @RequestParam(name = "excludeTypeTransferIn", required = false) Boolean excludeTypeTransferIn
+    ) {
 
         if (typeNames != null && !typeNames.isEmpty()) {
             map.put("typeName", typeNames);
@@ -63,15 +65,27 @@ public class DepositoryRecordController {
         if (excludeApplyRemarks != null && !excludeApplyRemarks.isEmpty()) {
             map.put("excludeApplyRemark", excludeApplyRemarks);
         }
+        if (Boolean.TRUE.equals(excludeTypeTransferIn)) {
+            map.put("excludeTypeTransferIn", true);
+        }
+
         String dateRange = (String) map.get("applyTime");
-        if (dateRange !=null && dateRange.contains(" - ")) {
+        if (dateRange != null && dateRange.contains(" - ")) {
             String[] dates = dateRange.split(" - ");
             map.put("startDate", dates[0] + " 00:00:00");
             map.put("endDate", dates[1] + " 23:59:59");
         }
-        List<DepositoryRecordP> list = depositoryRecordService.findDepositoryRecordPByCondition(map);
-        return new RestResponse(list, depositoryRecordService.findCountByCondition(map), 200);
+
+        List<DepositoryRecordP> list =
+                depositoryRecordService.findDepositoryRecordPByCondition(map);
+
+        return new RestResponse(
+                list,
+                depositoryRecordService.findCountByCondition(map),
+                200
+        );
     }
+
 
     //方法处理GET请求到/depositoryRecord的路径。这个方法接收一组查询参数，然后调用DepositoryRecordService.findDepositoryRecordPByCondition方法来查询满足条件的仓库记录。
     @GetMapping("/myApply")

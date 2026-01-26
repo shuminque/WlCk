@@ -257,7 +257,12 @@
                 dr.apply_remark NOT LIKE CONCAT('%', #{item}, '%')
             </foreach>
         </if>
-
+        <if test="excludeTypeTransferIn == true">
+            AND NOT (
+            type = 1
+            AND apply_remark LIKE '%转入%'
+            )
+        </if>
         <if test="startDate != null and endDate != null">
             AND DATE(dr.apply_time) BETWEEN #{startDate} AND #{endDate}
         </if>
