@@ -153,6 +153,16 @@
         </script>
         <script type="text/template" id="editModelTemplate">
             <form class="layui-form" lay-filter="editFormFilter">
+                <div class="layui-form-item"  >
+                    <label class="layui-form-label">厂区</label>
+                    <div class="layui-input-block">
+                        <select name="depositoryId" disabled>
+                            <option value="" >请选择厂区</option>
+                            <option value="1">SAB</option>
+                            <option value="2">ZAB</option>
+                        </select>
+                    </div>
+                </div>
                 <!-- AT号 -->
                 <div class="layui-form-item">
                     <label class="layui-form-label">AT号</label>
@@ -447,6 +457,11 @@
                     }
                 });
                 function editModel(data) {
+                    if (data.depositoryName === 'SAB') {
+                        data.depositoryId = '1';
+                    } else if (data.depositoryName === 'ZAB') {
+                        data.depositoryId = '2';
+                    }
                     var index = layer.open({
                         type: 1, // 页面层
                         title: '编辑部品',
