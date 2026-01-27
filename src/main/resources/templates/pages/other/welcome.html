@@ -2298,8 +2298,9 @@
                             }
                         });
                         let firstZeroIndex = turnoverRateData.findIndex(value => value === "0.00");
-                        if (firstZeroIndex > 0) {
-                            turnoverRateData[firstZeroIndex - 1] = "0.00"; // 将前一位设置为"0.00"
+                        // 仅当第一个零值出现在3月及以后，才抹除前一个月
+                        if (firstZeroIndex >= 2) {
+                            turnoverRateData[firstZeroIndex - 1] = "0.00";
                         }
                         let nonZeroValues = turnoverRateData.filter(value => value !== "0.00");
                         // 计算平均值
