@@ -2802,7 +2802,14 @@
                             title: params.name,
                             content: $('#recordTableContainer'),
                             area: [popupWidth + 'px', popupHeight + 'px'],
-                            shadeClose: true
+                            shadeClose: true,
+                            closeBtn: 1, // 显示关闭按钮
+                            success: function(layero, index) {
+                            },
+                            end: function() {
+                                // 关闭时隐藏容器
+                                $('#recordTableContainer').hide();
+                            }
                         });
 
                         renderTable(allRecords); // 如果你要按金额排序，可以在这里排序
@@ -3114,7 +3121,14 @@
                             title: params.name,
                             content: $('#recordTableContainer'),
                             area: [popupWidth + 'px', popupHeight + 'px'],
-                            shadeClose: true
+                            shadeClose: true,
+                            closeBtn: 1, // 显示关闭按钮
+                            success: function(layero, index) {
+                            },
+                            end: function() {
+                                // 关闭时隐藏容器
+                                $('#recordTableContainer').hide();
+                            }
                         });
 
                         renderTable(records);
