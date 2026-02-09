@@ -109,7 +109,7 @@ public class LineDataController {
             Sheet sheet = workbook.getSheetAt(0);
 
             for (Row row : sheet) {
-                if (row.getRowNum() == 0 || row.getRowNum() == 1) continue;  // 跳过标题行
+                if (row.getRowNum() == 0 ) continue;  // 跳过标题行
 
                 LineData lineData = new LineData();
                 lineData.setDate(Date.valueOf(date));
