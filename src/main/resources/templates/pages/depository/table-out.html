@@ -276,11 +276,12 @@
                         {field: 'typeName', width: '16%', title: '分类'},
                         {field: 'enginName', width: '10%', title: '工程',totalRowText: '合计'},
                         {field: 'quantity', width: '5%', title: '数量', templet: function(d) {
+                                let quantity = parseFloat(d.quantity) || 0;
                                 // 如果 applyRemark 含“领用退回”，数量显示负数
                                 if (d.applyRemark && d.applyRemark.includes("领用退回")) {
-                                    return -Math.abs(d.quantity);
+                                    quantity = -Math.abs(quantity);
                                 }
-                                return d.quantity;
+                                return formatQuantity(quantity);
                             }},
                         {field: 'price', width: '8%', title: '单价', templet: function(d) {
                                 return parseFloat(d.price).toFixed(2);  // 格式化为两位小数
@@ -337,7 +338,7 @@
                     ]],
                     done: function(res, curr, count) {
                         var totalQuantity = res.data.reduce(function(sum, item) {
-                            let qty = parseInt(item.quantity);
+                            let qty = parseFloat(item.quantity) || 0;
                             if (item.applyRemark && item.applyRemark.includes("领用退回")) {
                                 qty = -Math.abs(qty);
                             }
@@ -358,7 +359,7 @@
                         if (totalRow) {
                             var totalCell = totalRow.querySelector('td[data-field="quantity"] .layui-table-cell');
                             if (totalCell) {
-                                totalCell.innerText = totalQuantity.toString();
+                                totalCell.innerText = formatQuantity(totalQuantity);
                             }
                             var amountCell = totalRow.querySelector('td[data-field="amount"] .layui-table-cell');
                             if (amountCell) {
@@ -381,6 +382,10 @@
                     let month = (date.getMonth() + 1).toString().padStart(2, '0');
                     let day = date.getDate().toString().padStart(2, '0');
                     return `${year}-${month}-${day}`;
+                }
+
+                function formatQuantity(quantity) {
+                    return (parseFloat(quantity) || 0).toFixed(2).replace(/\.?0+$/, '');
                 }
                 // 监听搜索操作
                 form.on('submit(data-search-btn)', function (data) {
