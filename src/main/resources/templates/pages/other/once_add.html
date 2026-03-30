@@ -99,7 +99,7 @@
             <td>
                 <input type="text" class="layui-input" name="unitPrice" autocomplete="off">
             </td>
-            <td><input type="text" class="layui-input" name="quantity" autocomplete="off"></td>
+            <td><input type="number" step="0.01" min="0.01" class="layui-input" name="quantity" autocomplete="off"></td>
             <td>
                 <button name="applyRemark" class="layui-input custom-input" id="ID-dropdown-demo-complex-1"></button>
                 <input type="hidden" name="applyRemark" id="applyRemarkInput-1" value="">
@@ -140,7 +140,7 @@
             <td>
                 <input type="text" class="layui-input" name="unitPrice">
             </td>
-            <td><input type="text" class="layui-input" name="quantity"></td>
+            <td><input type="number" step="0.01" min="0.01" class="layui-input" name="quantity"></td>
             <td>
                 <button name="applyRemark" class="layui-input custom-input" id="ID-dropdown-demo-complex-template"></button>
                 <input type="hidden" name="applyRemark" id="applyRemarkInput-template" value="">
@@ -379,8 +379,13 @@
                 }
             });
 
-            if (parseFloat(allData[0].unitPrice) <= 0 || parseInt(allData[0].quantity) <= 0) {
-                layer.msg('请输入正确的单价与数量');
+            var quantityRegex = /^(?:0|[1-9]\d*)(?:\.\d{1,2})?$/;
+            var hasInvalidQuantity = allData.some(function(item) {
+                var quantityValue = (item.quantity || "").trim();
+                return !quantityRegex.test(quantityValue) || parseFloat(quantityValue) <= 0;
+            });
+            if (parseFloat(allData[0].unitPrice) <= 0 || hasInvalidQuantity) {
+                layer.msg('请输入正确的单价与数量（数量最多保留两位小数）');
                 return;
             }
             var loadingIndex = layer.load(1);

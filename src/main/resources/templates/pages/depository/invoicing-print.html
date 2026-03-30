@@ -245,7 +245,7 @@
                             if (totalRow) {
                                 var quantityCell = totalRow.querySelector('td[data-field="quantity"] .layui-table-cell');
                                 if (quantityCell) {
-                                    quantityCell.innerText = totalQuantity.toString();
+                                    quantityCell.innerText = formatQuantity(totalQuantity);
                                 }
                                 var amountCell = totalRow.querySelector('td[data-field="amount"] .layui-table-cell');
                                 if (amountCell) {
@@ -276,6 +276,10 @@
             let month = (date.getMonth() + 1).toString().padStart(2, '0');
             let day = date.getDate().toString().padStart(2, '0');
             return `${year}-${month}-${day}`;
+        }
+
+        function formatQuantity(quantity) {
+            return (parseFloat(quantity) || 0).toFixed(2).replace(/\.?0+$/, '');
         }
 
         function addCustomPrintButton() {
@@ -371,7 +375,7 @@
               <td style="border: 1px solid black;">${item.mname || ''}</td>
               <td style="border: 1px solid black;">${item.model || ''}</td>
               <td style="border: 1px solid black;">${price.toFixed(2)}</td>
-              <td style="border: 1px solid black;">${quantity}</td>
+              <td style="border: 1px solid black;">${formatQuantity(quantity)}</td>
               <td style="border: 1px solid black;">${amount}</td>
             </tr>
         `;
@@ -384,7 +388,7 @@
     <div style="margin-top: 20px; font-size: 16px; display: flex; justify-content: space-between;">
       <div>制单：</div>
       <div>入库确认：</div>
-      <div>总计数量：${totalQuantity.toFixed(0)}</div>
+      <div>总计数量：${formatQuantity(totalQuantity)}</div>
       <div>总计金额：${totalAmount.toFixed(2)}</div>
     </div>
 `;
