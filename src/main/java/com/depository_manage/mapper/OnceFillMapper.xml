@@ -9,7 +9,7 @@
         <result column="model" property="model" jdbcType="VARCHAR"/>
         <result column="type_id" property="typeId" jdbcType="INTEGER" />
         <result column="unit_price" property="unitPrice" jdbcType="DOUBLE"/>
-        <result column="quantity" property="quantity" jdbcType="INTEGER"/>
+        <result column="quantity" property="quantity" jdbcType="DECIMAL"/>
         <result column="price" property="price" jdbcType="DOUBLE"/>
         <result column="time" property="time" jdbcType="TIMESTAMP"/>
         <result column="apply_remark" property="applyRemark" jdbcType="VARCHAR"/>

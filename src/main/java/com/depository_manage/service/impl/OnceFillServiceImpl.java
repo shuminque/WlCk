@@ -12,6 +12,8 @@ import com.depository_manage.utils.ObjectFormatUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.text.DecimalFormat;
 import java.util.*;
 
@@ -89,7 +91,10 @@ public class OnceFillServiceImpl implements OnceFillService {
                 record.setApplyRemark(applyRemark);
             }
             DecimalFormat decimalFormat = new DecimalFormat("#.00");
-            double price = record.getUnitPrice() * record.getQuantity();
+            double price = BigDecimal.valueOf(record.getUnitPrice())
+                    .multiply(record.getQuantity())
+                    .setScale(2, RoundingMode.HALF_UP)
+                    .doubleValue();
             String formattedPrice = decimalFormat.format(price);
             record.setPrice(Double.parseDouble(formattedPrice));
         }
