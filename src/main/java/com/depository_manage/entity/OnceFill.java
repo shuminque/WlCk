@@ -2,6 +2,8 @@ package com.depository_manage.entity;
 
 import lombok.Data;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.Date;
 
 @Data
@@ -13,7 +15,7 @@ public class OnceFill {
     /** 材料种类id */
     private Integer typeId;
     private Double unitPrice;
-    private Integer quantity;
+    private BigDecimal quantity;
     private Double price;
     private Date time;
     private String applyRemark;
@@ -21,4 +23,8 @@ public class OnceFill {
     private String reviewRemark;
     private String checkRemark;
     private String checkPass;
+
+    public void setQuantity(BigDecimal quantity) {
+        this.quantity = quantity == null ? null : quantity.setScale(2, RoundingMode.HALF_UP);
+    }
 }

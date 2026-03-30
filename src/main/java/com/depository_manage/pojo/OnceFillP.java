@@ -3,6 +3,8 @@ package com.depository_manage.pojo;
 import com.depository_manage.entity.OnceFill;
 import lombok.Data;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.Date;
 @Data
 public class OnceFillP {
@@ -14,7 +16,7 @@ public class OnceFillP {
     private Integer typeId;
     private String typeName;
     private Double unitPrice;
-    private Integer quantity;
+    private BigDecimal quantity;
     private Double price;
     private Date time;
     private String applyRemark;
@@ -22,13 +24,13 @@ public class OnceFillP {
     private String reviewRemark;
     private String checkRemark;
     private String checkPass;
-    public OnceFillP(Integer id,  String name, String model, Integer quantity, Double price, Double unitPrice,Integer typeId, String typeName,
+    public OnceFillP(Integer id,  String name, String model, BigDecimal quantity, Double price, Double unitPrice,Integer typeId, String typeName,
                      Integer depositoryId, String applyRemark, Date time, String introduce
             , String reviewRemark, String checkRemark, String checkPass) {
         this.id = id;
         this.name = name;
         this.model =model;
-        this.quantity = quantity;
+        this.setQuantity(quantity);
         this.price = price;
         this.unitPrice=unitPrice;
         this.typeId = typeId;
@@ -46,7 +48,7 @@ public class OnceFillP {
         this.name = onceFill.getName();
         this.typeId = onceFill.getTypeId();
         this.model =onceFill.getModel();
-        this.quantity = onceFill.getQuantity();
+        this.setQuantity(onceFill.getQuantity());
         this.price = onceFill.getPrice();
         this.unitPrice=onceFill.getUnitPrice();
         this.depositoryId = onceFill.getDepositoryId();
@@ -56,5 +58,9 @@ public class OnceFillP {
         this.reviewRemark = onceFill.getReviewRemark();
         this.checkRemark = onceFill.getCheckRemark();
         this.checkPass = onceFill.getCheckPass();
+    }
+
+    public void setQuantity(BigDecimal quantity) {
+        this.quantity = quantity == null ? null : quantity.setScale(2, RoundingMode.HALF_UP);
     }
 }
