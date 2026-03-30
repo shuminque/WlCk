@@ -13,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -50,6 +51,9 @@ public class OnceFillController {
                 map.put(entry.getKey(), null);
             }
         }
+        normalizeDecimalInput(map, "unitPrice", false);
+        normalizeDecimalInput(map, "quantity", true);
+        normalizeDecimalInput(map, "price", false);
         // 必填字段验证：根据您的业务规则添加
         // if (map.get("someField") == null || "".equals(map.get("someField").toString().trim())) {
         //     return new RestResponse("Some field is required", 400, null);
@@ -203,6 +207,27 @@ public class OnceFillController {
         }
 
         return ResponseEntity.ok(result);
+    }
+
+
+    private void normalizeDecimalInput(Map<String, Object> map, String fieldName, boolean keepBigDecimal) {
+        Object value = map.get(fieldName);
+        if (value == null) {
+            return;
+        }
+
+        BigDecimal decimalValue;
+        if (value instanceof BigDecimal) {
+            decimalValue = (BigDecimal) value;
+        } else if (value instanceof Number) {
+            decimalValue = BigDecimal.valueOf(((Number) value).doubleValue());
+        } else if (value instanceof String && !((String) value).trim().isEmpty()) {
+            decimalValue = new BigDecimal(((String) value).trim());
+        } else {
+            return;
+        }
+
+        map.put(fieldName, keepBigDecimal ? decimalValue : decimalValue.doubleValue());
     }
 
 

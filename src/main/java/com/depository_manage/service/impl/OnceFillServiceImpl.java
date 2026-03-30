@@ -14,7 +14,6 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.text.DecimalFormat;
 import java.util.*;
 
 @Service
@@ -34,6 +33,7 @@ public class OnceFillServiceImpl implements OnceFillService {
 
     @Override
     public Integer updateOnceFill(Map<String, Object> map) {
+        normalizeNumericFields(map);
         return onceFillMapper.updateOnceFill(map);
     }
 
@@ -90,15 +90,51 @@ public class OnceFillServiceImpl implements OnceFillService {
                 applyRemark = applyRemark.replaceAll("(线\\([^)]*\\))", "线");
                 record.setApplyRemark(applyRemark);
             }
-            DecimalFormat decimalFormat = new DecimalFormat("#.00");
-            double price = BigDecimal.valueOf(record.getUnitPrice())
-                    .multiply(record.getQuantity())
-                    .setScale(2, RoundingMode.HALF_UP)
-                    .doubleValue();
-            String formattedPrice = decimalFormat.format(price);
-            record.setPrice(Double.parseDouble(formattedPrice));
+            BigDecimal unitPrice = BigDecimal.valueOf(record.getUnitPrice());
+            BigDecimal quantity = BigDecimal.valueOf(record.getQuantity().doubleValue());
+            BigDecimal totalPrice = unitPrice.multiply(quantity).setScale(2, RoundingMode.HALF_UP);
+            record.setPrice(totalPrice.doubleValue());
         }
         onceFillMapper.insertBatch(records);
+    }
+
+    private void normalizeNumericFields(Map<String, Object> map) {
+        BigDecimal unitPrice = null;
+        BigDecimal quantity = null;
+
+        if (map.containsKey("unitPrice") && map.get("unitPrice") != null) {
+            unitPrice = toBigDecimal(map.get("unitPrice"));
+            map.put("unitPrice", unitPrice.doubleValue());
+        }
+
+        if (map.containsKey("quantity") && map.get("quantity") != null) {
+            quantity = toBigDecimal(map.get("quantity")).setScale(2, RoundingMode.HALF_UP);
+            map.put("quantity", quantity);
+        }
+
+        if (unitPrice != null && quantity != null) {
+            BigDecimal totalPrice = unitPrice.multiply(quantity).setScale(2, RoundingMode.HALF_UP);
+            map.put("price", totalPrice.doubleValue());
+            return;
+        }
+
+        if (map.containsKey("price") && map.get("price") != null) {
+            BigDecimal price = toBigDecimal(map.get("price")).setScale(2, RoundingMode.HALF_UP);
+            map.put("price", price.doubleValue());
+        }
+    }
+
+    private BigDecimal toBigDecimal(Object value) {
+        if (value instanceof BigDecimal) {
+            return (BigDecimal) value;
+        }
+        if (value instanceof Number) {
+            return BigDecimal.valueOf(((Number) value).doubleValue());
+        }
+        if (value instanceof String && !((String) value).trim().isEmpty()) {
+            return new BigDecimal(((String) value).trim());
+        }
+        throw new IllegalArgumentException("Invalid numeric value: " + value);
     }
 
     private List<OnceFillP> pack(List<OnceFill> list){
