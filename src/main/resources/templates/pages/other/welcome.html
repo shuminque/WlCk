@@ -518,16 +518,34 @@
             return formattedData;
         }
 
+        function isLeafNode(node) {
+            return !node || !Array.isArray(node.children) || node.children.length === 0;
+        }
+
+        function loadCategoryRawData(category) {
+            return new Promise((resolve, reject) => {
+                $.get('/api/categories/' + category, function(response) {
+                    if (response.code === 0) {
+                        resolve(response.data);
+                    } else {
+                        reject(new Error(`无法加载${category.toUpperCase()}的分类数据`));
+                    }
+                }).fail(function() {
+                    reject(new Error(`无法加载${category.toUpperCase()}的分类数据`));
+                });
+            });
+        }
+
         function loadCategoryData(category, callback) {
-            $.get('/api/categories/' + category, function(response) {
-                console.log("数据内容",response.data);
-                if (response.code === 0) {
-                    const filteredData = response.data.filter(item => item.title !== "销售出库");
+            loadCategoryRawData(category).then(rawData => {
+                console.log("数据内容", rawData);
+                if (Array.isArray(rawData)) {
+                    const filteredData = rawData.filter(item => item.title !== "销售出库");
                     callback(formatData(filteredData));
                 } else {
-                    layer.msg(`无法加载${category.toUpperCase()}的分类数据`);
+                    callback([]);
                 }
-            }).fail(function() {
+            }).catch(function() {
                 layer.msg(`无法加载${category.toUpperCase()}的分类数据`);
             });
         }
@@ -867,8 +885,11 @@
                         if (!categoryType) {
                             throw new Error('未知的 depositoryId: ' + depositoryId);
                         }
-                        const categoryTreeResponse = await $.get(`/api/categories/${categoryType}`);
-                        const rootChildren = categoryTreeResponse?.data?.children || [];
+                        const categoryTreeRawData = await loadCategoryRawData(categoryType);
+                        const topLevelNodes = Array.isArray(categoryTreeRawData)
+                            ? categoryTreeRawData
+                            : (Array.isArray(categoryTreeRawData?.children) ? categoryTreeRawData.children : []);
+                        const rootChildren = topLevelNodes.filter(node => node && node.title !== '销售出库');
                         const findNodeByTitle = (nodes, targetTitle) => {
                             for (const node of (nodes || [])) {
                                 if (node.title === targetTitle) {
@@ -884,7 +905,8 @@
 
                         const zabNode = findNodeByTitle(rootChildren, 'ZAB领用工程');
                         const leafProjects = (zabNode?.children || [])
-                            .filter(item => (!item.children || item.children.length === 0) && item.title && item.title !== '新刀制作室')
+                            .filter(item => item && item.title !== '销售出库')
+                            .filter(item => isLeafNode(item) && item.title && item.title !== '新刀制作室')
                             .map(item => item.title);
 
                         const leafAmountByMonth = {};
