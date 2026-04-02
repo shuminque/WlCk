@@ -858,7 +858,16 @@
 
                 if (diameter === '生研完成品') {
                     try {
-                        const categoryTreeResponse = await $.get(`/api/categories/${depositoryId}`);
+                        const typeMap = {
+                            '1': 'sab',
+                            '2': 'zab'
+                        };
+                        const categoryType = typeMap[depositoryId];
+
+                        if (!categoryType) {
+                            throw new Error('未知的 depositoryId: ' + depositoryId);
+                        }
+                        const categoryTreeResponse = await $.get(`/api/categories/${categoryType}`);
                         const rootChildren = categoryTreeResponse?.data?.children || [];
                         const findNodeByTitle = (nodes, targetTitle) => {
                             for (const node of (nodes || [])) {
