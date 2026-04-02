@@ -911,9 +911,11 @@
 
                         const leafAmountByMonth = {};
                         const leafCountByMonth = {};
+                        const leafTitlesByMonth = {}; // 新增：每月有哪些叶子 title 有金额
                         months.forEach(m => {
                             leafAmountByMonth[m] = 0;
                             leafCountByMonth[m] = 0;
+                            leafTitlesByMonth[m] = []; // 初始化
                         });
 
                         const leafResults = await Promise.all(leafProjects.map(async (title) => {
@@ -927,7 +929,7 @@
                             }
                         }));
 
-                        leafResults.forEach(({ data }) => {
+                        leafResults.forEach(({ title, data }) => {
                             const positiveMonths = new Set();
                             data.forEach(item => {
                                 const month = item.month;
@@ -942,6 +944,7 @@
                             });
                             positiveMonths.forEach(month => {
                                 leafCountByMonth[month] += 1;
+                                leafTitlesByMonth[month].push(title);
                             });
                         });
 
@@ -980,6 +983,7 @@
                         monthlyAmountMap = finalAmountByMonth;
                         console.log(`【${targetYear}】【生研完成品】叶子金额：`, leafAmountByMonth);
                         console.log(`【${targetYear}】【生研完成品】叶子计数：`, leafCountByMonth);
+                        console.log(`【${targetYear}】【生研完成品】叶子title：`, leafTitlesByMonth); // 新增
                         console.log(`【${targetYear}】【生研完成品】扣积分后金额：`, finalAmountByMonth);
 
                         return {
