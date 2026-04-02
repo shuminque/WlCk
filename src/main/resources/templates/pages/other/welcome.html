@@ -621,6 +621,113 @@
                 alert("请确保已选择所有条件！");
                 return;
             }
+            function extractProductionMap(lineData) {
+                const map = new Map();
+                lineData.forEach(item => {
+                    if (item.date && item.production != null) {
+                        const monthStr = item.date.substring(0, 7); // 取 "2024-01"
+                        map.set(monthStr, item.production);
+                    }
+                });
+                return map;
+            }
+            function calculateUnitPrices(scoreData, productionMap) {
+                return scoreData.map(item => {
+                    const production = productionMap.get(item.month) || 0;
+                    const unitPrice = production > 0
+                        ? (item.amount / production).toFixed(6)
+                        : null;
+
+                    return {
+                        month: item.month,
+                        amount: item.amount,
+                        production: production,
+                        unitPrice: unitPrice
+                    };
+                });
+            }
+            function calculateYearlyTotals(data, scoreUnitPrices, monthKeys, isNeedDivide) {
+                const unitPriceMap = {};
+                scoreUnitPrices.forEach(item => {
+                    unitPriceMap[item.month] = item.unitPrice != null ? parseFloat(item.unitPrice) : null;
+                });
+
+                const monthlyScoreAmountMap = {};
+                monthKeys.forEach(month => {
+                    const unitPrice = unitPriceMap[month];
+                    let production = data.monthlyProductionMap[month] || 0;
+                    if (isNeedDivide) {
+                        production = production / 2;
+                    }
+                    monthlyScoreAmountMap[month] =
+                        unitPrice != null && production > 0
+                            ? parseFloat((unitPrice * production).toFixed(2))
+                            : 0;
+                });
+
+                const totalAmountMap = {};
+                monthKeys.forEach(month => {
+                    const originalAmount = data.monthlyAmountMap[month] || 0;
+                    const scoreAmount = monthlyScoreAmountMap[month] || 0;
+                    totalAmountMap[month] = originalAmount + scoreAmount;
+                });
+
+                const monthlyUnitCostMap = {};
+                monthKeys.forEach(month => {
+                    const production = data.monthlyProductionMap[month] || 0;
+                    const totalAmount = totalAmountMap[month];
+                    monthlyUnitCostMap[month] = production === 0
+                        ? 0
+                        : (totalAmount / production).toFixed(4);
+                });
+
+                let totalAmountLine = 0;
+                let totalProductionLine = 0;
+                monthKeys.forEach(month => {
+                    const amount = totalAmountMap[month] || 0;
+                    const production = data.monthlyProductionMap[month] || 0;
+                    totalAmountLine += amount;
+                    totalProductionLine += production;
+                });
+
+                const totalUnitCost = totalProductionLine > 0
+                    ? parseFloat((totalAmountLine / totalProductionLine).toFixed(4))
+                    : 0;
+                const monthlyUnitCosts = Object.values(monthlyUnitCostMap)
+                    .map(val => parseFloat(val))
+                    .filter(val => !isNaN(val) && val > 0);
+
+                const avgMonthlyUnitCost = monthlyUnitCosts.length > 0
+                    ? parseFloat((monthlyUnitCosts.reduce((a, b) => a + b, 0) / monthlyUnitCosts.length).toFixed(4))
+                    : 0;
+
+
+                return {
+                    monthlyScoreAmountMap,
+                    totalAmountMap,
+                    monthlyUnitCostMap,
+                    totalAmountLine,
+                    totalProductionLine,
+                    totalUnitCost,
+                    avgMonthlyUnitCost
+                };
+            }
+            async function fetchScoreData(targetYear, depositoryId) {
+                const url = `/ScoreForYear/${targetYear}/${depositoryId}`;
+                let scoreData = [];
+
+                try {
+                    const response = await $.get(url);
+                    scoreData = response || [];
+
+                    console.log(`ScoreUrl (${targetYear}):`, url);
+                    console.log(`Score data (${targetYear}):`, scoreData);
+                } catch (error) {
+                    console.error(`Error fetching score data for year ${targetYear}:`, error);
+                }
+
+                return scoreData;
+            }
             // async function fetchYearlyData(targetYear) {
             //     let categoryTitles = [];
             //     let monthLineMap = {}; // 用于存储每月参与的产线列表
@@ -749,6 +856,111 @@
                     }
                 }
 
+                if (diameter === '生研完成品') {
+                    try {
+                        const categoryTreeResponse = await $.get(`/api/categories/${depositoryId}`);
+                        const rootChildren = categoryTreeResponse?.data?.children || [];
+                        const findNodeByTitle = (nodes, targetTitle) => {
+                            for (const node of (nodes || [])) {
+                                if (node.title === targetTitle) {
+                                    return node;
+                                }
+                                const matched = findNodeByTitle(node.children, targetTitle);
+                                if (matched) {
+                                    return matched;
+                                }
+                            }
+                            return null;
+                        };
+
+                        const zabNode = findNodeByTitle(rootChildren, 'ZAB领用工程');
+                        const leafProjects = (zabNode?.children || [])
+                            .filter(item => (!item.children || item.children.length === 0) && item.title && item.title !== '新刀制作室')
+                            .map(item => item.title);
+
+                        const leafAmountByMonth = {};
+                        const leafCountByMonth = {};
+                        months.forEach(m => {
+                            leafAmountByMonth[m] = 0;
+                            leafCountByMonth[m] = 0;
+                        });
+
+                        const leafResults = await Promise.all(leafProjects.map(async (title) => {
+                            const leafUrl = `/CategoryForYear/${targetYear}/${depositoryId}/${encodeURIComponent(title)}`;
+                            try {
+                                const res = await $.get(leafUrl);
+                                return { title, data: Array.isArray(res) ? res : [] };
+                            } catch (err) {
+                                console.warn(`获取叶子工程 [${title}] 的金额数据失败：`, err);
+                                return { title, data: [] };
+                            }
+                        }));
+
+                        leafResults.forEach(({ data }) => {
+                            const positiveMonths = new Set();
+                            data.forEach(item => {
+                                const month = item.month;
+                                const amount = item.amount || 0;
+                                if (!month || !leafAmountByMonth.hasOwnProperty(month)) {
+                                    return;
+                                }
+                                leafAmountByMonth[month] += amount;
+                                if (amount > 0) {
+                                    positiveMonths.add(month);
+                                }
+                            });
+                            positiveMonths.forEach(month => {
+                                leafCountByMonth[month] += 1;
+                            });
+                        });
+
+                        const leafAvgByMonth = {};
+                        months.forEach(month => {
+                            const denominator = leafCountByMonth[month] || 0;
+                            leafAvgByMonth[month] = denominator > 0 ? (leafAmountByMonth[month] / denominator) : 0;
+                        });
+
+                        const scoreDataForYear = await fetchScoreData(targetYear, depositoryId);
+                        let scoreLineUrl = '/lineData/data/' + targetYear;
+                        if (categoryTitle) {
+                            scoreLineUrl += '/' + categoryTitle;
+                        }
+                        const scoreLineDataResponse = await $.get(scoreLineUrl);
+                        const scoreLineData = scoreLineDataResponse.data || [];
+                        const scoreProductionMap = extractProductionMap(scoreLineData);
+                        const scoreUnitPrices = calculateUnitPrices(scoreDataForYear, scoreProductionMap);
+                        const monthlyScoreAmountMap = calculateYearlyTotals(
+                            {
+                                year: targetYear,
+                                monthlyProductionMap,
+                                monthlyAmountMap: Object.fromEntries(months.map(month => [month, 0]))
+                            },
+                            scoreUnitPrices,
+                            months,
+                            diameter !== '单玉小径' && diameter !== '单玉中径'
+                        ).monthlyScoreAmountMap;
+
+                        const finalAmountByMonth = {};
+                        months.forEach(month => {
+                            const value = leafAvgByMonth[month] - (monthlyScoreAmountMap[month] || 0);
+                            finalAmountByMonth[month] = value > 0 ? value : 0;
+                        });
+
+                        monthlyAmountMap = finalAmountByMonth;
+                        console.log(`【${targetYear}】【生研完成品】叶子金额：`, leafAmountByMonth);
+                        console.log(`【${targetYear}】【生研完成品】叶子计数：`, leafCountByMonth);
+                        console.log(`【${targetYear}】【生研完成品】扣积分后金额：`, finalAmountByMonth);
+
+                        return {
+                            year: targetYear,
+                            monthlyProductionMap: monthlyProductionMap,
+                            monthlyAmountMap: monthlyAmountMap
+                        };
+                    } catch (err) {
+                        console.error(`【${targetYear}】【生研完成品】专用逻辑处理失败，回退默认逻辑：`, err);
+                    }
+                }
+
                 const requests = categoryTitles.map(async title => {
                     const encodedTitle = encodeURIComponent(title);
                     const url = `/CategoryForYear/${targetYear}/${depositoryId}/${encodedTitle}`;
@@ -818,24 +1030,6 @@
             if (categoryTitle) {
                 lineNameUrl += '/' + categoryTitle;
             }
-            // 封装函数：获取指定年份评分数据
-            async function fetchScoreData(targetYear, depositoryId) {
-                const url = `/ScoreForYear/${targetYear}/${depositoryId}`;
-                let scoreData = [];
-
-                try {
-                    const response = await $.get(url);
-                    scoreData = response || [];
-
-                    console.log(`ScoreUrl (${targetYear}):`, url);
-                    console.log(`Score data (${targetYear}):`, scoreData);
-                } catch (error) {
-                    console.error(`Error fetching score data for year ${targetYear}:`, error);
-                }
-
-                return scoreData;
-            }
-
             // 调用当前年与上一年的评分数据
             const scoreData = await fetchScoreData(year, depositoryId);
             const lastScoreData = await fetchScoreData(year - 1, depositoryId);
@@ -863,32 +1057,6 @@
                 console.warn("当前分类无产量数据，将产量设置为全为零");
                 lineData = []; // 清空 lineData，确保不会使用之前的数据
             }
-            function extractProductionMap(lineData) {
-                const map = new Map();
-                lineData.forEach(item => {
-                    if (item.date && item.production != null) {
-                        const monthStr = item.date.substring(0, 7); // 取 "2024-01"
-                        map.set(monthStr, item.production);
-                    }
-                });
-                return map;
-            }
-            function calculateUnitPrices(scoreData, productionMap) {
-                return scoreData.map(item => {
-                    const production = productionMap.get(item.month) || 0;
-                    const unitPrice = production > 0
-                        ? (item.amount / production).toFixed(6)
-                        : null;
-
-                    return {
-                        month: item.month,
-                        amount: item.amount,
-                        production: production,
-                        unitPrice: unitPrice
-                    };
-                });
-            }
-
             try {
                 // 获取金额数据
                 const amountData = await $.get(amountUrl);
@@ -1065,72 +1233,6 @@
                 console.log("referenceLineValueTwo当前年参考线值（金额之和/产量之和）：", referenceLineValueTwo);
 
                 const isNeedDivide = diameter !== '单玉小径' && diameter !== '单玉中径';
-                function calculateYearlyTotals(data, scoreUnitPrices, monthKeys, isNeedDivide) {
-                    const unitPriceMap = {};
-                    scoreUnitPrices.forEach(item => {
-                        unitPriceMap[item.month] = item.unitPrice != null ? parseFloat(item.unitPrice) : null;
-                    });
-
-                    const monthlyScoreAmountMap = {};
-                    monthKeys.forEach(month => {
-                        const unitPrice = unitPriceMap[month];
-                        let production = data.monthlyProductionMap[month] || 0;
-                        if (isNeedDivide) {
-                            production = production / 2;
-                        }
-                        monthlyScoreAmountMap[month] =
-                            unitPrice != null && production > 0
-                                ? parseFloat((unitPrice * production).toFixed(2))
-                                : 0;
-                    });
-
-                    const totalAmountMap = {};
-                    monthKeys.forEach(month => {
-                        const originalAmount = data.monthlyAmountMap[month] || 0;
-                        const scoreAmount = monthlyScoreAmountMap[month] || 0;
-                        totalAmountMap[month] = originalAmount + scoreAmount;
-                    });
-
-                    const monthlyUnitCostMap = {};
-                    monthKeys.forEach(month => {
-                        const production = data.monthlyProductionMap[month] || 0;
-                        const totalAmount = totalAmountMap[month];
-                        monthlyUnitCostMap[month] = production === 0
-                            ? 0
-                            : (totalAmount / production).toFixed(4);
-                    });
-
-                    let totalAmountLine = 0;
-                    let totalProductionLine = 0;
-                    monthKeys.forEach(month => {
-                        const amount = totalAmountMap[month] || 0;
-                        const production = data.monthlyProductionMap[month] || 0;
-                        totalAmountLine += amount;
-                        totalProductionLine += production;
-                    });
-
-                    const totalUnitCost = totalProductionLine > 0
-                        ? parseFloat((totalAmountLine / totalProductionLine).toFixed(4))
-                        : 0;
-                    const monthlyUnitCosts = Object.values(monthlyUnitCostMap)
-                        .map(val => parseFloat(val))              // 直接 parseFloat，无需断言
-                        .filter(val => !isNaN(val) && val > 0);   // 过滤掉 NaN 和 0
-
-                    const avgMonthlyUnitCost = monthlyUnitCosts.length > 0
-                        ? parseFloat((monthlyUnitCosts.reduce((a, b) => a + b, 0) / monthlyUnitCosts.length).toFixed(4))
-                        : 0;
-
-
-                    return {
-                        monthlyScoreAmountMap,
-                        totalAmountMap,
-                        monthlyUnitCostMap,
-                        totalAmountLine,
-                        totalProductionLine,
-                        totalUnitCost,
-                        avgMonthlyUnitCost
-                    };
-                }
                 const currentCostData = calculateYearlyTotals(
                     currentYearData,
                     ScoreUnitPrices,
