@@ -2716,6 +2716,16 @@
             });
 
             var totalProduction = validProductions.reduce((acc, curr) => acc + curr, 0);
+            // 前工序产量单独计入总产量（不做 /2 处理）
+            var includedCategorySet = new Set(validCategories);
+            var frontProcessProduction = aggregatedLineDataArray
+                .filter(item =>
+                    item &&
+                    item.craft === '前工序' &&
+                    !includedCategorySet.has(item.lineName)
+                )
+                .reduce((acc, curr) => acc + (curr.production || 0), 0);
+            totalProduction += frontProcessProduction;
             var totalPrice = validAmounts.reduce((acc, curr) => acc + curr, 0);
             var referenceLineValue = (totalPrice / totalProduction).toFixed(3);
             var formattedTotalPrice = totalPrice.toLocaleString();
