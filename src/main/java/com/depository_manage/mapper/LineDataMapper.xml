@@ -85,16 +85,24 @@
             #{item.lineName},
             #{item.production},
             #{item.model},
-            (SELECT c.craft FROM craft c WHERE c.lineName = #{item.lineName} LIMIT 1),
-            (SELECT s.diameter
+            (SELECT c.craft
+            FROM craft c
+            WHERE c.lineName = #{item.lineName}
+            LIMIT 1),
+
+            CASE
+            WHEN #{item.lineName} LIKE '%生研完成品%' THEN '生研完成品'
+            ELSE (
+            SELECT s.diameter
             FROM series s
             WHERE #{item.model} LIKE CONCAT('%', s.seriesName, '%')
             ORDER BY LENGTH(s.seriesName) DESC
-            LIMIT 1)
+            LIMIT 1
+            )
+            END
             )
         </foreach>
     </insert>
-
 
 
     <update id="updateLineData" parameterType="map">
