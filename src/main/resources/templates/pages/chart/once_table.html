@@ -106,6 +106,17 @@
                     </div>
                 </div>
                 <div class="layui-form-item">
+                    <label class="layui-form-label">供应商</label>
+                    <div class="layui-input-block">
+                        <select name="checkRemark" lay-search>
+                            <option value="">请选择供应商</option>
+                            <th:block th:each="supplier : ${suppliers}">
+                                <option th:value="${supplier.supplierName}" th:text="${supplier.supplierName}"></option>
+                            </th:block>
+                        </select>
+                    </div>
+                </div>
+                <div class="layui-form-item">
                     <label class="layui-form-label">单价</label>
                     <div class="layui-input-block">
                         <input type="number" name="unitPrice" placeholder="请输入单价" autocomplete="off" class="layui-input">
@@ -366,7 +377,7 @@
                                 return d.applyRemark ? d.applyRemark.replace(/[A-Z]-[A-Z](-\d)?/g, '') : '';
                             }},
                         {field: 'introduce', title: '备注'},
-                        {field: 'checkRemark', title: '供应商', hide: true },
+                        {field: 'checkRemark', title: '供应商'},
                         // {field: 'depositoryId', width: '6%', title: '厂区'}
                         {
                             title: '操作',
@@ -481,7 +492,8 @@
                                 type: 'date',
                                 value: data.time
                             });
-                            loadOutTypeDropdown(2);  // 或用 data.depositoryId 动态判断
+                            loadOutTypeDropdown(String(data.depositoryId || 2));
+                            form.render('select', 'editFormFilter');
 
                             // 监听提交按钮
                             form.on('submit(editSubmitBtnFilter)', function(formData) {
