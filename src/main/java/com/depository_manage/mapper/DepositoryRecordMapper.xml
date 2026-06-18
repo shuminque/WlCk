@@ -2283,6 +2283,7 @@ UNION ALL
             AND DATE(dr.apply_time) BETWEEN #{startDate} AND #{endDate}
         </if>
 
+        <if test="atId == null or atId == ''">
         UNION ALL
 
         SELECT
@@ -2331,6 +2332,8 @@ UNION ALL
             AND DATE(ofill.time) BETWEEN #{startDate} AND #{endDate}
         </if>
 
+        </if>
+
         ORDER BY applyTime DESC
         <if test="begin != null and size != null">
             LIMIT #{begin}, #{size}
@@ -2375,6 +2378,7 @@ UNION ALL
             AND DATE(dr.apply_time) BETWEEN #{startDate} AND #{endDate}
         </if>
 
+        <if test="atId == null or atId == ''">
         UNION ALL
 
         SELECT ofill.id
@@ -2404,6 +2408,7 @@ UNION ALL
         </if>
         <if test="startDate != null and endDate != null">
             AND DATE(ofill.time) BETWEEN #{startDate} AND #{endDate}
+        </if>
         </if>
         ) temp
     </select>
