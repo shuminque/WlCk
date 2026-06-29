@@ -938,8 +938,8 @@
                                     return;
                                 }
                                 leafAmountByMonth[month] += amount;
-                                // if (amount > 0) {
-                                    if (amount !== 0) {
+                                if (amount > 0) {
+                                //     if (amount !== 0) {
                                     positiveMonths.add(month);
                                 }
                             });
