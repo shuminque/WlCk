@@ -938,7 +938,8 @@
                                     return;
                                 }
                                 leafAmountByMonth[month] += amount;
-                                if (amount > 0) {
+                                // if (amount > 0) {
+                                    if (amount !== 0) {
                                     positiveMonths.add(month);
                                 }
                             });
@@ -979,12 +980,20 @@
                             const value = leafAvgByMonth[month] - (monthlyScoreAmountMap[month] || 0);
                             finalAmountByMonth[month] = value > 0 ? value : 0;
                         });
+                        // months.forEach(month => {
+                        //     const score = monthlyScoreAmountMap[month] || 0;
+                        //     // const value = leafAvgByMonth[month] - 2 * score; // 扣两次
+                        //     const value =   score;
+                        //
+                        //     finalAmountByMonth[month] = value > 0 ? value : 0;
+                        // });
 
                         monthlyAmountMap = finalAmountByMonth;
                         console.log(`【${targetYear}】【生研完成品】叶子金额：`, leafAmountByMonth);
                         console.log(`【${targetYear}】【生研完成品】叶子计数：`, leafCountByMonth);
-                        console.log(`【${targetYear}】【生研完成品】叶子title：`, leafTitlesByMonth); // 新增
+                        console.log(`【${targetYear}】【生研完成品】叶子title：`, leafTitlesByMonth);
                         console.log(`【${targetYear}】【生研完成品】扣积分后金额：`, finalAmountByMonth);
+                        // console.log(`【${targetYear}】【生研完成品】扣2次积分后金额：`, finalAmountByMonth);
 
                         return {
                             year: targetYear,
