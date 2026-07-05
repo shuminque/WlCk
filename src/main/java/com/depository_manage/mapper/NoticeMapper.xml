@@ -50,6 +50,9 @@
         <if test="depositoryId != null">
             AND n.depository_id = #{depositoryId}
         </if>
+        <if test="excludeOlderThanThreeMonths != null">
+            AND n.time >= DATE_SUB(NOW(), INTERVAL 3 MONTH)
+        </if>
         order by n.time DESC
 <!--        <if test="begin != null and size != null">-->
 <!--            LIMIT #{begin},#{size}-->

@@ -24,6 +24,7 @@ public class NoticeController {
 //    }
     @GetMapping("/notices")
     public RestResponse findNotices(@RequestParam Map<String,Object> map){
+        map.put("excludeOlderThanThreeMonths", true);
         List<Notice> notices = noticeService.findNoticeByCondition(map);
         int count = notices.size(); // 或者获取实际的数据总数
         return new RestResponse(200, "", count, notices);
