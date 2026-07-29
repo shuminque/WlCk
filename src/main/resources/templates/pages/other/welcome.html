@@ -829,7 +829,6 @@
             // }
             async function fetchYearlyData(targetYear) {
                 let categoryTitles = [];
-                let monthLineMap = {}; // 用于存储每月参与的产线列表
                 let response2;
 
                 try {
@@ -845,13 +844,6 @@
 
                     console.log(`【${targetYear}】包含的分类:`, categoryTitles);
                     console.log(`【${targetYear}】每月产线构成及产量:`, response2);
-
-                    // 构造每月的产线映射
-                    for (let entry of response2) {
-                        if (entry.month && entry.lineName) {
-                            monthLineMap[entry.month] = entry.lineName.split(',').map(l => l.trim());
-                        }
-                    }
 
                 } catch (err) {
                     console.error(`获取 ${targetYear} 年径类下的分类或产线构成失败：`, err);
@@ -1027,9 +1019,10 @@
                         for (let a of amountRes) {
                             const m = a.month;
                             const line = a.category;  // 用 category 字段代替 lineName
-                            const monthLines = monthLineMap[m] || [];
 
-                            if (!line || !monthLines.includes(line)) {
+                            // result.title 来自当前径类的历史 line_data。
+                            // 金额按实际领出月份归集，不再要求该工程当月必须有产量记录。
+                            if (!line || line !== result.title) {
                                 continue;
                             }
 
