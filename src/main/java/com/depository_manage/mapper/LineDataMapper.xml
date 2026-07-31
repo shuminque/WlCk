@@ -43,6 +43,9 @@
         <if test="model != null">
             AND l.model = #{model} <!-- 添加 model 的条件查询 -->
         </if>
+        <if test="diameter != null and diameter != ''">
+            AND l.diameter = #{diameter}
+        </if>
     </select>
 
     <select id="findLineDataByDate" resultMap="lineDataMap" parameterType="date">
@@ -143,6 +146,9 @@
         </if>
         <if test="craft != null">
             AND l.craft = #{craft} <!-- 添加 craft 的条件查询 -->
+        </if>
+        <if test="diameter != null and diameter != ''">
+            AND l.diameter = #{diameter}
         </if>
     </select>
 

@@ -24,6 +24,13 @@
               </div>
             </div>
 
+            <div class="layui-inline" style="display: none;">
+              <label class="layui-form-label">分类</label>
+              <div class="layui-input-block">
+                <input type="text" name="diameter" placeholder="请输入分类，如 IKO" autocomplete="off" class="layui-input">
+              </div>
+            </div>
+
             <div class="layui-inline">
               <button type="submit" class="layui-btn layui-btn-primary" lay-submit lay-filter="data-search-btn">
                 <i class="layui-icon"></i> 搜 索
@@ -335,6 +342,9 @@
         req.startDate = startDate.toISOString().split('T')[0];
         var endDate = new Date(year, month, 0);
         req.endDate = endDate.toISOString().split('T')[0];
+      }
+      if (data.diameter && data.diameter.trim() !== '') {
+        req.diameter = data.diameter.trim();
       }
       table.reload('currentTableId', {
         url: "/lineData",
