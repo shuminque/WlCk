@@ -1019,6 +1019,7 @@
                 });
 
                 const allAmountResults = await Promise.all(requests);
+                const requiresMonthlyProduction = ['单玉小径', '单玉中径'].includes(diameter);
 
                 // 聚合每个分类的金额
                 for (let result of allAmountResults) {
@@ -1031,9 +1032,10 @@
                             const hasMonthlyProduction = (monthlyProductionMap[m] || 0) > 0;
                             const validLine = hasMonthlyProduction
                                 ? (monthLineMap[m] || []).includes(line)
-                                : line === result.title;
+                                : !requiresMonthlyProduction && line === result.title;
 
-                            // 有产量时按当月 lineName 归集；产量为 0 时才回退到历史径类归属。
+                            // 有产量时按当月 lineName 归集；其他径类产量为 0 时才回退到历史归属。
+                            // 单玉小径、单玉中径必须等当月产量导入后才显示金额。
                             if (!line || !validLine) {
                                 continue;
                             }
