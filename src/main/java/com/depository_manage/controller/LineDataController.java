@@ -228,5 +228,12 @@ public class LineDataController {
         return lineDataService.selectMonthlyLinesByDiameter(year, diameter);
     }
 
+    @GetMapping("/diameterLineProductionMonths")
+    public List<LineData> getLineProductionMonths(
+            @RequestParam int startYear,
+            @RequestParam String diameter) {
+        return lineDataService.selectMonthlyLineProductionsFromYear(startYear, diameter);
+    }
+
 
 }

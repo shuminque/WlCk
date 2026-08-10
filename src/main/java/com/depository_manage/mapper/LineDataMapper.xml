@@ -249,4 +249,24 @@
             month
     </select>
 
+    <select id="selectMonthlyLineProductionsFromYear" resultType="com.depository_manage.entity.LineData">
+        SELECT
+            DATE_FORMAT(date, '%Y-%m') AS month,
+            lineName,
+            SUM(production) AS production
+        FROM
+            line_data
+        WHERE
+            YEAR(date) &gt;= #{startYear}
+          AND diameter = #{diameter}
+        GROUP BY
+            DATE_FORMAT(date, '%Y-%m'),
+            lineName
+        HAVING
+            SUM(production) &gt; 0
+        ORDER BY
+            month,
+            lineName
+    </select>
+
 </mapper>

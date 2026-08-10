@@ -36,4 +36,6 @@ public interface LineDataService {
     List<String> findCategoryTitlesByDiameter(String diameter);
 
     List<LineData> selectMonthlyLinesByDiameter(int year, String diameter);
+
+    List<LineData> selectMonthlyLineProductionsFromYear(int startYear, String diameter);
 }

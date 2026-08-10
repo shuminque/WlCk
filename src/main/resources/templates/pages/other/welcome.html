@@ -829,7 +829,7 @@
             // }
             async function fetchYearlyData(targetYear) {
                 let categoryTitles = [];
-                let monthLineMap = {}; // 用于存储每月实际参与生产的产线列表
+                let lineProductionMonthMap = {}; // 每条产线从目标年份开始出现正产量的月份
                 let response2;
 
                 try {
@@ -840,16 +840,26 @@
                         year: targetYear,
                         diameter: diameter
                     });
+                    const lineProductionResponse = diameter
+                        ? await $.get('/lineData/diameterLineProductionMonths', {
+                            startYear: targetYear,
+                            diameter: diameter
+                        })
+                        : [];
 
                     categoryTitles = response || [];
 
                     console.log(`【${targetYear}】包含的分类:`, categoryTitles);
                     console.log(`【${targetYear}】每月产线构成及产量:`, response2);
+                    console.log(`【${targetYear}】各产线后续正产量月份:`, lineProductionResponse);
 
-                    // 保留原有的当月产线映射；有产量的月份仍按这份名单归集金额。
-                    for (let entry of (response2 || [])) {
-                        if (entry.month && entry.lineName) {
-                            monthLineMap[entry.month] = entry.lineName.split(',').map(line => line.trim());
+                    for (let entry of (lineProductionResponse || [])) {
+                        const line = (entry.lineName || '').trim();
+                        if (line && entry.month && Number(entry.production) > 0) {
+                            if (!lineProductionMonthMap[line]) {
+                                lineProductionMonthMap[line] = [];
+                            }
+                            lineProductionMonthMap[line].push(entry.month);
                         }
                     }
 
@@ -860,6 +870,8 @@
                 // 初始化每月数据
                 let monthlyProductionMap = {}; // 月产量
                 let monthlyAmountMap = {};     // 月金额
+                let futureAmountMap = {};      // 结转到目标年份之后的金额
+                let unallocatedAmountMap = {}; // 尚未找到后续产量月份的金额
                 const months = [...Array(12).keys()].map(i => `${targetYear}-${String(i + 1).padStart(2, '0')}`);
 
                 for (let m of months) {
@@ -998,7 +1010,9 @@
                         return {
                             year: targetYear,
                             monthlyProductionMap: monthlyProductionMap,
-                            monthlyAmountMap: monthlyAmountMap
+                            monthlyAmountMap: monthlyAmountMap,
+                            futureAmountMap: futureAmountMap,
+                            unallocatedAmountMap: unallocatedAmountMap
                         };
                     } catch (err) {
                         console.error(`【${targetYear}】【生研完成品】专用逻辑处理失败，回退默认逻辑：`, err);
@@ -1019,46 +1033,61 @@
                 });
 
                 const allAmountResults = await Promise.all(requests);
-                const requiresMonthlyProduction = ['单玉小径', '单玉中径'].includes(diameter);
 
-                // 聚合每个分类的金额
+                // 每笔金额归集到同一产线下一次出现正产量的月份。
                 for (let result of allAmountResults) {
                     const amountRes = result.data;
                     if (Array.isArray(amountRes)) {
                         for (let a of amountRes) {
                             const m = a.month;
-                            const line = a.category;  // 用 category 字段代替 lineName
+                            const line = (a.category || result.title || '').trim();
+                            const title = (result.title || '').trim();
+                            const amount = Number(a.amount) || 0;
 
-                            const hasMonthlyProduction = (monthlyProductionMap[m] || 0) > 0;
-                            const validLine = hasMonthlyProduction
-                                ? (monthLineMap[m] || []).includes(line)
-                                : !requiresMonthlyProduction && line === result.title;
-
-                            // 有产量时按当月 lineName 归集；其他径类产量为 0 时才回退到历史归属。
-                            // 单玉小径、单玉中径必须等当月产量导入后才显示金额。
-                            if (!line || !validLine) {
+                            if (!m || !line || line !== title || amount === 0) {
                                 continue;
                             }
 
-                            if (m && monthlyAmountMap.hasOwnProperty(m)) {
-                                monthlyAmountMap[m] += a.amount || 0;
+                            const targetMonth = (lineProductionMonthMap[line] || [])
+                                .find(productionMonth => productionMonth >= m);
+
+                            if (!targetMonth) {
+                                unallocatedAmountMap[m] = (unallocatedAmountMap[m] || 0) + amount;
+                                continue;
+                            }
+
+                            if (monthlyAmountMap.hasOwnProperty(targetMonth)) {
+                                monthlyAmountMap[targetMonth] += amount;
+                            } else {
+                                futureAmountMap[targetMonth] = (futureAmountMap[targetMonth] || 0) + amount;
                             }
                         }
                     }
                 }
 
                 console.log(`【${targetYear}】各月产量：`, monthlyProductionMap);
-                console.log(`【${targetYear}】各月金额：`, monthlyAmountMap);
+                console.log(`【${targetYear}】成本归集金额：`, monthlyAmountMap);
+                console.log(`【${targetYear}】跨年结转金额：`, futureAmountMap);
+                console.log(`【${targetYear}】尚未找到后续产量的金额：`, unallocatedAmountMap);
 
                 return {
                     year: targetYear,
                     monthlyProductionMap: monthlyProductionMap,
-                    monthlyAmountMap: monthlyAmountMap
+                    monthlyAmountMap: monthlyAmountMap,
+                    futureAmountMap: futureAmountMap,
+                    unallocatedAmountMap: unallocatedAmountMap
                 };
             }
 
-            const currentYearData = await fetchYearlyData(year);
             const lastYearData = await fetchYearlyData(year - 1);
+            const currentYearData = await fetchYearlyData(year);
+
+            // 将上一年度尚未遇到产量、并在本年度找到产量月份的金额带入本年。
+            Object.entries(lastYearData.futureAmountMap || {}).forEach(([month, amount]) => {
+                if (currentYearData.monthlyAmountMap.hasOwnProperty(month)) {
+                    currentYearData.monthlyAmountMap[month] += Number(amount) || 0;
+                }
+            });
             // 1. 获取月份列表并排序（假设 key 都是类似 '2025-01' 的格式）
                 const monthKeys = Object.keys(currentYearData.monthlyProductionMap).sort();
             const monthKeysLastYear = [...Array(12).keys()].map(i => `${year - 1}-${String(i + 1).padStart(2, '0')}`);

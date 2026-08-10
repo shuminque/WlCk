@@ -46,4 +46,7 @@ public interface LineDataMapper {
 
     List<LineData> selectMonthlyLinesByDiameter(@Param("year") int year, @Param("diameter") String diameter);
 
+    List<LineData> selectMonthlyLineProductionsFromYear(@Param("startYear") int startYear,
+                                                        @Param("diameter") String diameter);
+
 }
