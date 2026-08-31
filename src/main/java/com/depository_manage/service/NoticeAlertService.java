@@ -15,6 +15,9 @@ public interface NoticeAlertService {
     // 插入新的预警记录
     int insert(NoticeAlert noticeAlert);
 
+    // 查询指定 AT 号已有的预警记录数量
+    int countByAtId(Integer atId);
+
     // 更新预警记录
     int update(NoticeAlert noticeAlert);
 

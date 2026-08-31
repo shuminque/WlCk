@@ -193,28 +193,56 @@
         // 提交添加表单
         form.on('submit(submitAddForm)', function(data) {
             var formData = data.field;
+
             $.ajax({
-                url: '/noticeAlerts/', // 添加预警记录的接口
-                type: 'POST',
-                contentType: 'application/json',
-                data: JSON.stringify(formData),
-                success: function(response) {
-                    layer.msg('添加成功！', {icon: 1, time: 2000}, function () {
-                        table.reload('noticeAlertTable');
-                    });
+                url: '/noticeAlerts/',
+                type: 'GET',
+                data: {atId: formData.atId},
+                success: function(existingAlerts) {
+                    if (existingAlerts && existingAlerts.length > 0) {
+                        var quantities = existingAlerts.map(function(alert) {
+                            return alert.alertQuantity;
+                        }).join('、');
+                        var duplicateTip = 'AT号' + formData.atId + '已有' + existingAlerts.length
+                            + '条预警记录（预警数量：' + quantities
+                            + '），请直接编辑已有记录，不可重复添加。';
+                        layer.alert(duplicateTip, {icon: 0, title: '已存在预警配置'});
+                        return;
+                    }
+
+                    createNoticeAlert(formData);
                 },
-                error: function(xhr, status, error) {
-                    layer.msg('添加失败！', {icon: 2, time: 2000});
-                },
-                complete: function () {
-                    form.val("addForm", {
-                        'atId': "",
-                        'alertQuantity': ""
-                    })
+                error: function() {
+                    layer.msg('无法校验该AT号是否已有预警记录，请稍后重试。', {icon: 2, time: 2500});
                 }
             });
             return false;
         });
+
+        function createNoticeAlert(formData) {
+            $.ajax({
+                url: '/noticeAlerts/',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(formData),
+                success: function() {
+                    layer.msg('添加成功！', {icon: 1, time: 2000}, function () {
+                        table.reload('noticeAlertTable');
+                        form.val("addForm", {
+                            'atId': "",
+                            'alertQuantity': ""
+                        });
+                    });
+                },
+                error: function(xhr) {
+                    var response = xhr.responseJSON || {};
+                    layer.alert(response.message || '添加失败，请稍后重试。', {
+                        icon: 2,
+                        title: '添加预警失败'
+                    });
+                }
+            });
+        }
 
         // 编辑和删除操作
         table.on('tool(noticeAlertTableFilter)', function(obj) {

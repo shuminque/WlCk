@@ -39,6 +39,13 @@
             LIMIT 1
     </insert>
 
+    <!-- 查询指定 AT 号已有的预警记录数量，新增前用于防止重复配置 -->
+    <select id="countByAtId" parameterType="int" resultType="int">
+        SELECT COUNT(*)
+        FROM notice_alerts
+        WHERE at_id = #{atId}
+    </select>
+
     <!-- 更新预警记录 -->
     <update id="update" parameterType="com.depository_manage.entity.NoticeAlert">
         UPDATE notice_alerts

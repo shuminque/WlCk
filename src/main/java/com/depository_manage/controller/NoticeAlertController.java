@@ -12,6 +12,7 @@ import com.depository_manage.service.NoticeAlertService;
 import com.depository_manage.service.NoticeService;
 import org.apache.poi.ss.usermodel.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -56,9 +57,25 @@ public class NoticeAlertController {
 
     // 插入新的预警记录
     @PostMapping("/")
-    public ResponseEntity<Void> create(@RequestBody NoticeAlert noticeAlert) {
-        noticeAlertService.insert(noticeAlert);
-        return ResponseEntity.ok().build();
+    public ResponseEntity<?> create(@RequestBody NoticeAlert noticeAlert) {
+        if (noticeAlert.getAtId() == null) {
+            return ResponseEntity.badRequest().body(new RestResponse(false, "AT号不能为空"));
+        }
+
+        int existingCount = noticeAlertService.countByAtId(noticeAlert.getAtId());
+        if (existingCount > 0) {
+            String message = "AT号" + noticeAlert.getAtId() + "已存在" + existingCount
+                    + "条预警记录，请直接编辑已有记录，不可重复添加";
+            return ResponseEntity.status(HttpStatus.CONFLICT)
+                    .body(new RestResponse(false, message));
+        }
+
+        int inserted = noticeAlertService.insert(noticeAlert);
+        if (inserted != 1) {
+            return ResponseEntity.unprocessableEntity()
+                    .body(new RestResponse(false, "未找到仓库2中对应的物料，无法添加预警"));
+        }
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
     @PostMapping("/import")
     public RestResponse importNoticeAlerts(@RequestParam("file") MultipartFile file) {

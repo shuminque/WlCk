@@ -31,6 +31,11 @@ public class NoticeAlertServiceImpl implements NoticeAlertService {
     }
 
     @Override
+    public int countByAtId(Integer atId) {
+        return noticeAlertMapper.countByAtId(atId);
+    }
+
+    @Override
     public int update(NoticeAlert noticeAlert) {
         return noticeAlertMapper.update(noticeAlert);
     }
