@@ -395,7 +395,12 @@ public class DepositoryRecordController {
     }
 
     @PostMapping("/depository/updateCheckRemark")
-    public ResponseEntity<?> updateCheckRemark(@RequestBody Map<String, Object> map) {
+    public ResponseEntity<?> updateCheckRemark(@RequestBody Map<String, Object> map,
+                                               HttpServletRequest request) {
+        if (!isSystemAdministrator(request)) {
+            return forbiddenSupplierUpdateResponse();
+        }
+
         Integer id = map.get("id") != null ? Integer.valueOf(map.get("id").toString()) : null;
         String checkRemark = map.get("checkRemark") != null ? map.get("checkRemark").toString().trim() : null;
         Integer atId = map.get("atId") != null ? Integer.valueOf(map.get("atId").toString()) : null;
@@ -417,10 +422,24 @@ public class DepositoryRecordController {
             result.put("message", "供应商更新成功");
             return ResponseEntity.ok(result);
         } else {
-            result.put("status", 500);
-            result.put("message", "供应商更新失败");
-            return ResponseEntity.status(500).body(result);
+            result.put("status", HttpStatus.CONFLICT.value());
+            result.put("message", "该记录已生成入库单号，不能修改供应商");
+            return ResponseEntity.ok(result);
         }
+    }
+
+    private boolean isSystemAdministrator(HttpServletRequest request) {
+        UserToken userToken = (UserToken) request.getAttribute("userToken");
+        return userToken != null
+                && userToken.getUser() != null
+                && "系统管理员".equals(userToken.getUser().getAuthority());
+    }
+
+    private ResponseEntity<Map<String, Object>> forbiddenSupplierUpdateResponse() {
+        Map<String, Object> error = new HashMap<>();
+        error.put("status", HttpStatus.FORBIDDEN.value());
+        error.put("message", "仅系统管理员可修改供应商");
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(error);
     }
 
     @PostMapping("/depository/batchUpdateReviewRemark")

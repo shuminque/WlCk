@@ -2183,6 +2183,7 @@ UNION ALL
         UPDATE depository_record
         SET check_remark = #{checkRemark}
         WHERE id = #{id}
+          AND (review_remark IS NULL OR review_remark = '')
     </update>
     <update id="updateCheckRemarkForGroup">
         UPDATE depository_record

@@ -332,14 +332,18 @@
                             minWidth: 200,
                             align: "center",
                             templet: function (row) {
-                                // 如果该行已有入库单号，隐藏操作按钮
+                                const canUpdateSupplier = userAuthority === '系统管理员';
+
+                                // 已生成入库单号即表示已开票归档，不再允许任何操作。
                                 if (row.reviewRemark) {
-                                    return ''; // 不渲染任何按钮
+                                    return '';
                                 }
                                 let buttons = '';
                                 buttons += '<a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="edit">设为已核对</a>';
                                 buttons += '<a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="clear">清空结算</a>';
-                                buttons += '<a class="layui-btn layui-btn-warm  layui-btn-  xs" lay-event="update">修改供应商</a>';
+                                if (canUpdateSupplier) {
+                                    buttons += '<a class="layui-btn layui-btn-warm layui-btn-xs" lay-event="update">修改供应商</a>';
+                                }
                                 return buttons;
                             }
                         }
@@ -680,6 +684,10 @@
                 }
             }
             else if (obj.event === 'update') {
+                if (userAuthority !== '系统管理员') {
+                    layer.msg('仅系统管理员可修改供应商');
+                    return;
+                }
                 layer.open({
                     type: 1,
                     title: '修改供应商',
